@@ -419,7 +419,7 @@ contains
                 case ("LJ")
                     allocate(Lennard_Jones_Expression :: expression)
                 case default
-                    call error_exit(potential_name//" unknown potential_name."//&
+                    call error_exit(potential_name//" unknown potential_name. "//&
                         "Choose between: 'null' and LJ.")
             end select
         else
@@ -432,13 +432,11 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        real(DP) :: LJ_epsilon, LJ_sigma
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP) :: LJ_epsilon, LJ_sigma
 
         select type(expression)
-            type is (Null_Potential_Expression)
-                call expression%set()
             type is (Lennard_Jones_Expression)
                 data_field = prefix//"epsilon"
                 call input_data%get(data_field, LJ_epsilon, data_found)
@@ -447,6 +445,7 @@ contains
                 call input_data%get(data_field, LJ_sigma, data_found)
                 call check_data_found(data_field, data_found)
                 call expression%set(LJ_epsilon, LJ_sigma)
+            type is (Null_Potential_Expression)
             class default
                 call error_exit("expression type unknown.")
         end select

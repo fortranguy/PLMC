@@ -4,28 +4,26 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box, &
-    XYZ_Periodic_Box, XY_Periodic_Box
-use class_temperature, only: Abstract_Temperature, &
-    Concrete_Temperature
-use class_field_expression, only: Abstract_Field_Expression, &
-    Constant_Field_Expression, Null_Field_Expression
+use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use class_temperature, only: Abstract_Temperature, Concrete_Temperature
+use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
+    Null_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
     Concrete_Parallelepiped_Domain, Concrete_Box_Domain, Null_Parallelepiped_Domain
-use class_external_field, only: Abstract_External_Field, &
-    Concrete_External_Field, Null_External_Field
+use class_external_field, only: Abstract_External_Field, Concrete_External_Field, &
+    Null_External_Field
 use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity, Null_Permittivity
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
-    Concrete_Reciprocal_Lattice, Null_Reciprocal_Lattice
-use class_floor_penetration, only: Abstract_Floor_Penetration, &
-    Flat_Floor_Penetration, Null_Floor_Penetration
+use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice, &
+    Null_Reciprocal_Lattice
+use class_floor_penetration, only: Abstract_Floor_Penetration, Flat_Floor_Penetration, &
+    Centered_Block_Penetration, Null_Floor_Penetration
 use procedures_component_factory, only: component_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use procedures_short_interactions_factory, only: short_interactions_create, &
     short_interactions_destroy
-use class_walls_potential, only: Abstract_Walls_Potential, &
-    Concrete_Walls_Potential, Null_Walls_Potential
+use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential, &
+    Null_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
     apply_external_field, use_permittivity, use_reciprocal_lattice, use_walls
@@ -115,10 +113,10 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
         character(len=:), allocatable :: box_periodicity
         real(DP), allocatable :: box_size(:)
+        character(len=:), allocatable :: data_field
+        logical :: data_found
 
         data_field = prefix//"Box.periodicity"
         call input_data%get(data_field, box_periodicity, data_found)
@@ -149,9 +147,9 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        real(DP) :: temperature_value
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP) :: temperature_value
 
         data_field = prefix//"Thermostat.temperature"
         call input_data%get(data_field, temperature_value, data_found)
@@ -182,8 +180,9 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field, field_name
+        character(len=:), allocatable :: field_name, data_field
         logical :: data_found
+
         if (field_applied) then
             data_field = prefix//"External Field.name"
             call input_data%get(data_field, field_name, data_found)
@@ -204,9 +203,9 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        real(DP), allocatable :: field_vector(:)
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP), allocatable :: field_vector(:)
 
         select type (field_expression)
             type is (Null_Field_Expression)
@@ -217,6 +216,8 @@ contains
                 call check_data_found(data_field, data_found)
                 call field_expression%set(field_vector)
                 deallocate(field_vector)
+            class default
+                call error_exit("field_expression type unknown.")
         end select
     end subroutine set_field_expression
 
@@ -234,10 +235,9 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        character(len=:), allocatable :: domain_name
+        character(len=:), allocatable :: domain_name, data_field
         real(DP), allocatable :: domain_origin(:), domain_size(:)
+        logical :: data_found
 
         if (needed) then
             data_field = prefix//"Parallelepiped Domain.name"
@@ -255,7 +255,7 @@ contains
                 case ("box")
                     allocate(Concrete_Box_Domain :: parallelepiped_domain)
                 case default
-                    call error_exit(domain_name//" domain_name unknown."//&
+                    call error_exit(domain_name//" domain_name unknown. "//&
                         "Choose between 'domain' and 'box'.")
             end select
         else
@@ -313,7 +313,7 @@ contains
             allocate(Null_Permittivity :: permittivity)
         end if
         call permittivity%set(permittivity_value)
-    end subroutine
+    end subroutine create_permittivity
 
     subroutine destroy_permittivity(permittivity)
         class(Abstract_Permittivity), allocatable, intent(inout) :: permittivity
@@ -321,7 +321,7 @@ contains
         if (allocated(permittivity)) then
             deallocate(permittivity)
         end if
-    end subroutine
+    end subroutine destroy_permittivity
 
     subroutine create_reciprocal_lattice(reciprocal_lattice, periodic_box, input_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
@@ -358,9 +358,18 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
+        call allocate_floor_penetration(floor_penetration, walls_used, input_data, prefix)
+        call set_floor_penetration(floor_penetration, input_data, prefix)
+    end subroutine create_floor_penetration
+
+    subroutine allocate_floor_penetration(floor_penetration, walls_used, input_data, prefix)
+        class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
+        logical, intent(in) :: walls_used
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: walls_name, data_field
         logical :: data_found
-        character(len=:), allocatable :: walls_name
 
         if (walls_used) then
             data_field = prefix//"Walls.name"
@@ -369,14 +378,42 @@ contains
             select case(walls_name)
                 case ("flat")
                     allocate(Flat_Floor_Penetration :: floor_penetration)
+                case ("block")
+                    allocate(Centered_Block_Penetration :: floor_penetration)
                 case default
-                    call error_exit(walls_name//" walls_name unknown. Choose: 'flat'.")
+                    call error_exit(walls_name//" walls_name unknown. "//&
+                        "Choose between 'flat' and 'block'.")
             end select
         else
             allocate(Null_Floor_Penetration :: floor_penetration)
         end if
-        !call floor_penetration%construct... if needed
-    end subroutine create_floor_penetration
+    end subroutine allocate_floor_penetration
+
+    subroutine set_floor_penetration(floor_penetration, input_data, prefix)
+        class(Abstract_Floor_Penetration), intent(inout) :: floor_penetration
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        real(DP), allocatable :: block_size(:)
+        real(DP) ::block_radius
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        select type (floor_penetration)
+            type is (Flat_Floor_Penetration)
+            type is (Centered_Block_Penetration)
+                data_field = prefix//"Walls.size"
+                call input_data%get(data_field, block_size, data_found)
+                call check_data_found(data_field, data_found)
+                data_field = prefix//"Walls.radius"
+                call input_data%get(data_field, block_radius, data_found)
+                call check_data_found(data_field, data_found)
+                call floor_penetration%set(block_size, block_radius)
+            type is (Null_Floor_Penetration)
+            class default
+                call error_exit("floor_penetration type unknown.")
+        end select
+    end subroutine set_floor_penetration
 
     subroutine destroy_floor_penetration(floor_penetration)
         class(Abstract_Floor_Penetration), allocatable, intent(inout) :: floor_penetration

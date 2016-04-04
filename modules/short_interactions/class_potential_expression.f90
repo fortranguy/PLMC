@@ -25,7 +25,6 @@ private
 
     type, extends(Abstract_Potential_Expression), public :: Null_Potential_Expression
     contains
-        procedure :: set => Null_set
         procedure :: get => Null_get
     end type Null_Potential_Expression
 
@@ -63,10 +62,6 @@ contains
 !end implementation Lennard_Jones_Expression
 
 !implementation Null_Potential_Expression
-
-    subroutine Null_set(this)
-        class(Null_Potential_Expression), intent(inout) :: this
-    end subroutine Null_set
 
     !> \[ u(r) = 0 \]
     pure real(DP) function Null_get(this, distance) result(expression)

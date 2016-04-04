@@ -57,6 +57,9 @@ contains
             call error_exit("Abstract_Walls_Potential: gap is too big.")
         end if
         this%gap = gap
+        if (2._DP * floor_penetration%get_min_depth() > this%gap) then
+            call error_exit("Abstract_Walls_Potential: floor_penetration's min_depth is too big.")
+        end if
         allocate(this%floor_penetration, source = floor_penetration)
     end subroutine Abstract_construct
 

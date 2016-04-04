@@ -117,28 +117,33 @@ contains
         real(DP), intent(out) :: shortest_vector_from_floor(num_dimensions)
         real(DP), intent(in) :: position_from_floor(num_dimensions)
 
-        real(DP) :: position_13(2)
+        real(DP), dimension(2) :: shortest_vector, position_13
 
-        position_13 = [position_from_floor(1), position_from_floor(3)]
+        if (0._DP < position_from_floor(1)) then
+            position_13 = [+position_from_floor(1), position_from_floor(3)]
+        else
+            position_13 = [-position_from_floor(1), position_from_floor(3)]
+        end if
+
         if (all(this%upper_out < position_13)) then !
-            call set_from_corner(shortest_vector_from_floor, this%upper_out, this%radius, &
-                position_13)
+            call set_from_corner(shortest_vector, this%upper_out, this%radius, position_13)
         else if (all(position_13 < this%lower_in)) then
-            call set_from_corner(shortest_vector_from_floor, this%lower_in, this%radius, &
-                position_13)
+            call set_from_corner(shortest_vector, this%lower_in, this%radius, position_13)
         else if (position_13(2) < this%size(2)/2._DP) then
             !> Frame: (0, \vec{e}_x, \vec{e}_z)
-            call set_from_wall(shortest_vector_from_floor, this%lower_out, position_13)
+            call set_from_wall(shortest_vector, this%lower_out, position_13)
         else
             !> Frame: (0^\prime, -\vec{e}_x, -\vec{e}_z)
-            call set_from_wall(shortest_vector_from_floor, -this%upper_in, -position_13)
-            shortest_vector_from_floor = -shortest_vector_from_floor
+            call set_from_wall(shortest_vector, -this%upper_in, -position_13)
+            shortest_vector = -shortest_vector
         end if
-        if (any(shortest_vector_from_floor < 0._DP )) then
+
+        if (any(shortest_vector < 0._DP )) then
             overlap = .true.
         else
             overlap = .false.
         end if
+        shortest_vector_from_floor = [shortest_vector(1), 0._DP, shortest_vector(2)]
     end subroutine Block_meet
 
 !implementation Centered_Block_Penetration
