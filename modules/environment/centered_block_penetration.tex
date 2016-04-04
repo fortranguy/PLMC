@@ -29,7 +29,7 @@
             --++ (\sizeX/2-\cornerRadius, 0);
 
         \draw[dashed] (\sizeX/2-\cornerRadius, \sizeZ) --++ (0, -\cornerRadius)
-            node[below left] {$U_\text{o}$}
+            node[left] {$U_\text{o}$}
             -- node[below] {$r$} ++ (\cornerRadius, 0);
         \draw[dashed] (\sizeX/2-\cornerRadius, \sizeZ) --++ (\cornerRadius, 0)
             node[above right] {$U_\text{i}$}
@@ -38,8 +38,11 @@
             node[below left] {$L_\text{o}$}
             --++ (\cornerRadius, 0);
         \draw[dashed] (\sizeX/2, \cornerRadius) --++ (\cornerRadius, 0)
-            node[above right] {$L_\text{i}$}
+            node[below left] {$L_\text{i}$}
             --++ (0, -\cornerRadius);
+
+        \draw [->] (0, \sizeZ/2) -- node[below]{$x/2$} ++ (\sizeX/2, 0);
+        \draw [<->] (\sizeX/2 + \cornerRadius + \sizeX/8, 0) -- node[left] {$z$} ++ (0, \sizeZ);
     \end{tikzpicture}
 
 \end{document}
