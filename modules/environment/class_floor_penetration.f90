@@ -3,6 +3,7 @@ module class_floor_penetration
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_checks, only: check_array_size, check_positive
+use procedures_centered_block_micro, only: set_from_corner, set_from_wall
 
 implicit none
 
@@ -38,11 +39,16 @@ private
         procedure :: meet => Flat_meet
     end type Flat_Floor_Penetration
 
+    !> This is a flat floor with a rounded block at the center, cf.
+    !> modules/environment/centered_block_penetration.tex which shows the right half.
+    !> When using [[Block_meet]], if a position is in a blue area,
+    !> shortestVectorFromFloor's origin will be on a rounder corner. Otherwise (i.e. white area),
+    !> it will be on a flat portion.
     type, extends(Abstract_Floor_Penetration), public :: Centered_Block_Penetration
     private
         real(DP), dimension(2) :: size
-        real(DP) :: corner_radius
-        real(DP), dimension(2) :: lower_in, lower_out, upper_in, upper_out ! left centers
+        real(DP) :: radius
+        real(DP), dimension(2) :: lower_in, lower_out, upper_in, upper_out ! right centers
     contains
         procedure :: set => Block_set
         procedure :: get_min_depth => Block_get_min_depth
@@ -83,15 +89,20 @@ contains
 
 !implementation Centered_Block_Penetration
 
-    subroutine Block_set(this, size, corner_radius)
+    subroutine Block_set(this, size, radius)
         class(Centered_Block_Penetration), intent(out) :: this
-        real(DP), intent(in) :: size(:), corner_radius
+        real(DP), intent(in) :: size(:), radius
 
         call check_array_size("Centered_Block_Penetration: set", "size", size, 2)
         call check_positive("Centered_Block_Penetration: set", "size", size)
         this%size = size
-        call check_positive("Centered_Block_Penetration: set", "corner_radius", corner_radius)
-        this%corner_radius = corner_radius
+        call check_positive("Centered_Block_Penetration: set", "radius", radius)
+        this%radius = radius
+
+        this%upper_in = [this%size(1)/2._DP, this%size(2)]
+        this%upper_out = [this%size(1)/2._DP - this%radius, this%size(2) - this%radius]
+        this%lower_in  = [this%size(1)/2._DP + this%radius, this%radius]
+        this%lower_out = [this%size(1)/2._DP, 0._DP]
     end subroutine Block_set
 
     pure real(DP) function Block_get_min_depth(this) result(min_depth)
@@ -105,6 +116,29 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: shortest_vector_from_floor(num_dimensions)
         real(DP), intent(in) :: position_from_floor(num_dimensions)
+
+        real(DP) :: position_13(2)
+
+        position_13 = [position_from_floor(1), position_from_floor(3)]
+        if (all(this%upper_out < position_13)) then !
+            call set_from_corner(shortest_vector_from_floor, this%upper_out, this%radius, &
+                position_13)
+        else if (all(position_13 < this%lower_in)) then
+            call set_from_corner(shortest_vector_from_floor, this%lower_in, this%radius, &
+                position_13)
+        else if (position_13(2) < this%size(2)/2._DP) then
+            !> Frame: (0, \vec{e}_x, \vec{e}_z)
+            call set_from_wall(shortest_vector_from_floor, this%lower_out, position_13)
+        else
+            !> Frame: (0^\prime, -\vec{e}_x, -\vec{e}_z)
+            call set_from_wall(shortest_vector_from_floor, -this%upper_in, -position_13)
+            shortest_vector_from_floor = -shortest_vector_from_floor
+        end if
+        if (any(shortest_vector_from_floor < 0._DP )) then
+            overlap = .true.
+        else
+            overlap = .false.
+        end if
     end subroutine Block_meet
 
 !implementation Centered_Block_Penetration

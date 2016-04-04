@@ -192,7 +192,7 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/environment/class_floor_penetration.f90">
-			<Option weight="1" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/environment/class_parallelepiped_domain.f90">
 			<Option weight="3" />
@@ -214,6 +214,9 @@
 		</Unit>
 		<Unit filename="modules/environment/class_walls_potential_visitor.f90">
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_centered_block_micro.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_environment_factory.f90">
 			<Option weight="9" />
