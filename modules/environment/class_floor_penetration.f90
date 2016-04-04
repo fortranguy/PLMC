@@ -2,6 +2,7 @@ module class_floor_penetration
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
+use procedures_errors, only: error_exit
 use procedures_checks, only: check_array_size, check_positive
 use procedures_centered_block_micro, only: set_from_corner, set_from_wall
 
@@ -97,6 +98,12 @@ contains
         call check_positive("Centered_Block_Penetration: set", "size", size)
         this%size = size
         call check_positive("Centered_Block_Penetration: set", "radius", radius)
+        if (this%size(1) < 2.0_DP*radius) then
+            call error_exit("Centered_Block_Penetration: set: 2*radius > size_x.")
+        end if
+        if (this%size(2) < 2.0_DP*radius) then
+            call error_exit("Centered_Block_Penetration: set: 2*radius > size_z.")
+        end if
         this%radius = radius
 
         this%upper_in = [this%size(1)/2._DP, this%size(2)]
