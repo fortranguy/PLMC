@@ -3,7 +3,7 @@ module class_moved_positions
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_errors, only: warning_continue
-use procedures_checks, only: check_3d_array, check_positive, check_increase_factor
+use procedures_checks, only: check_array_size, check_positive, check_increase_factor
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use module_change_tuning, only: Concrete_Change_Tuning_Parameters, &
@@ -42,7 +42,7 @@ contains
 
         this%periodic_box => periodic_box
         this%positions => positions
-        call check_3d_array("Concrete_Moved_Positions", "delta", delta)
+        call check_array_size("Concrete_Moved_Positions", "delta", delta, num_dimensions)
         call check_positive("Concrete_Moved_Positions", "delta", delta)
         this%delta = delta
         call check_increase_factor("Concrete_Moved_Positions", "increase_factor", &

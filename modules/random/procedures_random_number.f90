@@ -2,7 +2,7 @@ module procedures_random_number
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use procedures_checks, only: check_positive, check_3d_array
+use procedures_checks, only: check_positive, check_array_size
 use procedures_normal_random_number, only: normal_random_number
 
 implicit none
@@ -43,7 +43,7 @@ contains
         real(DP) :: rotation(num_dimensions)
         real(DP) :: amplitude, rand
 
-        call check_3d_array("markov_orientation", "orientation", orientation)
+        call check_array_size("markov_orientation", "orientation", orientation, num_dimensions)
 
         call normal_random_number(rotation)
         rotation = rotation - dot_product(rotation, orientation) * orientation

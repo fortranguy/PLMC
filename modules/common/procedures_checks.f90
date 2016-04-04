@@ -10,13 +10,13 @@ implicit none
 
 private
 public :: check_file_exists, check_data_found, check_string_not_empty, &
-    check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor, &
+    check_in_range, check_array_size, check_positive, check_norm, check_increase_factor, &
     check_potential_domain, check_ratio
 
-interface check_3d_array
-    module procedure :: check_integer_3d_array
-    module procedure :: check_real_3d_array
-end interface check_3d_array
+interface check_array_size
+    module procedure :: check_integer_array_size
+    module procedure :: check_real_array_size
+end interface check_array_size
 
 interface check_positive
     module procedure :: check_positive_integer_scalar
@@ -74,27 +74,28 @@ contains
         end if
     end subroutine check_in_range
 
-!implementation check_3d_array
+!implementation check_array_size
 
-    subroutine check_integer_3d_array(context, integer_name, integer_array)
+    subroutine check_integer_array_size(context, integer_name, integer_array, num_size)
         character(len=*), intent(in) :: context, integer_name
-        integer, intent(in) :: integer_array(:)
+        integer, intent(in) :: integer_array(:), num_size
 
-        if (size(integer_array) /= num_dimensions) then
+        if (size(integer_array) /= num_size) then
             call error_exit(context//": "//integer_name//" has wrong number of dimensions (size).")
         end if
-    end subroutine check_integer_3d_array
+    end subroutine check_integer_array_size
 
-    subroutine check_real_3d_array(context, real_name, real_array)
+    subroutine check_real_array_size(context, real_name, real_array, num_size)
         character(len=*), intent(in) :: context, real_name
         real(DP), intent(in) :: real_array(:)
+        integer, intent(in) :: num_size
 
-        if (size(real_array) /= num_dimensions) then
+        if (size(real_array) /= num_size) then
             call error_exit(context//": "//real_name//" has wrong number of dimensions (size).")
         end if
-    end subroutine check_real_3d_array
+    end subroutine check_real_array_size
 
-!end implementation check_3d_array
+!end implementation check_array_size
 
 !implementation check_positive
 

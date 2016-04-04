@@ -2,7 +2,7 @@ module class_mixture_total_moment
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use procedures_checks, only: check_3d_array
+use procedures_checks, only: check_array_size
 use types_component_wrapper, only: Component_Wrapper
 
 implicit none
@@ -96,7 +96,8 @@ contains
 
         if (.not.this%are_dipolar(i_component)) return
 
-        call check_3d_array("Abstract_Mixture_Total_Moment: add", "dipolar_moment", dipolar_moment)
+        call check_array_size("Abstract_Mixture_Total_Moment: add", "dipolar_moment", &
+            dipolar_moment, num_dimensions)
         this%total_moment = this%total_moment + dipolar_moment
     end subroutine Abstract_add
 
@@ -107,8 +108,8 @@ contains
 
         if (.not.this%are_dipolar(i_component)) return
 
-        call check_3d_array("Abstract_Mixture_Total_Moment: remove", "dipolar_moment", &
-            dipolar_moment)
+        call check_array_size("Abstract_Mixture_Total_Moment: remove", "dipolar_moment", &
+            dipolar_moment, num_dimensions)
         this%total_moment = this%total_moment - dipolar_moment
     end subroutine Abstract_remove
 

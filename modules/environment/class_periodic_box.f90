@@ -3,7 +3,7 @@ module class_periodic_box
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
 use procedures_errors, only: warning_continue
-use procedures_checks, only: check_3d_array, check_positive
+use procedures_checks, only: check_array_size, check_positive
 
 implicit none
 
@@ -57,7 +57,7 @@ contains
         class(Abstract_Periodic_Box), intent(out) :: this
         real(DP), intent(in) :: size(:)
 
-        call check_3d_array("Abstract_Periodic_Box", "size", size)
+        call check_array_size("Abstract_Periodic_Box", "size", size, num_dimensions)
         call check_positive("Abstract_Periodic_Box", "size", size)
         call this%check(size)
         this%size = size
