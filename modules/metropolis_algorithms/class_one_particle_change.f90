@@ -12,7 +12,7 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_move, &
     dipoles_field_visit_rotation
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
-use types_temporary_observables, only: Concrete_Delta_Energies
+use types_temporary_observables, only: Concrete_Single_Delta_Energies
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
@@ -201,7 +201,7 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        type(Concrete_Delta_Energies) :: deltas
+        type(Concrete_Single_Delta_Energies) :: deltas
         integer :: i_actor
 
         i_actor = this%selector%get()
@@ -223,7 +223,7 @@ contains
     subroutine Abstract_test_metropolis(this, success, deltas, i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Delta_Energies), intent(inout) :: deltas
+        type(Concrete_Single_Delta_Energies), intent(inout) :: deltas
         integer, intent(in) :: i_actor
 
         type(Concrete_Temporary_Particle) :: new, old
@@ -502,7 +502,7 @@ contains
     subroutine Null_test_metropolis(this, success, deltas, i_actor)
         class(Null_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Delta_Energies), intent(inout) :: deltas
+        type(Concrete_Single_Delta_Energies), intent(inout) :: deltas
         integer, intent(in) :: i_actor
         success = .false.
         deltas%field = 0._DP; deltas%walls = 0._DP; deltas%short = 0._DP; deltas%dipolar = 0._DP

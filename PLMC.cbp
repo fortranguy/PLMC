@@ -299,6 +299,7 @@
 		<Unit filename="modules/observables/types_observables_wrapper.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/observables/types_temporary_observables.f90" />
 		<Unit filename="modules/random/class_tower_sampler.f90">
 			<Option weight="2" />
 		</Unit>

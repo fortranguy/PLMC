@@ -11,6 +11,7 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_move
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use class_hetero_couples, only: Abstract_Hetero_Couples
 use module_changes_success, only: Concrete_Switch_Counters
+use types_temporary_observables, only: Concrete_Double_Delta_Energies
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
@@ -115,41 +116,36 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        real(DP), dimension(2) :: field_deltas, walls_deltas
-        real(DP) :: short_deltas(size(observables%short_energies), 2), &
-            dipolar_deltas(size(observables%dipolar_energies), 2)
-        real(DP) :: dipolar_mixture_delta
+        type(Concrete_Double_Delta_Energies) :: deltas
         integer :: ij_actors(2), i
 
         ij_actors = this%components_couples%get(this%selector%get())
         observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits = &
             observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits + 1
-        call this%test_metropolis(success, field_deltas, walls_deltas, short_deltas, &
-            dipolar_deltas,dipolar_mixture_delta, ij_actors)
+        allocate(deltas%short(size(observables%short_energies), 2))
+        allocate(deltas%dipolar(size(observables%dipolar_energies), 2))
+        call this%test_metropolis(success, deltas, ij_actors)
         if (success) then
             do i = 1, size(ij_actors)
                 observables%field_energies(ij_actors(i)) = &
-                    observables%field_energies(ij_actors(i)) + field_deltas(i)
+                    observables%field_energies(ij_actors(i)) + deltas%field(i)
                 observables%walls_energies(ij_actors(i)) = &
-                    observables%walls_energies(ij_actors(i)) + walls_deltas(i)
-                call update_energies(observables%short_energies, short_deltas(:, i), ij_actors(i))
-                call update_energies(observables%dipolar_energies, dipolar_deltas(:, i), &
+                    observables%walls_energies(ij_actors(i)) + deltas%walls(i)
+                call update_energies(observables%short_energies, deltas%short(:, i), ij_actors(i))
+                call update_energies(observables%dipolar_energies, deltas%dipolar(:, i), &
                     ij_actors(i))
             end do
             observables%dipolar_mixture_energy = observables%dipolar_mixture_energy + &
-                dipolar_mixture_delta
+                deltas%dipolar_mixture
             observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_success = &
                 observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_success + 1
         end if
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, field_deltas, walls_delta, short_deltas, &
-        dipolar_deltas, dipolar_mixture_delta, ij_actors)
+    subroutine Abstract_test_metropolis(this, success, deltas, ij_actors)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
         logical, intent(out) :: success
-        real(DP), intent(out) :: field_deltas(:), walls_delta(:)
-        real(DP), intent(out) :: short_deltas(:, :), dipolar_deltas(:, :)
-        real(DP), intent(out) :: dipolar_mixture_delta
+        type(Concrete_Double_Delta_Energies), intent(inout) :: deltas
         integer, intent(in) :: ij_actors(:)
 
         type(Concrete_Temporary_Particle) :: new(2), old(2)
@@ -160,15 +156,15 @@ contains
         call this%define_switch(ij_actors, new, old)
 
         success = .false.
-        call this%visit_field(field_deltas, new, old)
-        call this%visit_walls(overlap, walls_delta, ij_actors, new, old)
+        call this%visit_field(deltas%field, new, old)
+        call this%visit_walls(overlap, deltas%walls, ij_actors, new, old)
         if (overlap) return
-        call this%visit_short(overlap, short_deltas, ij_actors, new, old)
+        call this%visit_short(overlap, deltas%short, ij_actors, new, old)
         if (overlap) return
-        call this%visit_dipolar(dipolar_deltas, dipolar_mixture_delta, ij_actors, new, old)
+        call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, ij_actors, new, old)
 
-        energy_delta = sum(field_deltas + walls_delta) + sum(short_deltas + dipolar_deltas) + &
-            dipolar_mixture_delta
+        energy_delta = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
+            deltas%dipolar_mixture
         call random_number(rand)
         if (rand < exp(-energy_delta/this%environment%temperature%get())) then
             call this%update_actors(ij_actors, new, old)
@@ -351,17 +347,14 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
 
-    subroutine Null_test_metropolis(this, success, field_deltas, walls_delta, short_deltas, &
-        dipolar_deltas, dipolar_mixture_delta, ij_actors)
+    subroutine Null_test_metropolis(this, success, deltas, ij_actors)
         class(Null_Two_Particles_Switch), intent(in) :: this
         logical, intent(out) :: success
-        real(DP), intent(out) :: field_deltas(:), walls_delta(:)
-        real(DP), intent(out) :: short_deltas(:, :), dipolar_deltas(:, :)
-        real(DP), intent(out) :: dipolar_mixture_delta
+        type(Concrete_Double_Delta_Energies), intent(inout) :: deltas
         integer, intent(in) :: ij_actors(:)
         success = .false.
-        walls_delta = 0._DP; short_deltas = 0._DP; dipolar_deltas = 0._DP
-        dipolar_mixture_delta = 0._DP
+        deltas%field = 0._DP; deltas%walls = 0._DP; deltas%short = 0._DP; deltas%dipolar = 0._DP
+        deltas%dipolar_mixture = 0._DP
     end subroutine Null_test_metropolis
 
     subroutine Null_define_switch(this, ij_actors, new, old)
