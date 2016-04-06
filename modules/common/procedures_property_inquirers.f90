@@ -5,6 +5,7 @@ use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
+use class_external_field, only: Abstract_External_Field, Null_External_Field
 use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
@@ -32,6 +33,7 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
+    module procedure :: apply_external_field_from
 end interface apply_external_field
 
 interface use_permittivity
@@ -100,6 +102,17 @@ contains
 
         apply_external_field = logical_from_json(input_data, prefix//"External Field.apply")
     end function apply_external_field_from_json
+
+    pure logical function apply_external_field_from(external_field) result(apply_external_field)
+        class(Abstract_External_Field), intent(in) :: external_field
+
+        select type (external_field)
+            type is (Null_External_Field)
+                apply_external_field = .false.
+            class default
+                apply_external_field = .true.
+        end select
+    end function apply_external_field_from
 
     logical function use_permittivity_from_json(input_data, prefix) result(use_permittivity)
         type(json_file), intent(inout) :: input_data

@@ -1,10 +1,10 @@
 module procedures_writers_factory
 
 use json_module, only: json_file
-use data_wrappers_prefix, only: environment_prefix
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_number_to_string, only: Concrete_Number_to_String
+use class_external_field, only: Abstract_External_Field
 use class_walls_potential, only: Abstract_Walls_Potential
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
@@ -21,9 +21,9 @@ use class_changes_writer, only: Concrete_Changes_Selector, &
 use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
     Abstract_Coordinates_Writer, Concrete_Coordinates_Writer, Null_Coordinates_Writer
 use types_writers_wrapper, only: Component_Writers_Wrapper, Writers_Wrapper
-use procedures_property_inquirers, only: use_walls, component_exists, component_has_positions, &
-    component_has_orientations, component_can_move, component_can_rotate, component_can_exchange, &
-    component_is_dipolar, components_interact, component_interacts_with_wall
+use procedures_property_inquirers, only: apply_external_field, use_walls, component_exists, &
+    component_has_positions, component_has_orientations, component_can_move, component_can_rotate, &
+    component_can_exchange, component_is_dipolar, components_interact, component_interacts_with_wall
 
 implicit none
 
@@ -57,21 +57,22 @@ end interface writers_destroy
 
 contains
 
-    subroutine create_all(writers, components, wall_pairs, short_pairs, dipolar_pairs, changes, &
-        input_data, prefix)
+    subroutine create_all(writers, external_field, wall_pairs, components, changes, short_pairs, &
+        dipolar_pairs, input_data, prefix)
         type(Writers_Wrapper), intent(out) :: writers
-        type(Component_Wrapper), intent(in) :: components(:)
+        class(Abstract_External_Field), intent(in) :: external_field
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
         type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
         type(DES_Real_Pairs_Wrapper), intent(in) :: dipolar_pairs(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         logical :: are_dipolar(size(components))
 
         call writers_create(writers%components, components, changes, input_data, prefix)
-        call writers_create(writers%field, components, "field_energies.out")
+        call writers_create(writers%field, external_field, components, "field_energies.out")
         call writers_create(writers%walls, wall_pairs, "walls_energies.out")
         call writers_create(writers%switches, components, "switches.out")
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
@@ -217,8 +218,9 @@ contains
         end if
     end subroutine destroy_changes
 
-    subroutine create_field(field, components, filename)
+    subroutine create_field(field, external_field, components, filename)
         class(Abstract_Line_Writer), allocatable, intent(out) :: field
+        class(Abstract_External_Field), intent(in) :: external_field
         type(Component_Wrapper), intent(in) :: components(:)
         character(len=*), intent(in) :: filename
 
@@ -229,7 +231,7 @@ contains
             selector(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
         end do
 
-        if (any(selector)) then
+        if (any(selector) .and. apply_external_field(external_field)) then
             allocate(Concrete_Line_Writer :: field)
         else
             allocate(Null_Line_Writer :: field)

@@ -225,18 +225,19 @@ contains
         call observables_destroy(observables)
     end subroutine destroy_observables
 
-    subroutine create_writers(writers, components, short_interactions, dipolar_interactions, &
-        changes, input_data)
+    subroutine create_writers(writers, environment, components, changes, short_interactions, &
+        dipolar_interactions, input_data)
         type(Writers_Wrapper), intent(out) :: writers
+        type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Changes_Wrapper), intent(in) :: changes
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
-        type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
-        call writers_create(writers, components, short_interactions%wall_pairs, &
-            short_interactions%components_pairs, dipolar_interactions%real_pairs, changes%&
-            components, input_data, writers_prefix)
+        call writers_create(writers, environment%external_field, short_interactions%wall_pairs, &
+            components, changes%components, short_interactions%components_pairs, &
+            dipolar_interactions%real_pairs, input_data, writers_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)

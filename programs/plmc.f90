@@ -45,8 +45,8 @@ implicit none
     call plmc_set(metropolis_algorithms, mixture, short_interactions, dipolar_interactions)
     call plmc_propagator_create(metropolis_algorithms)
     call plmc_create(observables, mixture%components)
-    call plmc_create(writers, mixture%components, short_interactions, dipolar_interactions, &
-        changes, input_data)
+    call plmc_create(writers, environment, mixture%components, changes, short_interactions, &
+        dipolar_interactions, input_data)
     call plmc_destroy(input_data)
 
     call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
