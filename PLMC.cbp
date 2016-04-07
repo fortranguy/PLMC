@@ -189,7 +189,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/environment/class_field_expression.f90">
-			<Option weight="2" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/environment/class_floor_penetration.f90">
 			<Option weight="2" />
@@ -220,6 +220,9 @@
 		</Unit>
 		<Unit filename="modules/environment/procedures_environment_factory.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_field_expression_micro.f90">
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_parallelepiped_domain_macro.f90">
 			<Option weight="4" />
@@ -299,7 +302,9 @@
 		<Unit filename="modules/observables/types_observables_wrapper.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/observables/types_temporary_observables.f90" />
+		<Unit filename="modules/observables/types_temporary_observables.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/random/class_tower_sampler.f90">
 			<Option weight="2" />
 		</Unit>
