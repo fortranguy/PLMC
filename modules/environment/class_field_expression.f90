@@ -25,12 +25,6 @@ private
 
     end interface
 
-    type, extends(Abstract_Field_Expression), public :: Null_Field_Expression
-    contains
-        procedure :: set => Null_set
-        procedure :: get => Null_get
-    end type Null_Field_Expression
-
     type, extends(Abstract_Field_Expression), public :: Constant_Field_Expression
     private
         real(DP) :: vector(num_dimensions)
@@ -38,6 +32,22 @@ private
         procedure :: set => Constant_set
         procedure :: get => Constant_get
     end type Constant_Field_Expression
+
+    type, extends(Abstract_Field_Expression), public :: Centered_Plates_Expression
+    private
+        real(DP) :: size_x
+        real(DP) :: center_plus, center_minus
+        real(DP) :: surface_density
+    contains
+        procedure :: set => Plates_set
+        procedure :: get => Plates_get
+    end type Centered_Plates_Expression
+
+    type, extends(Abstract_Field_Expression), public :: Null_Field_Expression
+    contains
+        procedure :: set => Null_set
+        procedure :: get => Null_get
+    end type Null_Field_Expression
 
 contains
 
@@ -60,6 +70,22 @@ contains
     end function Constant_get
 
 !end implementation Constant_Field_Expression
+
+!implementation Centered_Plates_Expression
+
+    subroutine Plates_set(this, gap, size_x, surface_density)
+        class(Centered_Plates_Expression), intent(inout) :: this
+        real(DP), intent(in) :: gap, size_x
+        real(DP), intent(in) :: surface_density
+    end subroutine Plates_set
+
+    pure function Plates_get(this, position) result(expression)
+        class(Centered_Plates_Expression), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+        real(DP) :: expression(num_dimensions)
+    end function Plates_get
+
+!end implementation Centered_Plates_Expression
 
 !implementation Null_Field_Expression
 
