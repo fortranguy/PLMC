@@ -7,7 +7,7 @@ use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use class_temperature, only: Abstract_Temperature, Concrete_Temperature
 use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
-    Null_Field_Expression
+    Centered_Plates_Expression, Null_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
     Concrete_Parallelepiped_Domain, Concrete_Box_Domain, Null_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, Concrete_External_Field, &
@@ -77,15 +77,16 @@ contains
 
         call environment_create(environment%periodic_box, input_data, prefix)
         call environment_create(environment%temperature, input_data, prefix)
+        call environment_create(environment%permittivity, input_data, prefix)
         field_applied = apply_external_field(input_data, prefix)
-        call environment_create(field_expression, field_applied, input_data, prefix)
+        call environment_create(field_expression, environment%permittivity, field_applied, &
+            input_data, prefix)
         call environment_create(parallelepiped_domain, field_applied, &
             environment%periodic_box, input_data, prefix//"External Field.")
         call environment_create(environment%external_field, field_applied, &
             parallelepiped_domain, field_expression)
         call environment_destroy(field_expression)
         call environment_destroy(parallelepiped_domain)
-        call environment_create(environment%permittivity, input_data, prefix)
         call environment_create(environment%reciprocal_lattice, environment%periodic_box, &
             input_data, prefix)
         walls_used = use_walls(input_data, prefix)
@@ -102,8 +103,8 @@ contains
 
         call environment_destroy(environment%walls_potential)
         call environment_destroy(environment%reciprocal_lattice)
-        call environment_destroy(environment%permittivity)
         call environment_destroy(environment%external_field)
+        call environment_destroy(environment%permittivity)
         call environment_destroy(environment%temperature)
         call environment_destroy(environment%periodic_box)
     end subroutine destroy_all
@@ -164,14 +165,16 @@ contains
         if (allocated(temperature)) deallocate(temperature)
     end subroutine destroy_temperature
 
-    subroutine create_field_expression(field_expression, field_applied, input_data, prefix)
+    subroutine create_field_expression(field_expression, permittivity, field_applied, input_data, &
+        prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
+        class(Abstract_Permittivity), intent(in) :: permittivity
         logical, intent(in) :: field_applied
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_field_expression(field_expression, field_applied, input_data, prefix)
-        call set_field_expression(field_expression, input_data, prefix)
+        call set_field_expression(field_expression, permittivity, input_data, prefix)
     end subroutine create_field_expression
 
     subroutine allocate_field_expression(field_expression, field_applied, input_data, prefix)
@@ -190,20 +193,25 @@ contains
             select case (field_name)
                 case ("constant")
                     allocate(Constant_Field_Expression :: field_expression)
+                case ("plates")
+                    allocate(Centered_Plates_Expression :: field_expression)
                 case default
-                    call error_exit(field_name//" field_name unknown. Choose: 'constant'.")
+                    call error_exit(field_name//" field_name unknown. Choose:"//&
+                        " 'constant' or 'plates'.")
             end select
         else
             allocate(Null_Field_Expression :: field_expression)
         end if
     end subroutine allocate_field_expression
 
-    subroutine set_field_expression(field_expression, input_data, prefix)
+    subroutine set_field_expression(field_expression, permittivity, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
+        class(Abstract_Permittivity), intent(in) :: permittivity
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         real(DP), allocatable :: field_vector(:)
+        real(DP) :: gap, size_x, surface_density
         character(len=:), allocatable :: data_field
         logical :: data_found
 
@@ -216,6 +224,17 @@ contains
                 call check_data_found(data_field, data_found)
                 call field_expression%set(field_vector)
                 deallocate(field_vector)
+            type is (Centered_Plates_Expression)
+                data_field = prefix//"External Field.gap"
+                call input_data%get(data_field, gap, data_found)
+                call check_data_found(data_field, data_found)
+                data_field = prefix//"External Field.size x"
+                call input_data%get(data_field, size_x, data_found)
+                call check_data_found(data_field, data_found)
+                data_field = prefix//"External Field.surface density"
+                call input_data%get(data_field, surface_density, data_found)
+                call check_data_found(data_field, data_found)
+                call field_expression%set(permittivity, gap, size_x, surface_density)
             class default
                 call error_exit("field_expression type unknown.")
         end select
