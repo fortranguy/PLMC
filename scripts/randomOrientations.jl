@@ -9,28 +9,29 @@ module RandomOrientations
 end
 
 import JSON
-json = JSON
 import RandomOrientations
-ro = RandomOrientations
+RO = RandomOrientations
 include("PLMC.jl")
 import PLMC
-plmc = PLMC
 
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
 end
-input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
+input_data = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 num_components = input_data["Mixture"]["number of components"]
 if num_components == 0
     exit(0)
 end
 for i_component = 1:num_components
     if (input_data["Mixture"]["Component $(i_component)"]["is dipolar"])
-        component_i = plmc.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
+        component_i = PLMC.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
                                      zeros(3, 1), zeros(3, 1))
-        component_i.orientations = ro.randomOrientations(component_i.num)
-        output_file = input_data["Mixture"]["Component $(i_component)"]["initial orientations"]
+        component_i.orientations = RO.randomOrientations(component_i.num)
+        output_file =
+            open(input_data["Mixture"]["Component $(i_component)"]["initial orientations"], "w")
+        write(output_file, "#orientation_x   orientation_y   orientation_z\n")
         writedlm(output_file, component_i.orientations)
-        println("Orientations written in ", output_file)
+        close(output_file)
+        println("Orientations written in ", output_file.name)
     end
 end

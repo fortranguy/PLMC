@@ -8,7 +8,7 @@ use procedures_checks, only: check_file_exists
 implicit none
 
 private
-public :: increase_coordinates_size, read_coordinates
+public :: increase_coordinates_size, create_coordinates_from_file
 
     integer, parameter :: increase_factor = 2
 
@@ -31,30 +31,33 @@ contains
         deallocate(coordinates_tmp)
     end subroutine increase_coordinates_size
 
-    subroutine read_coordinates(coordinates, filename)
+    subroutine create_coordinates_from_file(coordinates, filename)
         real(DP), allocatable, intent(out) :: coordinates(:, :)
         character(len=*), intent(in) :: filename
 
+        character(len=max_line_length) :: dummy_header
         real(DP) :: coordinate(num_dimensions)
-        integer :: num_component, i_particle
+        integer :: num_particles, i_particle
         integer :: file_unit, read_stat
 
         call check_file_exists(filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, status="old", action="read")
-        num_component = 0
+        read(file_unit, *) dummy_header
+        num_particles = 0
         do
             read(file_unit, fmt=*, iostat=read_stat) coordinate
             if (read_stat == iostat_end) exit
-            num_component = num_component + 1
+            num_particles = num_particles + 1
         end do
-        if (num_component > 0) then
-            allocate(coordinates(num_dimensions, num_component))
+        if (num_particles > 0) then
+            allocate(coordinates(num_dimensions, num_particles))
             rewind(file_unit)
-            do i_particle = 1, num_component
+            read(file_unit, *) dummy_header
+            do i_particle = 1, num_particles
                 read(file_unit, *) coordinates(:, i_particle)
             end do
         end if
         close(file_unit)
-    end subroutine read_coordinates
+    end subroutine create_coordinates_from_file
 
 end module procedures_coordinates_micro

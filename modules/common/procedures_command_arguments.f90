@@ -5,33 +5,25 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_file_exists
 
 implicit none
+
 private
-public :: set_filename_from_argument
+public :: create_filename_from_argument
 
 contains
 
-    subroutine set_filename_from_argument(filename)
-        character(len=:), allocatable, intent(out) :: filename
-
-        if (command_argument_count() /= 1) then
-            call error_exit("Please provide a json input file as the only argument.")
-        end if
-        call argument_to_file(1, filename)
-    end subroutine set_filename_from_argument
-
-    subroutine argument_to_file(i_argument, filename_i)
-        integer, intent(in) :: i_argument
+    subroutine create_filename_from_argument(filename_i, i_argument)
         character(len=:), allocatable, intent(out) :: filename_i
+        integer, intent(in) :: i_argument
 
         character(len=max_word_length) :: filename
         integer :: length, argument_stat
 
         call get_command_argument(i_argument, filename, length, argument_stat)
         if (argument_stat /= 0) then
-            call error_exit("argument_to_file: error")
+            call error_exit("create_filename_from_argument: error")
         end if
         call check_file_exists(filename(1:length))
         filename_i = filename(1:length)
-    end subroutine argument_to_file
+    end subroutine create_filename_from_argument
 
 end module procedures_command_arguments

@@ -15,12 +15,14 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib)
 find_package(jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.3.0 REQUIRED)
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
-set(plmc_source programs/plmc.f90)
-get_filename_component(plmc_name ${plmc_source} NAME_WE)
-add_executable(${plmc_name} ${plmc_source})
-set_property(TARGET ${plmc_name} PROPERTY LINKER_LANGUAGE Fortran)
-target_link_libraries(${plmc_name} jsonfortran-static plmc_library)
-INSTALL(TARGETS ${plmc_name} DESTINATION plmc)
+file(GLOB_RECURSE programs_source_files programs/*.f90)
+foreach(program_source ${programs_source_files})
+    get_filename_component(program_name ${program_source} NAME_WE)
+    add_executable(${program_name} ${program_source})
+    set_property(TARGET ${program_name} PROPERTY LINKER_LANGUAGE Fortran)
+    target_link_libraries(${program_name} jsonfortran-static plmc_library)
+    INSTALL(TARGETS ${program_name} DESTINATION plmc)
+endforeach(program_source)
 
 # uninstall target
 configure_file(

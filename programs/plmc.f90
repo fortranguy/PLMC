@@ -34,7 +34,7 @@ implicit none
     logical :: changes_tuned
 
     call json_initialize()
-    call plmc_create(input_data)
+    call plmc_create(input_data, 1)
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
     call plmc_create(short_interactions, environment, mixture, input_data)

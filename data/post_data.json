@@ -1,0 +1,13 @@
+{
+    "Distribution": {
+        "delta": 0.05,
+        "file name": "distribution.out"
+    },
+    "Density": {
+        "Parallelepiped Domain": {
+            "name": "domain",
+            "origin": [0.0, 0.0, 0.0],
+            "size": [6.0, 6.0, 6.0]
+        }
+    }
+}
