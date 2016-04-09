@@ -66,7 +66,7 @@ for i_component = 1:size(components, 1)
         PM.next!(prog)
     end
     output_file = open(input_data["Mixture"]["Component $(i_component)"]["initial positions"], "w")
-    write(output_file, "#position_x  position_y  position_z\n")
+    write(output_file, "# position_x  position_y  position_z\n")
     writedlm(output_file, components[i_component].positions')
     close(output_file)
     println("Positions written in ", output_file.name)

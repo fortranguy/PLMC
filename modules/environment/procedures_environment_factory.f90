@@ -397,11 +397,11 @@ contains
             select case(walls_name)
                 case ("flat")
                     allocate(Flat_Floor_Penetration :: floor_penetration)
-                case ("block")
+                case ("blocks")
                     allocate(Centered_Block_Penetration :: floor_penetration)
                 case default
                     call error_exit(walls_name//" walls_name unknown. "//&
-                        "Choose between 'flat' and 'block'.")
+                        "Choose between 'flat' and 'blocks'.")
             end select
         else
             allocate(Null_Floor_Penetration :: floor_penetration)

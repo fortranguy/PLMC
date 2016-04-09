@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_constants, only: num_dimensions, max_line_length
 use data_wrappers_prefix, only: environment_prefix
 use json_module, only: json_file, json_initialize
-use procedures_errors, only: error_exit
+use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found, check_string_not_empty
 use procedures_command_arguments, only: create_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -12,6 +12,7 @@ use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_environment_factory, only: environment_create, environment_destroy
 use procedures_coordinates_micro, only: create_coordinates_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
+use procedures_property_inquirers, only: periodicity_is_xy
 
 implicit none
 
@@ -48,9 +49,12 @@ implicit none
     call plmc_create(post_data, command_argument_count())
     call environment_create(parallelepiped_domain, .true., periodic_box, post_data, &
         "Z Distribution.")
+    if (.not.periodicity_is_xy(periodic_box)) then
+        call warning_continue("Periodicity is not XY.")
+    end if
     data_field = "Z Distribution.delta"
     call post_data%get(data_field, delta, data_found)
-    call check_data_found(data_field, data_found)! check 2d
+    call check_data_found(data_field, data_found)
     data_field = "Z Distribution.file name"
     call post_data%get(data_field, bins_filename, data_found)
     call check_data_found(data_field, data_found)

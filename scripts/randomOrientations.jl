@@ -29,7 +29,7 @@ for i_component = 1:num_components
         component_i.orientations = RO.randomOrientations(component_i.num)
         output_file =
             open(input_data["Mixture"]["Component $(i_component)"]["initial orientations"], "w")
-        write(output_file, "#orientation_x   orientation_y   orientation_z\n")
+        write(output_file, "# orientation_x   orientation_y   orientation_z\n")
         writedlm(output_file, component_i.orientations)
         close(output_file)
         println("Orientations written in ", output_file.name)

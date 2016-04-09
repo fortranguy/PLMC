@@ -4,14 +4,13 @@
 !> \]
 !> with \( S(r) \) the area of a sphere.
 
-
 program plmc_radial_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_constants, only: max_line_length
 use data_wrappers_prefix, only: environment_prefix
 use json_module, only: json_file, json_initialize
-use procedures_errors, only: error_exit
+use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found, check_positive, check_string_not_empty
 use procedures_geometry, only: sphere_surface
 use procedures_command_arguments, only: create_filename_from_argument
@@ -19,6 +18,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_environment_factory, only: environment_create, environment_destroy
 use procedures_coordinates_micro, only: create_coordinates_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
+use procedures_property_inquirers, only: periodicity_is_xyz
 use types_radial_distribution, only: Concrete_Radial_Distribution_Component
 
 implicit none
@@ -49,7 +49,10 @@ implicit none
     num_snaps = command_argument_count() - 2
     if (mod(num_snaps, 2) /= 0) call error_exit("Number of snap shots must be even.")
     num_snaps = num_snaps / 2
-    call environment_create(periodic_box, input_data, environment_prefix)!warning: if not 3D
+    call environment_create(periodic_box, input_data, environment_prefix)
+    if (.not.periodicity_is_xyz(periodic_box)) then
+        call warning_continue("Periodicity is not XYZ.")
+    end if
     call plmc_destroy(input_data)
     max_distance = minval(periodic_box%get_size())/2._DP
 
