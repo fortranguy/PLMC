@@ -262,7 +262,7 @@ contains
             data_field = prefix//"Parallelepiped Domain.name"
             call input_data%get(data_field, domain_name, data_found)
             call check_data_found(data_field, data_found)
-            select case(domain_name)
+            select case (domain_name)
                 case ("domain")
                     data_field = prefix//"Parallelepiped Domain.origin"
                     call input_data%get(data_field, domain_origin, data_found)
@@ -394,7 +394,7 @@ contains
             data_field = prefix//"Walls.name"
             call input_data%get(data_field, walls_name, data_found)
             call check_data_found(data_field, data_found)
-            select case(walls_name)
+            select case (walls_name)
                 case ("flat")
                     allocate(Flat_Floor_Penetration :: floor_penetration)
                 case ("blocks")

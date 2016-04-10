@@ -229,7 +229,7 @@ contains
             data_field = prefix//"Cells.data structure"
             call input_data%get(data_field, cells_data_structure, data_found)
             call check_data_found(data_field, data_found)
-            select case(cells_data_structure)
+            select case (cells_data_structure)
                 case ("list")
                     allocate(Concrete_Visitable_List :: list)
                 case ("array")
@@ -413,7 +413,7 @@ contains
             data_field = prefix//"name"
             call input_data%get(data_field, potential_name, data_found)
             call check_data_found(data_field, data_found)
-            select case(potential_name)
+            select case (potential_name)
                 case ("null")
                     allocate(Null_Potential_Expression :: expression)
                 case ("LJ")

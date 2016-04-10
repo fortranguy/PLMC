@@ -17,6 +17,7 @@ use procedures_plmc_reset, only: plmc_reset
 use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
+use procedures_help, only: help_plmc
 
 implicit none
 
@@ -33,6 +34,7 @@ implicit none
     integer :: i_step
     logical :: changes_tuned
 
+    call help_plmc()
     call json_initialize()
     call plmc_create(input_data, 1)
     call plmc_create(environment, input_data)
