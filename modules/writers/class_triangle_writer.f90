@@ -45,10 +45,10 @@ contains
 
 !implementation Abstract_Triangle_Writer
 
-    subroutine Abstract_construct(this, filename, selector)
+    subroutine Abstract_construct(this, selector, filename)
         class(Abstract_Triangle_Writer), intent(out) :: this
-        character(len=*), intent(in) :: filename
         type(Concrete_Line_Selector), intent(in) :: selector(:)
+        character(len=*), intent(in) :: filename
 
         character(len=:), allocatable :: legend
         integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
@@ -125,10 +125,10 @@ contains
 
 !implementation Null_Triangle_Writer
 
-    subroutine Null_construct(this, filename, selector)
+    subroutine Null_construct(this, selector, filename)
         class(Null_Triangle_Writer), intent(out) :: this
-        character(len=*), intent(in) :: filename
         type(Concrete_Line_Selector), intent(in) :: selector(:)
+        character(len=*), intent(in) :: filename
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

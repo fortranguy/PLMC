@@ -2,6 +2,7 @@ module class_component_coordinates
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_constants, only: num_dimensions
+use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range, check_array_size, check_positive, check_norm
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_number, only: Abstract_Component_Number
@@ -18,6 +19,7 @@ private
         real(DP), allocatable :: coordinates(:, :)
     contains
         procedure(Abstract_destroy), deferred :: destroy
+        procedure :: set_all => Abstract_set_all
         procedure(Abstract_set), deferred :: set
         procedure :: get_num => Abstract_get_num
         procedure :: get => Abstract_get
@@ -63,6 +65,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: set_all => Null_set_all
         procedure :: set => Null_set
         procedure :: get_num => Null_get_num
         procedure :: get => Null_get
@@ -73,6 +76,25 @@ private
 contains
 
 !implementation Abstract_Component_Coordinates
+
+    subroutine Abstract_set_all(this, coordinates)
+        class(Abstract_Component_Coordinates), intent(inout) :: this
+        real(DP), intent(in) :: coordinates(:, :)
+
+        integer :: i_particle
+
+        if (this%get_num() /= size(coordinates, 2)) then
+            call error_exit("Abstract_Component_Coordinates: set_all: numbers do not match.")
+        end if
+        if (size(this%coordinates, 2) < this%get_num()) then
+            deallocate(this%coordinates)
+            allocate(this%coordinates(num_dimensions, this%get_num()))
+        end if
+
+        do i_particle = 1, this%get_num()
+            call this%set(i_particle, coordinates(:, i_particle))
+        end do
+    end subroutine Abstract_set_all
 
     subroutine Abstract_allocate_coordinates(this)
         class(Abstract_Component_Coordinates), intent(inout) :: this
@@ -199,6 +221,11 @@ contains
     subroutine Null_destroy(this)
         class(Null_Component_Coordinates), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_set_all(this, coordinates)
+        class(Null_Component_Coordinates), intent(inout) :: this
+        real(DP), intent(in) :: coordinates(:, :)
+    end subroutine Null_set_all
 
     subroutine Null_set(this, i_particle, vector)
         class(Null_Component_Coordinates), intent(inout) :: this

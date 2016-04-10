@@ -237,9 +237,9 @@ contains
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
         type(json_file), intent(inout) :: input_data
 
-        call writers_create(writers, environment%external_field, short_interactions%wall_pairs, &
-            components, changes%components, short_interactions%components_pairs, &
-            dipolar_interactions%real_pairs, input_data, writers_prefix)
+        call writers_create(writers, environment, short_interactions%wall_pairs, components, &
+            changes%components, short_interactions%components_pairs, dipolar_interactions%&
+            real_pairs, input_data, writers_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)

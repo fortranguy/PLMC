@@ -4,8 +4,9 @@ use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_number_to_string, only: Concrete_Number_to_String
+use class_periodic_box, only: Abstract_Periodic_Box
 use class_external_field, only: Abstract_External_Field
-use class_walls_potential, only: Abstract_Walls_Potential
+use types_environment_wrapper, only: Environment_Wrapper
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: mixture_set
@@ -57,10 +58,10 @@ end interface writers_destroy
 
 contains
 
-    subroutine create_all(writers, external_field, wall_pairs, components, changes, short_pairs, &
+    subroutine create_all(writers, environment, wall_pairs, components, changes, short_pairs, &
         dipolar_pairs, input_data, prefix)
         type(Writers_Wrapper), intent(out) :: writers
-        class(Abstract_External_Field), intent(in) :: external_field
+        type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
@@ -72,7 +73,8 @@ contains
         logical :: are_dipolar(size(components))
 
         call writers_create(writers%components, components, changes, input_data, prefix)
-        call writers_create(writers%field, external_field, components, "field_energies.out")
+        call writers_create(writers%field, environment%external_field, components, &
+            "field_energies.out")
         call writers_create(writers%walls, wall_pairs, "walls_energies.out")
         call writers_create(writers%switches, components, "switches.out")
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
@@ -146,27 +148,27 @@ contains
                 orientations_i => mixture_components(i_component)%orientations)
                 selector_i%write_positions = component_has_positions(positions_i)
                 selector_i%write_orientations = component_has_orientations(orientations_i)
-                call writers_create(components(i_component)%coordinates, "coordinates_"//&
-                    string%get(i_component), positions_i, orientations_i, selector_i, &
-                    write_coordinates)
+                call writers_create(components(i_component)%coordinates, positions_i, &
+                    orientations_i, selector_i, write_coordinates, "coordinates_"//string%&
+                    get(i_component))
             end associate
         end do
     end subroutine create_components_coordinates
 
-    subroutine create_coordinates(coordinates, basename, positions, orientations, &
-        selector, write_coordinates)
+    subroutine create_coordinates(coordinates, positions, orientations, selector, &
+        write_coordinates, basename)
         class(Abstract_Coordinates_Writer), allocatable, intent(out) :: coordinates
-        character(len=*), intent(in) :: basename
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: selector
         logical, intent(in) :: write_coordinates
+        character(len=*), intent(in) :: basename
 
         if (write_coordinates) then
             allocate(Concrete_Coordinates_Writer :: coordinates)
         else
             allocate(Null_Coordinates_Writer :: coordinates)
         end if
-        call coordinates%construct(basename, positions, orientations, selector)
+        call coordinates%construct(positions, orientations, selector, basename)
     end subroutine create_coordinates
 
     subroutine destroy_coordinates(coordinates)
@@ -206,7 +208,7 @@ contains
         else
             allocate(Null_Changes_Success_Writer :: changes)
         end if
-        call changes%construct(filename, selector)
+        call changes%construct(selector, filename)
     end subroutine create_changes
 
     subroutine destroy_changes(changes)
@@ -236,7 +238,7 @@ contains
         else
             allocate(Null_Line_Writer :: field)
         end if
-        call field%construct(filename, selector)
+        call field%construct(selector, filename)
     end subroutine create_field
 
     subroutine create_walls(walls, wall_pairs, filename)
@@ -256,7 +258,7 @@ contains
         else
             allocate(Null_Line_Writer :: walls)
         end if
-        call walls%construct(filename, selector)
+        call walls%construct(selector, filename)
     end subroutine create_walls
 
     subroutine destroy_line(line)
@@ -292,7 +294,7 @@ contains
         else
             allocate(Null_Triangle_Writer :: switches)
         end if
-        call switches%construct(filename, selectors)
+        call switches%construct(selectors, filename)
         call deallocate_selectors(selectors)
     end subroutine create_switches
 
@@ -320,7 +322,7 @@ contains
         else
             allocate(Null_Triangle_Writer :: energies)
         end if
-        call energies%construct(filename, selectors)
+        call energies%construct(selectors, filename)
         call deallocate_selectors(selectors)
     end subroutine create_short_energies
 
@@ -348,7 +350,7 @@ contains
         else
             allocate(Null_Triangle_Writer :: energies)
         end if
-        call energies%construct(filename, selectors)
+        call energies%construct(selectors, filename)
         call deallocate_selectors(selectors)
     end subroutine create_dipolar_energies
 

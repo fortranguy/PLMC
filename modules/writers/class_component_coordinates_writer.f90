@@ -17,14 +17,14 @@ private
 
     type, abstract, public :: Abstract_Coordinates_Writer
     private
-        character(len=:), allocatable :: basename
-        character(len=:), allocatable :: legend
-        integer :: period
-        type(Concrete_Number_to_String) :: string_step
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         type(Concrete_Number_to_String) :: string_positions
         class(Abstract_Number_to_String), allocatable :: string_orientations
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
+        character(len=:), allocatable :: basename
+        character(len=:), allocatable :: legend
+        integer :: period
+        type(Concrete_Number_to_String) :: string_step
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -46,11 +46,11 @@ contains
 
 !implementation Abstract_Coordinates_Writer
 
-    subroutine Abstract_construct(this, basename, positions, orientations, coordinates_selector)
+    subroutine Abstract_construct(this, positions, orientations, coordinates_selector, basename)
         class(Abstract_Coordinates_Writer), intent(out) :: this
-        character(len=*), intent(in) :: basename
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        character(len=*), intent(in) :: basename
 
         this%positions => positions
         this%orientations => orientations
@@ -87,6 +87,7 @@ contains
         if (mod(i_step, this%period) == 0) then
             open(newunit=unit_i, recl=max_line_length, file=this%basename//"_"//this%string_step%&
                 get(i_step)//".out", action="write")
+            write(unit_i, *) "# number", this%positions%get_num()
             write(unit_i, *) this%legend
             do i_particle = 1, this%positions%get_num()
                 write(unit_i, *) this%string_positions%get(this%positions%get(i_particle)), &
@@ -100,11 +101,11 @@ contains
 
 !implementation Null_Coordinates_Writer
 
-    subroutine Null_construct(this, basename, positions, orientations, coordinates_selector)
+    subroutine Null_construct(this, positions, orientations, coordinates_selector, basename)
         class(Null_Coordinates_Writer), intent(out) :: this
-        character(len=*), intent(in) :: basename
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        character(len=*), intent(in) :: basename
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

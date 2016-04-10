@@ -9,7 +9,7 @@ use procedures_command_arguments, only: create_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_environment_factory, only: environment_create, environment_destroy
-use procedures_coordinates_micro, only: create_coordinates_from_file
+use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 
 implicit none
@@ -21,7 +21,7 @@ implicit none
     integer :: num_snaps, i_snap
     character(len=:), allocatable :: snap_filename
     integer :: num_inside_sum
-    real(DP), allocatable :: positions(:, :)
+    real(DP), dimension(:, :), allocatable :: positions
 
     type(json_file) :: input_data, post_data
     character(len=:), allocatable :: data_field
@@ -46,7 +46,7 @@ implicit none
     num_inside_sum = 0
     do i_snap = 1, num_snaps
         call create_filename_from_argument(snap_filename, i_snap)
-        call create_coordinates_from_file(positions, snap_filename)
+        call create_positions_from_file(positions, snap_filename)
         do i_particle = 1, size(positions, 2)
             if (parallelepiped_domain%is_inside(positions(:, i_particle))) then
                 num_inside_sum = num_inside_sum + 1

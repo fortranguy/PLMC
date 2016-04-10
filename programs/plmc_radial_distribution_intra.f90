@@ -16,7 +16,7 @@ use procedures_geometry, only: sphere_surface
 use procedures_command_arguments, only: create_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_environment_factory, only: environment_create, environment_destroy
-use procedures_coordinates_micro, only: create_coordinates_from_file
+use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 use procedures_property_inquirers, only: periodicity_is_xyz
 use types_radial_distribution, only: Concrete_Radial_Distribution_Component
@@ -73,7 +73,7 @@ implicit none
     bins_function = 0._DP
     do i_snap = 1, num_snaps
         call create_filename_from_argument(snap_filename, i_snap)
-        call create_coordinates_from_file(component%positions, snap_filename)
+        call create_positions_from_file(component%positions, snap_filename)
         component%num_particles = size(component%positions, 2)
         bins_snap = 0._DP
         do i_particle = 1, component%num_particles

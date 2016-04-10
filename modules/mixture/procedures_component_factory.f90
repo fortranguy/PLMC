@@ -172,8 +172,6 @@ contains
         do i_particle = 1, component_coordinates%get_num()
             call component_coordinates%set(i_particle, file_coordinates(:, i_particle))
         end do
-        if (allocated(file_coordinates)) deallocate(file_coordinates)
-        deallocate(filename)
     end subroutine set_coordinates
 
     subroutine create_dipolar_moments(dipolar_moments, is_dipolar, &

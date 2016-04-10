@@ -35,14 +35,14 @@ contains
         real(DP), allocatable, intent(out) :: coordinates(:, :)
         character(len=*), intent(in) :: filename
 
-        character(len=max_line_length) :: dummy_header
+        character(len=max_line_length) :: comment_caracter
         real(DP) :: coordinate(num_dimensions)
         integer :: num_particles, i_particle
         integer :: file_unit, read_stat
 
         call check_file_exists(filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, status="old", action="read")
-        read(file_unit, *) dummy_header
+        read(file_unit, *) comment_caracter
         num_particles = 0
         do
             read(file_unit, fmt=*, iostat=read_stat) coordinate
@@ -52,7 +52,7 @@ contains
         if (num_particles > 0) then
             allocate(coordinates(num_dimensions, num_particles))
             rewind(file_unit)
-            read(file_unit, *) dummy_header
+            read(file_unit, *) comment_caracter
             do i_particle = 1, num_particles
                 read(file_unit, *) coordinates(:, i_particle)
             end do

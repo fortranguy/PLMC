@@ -30,8 +30,7 @@
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": false,
-            "initial positions": "positions_1.in",
-            "initial orientations": "orientations_1.in"
+            "initial coordinates": "coordinates_1.in"
         },
         "Component 2": {
             "number": 250,
@@ -39,8 +38,7 @@
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": false,
-            "initial positions": "positions_2.in",
-            "initial orientations": "orientations_2.in"
+            "initial coordinates": "coordinates_2.in"
         },
         "Component 3": {
             "number": 250,
@@ -48,8 +46,7 @@
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": false,
-            "initial positions": "positions_3.in",
-            "initial orientations": "orientations_3.in"
+            "initial coordinates": "coordinates_3.in"
         },
         "Inter 12": {
             "minimum distance": 0.8
