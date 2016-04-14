@@ -35,6 +35,7 @@
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}, gap: \type{real},
                     floorPenetration: \type{FloorPenetration}}}
                 \operation{\procedure{destroy}{}}
+                \operation{\procedure{areOutsideBox}{}: \type{bool}}
                 \operation{\procedure{getGap}{}: \type{real}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
                     position: \type{real[3]}, pairPotential: \type{PairPotential}}}
@@ -71,6 +72,7 @@
                 \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
                     numbers: \type{int[3]}}}
                 \operation{\procedure{destroy}{}}
+                \operation{\procedure{isSparseInZ}{}: \type{bool}}
                 \operation{\procedure{getNumbers}{}: \type{int[3]}}
             \end{abstractclass}
         \end{scope}

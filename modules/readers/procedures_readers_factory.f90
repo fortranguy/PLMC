@@ -1,6 +1,8 @@
 module procedures_readers_factory
 
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
+use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use class_component_number, only: Abstract_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates
@@ -37,7 +39,8 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call readers_create(readers%box_size, environment%periodic_box)
+        call readers_create(readers%box_size, environment%periodic_box, environment%&
+            reciprocal_lattice, environment%walls_potential)
         call readers_create(readers%components, components)
     end subroutine create_all
 
@@ -48,12 +51,14 @@ contains
         call readers_destroy(readers%box_size)
     end subroutine destroy_all
 
-    subroutine create_box_size(box_size, periodic_box)
+    subroutine create_box_size(box_size, periodic_box, reciprocal_lattice, walls_potential)
         class(Abstract_Box_Size_Reader), allocatable, intent(out) :: box_size
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
 
         allocate(Concrete_Box_Size_Reader :: box_size)
-        call box_size%construct(periodic_box)
+        call box_size%construct(periodic_box, reciprocal_lattice, walls_potential)
     end subroutine create_box_size
 
     subroutine destroy_box_size(box_size)

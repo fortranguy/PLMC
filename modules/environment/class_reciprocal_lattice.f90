@@ -16,8 +16,8 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box
     contains
         procedure :: construct => Abstract_construct
-        procedure, private :: check => Abstract_check
         procedure :: destroy => Abstract_destroy
+        procedure :: is_sparse_in_z => Abstract_is_sparse_in_z
         procedure :: get_numbers => Abstract_get_numbers
     end type Abstract_Reciprocal_Lattice
 
@@ -29,6 +29,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: is_sparse_in_z => Null_is_sparse_in_z
         procedure :: get_numbers => Null_get_numbers
     end type Null_Reciprocal_Lattice
 
@@ -42,38 +43,37 @@ contains
         integer, intent(in) :: numbers(:)
 
         this%periodic_box => periodic_box
-        call this%check(numbers)
-        this%numbers = numbers
-    end subroutine Abstract_construct
-
-    subroutine Abstract_check(this, numbers)
-        class(Abstract_Reciprocal_Lattice), intent(in) :: this
-        integer, intent(in) :: numbers(:)
-
-        real(DP) :: real_size(num_dimensions)
-        real(DP) :: real_zx_ratio, reci_zx_ratio
-
         call check_array_size("Abstract_Reciprocal_Lattice", "numbers", numbers, num_dimensions)
         call check_positive("Abstract_Reciprocal_Lattice", "numbers", numbers)
         if (numbers(1) /= numbers(2)) then
             call warning_continue("Abstract_Reciprocal_Lattice: "//&
                 "numbers(1) and numbers(2) are not equal.")
         end if
-
-        real_size = this%periodic_box%get_size()
-        real_zx_ratio = real_size(3) / real_size(1)
-        reci_zx_ratio = real(numbers(3), DP) / real(numbers(1), DP)
-        if (reci_zx_ratio < real_zx_ratio) then
-            call warning_continue("Abstract_Reciprocal_Lattice: "//&
-                "reci z/x ratio is lower than real z/x ratio.")
-        end if
-    end subroutine Abstract_check
+        this%numbers = numbers
+    end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Reciprocal_Lattice), intent(inout) :: this
 
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    !> This function tells if the density of wave vectors is too sparse in \( z \) direction.
+    pure logical function Abstract_is_sparse_in_z(this) result(is_sparse_in_z)
+        class(Abstract_Reciprocal_Lattice), intent(in) :: this
+
+        real(DP) :: real_size(num_dimensions)
+        real(DP) :: real_zx_ratio, reci_zx_ratio
+
+        real_size = this%periodic_box%get_size()
+        real_zx_ratio = real_size(3) / real_size(1)
+        reci_zx_ratio = real(this%numbers(3), DP) / real(this%numbers(1), DP)
+        if (reci_zx_ratio < real_zx_ratio) then
+            is_sparse_in_z = .true.
+        else
+            is_sparse_in_z = .false.
+        end if
+    end function Abstract_is_sparse_in_z
 
     pure function Abstract_get_numbers(this) result(numbers)
         class(Abstract_Reciprocal_Lattice), intent(in) :: this
@@ -95,6 +95,11 @@ contains
     subroutine Null_destroy(this)
         class(Null_Reciprocal_Lattice), intent(inout) :: this
     end subroutine Null_destroy
+
+    pure logical function Null_is_sparse_in_z(this) result(is_sparse_in_z)
+        class(Null_Reciprocal_Lattice), intent(in) :: this
+        is_sparse_in_z = .false.
+    end function Null_is_sparse_in_z
 
     pure function Null_get_numbers(this) result(numbers)
         class(Null_Reciprocal_Lattice), intent(in) :: this

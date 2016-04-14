@@ -2,8 +2,7 @@ module class_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use module_list_node, only: Concrete_Linkable_Node, &
-    deallocate_list, increase_nodes_size
+use module_list_node, only: Concrete_Linkable_Node, deallocate_list, increase_nodes_size
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_pair_potential, only: Abstract_Pair_Potential

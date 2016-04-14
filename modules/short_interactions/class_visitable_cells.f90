@@ -18,16 +18,16 @@ private
 
     type, abstract, public :: Abstract_Visitable_Cells
     private
+        class(Abstract_Periodic_Box), pointer :: periodic_box
+        class(Abstract_Component_Coordinates), pointer :: positions
+        class(Abstract_Pair_Potential), pointer :: pair_potential
         integer :: nums(num_dimensions)
         real(DP) :: size(num_dimensions)
         integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
         logical :: skip_bottom_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2)
         logical :: skip_top_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2)
-        class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
+        class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :), list_mold
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
-        class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Component_Coordinates), pointer :: positions
-        class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -93,13 +93,12 @@ contains
 
 !implementation Abstract_Visitable_Cells
 
-    subroutine Abstract_construct(this, list_mold, periodic_box, positions, &
-        pair_potential)
+    subroutine Abstract_construct(this, periodic_box, positions, pair_potential, list_mold)
         class(Abstract_Visitable_Cells), intent(out) :: this
-        class(Abstract_Visitable_List), intent(in) :: list_mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+        class(Abstract_Visitable_List), intent(in) :: list_mold
 
         this%periodic_box => periodic_box
         this%positions => positions
@@ -108,10 +107,11 @@ contains
         call this%set_division()
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
+        allocate(this%list_mold, mold=list_mold)
         allocate(this%visitable_lists(this%global_lbounds(1):this%global_ubounds(1), &
                                       this%global_lbounds(2):this%global_ubounds(2), &
                                       this%global_lbounds(3):this%global_ubounds(3)), &
-                                      mold=list_mold)
+                                      mold=this%list_mold)
         call this%construct_visitable_lists(periodic_box, positions)
         call this%set_skip_layers()
         allocate(this%neighbours(3, -nums_local_cells(1)/2:nums_local_cells(1)/2, &
@@ -245,6 +245,7 @@ contains
         end do
         if (allocated(this%neighbours)) deallocate(this%neighbours)
         if (allocated(this%visitable_lists)) deallocate(this%visitable_lists)
+        if (allocated(this%list_mold)) deallocate(this%list_mold)
         this%pair_potential => null()
         this%positions => null()
         this%periodic_box => null()
@@ -336,12 +337,12 @@ contains
 
 !implementation Null_Visitable_Cells
 
-    subroutine Null_construct(this, list_mold, periodic_box, positions, pair_potential)
+    subroutine Null_construct(this, periodic_box, positions, pair_potential, list_mold)
         class(Null_Visitable_Cells), intent(out) :: this
-        class(Abstract_Visitable_List), intent(in) :: list_mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+        class(Abstract_Visitable_List), intent(in) :: list_mold
     end subroutine Null_construct
 
     subroutine Null_fill(this)

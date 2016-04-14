@@ -72,6 +72,7 @@ contains
         call this%number%set(size(positions, 2))
         call this%positions%set_all(positions)
         call this%orientations%set_all(orientations)
+        !> reset ?
     end subroutine Abstract_read
 
 !end implementation Abstract_Coordinates_Reader

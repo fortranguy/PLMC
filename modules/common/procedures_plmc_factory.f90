@@ -78,7 +78,6 @@ contains
 
         call create_filename_from_argument(data_filename, i_argument)
         call input_data%load_file(filename = data_filename)
-        if (allocated(data_filename)) deallocate(data_filename)
     end subroutine create_input_data
 
     subroutine destroy_input_data(input_data)

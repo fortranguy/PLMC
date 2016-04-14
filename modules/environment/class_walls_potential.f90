@@ -20,6 +20,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: are_outside_box => Abstract_are_outside_box
         procedure :: get_gap => Abstract_get_gap
         procedure :: visit => Abstract_visit
         procedure, private :: position_from_floor => Abstract_position_from_floor
@@ -30,6 +31,7 @@ private
         contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: are_outside_box => Null_are_outside_box
         procedure :: get_gap => Null_get_gap
         procedure :: visit => Null_visit
     end type Null_Walls_Potential
@@ -48,14 +50,8 @@ contains
         real(DP), intent(in) :: gap
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
 
-        real(DP) :: box_size(num_dimensions)
-
         this%periodic_box => periodic_box
         call check_positive("Abstract_Walls_Potential", "gap", gap)
-        box_size = this%periodic_box%get_size()
-        if (gap > box_size(3)) then
-            call error_exit("Abstract_Walls_Potential: gap is too big.")
-        end if
         this%gap = gap
         if (2._DP * floor_penetration%get_min_depth() > this%gap) then
             call error_exit("Abstract_Walls_Potential: floor_penetration's min_depth is too big.")
@@ -69,6 +65,21 @@ contains
         if (allocated(this%floor_penetration)) deallocate(this%floor_penetration)
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    !> This function tells if the walls are outside the box.
+    !> They must remain inside if box_size(3) is constant (which is expected in XY periodicity).
+    pure logical function Abstract_are_outside_box(this) result(are_outside)
+        class(Abstract_Walls_Potential), intent(in) :: this
+
+        real(DP) :: box_size(num_dimensions)
+
+        box_size = this%periodic_box%get_size()
+        if (this%gap > box_size(3)) then
+            are_outside = .true.
+        else
+            are_outside = .false.
+        end if
+    end function Abstract_are_outside_box
 
     pure real(DP) function Abstract_get_gap(this) result(gap)
         class(Abstract_Walls_Potential), intent(in) :: this
@@ -126,6 +137,11 @@ contains
         real(DP), intent(in) :: gap
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
     end subroutine Null_construct
+
+    pure logical function Null_are_outside_box(this) result(are_outside)
+        class(Null_Walls_Potential), intent(in) :: this
+        are_outside = .false.
+    end function Null_are_outside_box
 
     pure real(DP) function Null_get_gap(this) result(gap)
         class(Null_Walls_Potential), intent(in) :: this

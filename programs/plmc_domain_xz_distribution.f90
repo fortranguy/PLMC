@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions, max_line_length
 use data_wrappers_prefix, only: environment_prefix
 use json_module, only: json_file, json_initialize
 use procedures_errors, only: error_exit, warning_continue
-use procedures_checks, only: check_data_found, check_string_not_empty
+use procedures_checks, only: check_data_found, check_string_not_empty, check_array_size
 use procedures_command_arguments, only: create_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
@@ -55,6 +55,7 @@ implicit none
     data_field = "XZ Distribution.deltas"
     call post_data%get(data_field, deltas, data_found)
     call check_data_found(data_field, data_found)
+    call check_array_size("plmc_domain_xz_distribution", "deltas", deltas, 2)
     data_field = "XZ Distribution.file name"
     call post_data%get(data_field, bins_filename, data_found)
     call check_data_found(data_field, data_found)

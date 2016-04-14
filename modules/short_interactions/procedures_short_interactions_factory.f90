@@ -5,27 +5,26 @@ use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_number_to_string, only: Concrete_Number_to_String
-use class_periodic_box, only: Abstract_Periodic_Box, &
-    XYZ_Periodic_Box, XY_Periodic_Box
+use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
-use class_potential_expression, only: Abstract_Potential_Expression, &
-    Null_Potential_Expression, Lennard_Jones_Expression
+use class_potential_expression, only: Abstract_Potential_Expression, Lennard_Jones_Expression, &
+    Null_Potential_Expression
 use types_potential_domain, only: Short_Potential_Domain
-use class_pair_potential, only: Abstract_Pair_Potential, &
-    Null_Pair_Potential, Tabulated_Pair_Potential, Raw_Pair_Potential
-use class_visitable_list, only: Abstract_Visitable_List, &
-    Null_Visitable_List, Concrete_Visitable_List, Concrete_Visitable_Array
-use class_visitable_cells, only: Abstract_Visitable_Cells, &
-    Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
+use class_pair_potential, only: Abstract_Pair_Potential, Tabulated_Pair_Potential, &
+    Raw_Pair_Potential, Null_Pair_Potential
+use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
+    Concrete_Visitable_Array, Null_Visitable_List
+use class_visitable_cells, only: Abstract_Visitable_Cells, XYZ_PBC_Visitable_Cells, &
+    XY_PBC_Visitable_Cells, Null_Visitable_Cells
 use class_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor, &
     Concrete_Walls_Potential_Visitor, Null_Walls_Potential_Visitor
-use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor, &
-    Concrete_Short_Pairs_Visitor, Null_Short_Pairs_Visitor
+use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor, Concrete_Short_Pairs_Visitor, &
+    Null_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
     Short_Interactions_Wrapper
 use procedures_property_inquirers, only: use_walls, components_interact
@@ -194,8 +193,8 @@ contains
                 j_pair = maxval([i_component, j_component])
                 i_pair = minval([i_component, j_component])
                 associate (pair_ij => pairs(j_pair)%line(i_pair)%potential)
-                    call cells(i_component, j_component)%construct(list, periodic_box, &
-                        components(i_component)%positions, pair_ij)
+                    call cells(i_component, j_component)%construct(periodic_box, &
+                        components(i_component)%positions, pair_ij, list)
                 end associate
             end do
         end do

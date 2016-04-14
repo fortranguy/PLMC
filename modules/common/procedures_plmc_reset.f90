@@ -22,7 +22,7 @@ contains
         call total_moment%reset()
     end subroutine reset_total_moments
 
-    !> Some quantities may need to be reset to reflect the current configuration.
+    !> Some dipolar accumulators may need to be reset to reflect the current configuration.
     subroutine reset_dipolar(dipolar_interactions)
         type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
 
