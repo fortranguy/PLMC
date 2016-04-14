@@ -15,7 +15,12 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: read => Abstract_read
     end type Abstract_Box_Size_Reader
+
+    type, extends(Abstract_Box_Size_Reader), public :: Concrete_Box_Size_Reader
+
+    end type Concrete_Box_Size_Reader
 
 contains
 

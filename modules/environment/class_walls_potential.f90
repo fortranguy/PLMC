@@ -15,7 +15,7 @@ private
     type, abstract, public :: Abstract_Walls_Potential
     private
         real(DP) :: gap
-        class(Abstract_Periodic_Box), pointer :: periodic_box
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
     contains
         procedure :: construct => Abstract_construct

@@ -26,6 +26,17 @@ private
         procedure :: read => Abstract_read
     end type Abstract_Coordinates_Reader
 
+    type, extends(Abstract_Coordinates_Reader), public :: Concrete_Coordinates_Reader
+
+    end type Concrete_Coordinates_Reader
+
+    type, extends(Abstract_Coordinates_Reader), public :: Null_Coordinates_Reader
+    contains
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: read => Null_read
+    end type Null_Coordinates_Reader
+
 contains
 
 !implementation Abstract_Coordinates_Reader
@@ -64,5 +75,26 @@ contains
     end subroutine Abstract_read
 
 !end implementation Abstract_Coordinates_Reader
+
+!implementation Null_Coordinates_Reader
+
+    subroutine Null_construct(this, number, positions, orientations, read_orientations)
+        class(Null_Coordinates_Reader), intent(out) :: this
+        class(Abstract_Component_Number), target, intent(in) :: number
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: orientations
+        logical, intent(in) :: read_orientations
+    end subroutine Null_construct
+
+    subroutine Null_destroy(this)
+        class(Null_Coordinates_Reader), intent(inout) :: this
+    end subroutine Null_destroy
+
+    subroutine Null_read(this, filename)
+        class(Null_Coordinates_Reader), intent(in) :: this
+        character(len=*), intent(in) :: filename
+    end subroutine Null_read
+
+!end implementation Null_Coordinates_Reader
 
 end module class_component_coordinates_reader

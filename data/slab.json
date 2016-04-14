@@ -2,7 +2,7 @@
     "Environment": {
         "Box": {
             "periodicity": "XY",
-            "size": [12.0, 12.0, 18.0]
+            "initial size": [12.0, 12.0, 18.0]
         },
         "Thermostat": {
             "temperature": 1.0
@@ -161,26 +161,26 @@
         },
         "Component 1": {
             "Small Move": {
-                "delta": [0.3, 0.3, 0.3]
+                "initial delta": [0.3, 0.3, 0.3]
             },
             "Small Rotation": {
-                "delta": 1.0
+                "initial delta": 1.0
             }
         },
         "Component 2": {
             "Small Move": {
-                "delta": [0.3, 0.3, 0.3]
+                "initial delta": [0.3, 0.3, 0.3]
             },
             "Small Rotation": {
-                "delta": 1.0
+                "initial delta": 1.0
             }
         },
         "Component 3": {
             "Small Move": {
-                "delta": [0.3, 0.3, 0.3]
+                "initial delta": [0.3, 0.3, 0.3]
             },
             "Small Rotation": {
-                "delta": 1.0
+                "initial delta": 1.0
             }
         }
     },

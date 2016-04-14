@@ -163,7 +163,7 @@ contains
         logical, intent(in) :: write_coordinates
         character(len=*), intent(in) :: basename
 
-        if (write_coordinates) then
+        if (write_coordinates .and. selector%write_positions) then
             allocate(Concrete_Coordinates_Writer :: coordinates)
         else
             allocate(Null_Coordinates_Writer :: coordinates)

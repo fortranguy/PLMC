@@ -1,5 +1,6 @@
 module types_writers_wrapper
 
+use class_box_size_writer, only: Abstract_Box_Size_Writer
 use class_component_coordinates_writer, only: Abstract_Coordinates_Writer
 use class_line_writer, only: Abstract_Line_Writer
 use class_triangle_writer, only: Abstract_Triangle_Writer
@@ -16,8 +17,9 @@ private
     end type Component_Writers_Wrapper
 
     type, public :: Writers_Wrapper
-        type(Component_Writers_Wrapper), allocatable :: components(:)
+        class(Abstract_Box_Size_Writer), allocatable :: box_size
         class(Abstract_Line_Writer), allocatable :: field, walls
+        type(Component_Writers_Wrapper), allocatable :: components(:)
         class(Abstract_Triangle_Writer), allocatable :: switches, short_energies, dipolar_energies
         class(Abstract_Energy_Writer), allocatable :: dipolar_mixture_energy
     end type Writers_Wrapper
