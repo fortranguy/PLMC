@@ -62,7 +62,7 @@ contains
         this%period = coordinates_selector%period
         if (coordinates_selector%write_orientations) then
             allocate(Concrete_Number_to_String :: this%string_orientations)
-            this%legend = this%legend//"    orientation_x    orientation_z    orientation_z"
+            this%legend = this%legend//"    orientation_x    orientation_y    orientation_z"
         else
             allocate(Null_Number_to_String :: this%string_orientations)
         end if

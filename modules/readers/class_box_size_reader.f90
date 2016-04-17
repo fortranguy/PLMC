@@ -4,8 +4,6 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, max_line_length, max_word_length
 use procedures_checks, only: check_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use class_walls_potential, only: Abstract_Walls_Potential
 
 implicit none
 
@@ -14,8 +12,6 @@ private
     type, abstract, public :: Abstract_Box_Size_Reader
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Reciprocal_Lattice), pointer :: reciprocal_lattice => null()
-        class(Abstract_Walls_Potential), pointer :: walls_potential => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -28,22 +24,16 @@ private
 
 contains
 
-    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, walls_potential)
+    subroutine Abstract_construct(this, periodic_box)
         class(Abstract_Box_Size_Reader), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Reciprocal_Lattice), target, intent(in) :: reciprocal_lattice
-        class(Abstract_Walls_Potential), target, intent(in) :: walls_potential
 
         this%periodic_box => periodic_box
-        this%reciprocal_lattice => reciprocal_lattice
-        this%walls_potential => walls_potential
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Box_Size_Reader), intent(inout) :: this
 
-        this%walls_potential => null()
-        this%reciprocal_lattice => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 

@@ -5,6 +5,8 @@ use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use class_box_size_checker, only: Abstract_Box_Size_Checker, Concrete_Box_Size_Checker, &
+    Null_Box_Size_Checker
 use class_temperature, only: Abstract_Temperature, Concrete_Temperature
 use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
     Centered_Plates_Expression, Null_Field_Expression
@@ -36,6 +38,7 @@ public :: environment_create, environment_destroy
 interface environment_create
     module procedure :: create_all
     module procedure :: create_periodic_box
+    module procedure :: create_box_size_checker
     module procedure :: create_temperature
     module procedure :: create_field_expression
     module procedure :: create_parallelepiped_domain
@@ -55,6 +58,7 @@ interface environment_destroy
     module procedure :: destroy_parallelepiped_domain
     module procedure :: destroy_field_expression
     module procedure :: destroy_temperature
+    module procedure :: destroy_box_size_checker
     module procedure :: destroy_periodic_box
     module procedure :: destroy_all
 end interface environment_destroy
@@ -94,13 +98,17 @@ contains
         call environment_create(environment%walls_potential, walls_used, &
             environment%periodic_box, floor_penetration, input_data, prefix)
         call environment_destroy(floor_penetration)
+        call environment_create(environment%box_size_checker, environment%reciprocal_lattice, &
+            environment%walls_potential)
 
         call environment_check(environment%periodic_box, environment%walls_potential)
+        call environment%box_size_checker%check()
     end subroutine create_all
 
     subroutine destroy_all(environment)
         type(Environment_Wrapper), intent(inout) :: environment
 
+        call environment_destroy(environment%box_size_checker)
         call environment_destroy(environment%walls_potential)
         call environment_destroy(environment%reciprocal_lattice)
         call environment_destroy(environment%external_field)
@@ -131,7 +139,7 @@ contains
                 call error_exit(data_field//" unknown. Choose between: 'XYZ' and 'XY'")
         end select
         deallocate(box_periodicity)
-        data_field = prefix//"Box.size"
+        data_field = prefix//"Box.initial size"
         call input_data%get(data_field, box_size, data_found)
         call check_data_found(data_field, data_found)
         call periodic_box%set(box_size)
@@ -470,6 +478,28 @@ contains
         call walls_potential%destroy()
         if (allocated(walls_potential)) deallocate(walls_potential)
     end subroutine destroy_walls_potential
+
+    subroutine create_box_size_checker(box_size_checker, reciprocal_lattice, walls_potential)
+        class(Abstract_Box_Size_Checker), allocatable, intent(out) :: box_size_checker
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
+
+        if (use_reciprocal_lattice(reciprocal_lattice) .or. use_walls(walls_potential)) then
+            allocate(Concrete_Box_Size_Checker :: box_size_checker)
+        else
+            allocate(Null_Box_Size_Checker :: box_size_checker)
+        end if
+        call box_size_checker%construct(reciprocal_lattice, walls_potential)
+    end subroutine create_box_size_checker
+
+    subroutine destroy_box_size_checker(box_size_checker)
+        class(Abstract_Box_Size_Checker), allocatable, intent(inout) :: box_size_checker
+
+        if (allocated(box_size_checker)) then
+            call box_size_checker%destroy()
+            deallocate(box_size_checker)
+        end if
+    end subroutine destroy_box_size_checker
 
     subroutine check_consistency(periodic_box, walls_potential)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box

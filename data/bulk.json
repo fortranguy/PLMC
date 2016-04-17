@@ -25,7 +25,7 @@
     "Mixture": {
         "number of components": 3,
         "Component 1": {
-            "number": 250,
+            "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,
@@ -33,7 +33,7 @@
             "initial coordinates": "coordinates_1.in"
         },
         "Component 2": {
-            "number": 250,
+            "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,
@@ -41,7 +41,7 @@
             "initial coordinates": "coordinates_2.in"
         },
         "Component 3": {
-            "number": 250,
+            "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,

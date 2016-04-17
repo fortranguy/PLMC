@@ -44,7 +44,7 @@ if size(ARGS, 1) == 0
 end
 input_data = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
-box_size = map(Float64, input_data["Environment"]["Box"]["size"])
+box_size = map(Float64, input_data["Environment"]["Box"]["initial size"])
 components = Array{PLMC.Component}(input_data["Mixture"]["number of components"])
 if (size(components, 1) == 0)
     exit(0)
@@ -53,7 +53,7 @@ end
 interMinDistance = zeros(size(components, 1), size(components, 1)) # triangle?
 for i_component = 1:size(components, 1)
     components[i_component] = PLMC.Component(
-        input_data["Mixture"]["Component $(i_component)"]["number"], zeros(3, 1), zeros(3, 1))
+        input_data["Mixture"]["Component $(i_component)"]["initial number"], zeros(3, 1), zeros(3, 1))
     for j_component = 1:i_component-1
         interMinDistance[i_component, j_component] =
             input_data["Mixture"]["Inter $(j_component)$(i_component)"]["minimum distance"]

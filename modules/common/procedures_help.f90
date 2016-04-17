@@ -19,7 +19,7 @@ contains
         call get_command_argument(1, argument, length, status)
         if (status /= 0) call error_exit("in procedures_help: plmc_help(). Type -h for help.")
 
-        select case (argument)
+        select case (argument) !unification?
             case ("-h", "--help")
                 write(output_unit, *) "Please provide a data file in json format."
                 stop

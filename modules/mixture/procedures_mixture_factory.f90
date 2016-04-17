@@ -15,6 +15,7 @@ use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Di
 use procedures_component_factory, only: component_create, component_destroy
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
+use types_readers_wrapper, only: Component_Readers_wrapper
 use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar
 
 implicit none
@@ -42,6 +43,7 @@ end interface mixture_destroy
 
 interface mixture_set
     module procedure :: set_are_dipolar
+    module procedure :: read_mixture_coordinates
 end interface mixture_set
 
 contains
@@ -247,5 +249,23 @@ contains
             are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
         end do
     end subroutine set_are_dipolar
+
+    subroutine read_mixture_coordinates(components_readers, input_data, prefix)
+        type(Component_Readers_wrapper), intent(in) :: components_readers(:)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        integer :: i_component
+        type(Concrete_Number_to_String) :: string
+        character(len=:), allocatable :: data_field, filename
+        logical :: data_found
+
+        do i_component = 1, size(components_readers)
+            data_field = prefix//"Component "//string%get(i_component)//"."//"initial coordinates"
+            call input_data%get(data_field, filename, data_found)
+            call check_data_found(data_field, data_found)
+            call components_readers(i_component)%coordinates%read(filename)
+        end do
+    end subroutine read_mixture_coordinates
 
 end module procedures_mixture_factory

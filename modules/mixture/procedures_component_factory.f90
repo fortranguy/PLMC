@@ -20,7 +20,7 @@ use procedures_property_inquirers, only: use_walls, component_is_dipolar, compon
 implicit none
 
 private
-public :: component_create, component_set, component_destroy
+public :: component_create, component_destroy
 
 interface component_create
     module procedure :: create_all
@@ -30,10 +30,6 @@ interface component_create
     module procedure :: create_dipolar_moments
     module procedure :: create_chemical_potential
 end interface component_create
-
-interface component_set
-    module procedure :: set_coordinates
-end interface component_set
 
 interface component_destroy
     module procedure :: destroy_chemical_potential
@@ -54,13 +50,10 @@ contains
 
         logical :: is_dipolar, can_exchange
 
-        call component_create(component%number, exists, input_data, prefix)
+        call component_create(component%number, exists)
         call component_create(component%positions, exists, periodic_box, component%number)
-        call component_set(component%positions, input_data, prefix//"initial positions")
         is_dipolar = exists .and. component_is_dipolar(input_data, prefix)
         call component_create(component%orientations, is_dipolar, component%number)
-        call component_set(component%orientations, input_data, &
-            prefix//"initial orientations")
         call component_create(component%dipolar_moments, is_dipolar, component%orientations, &
             input_data, prefix)
         can_exchange = exists .and. component_can_exchange(input_data, prefix)
@@ -78,26 +71,16 @@ contains
         call component_destroy(component%number)
     end subroutine destroy_all
 
-    subroutine create_number(component_number, exists, input_data, prefix)
+    subroutine create_number(component_number, exists)
         class(Abstract_Component_Number), allocatable, intent(out) :: component_number
         logical, intent(in) :: exists
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        integer :: num_particles
 
         if (exists) then
             allocate(Concrete_Component_Number :: component_number)
-            data_field = prefix//"number"
-            call input_data%get(data_field, num_particles, data_found)
-            call check_data_found(data_field, data_found)
         else
-            num_particles = 0
             allocate(Null_Component_Number :: component_number)
         end if
-        call component_number%set(num_particles)
+        ! It will be set with coordinates. Too fragile?
     end subroutine create_number
 
     subroutine destroy_number(component_number)
@@ -151,28 +134,6 @@ contains
             deallocate(component_coordinates)
         end if
     end subroutine destroy_coordinates
-
-    subroutine set_coordinates(component_coordinates, input_data, data_field)
-        class(Abstract_Component_Coordinates), intent(inout) :: component_coordinates
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: data_field
-
-        character(len=:), allocatable :: filename
-        logical :: data_found
-        real(DP), allocatable :: file_coordinates(:, :)
-        integer :: i_particle
-
-        if (component_coordinates%get_num() == 0) return
-        call input_data%get(data_field, filename, data_found)
-        call check_data_found(data_field, data_found)
-        call create_coordinates_from_file(file_coordinates, filename)
-        if (size(file_coordinates, 2) /= component_coordinates%get_num()) then
-            call error_exit("set_coordinates from "//filename//": wrong number of lines.")
-        end if
-        do i_particle = 1, component_coordinates%get_num()
-            call component_coordinates%set(i_particle, file_coordinates(:, i_particle))
-        end do
-    end subroutine set_coordinates
 
     subroutine create_dipolar_moments(dipolar_moments, is_dipolar, &
         component_orientations, input_data, prefix)

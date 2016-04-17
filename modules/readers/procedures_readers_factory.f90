@@ -1,9 +1,6 @@
 module procedures_readers_factory
 
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use class_walls_potential, only: Abstract_Walls_Potential
-use types_environment_wrapper, only: Environment_Wrapper
 use class_component_number, only: Abstract_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
@@ -16,7 +13,7 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: readers_create
+public :: readers_create, readers_destroy
 
 interface readers_create
     module procedure :: create_all
@@ -34,13 +31,12 @@ end interface readers_destroy
 
 contains
 
-    subroutine create_all(readers, environment, components)
+    subroutine create_all(readers, periodic_box, components)
         type(Readers_Wrapper), intent(out) :: readers
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call readers_create(readers%box_size, environment%periodic_box, environment%&
-            reciprocal_lattice, environment%walls_potential)
+        call readers_create(readers%box_size, periodic_box)
         call readers_create(readers%components, components)
     end subroutine create_all
 
@@ -51,14 +47,12 @@ contains
         call readers_destroy(readers%box_size)
     end subroutine destroy_all
 
-    subroutine create_box_size(box_size, periodic_box, reciprocal_lattice, walls_potential)
+    subroutine create_box_size(box_size, periodic_box)
         class(Abstract_Box_Size_Reader), allocatable, intent(out) :: box_size
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Walls_Potential), intent(in) :: walls_potential
 
         allocate(Concrete_Box_Size_Reader :: box_size)
-        call box_size%construct(periodic_box, reciprocal_lattice, walls_potential)
+        call box_size%construct(periodic_box)
     end subroutine create_box_size
 
     subroutine destroy_box_size(box_size)
@@ -71,12 +65,13 @@ contains
     end subroutine destroy_box_size
 
     subroutine create_components_coordinates(components, mixture_components)
-        type(Component_Readers_wrapper), intent(out) :: components(:)
+        type(Component_Readers_wrapper), allocatable, intent(out) :: components(:)
         type(Component_Wrapper), intent(in) :: mixture_components(:)
 
         type(Concrete_Coordinates_Reader_Selector) :: selector_i
         integer :: i_component
 
+        allocate(components(size(mixture_components)))
         do i_component = 1, size(components)
             associate(number_i => mixture_components(i_component)%number, &
                 positions_i => mixture_components(i_component)%positions, &

@@ -9,7 +9,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_mixture_factory, only: mixture_create, mixture_destroy
+use procedures_mixture_factory, only: mixture_create, mixture_destroy, mixture_set
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_factory, only: short_interactions_create, &
     short_interactions_destroy
@@ -26,6 +26,8 @@ use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create
     metropolis_algorithms_set, metropolis_algorithms_destroy
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
+use types_readers_wrapper, only: Component_Readers_wrapper, Readers_Wrapper
+use procedures_readers_factory, only: readers_create, readers_destroy
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper, &
@@ -47,10 +49,12 @@ interface plmc_create
     module procedure :: create_changes
     module procedure :: create_metropolis
     module procedure :: create_observables
+    module procedure :: create_readers
     module procedure :: create_writers
 end interface plmc_create
 
 interface plmc_set
+    module procedure :: set_mixture_coordinates
     module procedure :: set_metropolis
     module procedure :: tune_changes_components
     module procedure :: set_success_and_reset_counter
@@ -58,6 +62,7 @@ end interface plmc_set
 
 interface plmc_destroy
     module procedure :: destroy_writers
+    module procedure :: destroy_readers
     module procedure :: destroy_observables
     module procedure :: destroy_metropolis
     module procedure :: destroy_changes
@@ -112,6 +117,13 @@ contains
 
         call mixture_destroy(mixture)
     end subroutine destroy_mixture
+
+    subroutine set_mixture_coordinates(components_readers, input_data)
+        type(Component_Readers_wrapper), intent(in) :: components_readers(:)
+        type(json_file), intent(inout) :: input_data
+
+        call mixture_set(components_readers, input_data, mixture_prefix)
+    end subroutine set_mixture_coordinates
 
     subroutine create_short_interactions(short_interactions, environment, mixture, input_data)
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
@@ -225,6 +237,20 @@ contains
 
         call observables_destroy(observables)
     end subroutine destroy_observables
+
+    subroutine create_readers(readers, environment, components)
+        type(Readers_Wrapper), intent(out) :: readers
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        call readers_create(readers, environment%periodic_box, components)
+    end subroutine create_readers
+
+    subroutine destroy_readers(readers)
+        type(Readers_Wrapper), intent(inout) :: readers
+
+        call readers_destroy(readers)
+    end subroutine destroy_readers
 
     subroutine create_writers(writers, environment, components, changes, short_interactions, &
         dipolar_interactions, input_data)
