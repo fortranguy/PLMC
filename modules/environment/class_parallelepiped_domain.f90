@@ -12,8 +12,8 @@ private
 
     type, abstract, public :: Abstract_Parallelepiped_Domain
     private
-        real(DP), dimension(num_dimensions) :: origin, size
         class(Abstract_Periodic_Box), pointer :: periodic_box
+        real(DP), dimension(num_dimensions) :: origin = 0._DP, size = 0._DP
     contains
         procedure :: construct => Abstract_construct
         procedure, private :: is_boxed => Abstract_is_boxed

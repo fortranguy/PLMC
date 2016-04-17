@@ -13,9 +13,9 @@ private
 
     type, abstract, public :: Abstract_Visitable_List
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Component_Coordinates), pointer :: positions
-        type(Concrete_Linkable_Node), pointer :: beginning
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Component_Coordinates), pointer :: positions => null()
+        type(Concrete_Linkable_Node), pointer :: beginning => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -32,7 +32,7 @@ private
     type, extends(Abstract_Visitable_List), public :: Concrete_Visitable_Array
     private
         integer, allocatable :: nodes(:)
-        integer :: num_nodes
+        integer :: num_nodes = 0
     contains
         procedure :: construct =>  Array_construct
         procedure :: destroy => Array_destroy

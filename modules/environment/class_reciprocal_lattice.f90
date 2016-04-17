@@ -12,8 +12,8 @@ private
 
     type, abstract, public :: Abstract_Reciprocal_Lattice
     private
-        integer :: numbers(num_dimensions)
         class(Abstract_Periodic_Box), pointer :: periodic_box
+        integer :: numbers(num_dimensions) = 0
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

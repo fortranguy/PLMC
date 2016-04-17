@@ -12,10 +12,10 @@ private
 
     type, abstract, public :: Abstract_DES_Self_Component
     private
-        real(DP) :: permittivity
+        real(DP) :: permittivity = 0._DP
         class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
-        real(DP) :: apha_cube
-        real(DP) :: factor_denominator
+        real(DP) :: alpha_cube = 0._DP
+        real(DP) :: factor_denominator = 1._DP
         class(Abstract_Component_Dipolar_Moments), pointer :: dipolar_moments => null()
     contains
         procedure :: construct => Abstract_construct
@@ -58,7 +58,7 @@ contains
     subroutine Abstract_set(this)
         class(Abstract_DES_Self_Component), intent(inout) :: this
 
-        this%apha_cube = this%alpha%get()**3
+        this%alpha_cube = this%alpha%get()**3
         this%factor_denominator = 6._DP * this%permittivity * PI**(3._DP/2._DP)
     end subroutine Abstract_set
 
@@ -85,7 +85,7 @@ contains
         class(Abstract_DES_Self_Component), intent(in) :: this
         real(DP), intent(in) :: moment(:)
 
-        energy = this%apha_cube/this%factor_denominator * dot_product(moment, moment)
+        energy = this%alpha_cube/this%factor_denominator * dot_product(moment, moment)
     end function Abstract_meet
 
 !end implementation Abstract_DES_Self_Component

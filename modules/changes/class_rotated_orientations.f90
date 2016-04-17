@@ -16,10 +16,10 @@ private
     type, extends(Abstract_Changed_Coordinates), public :: Concrete_Rotated_Orientations
     private
         class(Abstract_Component_Coordinates), pointer :: orientations
-        real(DP) :: delta
+        real(DP) :: delta = 0._DP
         type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
-        real(DP) :: current_increase_factor
-        logical :: max_factor_reached
+        real(DP) :: current_increase_factor = 1._DP
+        logical :: max_factor_reached = .false.
     contains
         procedure :: construct => Concrete_construct
         procedure :: destroy => Concrete_destroy

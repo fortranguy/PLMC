@@ -17,7 +17,7 @@ private
     type, extends(Abstract_Structure_Visitor), abstract, public :: Abstract_DES_Reci_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        integer :: reci_numbers(num_dimensions)
+        integer :: reci_numbers(num_dimensions) = 0
         class(Abstract_DES_Reci_Weight), pointer :: weight => null()
         class(Abstract_DES_Reci_Structure), pointer :: structure => null()
     contains

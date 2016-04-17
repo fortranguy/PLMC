@@ -11,17 +11,17 @@ implicit none
 private
 
     type, public :: Concrete_Change_Tuner_Parameters
-        integer :: accumulation_period
-        real(DP) :: wanted_success_ratio
-        real(DP) :: tolerance
+        integer :: accumulation_period = 0
+        real(DP) :: wanted_success_ratio = 0._DP
+        real(DP) :: tolerance = 0._DP
     end type Concrete_Change_Tuner_Parameters
 
     type, abstract, public :: Abstract_Change_Tuner
     private
         class(Abstract_Changed_Coordinates), pointer :: changed_coordinates => null()
-        integer :: accumulation_period
-        real(DP) :: accumulated_success_ratio
-        real(DP) :: success_ratio_min, success_ratio_max
+        integer :: accumulation_period = 0
+        real(DP) :: accumulated_success_ratio = 0._DP
+        real(DP) :: success_ratio_min = 0._DP, success_ratio_max = 0._DP
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

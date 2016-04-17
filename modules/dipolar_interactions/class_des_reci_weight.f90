@@ -14,8 +14,8 @@ private
     type, abstract, public :: Abstract_DES_Reci_Weight
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        integer :: reci_numbers(num_dimensions)
-        real(DP) :: permittivity
+        integer :: reci_numbers(num_dimensions) = 0
+        real(DP) :: permittivity = 0._DP
         class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
         real(DP), allocatable :: weight(:, :, :)
     contains

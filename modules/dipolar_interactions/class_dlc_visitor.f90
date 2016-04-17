@@ -17,7 +17,7 @@ private
     type, extends(Abstract_Structure_Visitor), abstract, public :: Abstract_DLC_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        integer :: reci_numbers(num_dimensions)
+        integer :: reci_numbers(num_dimensions) = 0
         class(Abstract_DLC_Weight), pointer :: weight => null()
         class(Abstract_DLC_Structures), pointer :: structures => null()
     contains

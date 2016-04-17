@@ -16,7 +16,7 @@ private
     type, extends(Abstract_Structure_Factor), abstract, public :: Abstract_DLC_Structures
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        integer :: reci_numbers(2)
+        integer :: reci_numbers(2) = 0
         type(Component_Wrapper), pointer :: components(:) => null()
         logical, allocatable :: are_dipolar(:)
         complex(DP), dimension(:, :), allocatable :: structure_p, structure_m

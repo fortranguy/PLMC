@@ -10,8 +10,8 @@ implicit none
 private
 
     type, public :: Concrete_Coordinates_Reader_Selector
-        logical :: read_positions
-        logical :: read_orientations
+        logical :: read_positions = .false.
+        logical :: read_orientations = .false.
     end type Concrete_Coordinates_Reader_Selector
 
     type, abstract, public :: Abstract_Coordinates_Reader
@@ -19,7 +19,7 @@ private
         class(Abstract_Component_Number), pointer :: number => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
-        logical :: read_orientations
+        logical :: read_orientations = .false.
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

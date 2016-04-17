@@ -11,7 +11,7 @@ private
 
     type, abstract, public :: Abstract_Periodic_Box
     private
-        real(DP) :: size(num_dimensions)
+        real(DP) :: size(num_dimensions) = 0._DP
     contains
         procedure :: set => Abstract_set
         procedure :: get_size => Abstract_get_size

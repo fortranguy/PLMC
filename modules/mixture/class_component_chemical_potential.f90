@@ -9,7 +9,8 @@ private
 
     type, abstract, public :: Abstract_Component_Chemical_Potential
     private
-        real(DP) :: density, excess
+        real(DP) :: density = 0._DP ! right place?
+        real(DP) :: excess = 0._DP
     contains
         procedure :: set => Abstract_set
         procedure :: get_density => Abstract_get_density

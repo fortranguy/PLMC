@@ -12,7 +12,7 @@ private
     type, abstract, public :: Abstract_DES_Convergence_Parameter
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        real(DP) :: alpha_x_box
+        real(DP) :: alpha_x_box = 0._DP
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

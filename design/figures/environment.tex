@@ -90,12 +90,21 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
+        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
                 \operation{\procedure{construct}{parallelepipedDomain: \type{ParallelepipedDomain},
                     fieldExpression: \type{FieldExpression}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PeriodicBox |- FloorPenetration.north)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{BoxSizeChecker}{0, 0}
+                \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
+                    wallsPotential: \type{WallsPotential}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{check}{}}
             \end{abstractclass}
         \end{scope}
 
@@ -107,6 +116,7 @@
                 \attribute{permittivity: \type{Permittivity}}
                 \attribute{reciprocalLattice: \type{ReciprocalLattice}}
                 \attribute{wallsPotential: \type{WallsPotential}}
+                \attribute{boxSizeChecker: \type{BoxSizeChecker}}
             \end{class}
         \end{scope}
 
@@ -123,6 +133,8 @@
             \composition{ExternalField}{\refName{fieldExpression}}{\numRef{1}}{FieldExpression}
             \aggregation{WallsPotential}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \composition{WallsPotential}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
+            \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}
+            \aggregation{BoxSizeChecker}{\refName{wallsPotential}}{\numRef{1}}{WallsPotential}
         \end{scope}
     \end{tikzpicture}
 

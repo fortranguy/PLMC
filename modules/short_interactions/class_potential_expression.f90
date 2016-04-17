@@ -30,7 +30,7 @@ private
 
     type, extends(Abstract_Potential_Expression), public :: Lennard_Jones_Expression
     private
-        real(DP) :: epsilon, sigma
+        real(DP) :: epsilon = 0._DP, sigma = 0._DP
     contains
         procedure :: set => LJ_set
         procedure :: get => LJ_get

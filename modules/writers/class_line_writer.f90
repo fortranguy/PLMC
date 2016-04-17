@@ -12,8 +12,8 @@ private
 
     type, abstract, public :: Abstract_Line_Writer
     private
-        integer :: file_unit
         type(String_Wrapper), allocatable :: strings(:)
+        integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

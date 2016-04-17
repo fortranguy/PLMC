@@ -13,8 +13,8 @@ private
     type, abstract, public :: Abstract_DLC_Weight
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        integer :: reci_numbers(num_dimensions)
-        real(DP) :: permittivity
+        integer :: reci_numbers(num_dimensions) = 0
+        real(DP) :: permittivity = 0._DP
         real(DP), dimension(:, :), allocatable :: weight
     contains
         procedure :: construct => Abstract_construct

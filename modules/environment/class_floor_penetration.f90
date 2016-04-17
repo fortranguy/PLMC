@@ -47,9 +47,10 @@ private
     !> it will be on a flat portion.
     type, extends(Abstract_Floor_Penetration), public :: Centered_Block_Penetration
     private
-        real(DP), dimension(2) :: size
-        real(DP) :: radius
-        real(DP), dimension(2) :: lower_in, lower_out, upper_in, upper_out ! right centers
+        real(DP), dimension(2) :: size = 0._DP
+        real(DP) :: radius = 0._DP
+        real(DP), dimension(2) :: lower_in = 0._DP, lower_out = 0._DP, upper_in = 0._DP, &
+            upper_out = 0._DP! right centers
     contains
         procedure :: set => Block_set
         procedure :: get_min_depth => Block_get_min_depth

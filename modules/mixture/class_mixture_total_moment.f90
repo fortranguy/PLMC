@@ -13,7 +13,7 @@ private
     private
         type(Component_Wrapper), pointer :: components(:) => null()
         logical, allocatable :: are_dipolar(:)
-        real(DP) :: total_moment(num_dimensions)
+        real(DP) :: total_moment(num_dimensions) = 0._DP
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

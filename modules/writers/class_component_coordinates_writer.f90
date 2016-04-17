@@ -10,9 +10,9 @@ implicit none
 private
 
     type, public :: Concrete_Coordinates_Writer_Selector
-        integer :: period
-        logical :: write_positions
-        logical :: write_orientations
+        integer :: period = 0
+        logical :: write_positions = .false.
+        logical :: write_orientations = .false.
     end type Concrete_Coordinates_Writer_Selector
 
     type, abstract, public :: Abstract_Coordinates_Writer
@@ -23,7 +23,7 @@ private
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
         character(len=:), allocatable :: basename
         character(len=:), allocatable :: legend
-        integer :: period
+        integer :: period = 0
         type(Concrete_Number_to_String) :: string_step
     contains
         procedure :: construct => Abstract_construct

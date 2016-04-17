@@ -10,7 +10,7 @@ private
 
     type, abstract, public :: Abstract_Energy_Writer
     private
-        integer :: file_unit
+        integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

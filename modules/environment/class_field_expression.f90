@@ -29,7 +29,7 @@ private
 
     type, extends(Abstract_Field_Expression), public :: Constant_Field_Expression
     private
-        real(DP) :: vector(num_dimensions)
+        real(DP) :: vector(num_dimensions) = 0._DP
     contains
         procedure :: set => Constant_set
         procedure :: get => Constant_get
@@ -38,10 +38,10 @@ private
     !> This field is produced by 2 charged plates of opposite charge.
     type, extends(Abstract_Field_Expression), public :: Centered_Plates_Expression
     private
-        real(DP) :: coulomb
-        real(DP) :: size_x
-        real(DP), dimension(2) :: center_lower, center_upper
-        real(DP) :: surface_density
+        real(DP) :: coulomb = 0._DP
+        real(DP) :: size_x = 0._DP
+        real(DP), dimension(2) :: center_lower = 0._DP, center_upper = 0._DP
+        real(DP) :: surface_density = 0._DP
     contains
         procedure :: set => Plates_set
         procedure :: get => Plates_get

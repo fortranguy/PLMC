@@ -21,8 +21,8 @@ private
 
     type, abstract, public :: Abstract_Triangle_Writer
     private
-        integer :: file_unit
         type(Strings_Wrapper), allocatable :: strings(:)
+        integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

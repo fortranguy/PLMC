@@ -12,8 +12,8 @@ private
 
     type, extends(Abstract_Coordinates), abstract, public :: Abstract_Component_Dipolar_Moments
     private
-        real(DP) :: norm
-        class(Abstract_Component_Coordinates), pointer :: orientations
+        class(Abstract_Component_Coordinates), pointer :: orientations => null()
+        real(DP) :: norm = 0._DP
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

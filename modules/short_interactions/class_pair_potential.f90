@@ -13,8 +13,8 @@ private
 
     type, abstract, public :: Abstract_Pair_Potential
     private
-        type(Short_Potential_Domain) :: domain
         class(Abstract_Potential_Expression), allocatable :: expression
+        type(Short_Potential_Domain) :: domain
     contains
         procedure(Abstract_construct), deferred :: construct
         procedure(Abstract_destroy), deferred :: destroy
@@ -59,7 +59,7 @@ private
 
     type, extends(Abstract_Pair_Potential), public :: Raw_Pair_Potential
     private
-        real(DP) :: energy_domain_max
+        real(DP) :: energy_domain_max = 0._DP
     contains
         procedure :: construct => Raw_construct
         procedure, private :: set_domain => Raw_set_domain
@@ -67,7 +67,7 @@ private
         procedure :: meet => Raw_meet
     end type Raw_Pair_Potential
 
-        type, extends(Abstract_Pair_Potential), public :: Null_Pair_Potential
+    type, extends(Abstract_Pair_Potential), public :: Null_Pair_Potential
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy

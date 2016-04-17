@@ -13,7 +13,7 @@ private
     type, abstract, public :: Abstract_DES_Surf_Mixture
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        real(DP) :: permittivity
+        real(DP) :: permittivity = 0._DP
         class(Abstract_Mixture_Total_Moment), pointer :: total_moment => null()
     contains
         procedure :: construct => Abstract_construct

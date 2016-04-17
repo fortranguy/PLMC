@@ -9,7 +9,7 @@ private
 
     type, abstract, public :: Abstract_Permittivity
     private
-        real(DP) :: permittivity
+        real(DP) :: permittivity = 0._DP
     contains
         procedure :: set => Abstract_set
         procedure :: get => Abstract_get

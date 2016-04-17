@@ -9,7 +9,7 @@ private
 
     type, abstract, public :: Abstract_Minimum_Distance
     private
-        real(DP) :: min_distance
+        real(DP) :: min_distance = 0._DP
     contains
         procedure :: set => Abstract_set
         procedure :: get => Abstract_get

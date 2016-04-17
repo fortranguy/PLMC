@@ -8,7 +8,7 @@ private
 
     type, abstract, public :: Abstract_Hetero_Couples
     private
-        integer :: num_indices
+        integer :: num_indices = 0
         integer, allocatable :: couple(:, :)
     contains
         procedure :: construct => Abstract_construct

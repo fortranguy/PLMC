@@ -2,8 +2,8 @@ module class_changes_writer
 
 use data_constants, only: max_line_length
 use procedures_checks, only: check_string_not_empty
-use class_number_to_string, only: Abstract_Number_to_String, &
-    Concrete_Number_to_String, Null_Number_to_String
+use class_number_to_string, only: Abstract_Number_to_String, Concrete_Number_to_String, &
+    Null_Number_to_String
 use module_changes_success, only: Concrete_Changes_Success
 
 implicit none
@@ -11,17 +11,17 @@ implicit none
 private
 
     type, public :: Concrete_Changes_Selector
-        logical :: write_positions
-        logical :: write_rotations
-        logical :: write_exchanges
+        logical :: write_positions = .false.
+        logical :: write_rotations = .false.
+        logical :: write_exchanges = .false.
     end type Concrete_Changes_Selector
 
     type, abstract, public :: Abstract_Changes_Success_Writer
     private
-        integer :: file_unit
         type(Concrete_Number_to_String) :: string_move
         class(Abstract_Number_to_String), allocatable :: string_rotation
         class(Abstract_Number_to_String), allocatable :: string_exchange
+        integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

@@ -9,10 +9,10 @@ private
 
     type, abstract, public :: Abstract_Tower_Sampler
     private
-        logical :: unique_candidate
-        integer :: i_unique_candidate
-        integer :: num_candidates
-        integer :: num_choices
+        logical :: unique_candidate = .true.
+        integer :: i_unique_candidate = 0
+        integer :: num_candidates = 0
+        integer :: num_choices = 0
         real(DP), allocatable :: limits(:)
     contains
         procedure :: construct => Abstract_construct

@@ -15,7 +15,7 @@ private
 
     type, extends(Abstract_Coordinates), abstract, public :: Abstract_Component_Coordinates
     private
-        class(Abstract_Component_Number), pointer :: number
+        class(Abstract_Component_Number), pointer :: number => null()
         real(DP), allocatable :: coordinates(:, :)
     contains
         procedure(Abstract_destroy), deferred :: destroy
@@ -46,7 +46,7 @@ private
 
     type, extends(Abstract_Component_Coordinates), public :: Concrete_Component_Positions
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
     contains
         procedure :: construct => Positions_construct
         procedure :: destroy => Positions_destroy
@@ -54,7 +54,6 @@ private
     end type Concrete_Component_Positions
 
     type, extends(Abstract_Component_Coordinates), public :: Concrete_Component_Orientations
-    private
     contains
         procedure :: construct => Orientations_construct
         procedure :: destroy => Orientations_destroy
@@ -113,12 +112,12 @@ contains
         num_coordinates = this%number%get()
     end function Abstract_get_num
 
-    pure function Abstract_get(this, i_particle) result(coordinate)
+    pure function Abstract_get(this, i_particle) result(vector)
         class(Abstract_Component_Coordinates), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: coordinate(num_dimensions)
+        real(DP) :: vector(num_dimensions)
 
-        coordinate = this%coordinates(:, i_particle)
+        vector = this%coordinates(:, i_particle)
     end function Abstract_get
 
     subroutine Abstract_add(this, vector)
@@ -135,8 +134,7 @@ contains
         class(Abstract_Component_Coordinates), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Abstract_remove", this%number%get(), &
-            "i_particle", i_particle)
+        call check_in_range("Abstract_remove", this%number%get(), "i_particle", i_particle)
         if (i_particle < this%number%get()) then
             call this%set(i_particle, this%get(this%number%get()))
         end if
@@ -169,8 +167,8 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: vector(:)
 
-        call check_in_range("Concrete_Component_Positions: set", this%number%get(), &
-            "i_particle", i_particle)
+        call check_in_range("Concrete_Component_Positions: set", this%number%get(), "i_particle", &
+            i_particle)
         call check_array_size("Concrete_Component_Positions: set", "vector", vector, num_dimensions)
         this%coordinates(:, i_particle) = this%periodic_box%folded(vector)
     end subroutine Positions_set

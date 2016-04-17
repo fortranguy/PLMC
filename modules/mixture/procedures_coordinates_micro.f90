@@ -36,7 +36,7 @@ contains
         character(len=*), intent(in) :: filename
 
         character(len=max_line_length) :: comment_caracter
-        real(DP) :: coordinate(num_dimensions)
+        real(DP) :: vector(num_dimensions)
         integer :: num_particles, i_particle
         integer :: file_unit, read_stat
 
@@ -45,7 +45,7 @@ contains
         read(file_unit, *) comment_caracter
         num_particles = 0
         do
-            read(file_unit, fmt=*, iostat=read_stat) coordinate
+            read(file_unit, fmt=*, iostat=read_stat) vector
             if (read_stat == iostat_end) exit
             num_particles = num_particles + 1
         end do

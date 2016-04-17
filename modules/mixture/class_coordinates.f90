@@ -21,11 +21,11 @@ private
             integer :: num_coordinates
         end function Abstract_get_num
 
-        pure function Abstract_get(this, i_particle) result(coordinate)
+        pure function Abstract_get(this, i_particle) result(vector)
         import :: DP, num_dimensions, Abstract_Coordinates
             class(Abstract_Coordinates), intent(in) :: this
             integer, intent(in) :: i_particle
-            real(DP) :: coordinate(num_dimensions)
+            real(DP) :: vector(num_dimensions)
         end function Abstract_get
 
     end interface

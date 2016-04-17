@@ -18,14 +18,14 @@ private
 
     type, abstract, public :: Abstract_Visitable_Cells
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Component_Coordinates), pointer :: positions
-        class(Abstract_Pair_Potential), pointer :: pair_potential
-        integer :: nums(num_dimensions)
-        real(DP) :: size(num_dimensions)
-        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
-        logical :: skip_bottom_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2)
-        logical :: skip_top_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2)
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Component_Coordinates), pointer :: positions => null()
+        class(Abstract_Pair_Potential), pointer :: pair_potential => null()
+        integer :: nums(num_dimensions) = 0
+        real(DP) :: size(num_dimensions) = 0._DP
+        integer, dimension(num_dimensions) :: global_lbounds = 0, global_ubounds = 0
+        logical :: skip_bottom_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2) = .false.
+        logical :: skip_top_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2) = .false.
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :), list_mold
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
     contains

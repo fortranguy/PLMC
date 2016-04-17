@@ -9,7 +9,7 @@ private
 
     type, abstract, public :: Abstract_Temperature
     private
-        real(DP) :: temperature
+        real(DP) :: temperature = 0._DP
     contains
         procedure :: set => Abstract_set
         procedure :: get => Abstract_get

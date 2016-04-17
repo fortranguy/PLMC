@@ -14,7 +14,7 @@ end interface normal_random_number
 
     real(DP), parameter :: sigma_3d = 1._DP / sqrt(3._DP)
     logical :: result_saved = .false.
-    real(DP) :: saved_result
+    real(DP) :: saved_result = 0._DP
 
 contains
 

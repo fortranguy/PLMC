@@ -8,7 +8,7 @@ private
 
     type, abstract, public :: Abstract_Component_Number
     private
-        integer :: number
+        integer :: number = 0
     contains
         procedure :: set => Abstract_set
         procedure :: get => Abstract_get

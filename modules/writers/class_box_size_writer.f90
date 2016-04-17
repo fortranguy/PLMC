@@ -15,14 +15,28 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         character(len=:), allocatable :: basename
         character(len=:), allocatable :: legend
-        integer :: period
+        integer :: period = 0
         type(Concrete_Number_to_String) :: string_step
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: write => Abstract_write
     end type Abstract_Box_Size_Writer
 
+    type, extends(Abstract_Box_Size_Writer), public :: Concrete_Box_Size_Writer
+
+    end type Concrete_Box_Size_Writer
+
+    type, extends(Abstract_Box_Size_Writer), public :: Null_Box_Size_Writer
+    contains
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: write => Null_write
+    end type Null_Box_Size_Writer
+
 contains
+
+!implementation Abstract_Box_Size_Writer
 
     subroutine Abstract_construct(this, periodic_box, period, basename)
         class(Abstract_Box_Size_Writer), intent(out) :: this
@@ -60,5 +74,27 @@ contains
             close(unit_i)
         end if
     end subroutine Abstract_write
+
+!end implementation Abstract_Box_Size_Writer
+
+!implementation Null_Box_Size_Writer
+
+    subroutine Null_construct(this, periodic_box, period, basename)
+        class(Null_Box_Size_Writer), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        integer, intent(in) :: period
+        character(len=*), intent(in) :: basename
+    end subroutine Null_construct
+
+    subroutine Null_destroy(this)
+        class(Null_Box_Size_Writer), intent(inout) :: this
+    end subroutine Null_destroy
+
+    subroutine Null_write(this, i_step)
+        class(Null_Box_Size_Writer), intent(in) :: this
+        integer, intent(in) :: i_step
+    end subroutine Null_write
+
+!end implementation Null_Box_Size_Writer
 
 end module class_box_size_writer

@@ -16,8 +16,8 @@ private
     type, abstract, public :: Abstract_DES_Real_Pair
     private
         type(Dipolar_Potential_Domain) :: domain
-        real(DP) :: domain_max
-        real(DP) :: coulomb
+        real(DP) :: domain_max = 0._DP
+        real(DP) :: coulomb = 0._DP
         class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
     contains
         procedure(Abstract_construct), deferred :: construct
