@@ -25,7 +25,6 @@ private
         procedure :: destroy => Concrete_destroy
         procedure :: increase_delta => Concrete_increase_delta
         procedure :: decrease_delta => Concrete_decrease_delta
-        procedure :: get_num => Concrete_get_num
         procedure :: get => Concrete_get
     end type Concrete_Rotated_Orientations
 
@@ -69,12 +68,6 @@ contains
 
         this%delta = this%delta / this%current_increase_factor
     end subroutine Concrete_decrease_delta
-
-    pure integer function Concrete_get_num(this) result(num_orientations)
-        class(Concrete_Rotated_Orientations), intent(in) :: this
-
-        num_orientations = this%orientations%get_num()
-    end function Concrete_get_num
 
     function Concrete_get(this, i_particle) result(rotated_orientation)
         real(DP) :: rotated_orientation(num_dimensions)

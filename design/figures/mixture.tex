@@ -8,20 +8,23 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
-                \operation{\procedure{set}{number: \type{int}}}
-                \operation{\procedure{get}{}: \type{int}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
                 \operation[0]{\procedure{getNum}{}: \type{int}}
                 \operation[0]{\procedure{get}{iParticle: \type{int}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentNumber.north) + (8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(Coordinates.north) + (8 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
+                \inherit{Coordinates}
+                \operation{\procedure{construct}{norm: \type{real},
+                    orientations: \type{ComponentCoordinates}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getNorm}{}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ComponentDipolarMoments.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
                 \inherit{Coordinates}
                 \operation[0]{\procedure{construct}{...}}
@@ -32,17 +35,22 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
-                \inherit{Coordinates}
-                \operation{\procedure{construct}{norm: \type{real},
-                    orientations: \type{ComponentCoordinates}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{getNorm}{}: \type{real}}
+        \begin{scope}[shift={($(Coordinates |- ComponentCoordinates.north)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
+                \operation{\procedure{set}{number: \type{int}}}
+                \operation{\procedure{get}{}: \type{int}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentCoordinates.north) + (0 cm, 4.5 cm)$)}]
+        \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ComponentAverageNumber}{0, 0}
+                \operation{\procedure{construct}{...}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{get}{}: \type{int}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ComponentDipolarMoments.north) + (0 cm, 4.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{Component}{0, 0}
                 \attribute{number: \type{ComponentNumber}}
                 \attribute{positions: \type{ComponentCoordinates}}
@@ -52,7 +60,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(ComponentDipolarMoments.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
                 \operation{\procedure{construct}{components: \type{Component[:]},
                     areDipolar: \type{bool[:]}}}
@@ -66,7 +74,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Coordinates.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
                 \operation{\procedure{set}{minDistance: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}

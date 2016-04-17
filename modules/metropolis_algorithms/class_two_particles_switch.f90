@@ -26,12 +26,12 @@ private
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
+        class(Abstract_Hetero_Couples), allocatable :: couples
         class(Abstract_Tower_Sampler), allocatable :: selector ![i, j] <-> k: convert
-        class(Abstract_Hetero_Couples), allocatable :: components_couples
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: set_candidates => Abstract_set_candidates
+        procedure :: allocate_couples_and_selector => Abstract_allocate_couples_and_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: test_metropolis => Abstract_test_metropolis
@@ -51,7 +51,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: set_candidates => Null_set_candidates
+        procedure :: allocate_couples_and_selector => Null_allocate_couples_and_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
         procedure, private :: test_metropolis => Null_test_metropolis
@@ -67,43 +67,45 @@ contains
 
 !implementation Abstract_Two_Particles_Switch
 
-    subroutine Abstract_construct(this, environment, selector, components_couples)
+    subroutine Abstract_construct(this, environment, components, short_interactions, &
+        dipolar_interactions)
         class(Abstract_Two_Particles_Switch), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        class(Abstract_Tower_Sampler), intent(in) :: selector
-        class(Abstract_Hetero_Couples), intent(in) :: components_couples
+        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
 
         this%environment => environment
-        allocate(this%selector, source=selector)
-        allocate(this%components_couples, source=components_couples)
+        this%components => components
+        this%short_interactions => short_interactions
+        this%dipolar_interactions => dipolar_interactions
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
 
-        this%dipolar_interactions => null()
-        this%short_interactions => null()
-        this%components => null()
-        if (allocated(this%components_couples)) then
-            call this%components_couples%destroy()
-            deallocate(this%components_couples)
-        end if
         if (allocated(this%selector)) then
             call this%selector%destroy()
             deallocate(this%selector)
         end if
+        if (allocated(this%couples)) then
+            call this%couples%destroy()
+            deallocate(this%couples)
+        end if
+        this%dipolar_interactions => null()
+        this%short_interactions => null()
+        this%components => null()
+        this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_set_candidates(this, components, short_interactions, dipolar_interactions)
+    subroutine Abstract_allocate_couples_and_selector(this, couples, selector)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
-        type(Component_Wrapper), target, intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        class(Abstract_Hetero_Couples), intent(in) :: couples
+        class(Abstract_Tower_Sampler), intent(in) :: selector
 
-        this%components => components
-        this%short_interactions => short_interactions
-        this%dipolar_interactions => dipolar_interactions
-    end subroutine Abstract_set_candidates
+        allocate(this%couples, source=couples)
+        allocate(this%selector, source=selector)
+    end subroutine Abstract_allocate_couples_and_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
@@ -119,7 +121,7 @@ contains
         type(Concrete_Double_Delta_Energies) :: deltas
         integer :: ij_actors(2), i
 
-        ij_actors = this%components_couples%get(this%selector%get())
+        ij_actors = this%couples%get(this%selector%get())
         observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits = &
             observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits + 1
         allocate(deltas%short(size(observables%short_energies), 2))
@@ -319,23 +321,24 @@ contains
 
 !implementation Null_Two_Particles_Switch
 
-    subroutine Null_construct(this, environment, selector, components_couples)
+    subroutine Null_construct(this, environment, components, short_interactions, &
+        dipolar_interactions)
         class(Null_Two_Particles_Switch), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        class(Abstract_Tower_Sampler), intent(in) :: selector
-        class(Abstract_Hetero_Couples), intent(in) :: components_couples
+        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Two_Particles_Switch), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_set_candidates(this, components, short_interactions, dipolar_interactions)
+    subroutine Null_allocate_couples_and_selector(this, couples, selector)
         class(Null_Two_Particles_Switch), intent(inout) :: this
-        type(Component_Wrapper), target, intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
-    end subroutine Null_set_candidates
+        class(Abstract_Hetero_Couples), intent(in) :: couples
+        class(Abstract_Tower_Sampler), intent(in) :: selector
+    end subroutine Null_allocate_couples_and_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Two_Particles_Switch), intent(in) :: this

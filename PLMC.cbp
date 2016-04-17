@@ -302,7 +302,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/environment/types_environment_wrapper.f90">
-			<Option weight="5" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/metropolis_algorithms/class_metropolis_algorithm.f90">
 			<Option weight="3" />
@@ -321,6 +321,9 @@
 		</Unit>
 		<Unit filename="modules/metropolis_algorithms/types_metropolis_algorithms_wrapper.f90">
 			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/mixture/class_component_average_number.f90">
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/mixture/class_component_chemical_potential.f90">
 			<Option weight="2" />
@@ -392,7 +395,7 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/readers/class_box_size_reader.f90">
-			<Option weight="5" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/readers/class_component_coordinates_reader.f90">
 			<Option weight="4" />
@@ -404,7 +407,7 @@
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/readers/types_readers_wrapper.f90">
-			<Option weight="6" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/short_interactions/class_pair_potential.f90">
 			<Option weight="3" />

@@ -11,7 +11,6 @@ private
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_increase_delta), deferred :: increase_delta
         procedure(Abstract_decrease_delta), deferred :: decrease_delta
-        procedure(Abstract_get_num), deferred :: get_num
         procedure(Abstract_get), deferred :: get
     end type Abstract_Changed_Coordinates
 
@@ -32,11 +31,6 @@ private
             class(Abstract_Changed_Coordinates), intent(inout) :: this
         end subroutine Abstract_decrease_delta
 
-        pure integer function Abstract_get_num(this) result(num_coordinates)
-            import :: Abstract_Changed_Coordinates
-            class(Abstract_Changed_Coordinates), intent(in) :: this
-        end function Abstract_get_num
-
         function Abstract_get(this, i_particle) result(changed)
             import :: DP, num_dimensions, Abstract_Changed_Coordinates
             real(DP) :: changed(num_dimensions)
@@ -52,7 +46,6 @@ private
         procedure :: destroy => Null_destroy
         procedure :: increase_delta => Null_increase_delta
         procedure :: decrease_delta => Null_decrease_delta
-        procedure :: get_num => Null_get_num
         procedure :: get => Null_get
     end type Null_Changed_Coordinates
 
@@ -75,11 +68,6 @@ contains
     subroutine Null_decrease_delta(this)
         class(Null_Changed_Coordinates), intent(inout) :: this
     end subroutine Null_decrease_delta
-
-    pure integer function Null_get_num(this) result(num_coordinates)
-        class(Null_Changed_Coordinates), intent(in) :: this
-        num_coordinates = 0
-    end function Null_get_num
 
     function Null_get(this, i_particle) result(changed)
         real(DP) :: changed(num_dimensions)

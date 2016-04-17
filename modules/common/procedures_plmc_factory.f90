@@ -190,23 +190,25 @@ contains
         call changes_destroy(changes)
     end subroutine destroy_changes
 
-    subroutine create_metropolis(metropolis, environment, components, changes)
+    subroutine create_metropolis(metropolis, environment, mixture, changes, short_interactions, &
+        dipolar_interactions)
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Wrapper), intent(in) :: changes
-
-        call metropolis_algorithms_create(metropolis, environment, components, changes%components)
-    end subroutine create_metropolis
-
-    subroutine set_metropolis(metropolis, mixture, short_interactions, dipolar_interactions)
-        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
         type(Mixture_Wrapper), intent(in) :: mixture
+        type(Changes_Wrapper), intent(in) :: changes
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
-        call metropolis_algorithms_set(metropolis, mixture, short_interactions, &
-            dipolar_interactions)
+        call metropolis_algorithms_create(metropolis, environment, mixture, changes%components, &
+            short_interactions, dipolar_interactions)
+    end subroutine create_metropolis
+
+    subroutine set_metropolis(metropolis, mixture, changes)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
+        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Changes_Wrapper), intent(in) :: changes
+
+        call metropolis_algorithms_set(metropolis, mixture%components, changes%components)
     end subroutine set_metropolis
 
     subroutine destroy_metropolis(metropolis)

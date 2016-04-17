@@ -8,7 +8,7 @@ use procedures_checks, only: check_file_exists
 implicit none
 
 private
-public :: increase_coordinates_size, create_coordinates_from_file
+public :: increase_coordinates_size
 
     integer, parameter :: increase_factor = 2
 
@@ -30,34 +30,5 @@ contains
         coordinates(:, 1:size2) = coordinates_tmp
         deallocate(coordinates_tmp)
     end subroutine increase_coordinates_size
-
-    subroutine create_coordinates_from_file(coordinates, filename)
-        real(DP), allocatable, intent(out) :: coordinates(:, :)
-        character(len=*), intent(in) :: filename
-
-        character(len=max_line_length) :: comment_caracter
-        real(DP) :: vector(num_dimensions)
-        integer :: num_particles, i_particle
-        integer :: file_unit, read_stat
-
-        call check_file_exists(filename)
-        open(newunit=file_unit, recl=max_line_length, file=filename, status="old", action="read")
-        read(file_unit, *) comment_caracter
-        num_particles = 0
-        do
-            read(file_unit, fmt=*, iostat=read_stat) vector
-            if (read_stat == iostat_end) exit
-            num_particles = num_particles + 1
-        end do
-        if (num_particles > 0) then
-            allocate(coordinates(num_dimensions, num_particles))
-            rewind(file_unit)
-            read(file_unit, *) comment_caracter
-            do i_particle = 1, num_particles
-                read(file_unit, *) coordinates(:, i_particle)
-            end do
-        end if
-        close(file_unit)
-    end subroutine create_coordinates_from_file
 
 end module procedures_coordinates_micro

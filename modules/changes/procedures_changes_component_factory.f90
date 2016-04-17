@@ -114,7 +114,7 @@ contains
 
         select type (moved_positions)
             type is (Concrete_Moved_Positions)
-                data_field = prefix//"Small Move.delta"
+                data_field = prefix//"Small Move.initial delta"
                 call input_data%get(data_field, move_delta, data_found)
                 call check_data_found(data_field, data_found)
                 call moved_positions%construct(periodic_box, positions, move_delta, &
@@ -196,7 +196,7 @@ contains
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)
-                data_field = prefix//"Small Rotation.delta"
+                data_field = prefix//"Small Rotation.initial delta"
                 call input_data%get(data_field, rotation_delta, data_found)
                 call check_data_found(data_field, data_found)
                 call rotated_orientations%construct(orientations, rotation_delta, tuning_parameters)
