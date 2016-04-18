@@ -1,7 +1,7 @@
 module class_triangle_writer
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: max_line_length
+use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
 use types_line_observables, only: Concrete_Line_Observables

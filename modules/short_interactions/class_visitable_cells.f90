@@ -2,8 +2,8 @@ module class_visitable_cells
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
+use data_cells, only: nums_local_cells
 use procedures_errors, only: error_exit
-use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -13,8 +13,6 @@ use class_pair_potential, only: Abstract_Pair_Potential
 implicit none
 
 private
-
-    integer, parameter :: nums_local_cells(num_dimensions) = 3
 
     type, abstract, public :: Abstract_Visitable_Cells
     private
@@ -35,17 +33,16 @@ private
         procedure :: move => Abstract_move
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
-        procedure, private :: set_nums => Abstract_set_nums
+        procedure(Abstract_set_skip_layers), private, deferred :: set_skip_layers
+        procedure, private :: create_space => Abstract_create_space
         procedure(Abstract_check_nums), private, deferred :: check_nums
-        procedure, private :: set_division => Abstract_set_division
-        procedure, private :: check_division => Abstract_check_division
+        procedure, private :: check_size => Abstract_check_size
         procedure, private :: construct_visitable_lists => &
             Abstract_construct_visitable_lists
         procedure, private :: set_neighbours => Abstract_set_neighbours
         procedure, private :: index => Abstract_index
-        procedure(Abstract_set_skip_layers), private, deferred :: set_skip_layers
         procedure, private :: skip_local => Abstract_skip_local
-        procedure, private :: fill => Abstract_fill
+        procedure, private :: fill_with_particles => Abstract_fill_with_particles
     end type Abstract_Visitable_Cells
 
     abstract interface
@@ -72,7 +69,7 @@ private
         procedure :: remove => Null_remove
         procedure, private :: check_nums => Null_check_nums
         procedure, private :: set_skip_layers => Null_set_skip_layers
-        procedure, private :: fill => Null_fill
+        procedure, private :: fill_with_particles => Null_fill_with_particles
     end type Null_Visitable_Cells
 
     type, extends(Abstract_Visitable_Cells), public :: XYZ_PBC_Visitable_Cells
@@ -103,17 +100,29 @@ contains
         this%periodic_box => periodic_box
         this%positions => positions
         this%pair_potential => pair_potential
-        call this%set_nums()
-        call this%set_division()
+        allocate(this%list_mold, mold=list_mold)
+        call this%set_skip_layers()
+
+        call this%create_space()
+        call this%fill_with_particles()
+    end subroutine Abstract_construct
+
+    subroutine Abstract_create_space(this)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+
+        this%nums = floor(this%periodic_box%get_size()/this%pair_potential%get_max_distance())
+        call this%check_nums()
+        this%size = this%periodic_box%get_size() / real(this%nums, DP)
+        call this%check_size()
+
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
-        allocate(this%list_mold, mold=list_mold)
         allocate(this%visitable_lists(this%global_lbounds(1):this%global_ubounds(1), &
                                       this%global_lbounds(2):this%global_ubounds(2), &
                                       this%global_lbounds(3):this%global_ubounds(3)), &
                                       mold=this%list_mold)
-        call this%construct_visitable_lists(periodic_box, positions)
-        call this%set_skip_layers()
+        call this%construct_visitable_lists()
+
         allocate(this%neighbours(3, -nums_local_cells(1)/2:nums_local_cells(1)/2, &
                                     -nums_local_cells(2)/2:nums_local_cells(2)/2, &
                                     -nums_local_cells(3)/2:nums_local_cells(3)/2, &
@@ -121,51 +130,30 @@ contains
                                     this%global_lbounds(2):this%global_ubounds(2), &
                                     this%global_lbounds(3):this%global_ubounds(3)))
         call this%set_neighbours()
-        call this%fill()
-    end subroutine Abstract_construct
+    end subroutine Abstract_create_space
 
-    subroutine Abstract_set_nums(this)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
-
-        call check_positive("Abstract_Visitable_Cells: set_nums", &
-            "this%pair_potential%get_max_distance()", this%pair_potential%get_max_distance())
-        this%nums = floor(this%periodic_box%get_size()/this%pair_potential%get_max_distance())
-        call check_positive("Abstract_Visitable_Cells: set_nums", "this%nums", this%nums)
-        call this%check_nums()
-    end subroutine Abstract_set_nums
-
-    subroutine Abstract_set_division(this)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
-
-        this%size = this%periodic_box%get_size() / real(this%nums, DP)
-        call check_positive("Abstract_Visitable_Cells: set_division", "this%size", this%size)
-        call this%check_division()
-    end subroutine Abstract_set_division
-
-    subroutine Abstract_check_division(this)
+    subroutine Abstract_check_size(this)
         class(Abstract_Visitable_Cells), intent(in) :: this
 
         real(DP) :: box_mod_cell(num_dimensions)
 
         box_mod_cell = modulo(this%periodic_box%get_size(), this%size)
         if (any(box_mod_cell > real_zero .and. abs(box_mod_cell - this%size) > real_zero)) then
-            call error_exit("Abstract_Visitable_Cells: check_division: "//&
+            call error_exit("Abstract_Visitable_Cells: check_size: "//&
                             "this%size is not a divisor of periodic_box%get_size()")
         end if
-    end subroutine Abstract_check_division
+    end subroutine Abstract_check_size
 
-    subroutine Abstract_construct_visitable_lists(this, periodic_box, positions)
+    subroutine Abstract_construct_visitable_lists(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), intent(in) :: positions
 
         integer :: global_i1, global_i2, global_i3
 
         do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
         do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
         do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            call this%visitable_lists(global_i1, global_i2, global_i3)%construct(periodic_box, &
-                positions)
+            call this%visitable_lists(global_i1, global_i2, global_i3)%construct(this%periodic_box,&
+                this%positions)
         end do
         end do
         end do
@@ -177,7 +165,7 @@ contains
         integer :: global_i1, global_i2, global_i3
         logical :: bottom_layer, top_layer
         integer :: local_i1, local_i2, local_i3
-        integer :: i_cell(num_dimensions)
+        integer :: ijk_cell(num_dimensions)
 
         this%neighbours = 0
         do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
@@ -189,10 +177,10 @@ contains
                 if (this%skip_local(bottom_layer, top_layer, local_i3)) cycle
             do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
             do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
-                i_cell = [global_i1, global_i2, global_i3] + [local_i1, local_i2, local_i3]
-                i_cell = pbc_3d_index(i_cell, this%nums)
+                ijk_cell = [global_i1, global_i2, global_i3] + [local_i1, local_i2, local_i3]
+                ijk_cell = pbc_3d_index(ijk_cell, this%nums)
                 this%neighbours(:, local_i1, local_i2, local_i3, &
-                    global_i1, global_i2, global_i3) = i_cell
+                    global_i1, global_i2, global_i3) = ijk_cell
             end do
             end do
             end do
@@ -201,11 +189,11 @@ contains
         end do
     end subroutine Abstract_set_neighbours
 
-    pure function pbc_3d_index(i_cell, nums_cells)
-        integer, intent(in) :: i_cell(:), nums_cells(:)
+    pure function pbc_3d_index(ijk_cell, nums_cells)
+        integer, intent(in) :: ijk_cell(:), nums_cells(:)
         integer :: pbc_3d_index(3)
 
-        pbc_3d_index = modulo(i_cell + nums_cells/2, nums_cells) - nums_cells/2
+        pbc_3d_index = modulo(ijk_cell + nums_cells/2, nums_cells) - nums_cells/2
     end function pbc_3d_index
 
     pure function Abstract_skip_local(this, bottom_layer, top_layer, local_i3) result(skip_local)
@@ -218,7 +206,7 @@ contains
             (top_layer .and. this%skip_top_layer(local_i3))
     end function Abstract_skip_local
 
-    subroutine Abstract_fill(this)
+    subroutine Abstract_fill_with_particles(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
         type(Concrete_Temporary_Particle) :: particle
@@ -229,7 +217,7 @@ contains
             particle%position = this%positions%get(particle%i)
             call this%add(particle)
         end do
-    end subroutine Abstract_fill
+    end subroutine Abstract_fill_with_particles
 
     subroutine Abstract_destroy(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -259,21 +247,21 @@ contains
         integer, intent(in) :: i_exclude
 
         real(DP) :: energy_i
-        integer, dimension(num_dimensions) :: i_cell, i_local_cell
+        integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
         logical :: bottom_layer, top_layer
         integer :: local_i1, local_i2, local_i3
 
-        i_cell = this%index(particle%position)
-        bottom_layer = (i_cell(3) == this%global_lbounds(3))
-        top_layer = (i_cell(3) == this%global_ubounds(3))
+        ijk_cell = this%index(particle%position)
+        bottom_layer = (ijk_cell(3) == this%global_lbounds(3))
+        top_layer = (ijk_cell(3) == this%global_ubounds(3))
         energy = 0._DP
         do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
             if (this%skip_local(bottom_layer, top_layer, local_i3)) cycle
         do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
         do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
-            i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
-                i_cell(1), i_cell(2), i_cell(3))
-            call this%visitable_lists(i_local_cell(1), i_local_cell(2), i_local_cell(3))%&
+            ijk_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
+                ijk_cell(1), ijk_cell(2), ijk_cell(3))
+            call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
                 visit(overlap, energy_i, particle, this%pair_potential, i_exclude)
             if (overlap) return
             energy = energy + energy_i
@@ -287,13 +275,14 @@ contains
         real(DP), intent(in) :: to_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: from
 
-        integer, dimension(num_dimensions) :: from_i_cell, to_i_cell
+        integer, dimension(num_dimensions) :: from_ijk_cell, to_ijk_cell
 
-        from_i_cell = this%index(from%position)
-        to_i_cell = this%index(to_position)
-        if (any(from_i_cell /= to_i_cell)) then
-            call this%visitable_lists(from_i_cell(1), from_i_cell(2), from_i_cell(3))%remove(from%i)
-            call this%visitable_lists(to_i_cell(1), to_i_cell(2), to_i_cell(3))%add(from%i)
+        from_ijk_cell = this%index(from%position)
+        to_ijk_cell = this%index(to_position)
+        if (any(from_ijk_cell /= to_ijk_cell)) then
+            call this%visitable_lists(from_ijk_cell(1), from_ijk_cell(2), from_ijk_cell(3))%&
+                remove(from%i)
+            call this%visitable_lists(to_ijk_cell(1), to_ijk_cell(2), to_ijk_cell(3))%add(from%i)
         end if
     end subroutine Abstract_move
 
@@ -301,23 +290,23 @@ contains
         class(Abstract_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        integer :: i_cell(num_dimensions)
+        integer :: ijk_cell(num_dimensions)
 
-        i_cell = this%index(particle%position)
-        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%add(particle%i)
+        ijk_cell = this%index(particle%position)
+        call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%add(particle%i)
     end subroutine Abstract_add
 
     subroutine Abstract_remove(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        integer :: i_cell(num_dimensions)
+        integer :: ijk_cell(num_dimensions)
 
-        i_cell = this%index(particle%position)
-        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%remove(particle%i)
+        ijk_cell = this%index(particle%position)
+        call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%remove(particle%i)
         if (particle%i < this%positions%get_num()) then
-            call this%visitable_lists(i_cell(1), i_cell(2), &
-                i_cell(3))%set(this%positions%get_num(), particle%i)
+            call this%visitable_lists(ijk_cell(1), ijk_cell(2), &
+                ijk_cell(3))%set(this%positions%get_num(), particle%i)
         end if
     end subroutine Abstract_remove
 
@@ -345,9 +334,9 @@ contains
         class(Abstract_Visitable_List), intent(in) :: list_mold
     end subroutine Null_construct
 
-    subroutine Null_fill(this)
+    subroutine Null_fill_with_particles(this)
         class(Null_Visitable_Cells), intent(inout) :: this
-    end subroutine Null_fill
+    end subroutine Null_fill_with_particles
 
     subroutine Null_destroy(this)
         class(Null_Visitable_Cells), intent(inout) :: this
@@ -391,6 +380,13 @@ contains
 
 !implementation XYZ_PBC_Visitable_Cells
 
+    pure subroutine XYZ_set_skip_layers(this)
+        class(XYZ_PBC_Visitable_Cells), intent(inout) :: this
+
+        this%skip_top_layer = .false.
+        this%skip_bottom_layer = .false.
+    end subroutine XYZ_set_skip_layers
+
     subroutine XYZ_check_nums(this)
         class(XYZ_PBC_Visitable_Cells), intent(in) :: this
 
@@ -399,24 +395,9 @@ contains
         end if
     end subroutine XYZ_check_nums
 
-    pure subroutine XYZ_set_skip_layers(this)
-        class(XYZ_PBC_Visitable_Cells), intent(inout) :: this
-
-        this%skip_top_layer = .false.
-        this%skip_bottom_layer = .false.
-    end subroutine XYZ_set_skip_layers
-
 !end implementation XYZ_PBC_Visitable_Cells
 
 !implementation XY_PBC_Visitable_Cells
-
-    subroutine XY_check_nums(this)
-        class(XY_PBC_Visitable_Cells), intent(in) :: this
-
-        if (any(this%nums(1:2) < nums_local_cells(1:2))) then
-            call error_exit("XY_PBC_Visitable_Cells: this%nums is too small.")
-        end if
-    end subroutine XY_check_nums
 
     pure subroutine XY_set_skip_layers(this)
         class(XY_PBC_Visitable_Cells), intent(inout) :: this
@@ -436,6 +417,14 @@ contains
             end if
         end do
     end subroutine XY_set_skip_layers
+
+    subroutine XY_check_nums(this)
+        class(XY_PBC_Visitable_Cells), intent(in) :: this
+
+        if (any(this%nums(1:2) < nums_local_cells(1:2))) then
+            call error_exit("XY_PBC_Visitable_Cells: this%nums is too small.")
+        end if
+    end subroutine XY_check_nums
 
 !end implementation XY_PBC_Visitable_Cells
 

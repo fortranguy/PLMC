@@ -1,6 +1,6 @@
 module procedures_command_arguments
 
-use data_constants, only: max_word_length
+use data_strings, only: max_word_length
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_file_exists
 

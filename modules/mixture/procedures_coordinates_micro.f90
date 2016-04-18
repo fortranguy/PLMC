@@ -1,7 +1,8 @@
 module procedures_coordinates_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, iostat_end
-use data_constants, only: num_dimensions, max_line_length
+use data_constants, only: num_dimensions
+use data_strings, only: max_line_length
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_file_exists
 

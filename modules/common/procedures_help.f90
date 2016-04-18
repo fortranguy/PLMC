@@ -1,7 +1,7 @@
 module procedures_help
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-use data_constants, only: max_word_length
+use data_strings, only: max_word_length
 use procedures_errors, only: error_exit
 
 implicit none

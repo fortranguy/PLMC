@@ -1,0 +1,9 @@
+module procedures_changed_coordinates_factory
+
+implicit none
+
+private
+
+contains
+
+end module procedures_changed_coordinates_factory

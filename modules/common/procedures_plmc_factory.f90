@@ -1,6 +1,6 @@
 module procedures_plmc_factory
 
-use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
+use data_prefixes, only:environment_prefix, mixture_prefix, changes_prefix, &
     short_interactions_prefix, dipolar_interactions_prefix, writers_prefix
 use json_module, only: json_file
 use procedures_command_arguments, only: create_filename_from_argument

@@ -1,7 +1,8 @@
 module procedures_checks
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: num_dimensions, max_word_length, real_zero
+use data_constants, only: num_dimensions, real_zero
+use data_strings, only: max_word_length
 use procedures_errors, only: warning_continue, error_exit
 use types_potential_domain, only: Abstract_Potential_Domain, Short_Potential_Domain, &
     Dipolar_Potential_Domain

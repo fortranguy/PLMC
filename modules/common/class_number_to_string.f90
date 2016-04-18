@@ -1,7 +1,7 @@
 module class_number_to_string
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: max_word_length
+use data_strings, only: max_word_length
 
 implicit none
 

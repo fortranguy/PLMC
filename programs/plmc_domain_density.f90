@@ -1,7 +1,7 @@
 program plmc_domain_density
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_wrappers_prefix, only: environment_prefix
+use data_prefixes, only: environment_prefix
 use json_module, only: json_file, json_initialize
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found

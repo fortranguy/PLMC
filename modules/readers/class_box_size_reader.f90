@@ -1,7 +1,8 @@
 module class_box_size_reader
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: num_dimensions, max_line_length, max_word_length
+use data_constants, only: num_dimensions
+use data_strings, only: max_line_length, max_word_length
 use procedures_checks, only: check_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 

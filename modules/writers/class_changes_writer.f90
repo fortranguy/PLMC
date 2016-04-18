@@ -1,6 +1,6 @@
 module class_changes_writer
 
-use data_constants, only: max_line_length
+use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Abstract_Number_to_String, Concrete_Number_to_String, &
     Null_Number_to_String

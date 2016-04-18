@@ -1,4 +1,4 @@
-module data_wrappers_prefix
+module data_prefixes
 
 implicit none
 
@@ -13,4 +13,4 @@ public :: environment_prefix, mixture_prefix, changes_prefix, &
     character(len=*), parameter :: dipolar_interactions_prefix = "Dipolar Interactions."
     character(len=*), parameter :: writers_prefix = "Output."
 
-end module data_wrappers_prefix
+end module data_prefixes

@@ -1,7 +1,7 @@
 module module_plmc_iterations
 
 use json_module, only: json_file
-use data_wrappers_prefix, only: changes_prefix
+use data_prefixes, only: changes_prefix
 use procedures_checks, only: check_data_found, check_positive
 
 implicit none

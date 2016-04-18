@@ -1,7 +1,7 @@
 module class_line_writer
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: max_line_length
+use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
 use module_string_wrapper, only: String_Wrapper, strings_wrapper_destroy
