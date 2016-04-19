@@ -4,7 +4,7 @@ use data_prefixes, only:environment_prefix, mixture_prefix, changes_prefix, &
     short_interactions_prefix, dipolar_interactions_prefix, writers_prefix
 use json_module, only: json_file
 use procedures_command_arguments, only: create_filename_from_argument
-use class_periodic_box, only: Abstract_Periodic_Box
+use classes_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
 use types_component_wrapper, only: Component_Wrapper

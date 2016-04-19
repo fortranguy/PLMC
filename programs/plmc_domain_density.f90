@@ -6,8 +6,8 @@ use json_module, only: json_file, json_initialize
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use procedures_command_arguments, only: create_filename_from_argument
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_environment_factory, only: environment_create, environment_destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy

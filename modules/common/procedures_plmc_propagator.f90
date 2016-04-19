@@ -1,6 +1,6 @@
 module procedures_plmc_propagator
 
-use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
+use classes_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer, &
     Metropolis_Algorithms_Wrapper
 use types_observables_wrapper, only: Observables_Wrapper

@@ -14,7 +14,7 @@ use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found, check_positive, check_string_not_empty
 use procedures_geometry, only: sphere_surface
 use procedures_command_arguments, only: create_filename_from_argument
-use class_periodic_box, only: Abstract_Periodic_Box
+use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_environment_factory, only: environment_create, environment_destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy

@@ -2,18 +2,18 @@ module procedures_plmc_visit
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
-use class_number_to_string, only: Concrete_Number_to_String
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use class_external_field, only: Abstract_External_Field
-use class_walls_potential, only: Abstract_Walls_Potential
+use classes_number_to_string, only: Concrete_Number_to_String
+use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
+use classes_external_field, only: Abstract_External_Field
+use classes_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
-use class_component_coordinates, only: Abstract_Component_Coordinates
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use classes_component_coordinates, only: Abstract_Component_Coordinates
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use class_pair_potential, only: Abstract_Pair_Potential
-use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
+use classes_pair_potential, only: Abstract_Pair_Potential
+use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper, &
     Dipolar_Interactions_Wrapper

@@ -1,11 +1,11 @@
 module procedures_readers_factory
 
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_number, only: Abstract_Component_Number
-use class_component_coordinates, only: Abstract_Component_Coordinates
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_component_number, only: Abstract_Component_Number
+use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
-use class_box_size_reader, only: Abstract_Box_Size_Reader, Concrete_Box_Size_Reader
-use class_component_coordinates_reader, only: Concrete_Coordinates_Reader_Selector, &
+use classes_box_size_reader, only: Abstract_Box_Size_Reader, Concrete_Box_Size_Reader
+use classes_component_coordinates_reader, only: Concrete_Coordinates_Reader_Selector, &
     Abstract_Coordinates_Reader, Concrete_Coordinates_Reader, Null_Coordinates_Reader
 use types_readers_wrapper, only: Component_Readers_wrapper, Readers_Wrapper
 use procedures_property_inquirers, only: component_has_positions, component_has_orientations

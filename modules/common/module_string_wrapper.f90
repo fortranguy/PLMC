@@ -1,6 +1,6 @@
 module module_string_wrapper
 
-use class_number_to_string, only: Abstract_Number_to_String
+use classes_number_to_string, only: Abstract_Number_to_String
 
 implicit none
 
@@ -19,10 +19,8 @@ contains
         integer :: i_string
 
         if (allocated(strings)) then
-            do i_string = 1, size(strings)
-                if (allocated(strings(i_string)%string)) then
-                    deallocate(strings(i_string)%string)
-                end if
+            do i_string = size(strings), 1, -1
+                if (allocated(strings(i_string)%string)) deallocate(strings(i_string)%string)
             end do
         end if
     end subroutine strings_wrapper_destroy

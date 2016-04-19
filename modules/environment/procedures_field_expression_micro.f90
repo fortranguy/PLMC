@@ -10,7 +10,7 @@ public :: plate_expression
 
 contains
 
-    !> \( \vec{b}(x, z) \), cf. [[class_field_expression:Plates_get]]:
+    !> \( \vec{b}(x, z) \), cf. [[classes_field_expression:Plates_get]]:
     !> \[
     !>      b_x(x, z) = \ln \left[ \frac{(x + a/2)^2 + z^2}{(x - a/2)^2 + z^2} \right] \\
     !>      b_y(x, z) = 0 \\

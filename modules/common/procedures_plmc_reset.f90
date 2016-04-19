@@ -1,6 +1,6 @@
 module procedures_plmc_reset
 
-use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment
+use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment
 use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper, Dipolar_Interactions_Wrapper
 
 implicit none

@@ -1,7 +1,7 @@
 module procedures_component_exchange_factory
 
 use types_component_wrapper, only: Component_Wrapper
-use class_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange, &
+use classes_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange, &
     Null_Component_Exchange
 use procedures_property_inquirers, only: component_can_exchange
 

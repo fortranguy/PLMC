@@ -2,9 +2,9 @@ module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use class_number_to_string, only: Concrete_Number_to_String
+use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box
+use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use module_change_tuning, only: Concrete_Change_Tuning_Parameters
 use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters

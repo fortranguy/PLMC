@@ -1,10 +1,10 @@
 module types_component_wrapper
 
-use class_component_number, only: Abstract_Component_Number
-use class_component_coordinates, only: Abstract_Component_Coordinates
-use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
-use class_component_average_number, only: Abstract_Component_Average_Number
+use classes_component_number, only: Abstract_Component_Number
+use classes_component_coordinates, only: Abstract_Component_Coordinates
+use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use classes_component_average_number, only: Abstract_Component_Average_Number
 
 implicit none
 

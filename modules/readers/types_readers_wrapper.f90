@@ -1,7 +1,7 @@
 module types_readers_wrapper
 
-use class_box_size_reader, only: Abstract_Box_Size_Reader
-use class_component_coordinates_reader, only: Abstract_Coordinates_Reader
+use classes_box_size_reader, only: Abstract_Box_Size_Reader
+use classes_component_coordinates_reader, only: Abstract_Coordinates_Reader
 
 implicit none
 

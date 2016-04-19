@@ -1,12 +1,12 @@
 module procedures_des_surf_factory
 
 use procedures_errors, only: error_exit
-use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use class_permittivity, only: Abstract_Permittivity
-use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
+use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use classes_permittivity, only: Abstract_Permittivity
+use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
     Concrete_Mixture_Total_Moment, Null_Mixture_Total_Moment
 use types_component_wrapper, only: Component_Wrapper
-use class_des_surf_mixture, only: Abstract_DES_Surf_Mixture, Spheric_DES_Surf_Mixture, &
+use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture, Spheric_DES_Surf_Mixture, &
     Rectangular_DES_Surf_Mixture, Null_DES_Surf_Mixture
 
 implicit none

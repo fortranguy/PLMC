@@ -4,27 +4,27 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use class_box_size_checker, only: Abstract_Box_Size_Checker, Concrete_Box_Size_Checker, &
+use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use classes_box_size_checker, only: Abstract_Box_Size_Checker, Concrete_Box_Size_Checker, &
     Null_Box_Size_Checker
-use class_temperature, only: Abstract_Temperature, Concrete_Temperature
-use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
+use classes_temperature, only: Abstract_Temperature, Concrete_Temperature
+use classes_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
     Centered_Plates_Expression, Null_Field_Expression
-use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
     Concrete_Parallelepiped_Domain, Concrete_Box_Domain, Null_Parallelepiped_Domain
-use class_external_field, only: Abstract_External_Field, Concrete_External_Field, &
+use classes_external_field, only: Abstract_External_Field, Concrete_External_Field, &
     Null_External_Field
-use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity, Null_Permittivity
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice, &
+use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity, Null_Permittivity
+use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice, &
     Null_Reciprocal_Lattice
-use class_floor_penetration, only: Abstract_Floor_Penetration, Flat_Floor_Penetration, &
+use classes_floor_penetration, only: Abstract_Floor_Penetration, Flat_Floor_Penetration, &
     Centered_Block_Penetration, Null_Floor_Penetration
 use procedures_component_factory, only: component_destroy
-use class_potential_expression, only: Abstract_Potential_Expression
-use class_pair_potential, only: Abstract_Pair_Potential
+use classes_potential_expression, only: Abstract_Potential_Expression
+use classes_pair_potential, only: Abstract_Pair_Potential
 use procedures_short_interactions_factory, only: short_interactions_create, &
     short_interactions_destroy
-use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential, &
+use classes_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential, &
     Null_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &

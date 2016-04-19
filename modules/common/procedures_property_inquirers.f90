@@ -2,25 +2,25 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
-use class_external_field, only: Abstract_External_Field, Null_External_Field
-use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
-use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
-use class_component_coordinates, only: Abstract_Component_Coordinates, &
+use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
+use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
+use classes_external_field, only: Abstract_External_Field, Null_External_Field
+use classes_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
+use classes_component_number, only: Abstract_Component_Number, Concrete_Component_Number
+use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
-use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
+use classes_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Concrete_Component_Dipolar_Moments
-use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
+use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential
-use class_changed_coordinates, only: Abstract_Changed_Coordinates
-use class_moved_positions, only: Concrete_Moved_Positions
-use class_rotated_orientations, only: Concrete_Rotated_Orientations
-use class_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
-use class_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
-use class_des_real_pair, only: Abstract_DES_Real_Pair, Null_DES_Real_Pair
+use classes_changed_coordinates, only: Abstract_Changed_Coordinates
+use classes_moved_positions, only: Concrete_Moved_Positions
+use classes_rotated_orientations, only: Concrete_Rotated_Orientations
+use classes_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
+use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
+use classes_des_real_pair, only: Abstract_DES_Real_Pair, Null_DES_Real_Pair
 
 implicit none
 

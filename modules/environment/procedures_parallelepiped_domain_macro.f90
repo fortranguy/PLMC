@@ -2,7 +2,7 @@ module procedures_parallelepiped_domain_macro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 
 implicit none
 

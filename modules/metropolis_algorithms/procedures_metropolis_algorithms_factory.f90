@@ -2,17 +2,17 @@ module procedures_metropolis_algorithms_factory
 
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
-use class_hetero_couples, only: Abstract_Hetero_Couples, Null_Hetero_Couples, &
+use classes_hetero_couples, only: Abstract_Hetero_Couples, Null_Hetero_Couples, &
     Concrete_Hetero_Couples
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
-use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use class_one_particle_change, only: Abstract_One_Particle_Change, &
+use classes_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
+use classes_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
-use class_two_particles_switch, only: Abstract_Two_Particles_Switch, &
+use classes_two_particles_switch, only: Abstract_Two_Particles_Switch, &
     Concrete_Two_Particles_Switch, Null_Two_Particles_Switch
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 use procedures_property_inquirers, only: component_can_move, component_can_rotate

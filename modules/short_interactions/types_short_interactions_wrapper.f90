@@ -1,9 +1,9 @@
 module types_short_interactions_wrapper
 
-use class_pair_potential, only: Abstract_Pair_Potential
-use class_visitable_cells, only: Abstract_Visitable_Cells
-use class_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor
-use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
+use classes_pair_potential, only: Abstract_Pair_Potential
+use classes_visitable_cells, only: Abstract_Visitable_Cells
+use classes_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor
+use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 
 implicit none
 

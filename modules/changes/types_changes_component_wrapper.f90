@@ -1,8 +1,8 @@
 module types_changes_component_wrapper
 
-use class_changed_coordinates, only: Abstract_Changed_Coordinates
-use class_change_tuner, only: Abstract_Change_Tuner
-use class_component_exchange, only: Abstract_Component_Exchange
+use classes_changed_coordinates, only: Abstract_Changed_Coordinates
+use classes_change_tuner, only: Abstract_Change_Tuner
+use classes_component_exchange, only: Abstract_Component_Exchange
 
 implicit none
 

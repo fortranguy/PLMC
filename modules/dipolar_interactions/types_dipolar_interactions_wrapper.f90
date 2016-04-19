@@ -1,17 +1,17 @@
 module types_dipolar_interactions_wrapper
 
-use class_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use class_des_real_pair, only: Abstract_DES_Real_Pair
-use class_des_real_component, only: Abstract_DES_Real_Component
-use class_des_real_visitor, only: Abstract_DES_Real_Visitor
-use class_des_reci_weight, only: Abstract_DES_Reci_Weight
-use class_des_reci_structure, only: Abstract_DES_Reci_Structure
-use class_des_reci_visitor, only: Abstract_DES_Reci_Visitor
-use class_des_self_component, only: Abstract_DES_Self_Component
-use class_des_surf_mixture, only: Abstract_DES_Surf_Mixture
-use class_dlc_weight, only: Abstract_DLC_Weight
-use class_dlc_structures, only: Abstract_DLC_Structures
-use class_dlc_visitor, only: Abstract_DLC_Visitor
+use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
+use classes_des_real_pair, only: Abstract_DES_Real_Pair
+use classes_des_real_component, only: Abstract_DES_Real_Component
+use classes_des_real_visitor, only: Abstract_DES_Real_Visitor
+use classes_des_reci_weight, only: Abstract_DES_Reci_Weight
+use classes_des_reci_structure, only: Abstract_DES_Reci_Structure
+use classes_des_reci_visitor, only: Abstract_DES_Reci_Visitor
+use classes_des_self_component, only: Abstract_DES_Self_Component
+use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture
+use classes_dlc_weight, only: Abstract_DLC_Weight
+use classes_dlc_structures, only: Abstract_DLC_Structures
+use classes_dlc_visitor, only: Abstract_DLC_Visitor
 
 implicit none
 

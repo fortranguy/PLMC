@@ -3,23 +3,23 @@ module procedures_writers_factory
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
-use class_number_to_string, only: Concrete_Number_to_String
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_external_field, only: Abstract_External_Field
+use classes_number_to_string, only: Concrete_Number_to_String
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_external_field, only: Abstract_External_Field
 use types_environment_wrapper, only: Environment_Wrapper
-use class_component_coordinates, only: Abstract_Component_Coordinates
+use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: mixture_set
 use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper
 use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use class_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer
-use class_triangle_writer, only: Concrete_Line_Selector, &
+use classes_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer
+use classes_triangle_writer, only: Concrete_Line_Selector, &
     Abstract_Triangle_Writer, Concrete_Triangle_Writer, Null_Triangle_Writer
-use class_energy_writer, only: Abstract_Energy_Writer, Concrete_Energy_Writer, Null_Energy_Writer
-use class_changes_writer, only: Concrete_Changes_Selector, &
+use classes_energy_writer, only: Abstract_Energy_Writer, Concrete_Energy_Writer, Null_Energy_Writer
+use classes_changes_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
-use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
+use classes_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
     Abstract_Coordinates_Writer, Concrete_Coordinates_Writer, Null_Coordinates_Writer
 use types_writers_wrapper, only: Component_Writers_Wrapper, Writers_Wrapper
 use procedures_property_inquirers, only: apply_external_field, use_walls, component_exists, &

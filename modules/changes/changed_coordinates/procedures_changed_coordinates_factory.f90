@@ -4,11 +4,11 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_coordinates, only: Abstract_Component_Coordinates
-use class_changed_coordinates, only: Abstract_Changed_Coordinates, Null_Changed_Coordinates
-use class_moved_positions, only: Concrete_Moved_Positions
-use class_rotated_orientations, only: Concrete_Rotated_Orientations
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_component_coordinates, only: Abstract_Component_Coordinates
+use classes_changed_coordinates, only: Abstract_Changed_Coordinates, Null_Changed_Coordinates
+use classes_moved_positions, only: Concrete_Moved_Positions
+use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use module_change_tuning, only: Concrete_Change_Tuning_Parameters
 use procedures_property_inquirers, only: component_has_positions, component_has_orientations
 

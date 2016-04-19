@@ -1,10 +1,10 @@
 module procedures_des_self_factory
 
-use class_permittivity, only: Abstract_Permittivity
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use classes_permittivity, only: Abstract_Permittivity
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
-use class_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use class_des_self_component, only: Abstract_DES_Self_Component, &
+use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
+use classes_des_self_component, only: Abstract_DES_Self_Component, &
     Concrete_DES_Self_Component, Null_DES_Self_Component
 use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper
 

@@ -1,7 +1,7 @@
 module procedures_changes_component_factory
 
 use json_module, only: json_file
-use class_periodic_box, only: Abstract_Periodic_Box
+use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use procedures_changed_coordinates_factory, only: changed_coordinates_create, &
     changed_coordinates_destroy

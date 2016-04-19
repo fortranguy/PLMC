@@ -1,11 +1,11 @@
 module types_writers_wrapper
 
-use class_box_size_writer, only: Abstract_Box_Size_Writer
-use class_component_coordinates_writer, only: Abstract_Coordinates_Writer
-use class_line_writer, only: Abstract_Line_Writer
-use class_triangle_writer, only: Abstract_Triangle_Writer
-use class_energy_writer, only: Abstract_Energy_Writer
-use class_changes_writer, only: Abstract_Changes_Success_Writer
+use classes_box_size_writer, only: Abstract_Box_Size_Writer
+use classes_component_coordinates_writer, only: Abstract_Coordinates_Writer
+use classes_line_writer, only: Abstract_Line_Writer
+use classes_triangle_writer, only: Abstract_Triangle_Writer
+use classes_energy_writer, only: Abstract_Energy_Writer
+use classes_changes_writer, only: Abstract_Changes_Success_Writer
 
 implicit none
 

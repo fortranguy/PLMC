@@ -3,12 +3,12 @@ module procedures_des_reci_factory
 use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use class_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use class_des_reci_weight, only: Abstract_DES_Reci_Weight, Concrete_DES_Reci_Weight, &
+use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
+use classes_des_reci_weight, only: Abstract_DES_Reci_Weight, Concrete_DES_Reci_Weight, &
     Null_DES_Reci_Weight
-use class_des_reci_structure, only: Abstract_DES_Reci_Structure, &
+use classes_des_reci_structure, only: Abstract_DES_Reci_Structure, &
     Concrete_DES_Reci_Structure, Null_DES_Reci_Structure
-use class_des_reci_visitor, only: Abstract_DES_Reci_Visitor, &
+use classes_des_reci_visitor, only: Abstract_DES_Reci_Visitor, &
     Concrete_DES_Reci_Visitor, Null_DES_Reci_Visitor
 
 implicit none

@@ -4,16 +4,16 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number, &
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_component_number, only: Abstract_Component_Number, Concrete_Component_Number, &
     Null_Component_Number
-use class_component_coordinates, only: Abstract_Component_Coordinates, &
+use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations, Null_Component_Coordinates
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Concrete_Component_Dipolar_Moments, Null_Component_Dipolar_Moments
-use class_component_chemical_potential, only : Abstract_Component_Chemical_Potential, &
+use classes_component_chemical_potential, only : Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential, Null_Component_Chemical_Potential
-use class_component_average_number, only: Abstract_Component_Average_Number, &
+use classes_component_average_number, only: Abstract_Component_Average_Number, &
     Constant_Component_Average_Number, Variable_Component_Average_Number, &
     Null_Component_Average_Number
 use types_component_wrapper, only: Component_Wrapper

@@ -4,21 +4,21 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_permittivity, only: Abstract_Permittivity
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_permittivity, only: Abstract_Permittivity
 use types_environment_wrapper, only: Environment_Wrapper
-use class_minimum_distance, only: Abstract_Minimum_Distance
-use class_component_coordinates, only: Abstract_Component_Coordinates
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use classes_minimum_distance, only: Abstract_Minimum_Distance
+use classes_component_coordinates, only: Abstract_Component_Coordinates
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distances_Wrapper
 use types_potential_domain, only: Dipolar_Potential_Domain
-use class_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use class_des_real_pair, only: Abstract_DES_Real_Pair, Tabulated_DES_Real_Pair, &
+use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
+use classes_des_real_pair, only: Abstract_DES_Real_Pair, Tabulated_DES_Real_Pair, &
     Raw_DES_Real_Pair, Null_DES_Real_Pair
-use class_des_real_component, only: Abstract_DES_Real_Component, &
+use classes_des_real_component, only: Abstract_DES_Real_Component, &
     Concrete_DES_Real_Component, Null_DES_Real_Component
-use class_des_real_visitor, only: Abstract_DES_Real_Visitor, Concrete_DES_Real_Visitor, &
+use classes_des_real_visitor, only: Abstract_DES_Real_Visitor, Concrete_DES_Real_Visitor, &
     Null_DES_Real_Visitor
 use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper, DES_Real_Component_Wrapper
 use procedures_property_inquirers, only: components_interact

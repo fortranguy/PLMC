@@ -1,9 +1,8 @@
 module procedures_change_tuner_factory
 
-use class_changed_coordinates, only: Abstract_Changed_Coordinates
+use classes_changed_coordinates, only: Abstract_Changed_Coordinates
 use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters
-use class_change_tuner, only: Abstract_Change_Tuner, &
-    Concrete_Change_Tuner, Null_Change_Tuner
+use classes_change_tuner, only: Abstract_Change_Tuner, Concrete_Change_Tuner, Null_Change_Tuner
 use procedures_property_inquirers, only: component_can_move, component_can_rotate
 use module_plmc_iterations, only: num_tuning_steps
 

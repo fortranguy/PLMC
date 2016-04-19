@@ -3,14 +3,14 @@ module procedures_mixture_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found, check_positive
-use class_number_to_string, only: Concrete_Number_to_String
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_walls_potential, only: Abstract_Walls_Potential
+use classes_number_to_string, only: Concrete_Number_to_String
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
-use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
+use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
     Concrete_Mixture_Total_Moment, Null_Mixture_Total_Moment
 use types_component_wrapper, only: Component_Wrapper
-use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance, &
+use classes_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance, &
     Null_Minimum_Distance
 use procedures_component_factory, only: component_create, component_destroy
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &

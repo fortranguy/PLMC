@@ -3,10 +3,10 @@ module procedures_dlc_factory
 use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use class_dlc_weight, only: Abstract_DLC_Weight, Concrete_DLC_Weight, Null_DLC_Weight
-use class_dlc_structures, only: Abstract_DLC_Structures, Concrete_DLC_Structures, &
+use classes_dlc_weight, only: Abstract_DLC_Weight, Concrete_DLC_Weight, Null_DLC_Weight
+use classes_dlc_structures, only: Abstract_DLC_Structures, Concrete_DLC_Structures, &
     Null_DLC_Structures
-use class_dlc_visitor, only: Abstract_DLC_Visitor, Concrete_DLC_Visitor, Null_DLC_Visitor
+use classes_dlc_visitor, only: Abstract_DLC_Visitor, Concrete_DLC_Visitor, Null_DLC_Visitor
 use procedures_property_inquirers, only: periodicity_is_xy
 
 implicit none

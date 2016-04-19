@@ -1,9 +1,9 @@
 module procedures_dipoles_field_interaction
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use class_external_field, only: Abstract_External_Field
-use class_component_coordinates, only: Abstract_Component_Coordinates
-use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use classes_external_field, only: Abstract_External_Field
+use classes_component_coordinates, only: Abstract_Component_Coordinates
+use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_temporary_particle, only: Concrete_Temporary_Particle
 
 implicit none

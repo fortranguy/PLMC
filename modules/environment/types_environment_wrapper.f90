@@ -1,12 +1,12 @@
 module types_environment_wrapper
 
-use class_periodic_box, only: Abstract_Periodic_Box
-use class_box_size_checker, only: Abstract_Box_Size_Checker
-use class_temperature, only: Abstract_Temperature
-use class_external_field, only: Abstract_External_Field
-use class_permittivity, only: Abstract_Permittivity
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use class_walls_potential, only: Abstract_Walls_Potential
+use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_box_size_checker, only: Abstract_Box_Size_Checker
+use classes_temperature, only: Abstract_Temperature
+use classes_external_field, only: Abstract_External_Field
+use classes_permittivity, only: Abstract_Permittivity
+use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
+use classes_walls_potential, only: Abstract_Walls_Potential
 
 implicit none
 
