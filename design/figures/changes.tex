@@ -48,9 +48,10 @@
         \end{scope}
 
         \begin{scope}[shift={($(ChangedCoordinates |- ChangeTuner.north)$)}]
-            \begin{class}[text width=\smallTextWidth]{ChangeTuningParameters}{0, 0}
-                \attribute{increaseFactor: \type{real}}
-                \attribute{increaseFactorMax: \type{real}}
+            \begin{class}[text width=\smallTextWidth]{ChangeTunerParameters}{0, 0}
+                \attribute{accumulationPeriod: \type{int}}
+                \attribute{wantedSuccessRatio: \type{real}}
+                \attribute{tolerance: \type{real}}
             \end{class}
         \end{scope}
 

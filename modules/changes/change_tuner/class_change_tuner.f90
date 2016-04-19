@@ -5,16 +5,11 @@ use procedures_errors, only: warning_continue
 use procedures_checks, only: check_positive, check_ratio
 use module_plmc_iterations, only: num_tuning_steps
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
+use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters
 
 implicit none
 
 private
-
-    type, public :: Concrete_Change_Tuner_Parameters
-        integer :: accumulation_period = 0
-        real(DP) :: wanted_success_ratio = 0._DP
-        real(DP) :: tolerance = 0._DP
-    end type Concrete_Change_Tuner_Parameters
 
     type, abstract, public :: Abstract_Change_Tuner
     private

@@ -36,7 +36,7 @@ interface writers_create
     module procedure :: create_components
     module procedure :: create_components_coordinates
     module procedure :: create_coordinates
-    module procedure :: create_components_changes
+    module procedure :: create_change_components
     module procedure :: create_changes
     module procedure :: create_field
     module procedure :: create_walls
@@ -58,13 +58,13 @@ end interface writers_destroy
 
 contains
 
-    subroutine create_all(writers, environment, wall_pairs, components, changes, short_pairs, &
-        dipolar_pairs, input_data, prefix)
+    subroutine create_all(writers, environment, wall_pairs, components, change_components, &
+        short_pairs, dipolar_pairs, input_data, prefix)
         type(Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
         type(DES_Real_Pairs_Wrapper), intent(in) :: dipolar_pairs(:)
         type(json_file), intent(inout) :: input_data
@@ -72,7 +72,7 @@ contains
 
         logical :: are_dipolar(size(components))
 
-        call writers_create(writers%components, components, changes, input_data, prefix)
+        call writers_create(writers%components, components, change_components, input_data, prefix)
         call writers_create(writers%field, environment%external_field, components, &
             "field_energies.out")
         call writers_create(writers%walls, wall_pairs, "walls_energies.out")
@@ -96,16 +96,17 @@ contains
         call writers_destroy(writers%components)
     end subroutine destroy_all
 
-    subroutine create_components(components, mixture_components, changes, input_data, prefix)
+    subroutine create_components(components, mixture_components, change_components, input_data, &
+        prefix)
         type(Component_Writers_Wrapper), allocatable, intent(out) :: components(:)
         type(Component_Wrapper), intent(in) :: mixture_components(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         allocate(components(size(mixture_components)))
         call writers_create(components, mixture_components, input_data, prefix)
-        call writers_create(components, changes)
+        call writers_create(components, change_components)
     end subroutine create_components
 
     subroutine destroy_components(components)
@@ -180,23 +181,25 @@ contains
         end if
     end subroutine destroy_coordinates
 
-    subroutine create_components_changes(components, changes)
+    subroutine create_change_components(components, change_components)
         type(Component_Writers_Wrapper), intent(inout) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         type(Concrete_Changes_Selector) :: selector_i
         type(Concrete_Number_to_String) :: string
 
         integer :: i_component
         do i_component = 1, size(components)
-            selector_i%write_positions = component_can_move(changes(i_component)%moved_positions)
-            selector_i%write_rotations = component_can_rotate(changes(i_component)%&
+            selector_i%write_positions = component_can_move(change_components(i_component)%&
+                moved_positions)
+            selector_i%write_rotations = component_can_rotate(change_components(i_component)%&
                 rotated_orientations)
-            selector_i%write_exchanges = component_can_exchange(changes(i_component)%exchange)
+            selector_i%write_exchanges = component_can_exchange(change_components(i_component)%&
+                exchange)
             call writers_create(components(i_component)%changes, selector_i, "changes_"//&
                 string%get(i_component)//".out")
         end do
-    end subroutine create_components_changes
+    end subroutine create_change_components
 
     subroutine create_changes(changes, selector, filename)
         class(Abstract_Changes_Success_Writer), allocatable, intent(out) :: changes

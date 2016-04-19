@@ -7,7 +7,7 @@ use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use module_change_tuning, only: Concrete_Change_Tuning_Parameters
-use class_change_tuner, only: Concrete_Change_Tuner_Parameters
+use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_component_factory, only: changes_component_create, changes_component_destroy
 use module_plmc_iterations, only: num_tuning_steps
@@ -17,17 +17,9 @@ implicit none
 private
 public :: changes_create, changes_destroy
 
-interface changes_create
-    module procedure :: create_all
-end interface changes_create
-
-interface changes_destroy
-    module procedure :: destroy_all
-end interface changes_destroy
-
 contains
 
-    subroutine create_all(changes, periodic_box, components, input_data, prefix)
+    subroutine changes_create(changes, periodic_box, components, input_data, prefix)
         type(Changes_Wrapper), intent(out) :: changes
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
@@ -47,7 +39,7 @@ contains
                 components(i_component), tuning_parameters, tuner_parameters, input_data, &
                 prefix//"Component "//string%get(i_component)//".")
         end do
-    end subroutine create_all
+    end subroutine changes_create
 
     subroutine set_tuning_parameters(parameters, input_data, prefix)
         type(Concrete_Change_Tuning_Parameters), intent(out) :: parameters
@@ -95,7 +87,7 @@ contains
         end if
     end subroutine set_tuner_parameters
 
-    subroutine destroy_all(changes)
+    subroutine changes_destroy(changes)
         type(Changes_Wrapper), intent(inout) :: changes
 
         integer :: i_component
@@ -106,6 +98,6 @@ contains
             end do
             deallocate(changes%components)
         end if
-    end subroutine destroy_all
+    end subroutine changes_destroy
 
 end module procedures_changes_factory

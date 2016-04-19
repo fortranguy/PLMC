@@ -103,6 +103,15 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="modules/changes/change_tuner/class_change_tuner.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/changes/change_tuner/procedures_change_tuner_factory.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/changes/change_tuner/types_change_tuner_parameters.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/changes/changed_coordinates/class_changed_coordinates.f90">
 			<Option weight="1" />
 		</Unit>
@@ -112,20 +121,23 @@
 		<Unit filename="modules/changes/changed_coordinates/class_rotated_orientations.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/changes/class_change_tuner.f90">
-			<Option weight="3" />
+		<Unit filename="modules/changes/changed_coordinates/procedures_changed_coordinates_factory.f90">
+			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/changes/class_component_exchange.f90">
+		<Unit filename="modules/changes/component_exchange/class_component_exchange.f90">
 			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/changes/component_exchange/procedures_component_exchange_factory.f90">
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/changes/module_change_tuning.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/changes/procedures_changes_component_factory.f90">
-			<Option weight="8" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/changes/procedures_changes_factory.f90">
-			<Option weight="9" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/changes/types_changes_component_wrapper.f90">
 			<Option weight="7" />

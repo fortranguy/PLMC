@@ -6,8 +6,7 @@ use procedures_errors, only: warning_continue
 use procedures_checks, only: check_array_size, check_positive, check_increase_factor
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_coordinates, only: Abstract_Component_Coordinates
-use module_change_tuning, only: Concrete_Change_Tuning_Parameters, &
-    set_increase_factor
+use module_change_tuning, only: Concrete_Change_Tuning_Parameters, set_increase_factor
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
 
 implicit none

@@ -43,19 +43,19 @@ end interface metropolis_algorithms_destroy
 
 contains
 
-    subroutine create_all(metropolis_algorithms, environment, mixture, changes, short_interactions,&
-        dipolar_interactions)
+    subroutine create_all(metropolis_algorithms, environment, mixture, change_components, &
+        short_interactions, dipolar_interactions)
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
         call metropolis_algorithms_create_move(metropolis_algorithms%one_particle_move, &
-            environment, mixture, changes, short_interactions, dipolar_interactions)
+            environment, mixture, change_components, short_interactions, dipolar_interactions)
         call metropolis_algorithms_create_rotation(metropolis_algorithms%one_particle_rotation, &
-            environment, mixture, changes, short_interactions, dipolar_interactions)
+            environment, mixture, change_components, short_interactions, dipolar_interactions)
         call metropolis_algorithms_create(metropolis_algorithms%two_particles_switch, environment, &
             mixture%components, short_interactions, dipolar_interactions)
     end subroutine create_all
@@ -69,11 +69,11 @@ contains
     end subroutine destroy_all
 
     subroutine metropolis_algorithms_create_move(one_particle_move, environment, mixture, &
-        changes, short_interactions, dipolar_interactions)
+        change_components, short_interactions, dipolar_interactions)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
@@ -81,8 +81,8 @@ contains
         integer :: i_component
 
         some_components_can_move = .false.
-        do i_component = 1, size(changes)
-            if (component_can_move(changes(i_component)%moved_positions)) then
+        do i_component = 1, size(change_components)
+            if (component_can_move(change_components(i_component)%moved_positions)) then
                 some_components_can_move = .true.
                 exit
             end if
@@ -94,16 +94,16 @@ contains
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
 
-        call one_particle_move%construct(environment, mixture, changes, short_interactions, &
-            dipolar_interactions)
+        call one_particle_move%construct(environment, mixture, change_components, &
+            short_interactions, dipolar_interactions)
     end subroutine metropolis_algorithms_create_move
 
     subroutine metropolis_algorithms_create_rotation(one_particle_rotation, environment, mixture, &
-        changes, short_interactions, dipolar_interactions)
+        change_components, short_interactions, dipolar_interactions)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
@@ -111,8 +111,8 @@ contains
         integer :: i_component
 
         some_components_can_rotate = .false.
-        do i_component = 1, size(changes)
-            if (component_can_rotate(changes(i_component)%rotated_orientations)) then
+        do i_component = 1, size(change_components)
+            if (component_can_rotate(change_components(i_component)%rotated_orientations)) then
                 some_components_can_rotate = .true.
                 exit
             end if
@@ -124,8 +124,8 @@ contains
             allocate(Null_One_Particle_Change :: one_particle_rotation)
         end if
 
-        call one_particle_rotation%construct(environment, mixture, changes, short_interactions, &
-            dipolar_interactions)
+        call one_particle_rotation%construct(environment, mixture, change_components, &
+            short_interactions, dipolar_interactions)
     end subroutine metropolis_algorithms_create_rotation
 
     subroutine destroy_change(one_particle_change)
@@ -164,27 +164,27 @@ contains
         end if
     end subroutine destroy_switch
 
-    subroutine set_all(metropolis_algorithms, components, changes)
+    subroutine set_all(metropolis_algorithms, components, change_components)
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         call metropolis_algorithms_set_move(metropolis_algorithms%one_particle_move, components, &
-            changes)
+            change_components)
         call metropolis_algorithms_set_rotation(metropolis_algorithms%one_particle_rotation, &
-            components, changes)
+            components, change_components)
         call metropolis_algorithms_set(metropolis_algorithms%two_particles_switch, components)
     end subroutine set_all
 
-    subroutine metropolis_algorithms_set_move(one_particle_move, components, changes)
+    subroutine metropolis_algorithms_set_move(one_particle_move, components, change_components)
         class(Abstract_One_Particle_Change), intent(inout) :: one_particle_move
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         integer :: nums_candidates(size(components)), i_component
 
         do i_component = 1, size(nums_candidates)
-            if (component_can_move(changes(i_component)%moved_positions)) then
+            if (component_can_move(change_components(i_component)%moved_positions)) then
                 nums_candidates(i_component) = components(i_component)%average_number%get()
             else
                 nums_candidates(i_component) = 0
@@ -193,15 +193,16 @@ contains
         call allocate_selector(one_particle_move, nums_candidates)
     end subroutine metropolis_algorithms_set_move
 
-    subroutine metropolis_algorithms_set_rotation(one_particle_rotation, components, changes)
+    subroutine metropolis_algorithms_set_rotation(one_particle_rotation, components, &
+        change_components)
         class(Abstract_One_Particle_Change), intent(inout) :: one_particle_rotation
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         integer :: nums_candidates(size(components)), i_component
 
         do i_component = 1, size(nums_candidates)
-            if (component_can_rotate(changes(i_component)%rotated_orientations)) then
+            if (component_can_rotate(change_components(i_component)%rotated_orientations)) then
                 nums_candidates(i_component) = components(i_component)%average_number%get()
             else
                 nums_candidates(i_component) = 0

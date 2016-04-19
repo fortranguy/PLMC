@@ -25,7 +25,7 @@ private
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
-        type(Changes_Component_Wrapper), pointer :: changes(:) => null()
+        type(Changes_Component_Wrapper), pointer :: change_components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
@@ -154,18 +154,18 @@ contains
 
 !implementation Abstract_One_Particle_Change
 
-    subroutine Abstract_construct(this, environment, mixture, changes, short_interactions, &
-        dipolar_interactions)
+    subroutine Abstract_construct(this, environment, mixture, change_components, &
+        short_interactions, dipolar_interactions)
         class(Abstract_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
-        type(Changes_Component_Wrapper), target, intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
 
         this%environment => environment
         this%mixture => mixture
-        this%changes => changes
+        this%change_components => change_components
         this%short_interactions => short_interactions
         this%dipolar_interactions => dipolar_interactions
     end subroutine Abstract_construct
@@ -179,7 +179,7 @@ contains
         end if
         this%dipolar_interactions => null()
         this%short_interactions => null()
-        this%changes => null()
+        this%change_components => null()
         this%mixture => null()
         this%environment => null()
     end subroutine Abstract_destroy
@@ -265,7 +265,7 @@ contains
         old%orientation = this%mixture%components(i_actor)%orientations%get(old%i)
         old%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
-        new%position = this%changes(i_actor)%moved_positions%get(new%i)
+        new%position = this%change_components(i_actor)%moved_positions%get(new%i)
         new%orientation = old%orientation
         new%dipolar_moment = old%dipolar_moment
     end subroutine Move_define_change
@@ -384,7 +384,7 @@ contains
         old%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
         new%position = old%position
-        new%orientation = this%changes(i_actor)%rotated_orientations%get(new%i)
+        new%orientation = this%change_components(i_actor)%rotated_orientations%get(new%i)
         new%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get_norm() * new%&
             orientation
     end subroutine Rotation_define_change
@@ -472,12 +472,12 @@ contains
 
 !implementation Null_One_Particle_Change
 
-    subroutine Null_construct(this, environment, mixture, changes, short_interactions, &
+    subroutine Null_construct(this, environment, mixture, change_components, short_interactions, &
         dipolar_interactions)
         class(Null_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
-        type(Changes_Component_Wrapper), target, intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
     end subroutine Null_construct

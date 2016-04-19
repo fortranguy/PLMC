@@ -56,7 +56,7 @@ end interface plmc_create
 interface plmc_set
     module procedure :: set_mixture_coordinates
     module procedure :: set_metropolis
-    module procedure :: tune_changes_components
+    module procedure :: tune_change_components
     module procedure :: set_success_and_reset_counter
 end interface plmc_set
 
@@ -166,23 +166,23 @@ contains
         call changes_create(changes, periodic_box, components, input_data, changes_prefix)
     end subroutine create_changes
 
-    subroutine tune_changes_components(tuned, i_step, components, changes_sucesses)
+    subroutine tune_change_components(tuned, i_step, change_components, changes_sucesses)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
-        type(Changes_Component_Wrapper), intent(inout) :: components(:)
+        type(Changes_Component_Wrapper), intent(inout) :: change_components(:)
         type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
 
-        logical :: move_tuned(size(components)), rotation_tuned(size(components))
+        logical :: move_tuned(size(change_components)), rotation_tuned(size(change_components))
         integer :: i_component
 
-        do i_component = 1, size(components)
-            call components(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
+        do i_component = 1, size(change_components)
+            call change_components(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
                 changes_sucesses(i_component)%move)
-            call components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), i_step, &
-                changes_sucesses(i_component)%rotation)
+            call change_components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
+                i_step, changes_sucesses(i_component)%rotation)
         end do
         tuned = all(move_tuned) .and. all(rotation_tuned)
-    end subroutine tune_changes_components
+    end subroutine tune_change_components
 
     subroutine destroy_changes(changes)
         type(Changes_Wrapper), intent(inout) :: changes
