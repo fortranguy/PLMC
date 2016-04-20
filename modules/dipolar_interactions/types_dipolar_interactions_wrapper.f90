@@ -35,9 +35,9 @@ private
 
     type, public :: Dipolar_Interactions_Wrapper
         class(Abstract_DES_Convergence_Parameter), allocatable :: alpha
-        class(Abstract_DES_Real_Visitor), allocatable :: real_visitor
-        type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
         type(DES_Real_Pairs_Wrapper), allocatable :: real_pairs(:)
+        type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
+        class(Abstract_DES_Real_Visitor), allocatable :: real_visitor
         class(Abstract_DES_Reci_Weight), allocatable :: reci_weight
         class(Abstract_DES_Reci_Structure), allocatable :: reci_structure
         class(Abstract_DES_Reci_Visitor), allocatable :: reci_visitor

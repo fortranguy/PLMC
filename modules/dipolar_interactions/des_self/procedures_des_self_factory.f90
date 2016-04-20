@@ -1,11 +1,10 @@
 module procedures_des_self_factory
 
 use classes_permittivity, only: Abstract_Permittivity
-use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use classes_des_self_component, only: Abstract_DES_Self_Component, &
-    Concrete_DES_Self_Component, Null_DES_Self_Component
+use procedures_des_self_component_factory, only: des_self_component_create, &
+    des_self_component_destroy
 use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper
 
 implicit none
@@ -15,11 +14,11 @@ public :: des_self_create, des_self_destroy
 
 interface des_self_create
     module procedure :: create_components
-    module procedure :: create_component
+    module procedure :: des_self_component_create
 end interface des_self_create
 
 interface des_self_destroy
-    module procedure :: destroy_component
+    module procedure :: des_self_component_destroy
     module procedure :: destroy_components
 end interface des_self_destroy
 
@@ -53,29 +52,5 @@ contains
             deallocate(components)
         end if
     end subroutine destroy_components
-
-    subroutine create_component(component, permittivity, dipolar_moments, is_dipolar, alpha)
-        class(Abstract_DES_Self_Component), allocatable, intent(out) :: component
-        class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
-        logical, intent(in) :: is_dipolar
-        class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-
-        if (is_dipolar) then
-            allocate(Concrete_DES_Self_Component :: component)
-        else
-            allocate(Null_DES_Self_Component :: component)
-        end if
-        call component%construct(permittivity, dipolar_moments, alpha)
-    end subroutine create_component
-
-    subroutine destroy_component(component)
-        class(Abstract_DES_Self_Component), allocatable, intent(inout) :: component
-
-        if (allocated(component)) then
-            call component%destroy()
-            deallocate(component)
-        end if
-    end subroutine destroy_component
 
 end module procedures_des_self_factory

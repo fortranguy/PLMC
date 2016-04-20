@@ -16,8 +16,8 @@ private
         class(Abstract_Periodic_Box), allocatable :: periodic_box
         class(Abstract_Temperature), allocatable :: temperature
         class(Abstract_External_Field), allocatable :: external_field
-        class(Abstract_Permittivity), allocatable :: permittivity
         class(Abstract_Reciprocal_Lattice), allocatable :: reciprocal_lattice
+        class(Abstract_Permittivity), allocatable :: permittivity
         class(Abstract_Walls_Potential), allocatable :: walls_potential
         class(Abstract_Box_Size_Checker), allocatable :: box_size_checker
     end type Environment_Wrapper
