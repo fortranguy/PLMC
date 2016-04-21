@@ -15,16 +15,12 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: changed_coordinates_create, changed_coordinates_destroy
+public :: create, destroy
 
-interface changed_coordinates_create
+interface create
     module procedure :: create_moved_positions
     module procedure :: create_rotated_orientations
-end interface changed_coordinates_create
-
-interface changed_coordinates_destroy
-    module procedure ::destroy_changed_coordinates
-end interface changed_coordinates_destroy
+end interface create
 
 contains
 
@@ -91,13 +87,13 @@ contains
         end select
     end subroutine create_rotated_orientations
 
-    subroutine destroy_changed_coordinates(changed_coordinates)
+    subroutine destroy(changed_coordinates)
         class(Abstract_Changed_Coordinates), allocatable, intent(inout) :: changed_coordinates
 
         if (allocated(changed_coordinates)) then
             call changed_coordinates%destroy()
             deallocate(changed_coordinates)
         end if
-    end subroutine destroy_changed_coordinates
+    end subroutine destroy
 
 end module procedures_changed_coordinates_factory

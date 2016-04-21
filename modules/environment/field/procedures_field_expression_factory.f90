@@ -11,12 +11,11 @@ use classes_field_expression, only: Abstract_Field_Expression, Constant_Field_Ex
 implicit none
 
 private
-public :: field_expression_create, field_expression_destroy
+public :: create, destroy
 
 contains
 
-    subroutine field_expression_create(field_expression, permittivity, field_applied, input_data, &
-        prefix)
+    subroutine create(field_expression, permittivity, field_applied, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
         class(Abstract_Permittivity), intent(in) :: permittivity
         logical, intent(in) :: field_applied
@@ -25,7 +24,7 @@ contains
 
         call allocate_field_expression(field_expression, field_applied, input_data, prefix)
         call set_field_expression(field_expression, permittivity, input_data, prefix)
-    end subroutine field_expression_create
+    end subroutine create
 
     subroutine allocate_field_expression(field_expression, field_applied, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
@@ -90,10 +89,10 @@ contains
         end select
     end subroutine set_field_expression
 
-    subroutine field_expression_destroy(field_expression)
+    subroutine destroy(field_expression)
         class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
 
         if (allocated(field_expression)) deallocate(field_expression)
-    end subroutine field_expression_destroy
+    end subroutine destroy
 
 end module procedures_field_expression_factory

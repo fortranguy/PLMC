@@ -6,11 +6,11 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
-use procedures_one_particle_change_factory, only: one_particle_move_create, &
-    one_particle_rotation_create, one_particle_change_destroy, one_particle_move_set, &
-    one_particle_rotation_set
-use procedures_two_particles_switch_factory, only: two_particles_switch_create, &
-    two_particles_switch_destroy, two_particles_switch_set
+use procedures_one_particle_change_factory, only: one_particle_move_create => create_move, &
+    one_particle_rotation_create => create_rotation, one_particle_change_destroy => destroy, &
+    one_particle_move_set => set_move, one_particle_rotation_set => set_rotation
+use procedures_two_particles_switch_factory, only: two_particles_switch_create => create, &
+    two_particles_switch_destroy => destroy, two_particles_switch_set => set
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 
 implicit none

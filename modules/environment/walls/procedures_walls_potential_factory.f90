@@ -12,12 +12,11 @@ use procedures_property_inquirers, only: use_walls
 implicit none
 
 private
-public :: walls_potential_create, walls_potential_destroy
+public :: create, destroy
 
 contains
 
-    subroutine walls_potential_create(walls_potential, periodic_box, floor_penetration, input_data,&
-        prefix)
+    subroutine create(walls_potential, periodic_box, floor_penetration, input_data, prefix)
         class(Abstract_Walls_Potential), allocatable, intent(out) :: walls_potential
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
@@ -37,15 +36,15 @@ contains
             allocate(Null_Walls_Potential :: walls_potential)
         end if
         call walls_potential%construct(periodic_box, gap, floor_penetration)
-    end subroutine walls_potential_create
+    end subroutine create
 
-    subroutine walls_potential_destroy(walls_potential)
+    subroutine destroy(walls_potential)
         class(Abstract_Walls_Potential), allocatable, intent(inout) :: walls_potential
 
         if (allocated(walls_potential)) then
             call walls_potential%destroy()
             deallocate(walls_potential)
         end if
-    end subroutine walls_potential_destroy
+    end subroutine destroy
 
 end module procedures_walls_potential_factory

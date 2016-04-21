@@ -8,11 +8,11 @@ use classes_temperature, only: Abstract_Temperature, Concrete_Temperature
 implicit none
 
 private
-public :: temperature_create, temperature_destroy
+public :: create, destroy
 
 contains
 
-    subroutine temperature_create(temperature, input_data, prefix)
+    subroutine create(temperature, input_data, prefix)
         class(Abstract_Temperature), allocatable, intent(out) :: temperature
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -26,12 +26,12 @@ contains
         call check_data_found(data_field, data_found)
         allocate(Concrete_Temperature :: temperature)
         call temperature%set(temperature_value)
-    end subroutine temperature_create
+    end subroutine create
 
-    subroutine temperature_destroy(temperature)
+    subroutine destroy(temperature)
         class(Abstract_Temperature), allocatable, intent(inout) :: temperature
 
         if (allocated(temperature)) deallocate(temperature)
-    end subroutine temperature_destroy
+    end subroutine destroy
 
 end module procedures_temperature_factory

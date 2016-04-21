@@ -11,18 +11,18 @@ use procedures_property_inquirers, only: use_walls
 implicit none
 
 private
-public :: floor_penetration_create, floor_penetration_destroy
+public :: create, destroy
 
 contains
 
-    subroutine floor_penetration_create(floor_penetration, input_data, prefix)
+    subroutine create(floor_penetration, input_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_floor_penetration(floor_penetration, input_data, prefix)
         call set_floor_penetration(floor_penetration, input_data, prefix)
-    end subroutine floor_penetration_create
+    end subroutine create
 
     subroutine allocate_floor_penetration(floor_penetration, input_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
@@ -76,10 +76,10 @@ contains
         end select
     end subroutine set_floor_penetration
 
-    subroutine floor_penetration_destroy(floor_penetration)
+    subroutine destroy(floor_penetration)
         class(Abstract_Floor_Penetration), allocatable, intent(inout) :: floor_penetration
 
         if (allocated(floor_penetration)) deallocate(floor_penetration)
-    end subroutine floor_penetration_destroy
+    end subroutine destroy
 
 end module procedures_floor_penetration_factory

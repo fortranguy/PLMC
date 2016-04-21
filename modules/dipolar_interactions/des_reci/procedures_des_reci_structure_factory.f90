@@ -8,11 +8,11 @@ use classes_des_reci_structure, only: Abstract_DES_Reci_Structure, Concrete_DES_
 implicit none
 
 private
-public :: des_reci_structure_create, des_reci_structure_destroy
+public :: create, destroy
 
 contains
 
-    subroutine des_reci_structure_create(structure, environment, components, are_dipolar)
+    subroutine create(structure, environment, components, are_dipolar)
         class(Abstract_DES_Reci_Structure), allocatable, intent(out) :: structure
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
@@ -25,15 +25,15 @@ contains
         end if
         call structure%construct(environment%periodic_box, environment%reciprocal_lattice, &
             components, are_dipolar)
-    end subroutine des_reci_structure_create
+    end subroutine create
 
-    subroutine des_reci_structure_destroy(structure)
+    subroutine destroy(structure)
         class(Abstract_DES_Reci_Structure), allocatable, intent(inout) :: structure
 
         if (allocated(structure)) then
             call structure%destroy()
             deallocate(structure)
         end if
-    end subroutine des_reci_structure_destroy
+    end subroutine destroy
 
 end module procedures_des_reci_structure_factory

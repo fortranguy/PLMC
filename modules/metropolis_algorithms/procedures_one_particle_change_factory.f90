@@ -14,12 +14,11 @@ use procedures_property_inquirers, only: component_can_move, component_can_rotat
 implicit none
 
 private
-public :: one_particle_move_create, one_particle_rotation_create, one_particle_change_destroy, &
-    one_particle_move_set, one_particle_rotation_set
+public :: create_move, create_rotation, destroy, set_move, set_rotation
 
 contains
 
-    subroutine one_particle_move_create(one_particle_move, environment, mixture, &
+    subroutine create_move(one_particle_move, environment, mixture, &
         change_components, short_interactions, dipolar_interactions)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
@@ -47,9 +46,9 @@ contains
 
         call one_particle_move%construct(environment, mixture, change_components, &
             short_interactions, dipolar_interactions)
-    end subroutine one_particle_move_create
+    end subroutine create_move
 
-    subroutine one_particle_rotation_create(one_particle_rotation, environment, mixture, &
+    subroutine create_rotation(one_particle_rotation, environment, mixture, &
         change_components, short_interactions, dipolar_interactions)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
@@ -77,18 +76,18 @@ contains
 
         call one_particle_rotation%construct(environment, mixture, change_components, &
             short_interactions, dipolar_interactions)
-    end subroutine one_particle_rotation_create
+    end subroutine create_rotation
 
-    subroutine one_particle_change_destroy(one_particle_change)
+    subroutine destroy(one_particle_change)
         class(Abstract_One_Particle_Change), allocatable, intent(inout) :: one_particle_change
 
         if (allocated(one_particle_change)) then
             call one_particle_change%destroy()
             deallocate(one_particle_change)
         end if
-    end subroutine one_particle_change_destroy
+    end subroutine destroy
 
-    subroutine one_particle_move_set(one_particle_move, components, change_components)
+    subroutine set_move(one_particle_move, components, change_components)
         class(Abstract_One_Particle_Change), intent(inout) :: one_particle_move
         type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
@@ -103,9 +102,9 @@ contains
             end if
         end do
         call allocate_selector(one_particle_move, nums_candidates)
-    end subroutine one_particle_move_set
+    end subroutine set_move
 
-    subroutine one_particle_rotation_set(one_particle_rotation, components, change_components)
+    subroutine set_rotation(one_particle_rotation, components, change_components)
         class(Abstract_One_Particle_Change), intent(inout) :: one_particle_rotation
         type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
@@ -120,7 +119,7 @@ contains
             end if
         end do
         call allocate_selector(one_particle_rotation, nums_candidates)
-    end subroutine one_particle_rotation_set
+    end subroutine set_rotation
 
     subroutine allocate_selector(one_particle_change, nums_candidates)
         class(Abstract_One_Particle_Change), intent(inout) :: one_particle_change

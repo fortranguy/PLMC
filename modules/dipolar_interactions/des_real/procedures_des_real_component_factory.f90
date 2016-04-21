@@ -11,11 +11,11 @@ use procedures_property_inquirers, only: components_interact
 implicit none
 
 private
-public :: des_real_component_create, des_real_component_destroy
+public :: create, destroy
 
 contains
 
-    subroutine des_real_component_create(component, periodic_box, positions, dipolar_moments, pair)
+    subroutine create(component, periodic_box, positions, dipolar_moments, pair)
         class(Abstract_DES_Real_Component), allocatable, intent(out) :: component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
@@ -28,15 +28,15 @@ contains
             allocate(Null_DES_Real_Component :: component)
         end if
         call component%construct(periodic_box, positions, dipolar_moments, pair)
-    end subroutine des_real_component_create
+    end subroutine create
 
-    subroutine des_real_component_destroy(component)
+    subroutine destroy(component)
         class(Abstract_DES_Real_Component), allocatable, intent(inout) :: component
 
         if (allocated(component)) then
             call component%destroy()
             deallocate(component)
         end if
-    end subroutine des_real_component_destroy
+    end subroutine destroy
 
 end module procedures_des_real_component_factory

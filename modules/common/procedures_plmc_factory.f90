@@ -9,7 +9,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_mixture_factory, only: mixture_create, mixture_destroy, mixture_set
+use procedures_mixture_factory, only: mixture_create, mixture_destroy, mixture_set_initial_coordinates
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_factory, only: short_interactions_create, &
     short_interactions_destroy
@@ -38,7 +38,7 @@ use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
 implicit none
 
 private
-public :: plmc_create, plmc_set, plmc_destroy
+public :: plmc_create, plmc_destroy, plmc_set
 
 interface plmc_create
     module procedure :: create_input_data
@@ -53,13 +53,6 @@ interface plmc_create
     module procedure :: create_writers
 end interface plmc_create
 
-interface plmc_set
-    module procedure :: set_mixture_coordinates
-    module procedure :: set_metropolis
-    module procedure :: tune_change_components
-    module procedure :: set_success_and_reset_counter
-end interface plmc_set
-
 interface plmc_destroy
     module procedure :: destroy_writers
     module procedure :: destroy_readers
@@ -72,6 +65,13 @@ interface plmc_destroy
     module procedure :: destroy_environment
     module procedure :: destroy_input_data
 end interface plmc_destroy
+
+interface plmc_set
+    module procedure :: set_mixture_initial_coordinates
+    module procedure :: set_metropolis
+    module procedure :: tune_change_components
+    module procedure :: set_success_and_reset_counter
+end interface plmc_set
 
 contains
 
@@ -118,12 +118,12 @@ contains
         call mixture_destroy(mixture)
     end subroutine destroy_mixture
 
-    subroutine set_mixture_coordinates(components_readers, input_data)
+    subroutine set_mixture_initial_coordinates(components_readers, input_data)
         type(Component_Readers_wrapper), intent(in) :: components_readers(:)
         type(json_file), intent(inout) :: input_data
 
-        call mixture_set(components_readers, input_data, mixture_prefix)
-    end subroutine set_mixture_coordinates
+        call mixture_set_initial_coordinates(components_readers, input_data, mixture_prefix)
+    end subroutine set_mixture_initial_coordinates
 
     subroutine create_short_interactions(short_interactions, environment, mixture, input_data)
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions

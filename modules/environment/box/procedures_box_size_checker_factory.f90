@@ -9,11 +9,11 @@ use procedures_property_inquirers, only: use_reciprocal_lattice, use_walls
 implicit none
 
 private
-public :: box_size_checker_create, box_size_checker_destroy
+public :: create, destroy
 
 contains
 
-    subroutine box_size_checker_create(box_size_checker, reciprocal_lattice, walls_potential)
+    subroutine create(box_size_checker, reciprocal_lattice, walls_potential)
         class(Abstract_Box_Size_Checker), allocatable, intent(out) :: box_size_checker
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
@@ -24,15 +24,15 @@ contains
             allocate(Null_Box_Size_Checker :: box_size_checker)
         end if
         call box_size_checker%construct(reciprocal_lattice, walls_potential)
-    end subroutine box_size_checker_create
+    end subroutine create
 
-    subroutine box_size_checker_destroy(box_size_checker)
+    subroutine destroy(box_size_checker)
         class(Abstract_Box_Size_Checker), allocatable, intent(inout) :: box_size_checker
 
         if (allocated(box_size_checker)) then
             call box_size_checker%destroy()
             deallocate(box_size_checker)
         end if
-    end subroutine box_size_checker_destroy
+    end subroutine destroy
 
 end module procedures_box_size_checker_factory

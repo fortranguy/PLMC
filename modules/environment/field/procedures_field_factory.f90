@@ -1,21 +1,23 @@
 module procedures_field_factory
 
-use procedures_field_expression_factory, only: field_expression_create, field_expression_destroy
-use procedures_external_field_factory, only: external_field_create, external_field_destroy
+use procedures_field_expression_factory, only: field_expression_create => create, &
+    field_expression_destroy => destroy
+use procedures_external_field_factory, only: external_field_create => create, &
+    external_field_destroy => destroy
 
 implicit none
 
 private
-public :: field_create, field_destroy
+public :: create, destroy
 
-interface field_create
+interface create
     module procedure :: field_expression_create
     module procedure :: external_field_create
-end interface field_create
+end interface create
 
-interface field_destroy
+interface destroy
     module procedure :: external_field_destroy
     module procedure :: field_expression_destroy
-end interface field_destroy
+end interface destroy
 
 end module procedures_field_factory

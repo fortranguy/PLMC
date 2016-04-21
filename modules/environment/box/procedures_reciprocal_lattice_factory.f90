@@ -10,11 +10,11 @@ use procedures_property_inquirers, only: use_reciprocal_lattice
 implicit none
 
 private
-public :: reciprocal_lattice_create, reciprocal_lattice_destroy
+public :: create, destroy
 
 contains
 
-    subroutine reciprocal_lattice_create(reciprocal_lattice, periodic_box, input_data, prefix)
+    subroutine create(reciprocal_lattice, periodic_box, input_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
@@ -33,16 +33,16 @@ contains
             allocate(Null_Reciprocal_Lattice :: reciprocal_lattice)
         end if
         call reciprocal_lattice%construct(periodic_box, numbers)
-    end subroutine reciprocal_lattice_create
+    end subroutine create
 
-    subroutine reciprocal_lattice_destroy(reciprocal_lattice)
+    subroutine destroy(reciprocal_lattice)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(inout) :: reciprocal_lattice
 
         if (allocated(reciprocal_lattice)) then
             call reciprocal_lattice%destroy()
             deallocate(reciprocal_lattice)
         end if
-    end subroutine reciprocal_lattice_destroy
+    end subroutine destroy
 
 
 end module procedures_reciprocal_lattice_factory

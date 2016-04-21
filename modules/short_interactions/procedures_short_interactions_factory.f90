@@ -7,12 +7,12 @@ use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use classes_walls_potential, only: Abstract_Walls_Potential
-use procedures_walls_factory, only: walls_create, walls_destroy
+use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use classes_minimum_distance, only: Abstract_Minimum_Distance
+use classes_min_distance, only: Abstract_Min_Distance
 use types_component_wrapper, only: Component_Wrapper
-use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
-    Mixture_Wrapper
+use types_min_distances_wrapper, only: Min_Distance_Wrapper, Min_Distances_Wrapper
+use types_mixture_wrapper, only:  Mixture_Wrapper
 use classes_potential_expression, only: Abstract_Potential_Expression, Lennard_Jones_Expression, &
     Null_Potential_Expression
 use types_potential_domain, only: Short_Potential_Domain
@@ -92,7 +92,7 @@ contains
     subroutine create_wall_pairs(pairs, interact, min_distances, input_data, prefix)
         type(Pair_Potential_Wrapper), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
-        type(Minimum_Distance_Wrapper), intent(in) :: min_distances(:)
+        type(Min_Distance_Wrapper), intent(in) :: min_distances(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -227,7 +227,7 @@ contains
     subroutine create_components_pairs(pairs, interact, min_distances, input_data, prefix)
         type(Pair_Potentials_Wrapper), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
-        type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
+        type(Min_Distances_Wrapper), intent(in) :: min_distances(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -290,7 +290,7 @@ contains
 
     subroutine create_pair(pair, min_distance, interact, expression, input_data, prefix)
         class(Abstract_Pair_Potential), allocatable, intent(out) :: pair
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Min_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         class(Abstract_Potential_Expression), intent(in) :: expression
         type(json_file), intent(inout) :: input_data
@@ -325,7 +325,7 @@ contains
 
     subroutine construct_pair(pair, min_distance, interact, expression, input_data, prefix)
         class(Abstract_Pair_Potential), intent(inout) :: pair
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Min_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         class(Abstract_Potential_Expression), intent(in) :: expression
         type(json_file), intent(inout) :: input_data

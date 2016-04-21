@@ -10,7 +10,7 @@ use classes_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Pote
 use classes_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
-use classes_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance
+use classes_min_distance, only: Abstract_Min_Distance, Concrete_Min_Distance
 use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Concrete_Component_Dipolar_Moments
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
@@ -183,10 +183,10 @@ contains
 
     pure logical function components_interact_from_min_distance(min_distance) &
         result(components_interact)
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Min_Distance), intent(in) :: min_distance
 
         select type (min_distance)
-            type is (Concrete_Minimum_Distance)
+            type is (Concrete_Min_Distance)
                 components_interact = .true.
             class default
                 components_interact = .false.

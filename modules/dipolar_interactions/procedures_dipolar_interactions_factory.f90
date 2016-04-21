@@ -7,16 +7,17 @@ use classes_permittivity, only: Abstract_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_mixture_factory, only: mixture_set
-use procedures_des_convergence_parameter_factory, only: des_convergence_parameter_create, &
-    des_convergence_parameter_destroy
+use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use procedures_des_convergence_parameter_factory, only: des_convergence_parameter_create => create,&
+    des_convergence_parameter_destroy => destroy
+use procedures_des_real_factory, only: des_real_create => create, des_real_destroy => destroy
+use procedures_des_reci_factory, only: des_reci_create => create, des_reci_destroy => destroy
+use procedures_des_self_factory, only: des_self_create => create, des_self_destroy => destroy
+use procedures_des_surf_mixture_factory, only: des_surf_mixture_create => create, &
+    des_surf_mixture_destroy => destroy
+use procedures_dlc_factory, only: dlc_create => create, dlc_destroy => destroy
 use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattice
-use procedures_des_real_factory, only: des_real_create, des_real_destroy
-use procedures_des_reci_factory, only: des_reci_create, des_reci_destroy
-use procedures_des_self_factory, only: des_self_create, des_self_destroy
-use procedures_des_surf_mixture_factory, only: des_surf_mixture_create, des_surf_mixture_destroy
-use procedures_dlc_factory, only: dlc_create, dlc_destroy
 
 implicit none
 
@@ -35,7 +36,7 @@ contains
 
         logical :: are_dipolar(size(mixture%components))
 
-        call mixture_set(are_dipolar, mixture%components)
+        call set_are_dipolar(are_dipolar, mixture%components)
         call check_consistency(environment%reciprocal_lattice, environment%permittivity, &
             any(are_dipolar))
         call des_convergence_parameter_create(dipolar_interactions%alpha, environment%periodic_box,&

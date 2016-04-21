@@ -9,11 +9,11 @@ use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Peri
 implicit none
 
 private
-public :: periodic_box_create, periodic_box_destroy
+public :: create, destroy
 
 contains
 
-    subroutine periodic_box_create(periodic_box, input_data, prefix)
+    subroutine create(periodic_box, input_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -38,12 +38,12 @@ contains
         call input_data%get(data_field, box_size, data_found)
         call check_data_found(data_field, data_found)
         call periodic_box%set(box_size)
-    end subroutine periodic_box_create
+    end subroutine create
 
-    subroutine periodic_box_destroy(periodic_box)
+    subroutine destroy(periodic_box)
         class(Abstract_Periodic_Box), allocatable, intent(inout) :: periodic_box
 
         if (allocated(periodic_box)) deallocate(periodic_box)
-    end subroutine periodic_box_destroy
+    end subroutine destroy
 
 end module procedures_periodic_box_factory

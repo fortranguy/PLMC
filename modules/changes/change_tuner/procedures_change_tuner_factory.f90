@@ -9,15 +9,11 @@ use module_plmc_iterations, only: num_tuning_steps
 implicit none
 
 private
-public :: change_tuner_create_move, change_tuner_create_rotation, change_tuner_destroy
-
-interface change_tuner_destroy
-    module procedure :: destroy_change_tuner
-end interface change_tuner_destroy
+public :: create_move, create_rotation, destroy
 
 contains
 
-    subroutine change_tuner_create_move(move_tuner, moved_positions, tuner_parameters)
+    subroutine create_move(move_tuner, moved_positions, tuner_parameters)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
         class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
         type(Concrete_Change_Tuner_Parameters), intent(in) :: tuner_parameters
@@ -28,9 +24,9 @@ contains
             allocate(Null_Change_Tuner :: move_tuner)
         end if
         call move_tuner%construct(moved_positions, tuner_parameters)
-    end subroutine change_tuner_create_move
+    end subroutine create_move
 
-    subroutine change_tuner_create_rotation(rotation_tuner, rotated_orientations, tuner_parameters)
+    subroutine create_rotation(rotation_tuner, rotated_orientations, tuner_parameters)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
         class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
         type(Concrete_Change_Tuner_Parameters), intent(in) :: tuner_parameters
@@ -41,15 +37,15 @@ contains
             allocate(Null_Change_Tuner :: rotation_tuner)
         end if
         call rotation_tuner%construct(rotated_orientations, tuner_parameters)
-    end subroutine change_tuner_create_rotation
+    end subroutine create_rotation
 
-    subroutine destroy_change_tuner(change_tuner)
+    subroutine destroy(change_tuner)
         class(Abstract_Change_Tuner), allocatable, intent(inout) :: change_tuner
 
         if (allocated(change_tuner)) then
             call change_tuner%destroy()
             deallocate(change_tuner)
         end if
-    end subroutine destroy_change_tuner
+    end subroutine destroy
 
 end module procedures_change_tuner_factory

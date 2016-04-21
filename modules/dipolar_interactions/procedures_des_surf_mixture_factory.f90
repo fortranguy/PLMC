@@ -11,11 +11,11 @@ use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture, Spheric_DES_Surf_
 implicit none
 
 private
-public :: des_surf_mixture_create, des_surf_mixture_destroy
+public :: create, destroy
 
 contains
 
-    subroutine des_surf_mixture_create(mixture, periodic_box, permittivity, total_moment)
+    subroutine create(mixture, periodic_box, permittivity, total_moment)
         class(Abstract_DES_Surf_Mixture), allocatable, intent(out) :: mixture
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
@@ -29,23 +29,25 @@ contains
                     type is (XY_Periodic_Box)
                         allocate(Rectangular_DES_Surf_Mixture :: mixture)
                     class default
-                        call error_exit("create_mixture: periodic_box type unknown.")
+                        call error_exit("procedures_des_surf_mixture_factory: create: "//&
+                            "periodic_box type unknown.")
                 end select
             type is (Null_Mixture_Total_Moment)
                 allocate(Null_DES_Surf_Mixture :: mixture)
             class default
-                call error_exit("create_mixture: total_moment type unknown.")
+                call error_exit("procedures_des_surf_mixture_factory: create: //"&
+                    "total_moment type unknown.")
         end select
         call mixture%construct(periodic_box, permittivity, total_moment)
-    end subroutine des_surf_mixture_create
+    end subroutine create
 
-    subroutine des_surf_mixture_destroy(mixture)
+    subroutine destroy(mixture)
         class(Abstract_DES_Surf_Mixture), allocatable, intent(inout) :: mixture
 
         if (allocated(mixture)) then
             call mixture%destroy()
             deallocate(mixture)
         end if
-    end subroutine des_surf_mixture_destroy
+    end subroutine destroy
 
 end module procedures_des_surf_mixture_factory

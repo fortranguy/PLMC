@@ -13,12 +13,12 @@ use classes_two_particles_switch, only: Abstract_Two_Particles_Switch, &
 implicit none
 
 private
-public :: two_particles_switch_create, two_particles_switch_destroy, two_particles_switch_set
+public :: create, destroy, set
 
 contains
 
-    subroutine two_particles_switch_create(two_particles_switch, environment, components, &
-        short_interactions, dipolar_interactions)
+    subroutine create(two_particles_switch, environment, components, short_interactions, &
+        dipolar_interactions)
         class(Abstract_Two_Particles_Switch), allocatable, intent(out) :: two_particles_switch
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
@@ -33,18 +33,18 @@ contains
 
         call two_particles_switch%construct(environment, components, short_interactions, &
             dipolar_interactions)
-    end subroutine two_particles_switch_create
+    end subroutine create
 
-    subroutine two_particles_switch_destroy(two_particles_switch)
+    subroutine destroy(two_particles_switch)
         class(Abstract_Two_Particles_Switch), allocatable, intent(inout) :: two_particles_switch
 
         if (allocated(two_particles_switch)) then
             call two_particles_switch%destroy()
             deallocate(two_particles_switch)
         end if
-    end subroutine two_particles_switch_destroy
+    end subroutine destroy
 
-    subroutine two_particles_switch_set(two_particles_switch, components)
+    subroutine set(two_particles_switch, components)
         class(Abstract_Two_Particles_Switch), intent(inout) :: two_particles_switch
         type(Component_Wrapper), intent(in) :: components(:)
 
@@ -75,6 +75,6 @@ contains
         call two_particles_switch%allocate_couples_and_selector(couples, selector)
         call selector%destroy()
         call couples%destroy()
-    end subroutine two_particles_switch_set
+    end subroutine set
 
 end module procedures_two_particles_switch_factory

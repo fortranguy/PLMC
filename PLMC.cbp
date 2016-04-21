@@ -124,11 +124,8 @@
 		<Unit filename="modules/changes/changed_coordinates/procedures_changed_coordinates_factory.f90">
 			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/changes/component_exchange/classes_component_exchange.f90">
+		<Unit filename="modules/changes/classes_component_exchange.f90">
 			<Option weight="6" />
-		</Unit>
-		<Unit filename="modules/changes/component_exchange/procedures_component_exchange_factory.f90">
-			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/changes/module_change_tuning.f90">
 			<Option weight="1" />
@@ -138,6 +135,9 @@
 		</Unit>
 		<Unit filename="modules/changes/procedures_changes_factory.f90">
 			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/changes/procedures_component_exchange_factory.f90">
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/changes/types_changes_component_wrapper.f90">
 			<Option weight="7" />
@@ -359,7 +359,7 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_environment_factory.f90">
-			<Option weight="10" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_permittivity_factory.f90">
 			<Option weight="8" />
@@ -412,41 +412,77 @@
 		<Unit filename="modules/metropolis_algorithms/procedures_one_particle_change_factory.f90">
 			<Option weight="10" />
 		</Unit>
-		<Unit filename="modules/metropolis_algorithms/types_metropolis_algorithms_wrapper.f90">
+		<Unit filename="modules/metropolis_algorithms/procedures_two_particles_switch_factory.f90">
 			<Option weight="10" />
 		</Unit>
-		<Unit filename="modules/mixture/classes_component_average_number.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="modules/mixture/classes_component_chemical_potential.f90">
-			<Option weight="2" />
-		</Unit>
-		<Unit filename="modules/mixture/classes_component_coordinates.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="modules/mixture/classes_component_dipolar_moments.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="modules/mixture/classes_component_number.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="modules/mixture/classes_coordinates.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="modules/mixture/classes_minimum_distance.f90">
-			<Option weight="2" />
+		<Unit filename="modules/metropolis_algorithms/types_metropolis_algorithms_wrapper.f90">
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/mixture/classes_mixture_total_moment.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/mixture/procedures_component_factory.f90">
-			<Option weight="8" />
+		<Unit filename="modules/mixture/composition/classes_component_average_number.f90">
+			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/mixture/procedures_coordinates_micro.f90">
+		<Unit filename="modules/mixture/composition/classes_component_chemical_potential.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/mixture/procedures_mixture_factory.f90">
+		<Unit filename="modules/mixture/composition/classes_component_number.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/mixture/composition/procedures_component_average_number_factory.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/mixture/composition/procedures_component_chemical_potential_factory.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/mixture/composition/procedures_component_number_factory.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/mixture/composition/procedures_composition_factory.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/classes_component_coordinates.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/classes_component_dipolar_moments.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/classes_coordinates.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/procedures_component_coordinates_factory.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/procedures_component_dipolar_moments_factory.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/procedures_coordinates_factory.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/mixture/coordinates/procedures_coordinates_micro.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/mixture/min_distances/classes_min_distance.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/mixture/min_distances/procedures_min_distance_factory.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/mixture/min_distances/procedures_min_distances_factory.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/mixture/min_distances/types_min_distances_wrapper.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_component_factory.f90">
+			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_mixture_factory.f90">
+			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_mixture_total_moment_factory.f90">
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/mixture/types_component_wrapper.f90">
 			<Option weight="5" />
@@ -554,7 +590,7 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_writers_factory.f90">
-			<Option weight="10" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/writers/types_writers_wrapper.f90">
 			<Option weight="5" />

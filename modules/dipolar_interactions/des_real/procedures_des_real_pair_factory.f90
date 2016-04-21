@@ -6,21 +6,20 @@ use types_potential_domain, only: Dipolar_Potential_Domain
 use classes_des_real_pair, only: Abstract_DES_Real_Pair, Tabulated_DES_Real_Pair, &
     Raw_DES_Real_Pair, Null_DES_Real_Pair
 use classes_permittivity, only: Abstract_Permittivity
-use classes_minimum_distance, only: Abstract_Minimum_Distance
+use classes_min_distance, only: Abstract_Min_Distance
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 
 implicit none
 
 private
-public :: des_real_pair_create, des_real_pair_destroy
+public :: create, destroy
 
 contains
 
-    subroutine des_real_pair_create(pair, permittivity, min_distance, interact, alpha, input_data, &
-        prefix)
+    subroutine create(pair, permittivity, min_distance, interact, alpha, input_data, prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Min_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
@@ -28,7 +27,7 @@ contains
 
         call allocate_pair(pair, interact, input_data, prefix)
         call construct_pair(pair, permittivity, min_distance, interact, alpha, input_data, prefix)
-    end subroutine des_real_pair_create
+    end subroutine create
 
     subroutine allocate_pair(pair, interact, input_data, prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
@@ -57,7 +56,7 @@ contains
         prefix)
         class(Abstract_DES_Real_Pair), intent(inout) :: pair
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Min_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
@@ -82,13 +81,13 @@ contains
         call pair%construct(permittivity, alpha, domain)
     end subroutine construct_pair
 
-    subroutine des_real_pair_destroy(pair)
+    subroutine destroy(pair)
         class(Abstract_DES_Real_Pair), allocatable, intent(inout) :: pair
 
         if (allocated(pair)) then
             call pair%destroy()
             deallocate(pair)
         end if
-    end subroutine des_real_pair_destroy
+    end subroutine destroy
 
 end module procedures_des_real_pair_factory

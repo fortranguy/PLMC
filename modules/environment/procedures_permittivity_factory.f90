@@ -9,11 +9,11 @@ use procedures_property_inquirers, only: use_permittivity
 implicit none
 
 private
-public :: permittivity_create, permittivity_destroy
+public :: create, destroy
 
 contains
 
-    subroutine permittivity_create(permittivity, input_data, prefix)
+    subroutine create(permittivity, input_data, prefix)
         class(Abstract_Permittivity), allocatable, intent(out) :: permittivity
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -31,14 +31,14 @@ contains
             allocate(Null_Permittivity :: permittivity)
         end if
         call permittivity%set(permittivity_value)
-    end subroutine permittivity_create
+    end subroutine create
 
-    subroutine permittivity_destroy(permittivity)
+    subroutine destroy(permittivity)
         class(Abstract_Permittivity), allocatable, intent(inout) :: permittivity
 
         if (allocated(permittivity)) then
             deallocate(permittivity)
         end if
-    end subroutine permittivity_destroy
+    end subroutine destroy
 
 end module procedures_permittivity_factory

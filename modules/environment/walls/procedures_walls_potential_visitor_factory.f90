@@ -7,11 +7,11 @@ use classes_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor, &
 implicit none
 
 private
-public :: walls_potential_visitor_create, walls_potential_visitor_destroy
+public :: create, destroy
 
 contains
 
-    subroutine walls_potential_visitor_create(visitor, walls_potential, interact)
+    subroutine create(visitor, walls_potential, interact)
         class(Abstract_Walls_Potential_Visitor), allocatable, intent(out) :: visitor
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         logical, intent(in) :: interact
@@ -22,15 +22,15 @@ contains
             allocate(Null_Walls_Potential_Visitor :: visitor)
         end if
         call visitor%construct(walls_potential)
-    end subroutine walls_potential_visitor_create
+    end subroutine create
 
-    subroutine walls_potential_visitor_destroy(visitor)
+    subroutine destroy(visitor)
         class(Abstract_Walls_Potential_Visitor), allocatable, intent(inout) :: visitor
 
         if (allocated(visitor)) then
             call visitor%destroy()
             deallocate(visitor)
         end if
-    end subroutine walls_potential_visitor_destroy
+    end subroutine destroy
 
 end module procedures_walls_potential_visitor_factory

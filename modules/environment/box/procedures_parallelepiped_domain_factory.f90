@@ -11,12 +11,11 @@ use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
 implicit none
 
 private
-public :: parallelepiped_domain_create, parallelepiped_domain_destroy
+public :: create, destroy
 
 contains
 
-    subroutine parallelepiped_domain_create(parallelepiped_domain, periodic_box, needed, &
-        input_data, prefix)
+    subroutine create(parallelepiped_domain, periodic_box, needed, input_data, prefix)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: needed
@@ -50,15 +49,15 @@ contains
             allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
         end if
         call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
-    end subroutine parallelepiped_domain_create
+    end subroutine create
 
-    subroutine parallelepiped_domain_destroy(parallelepiped_domain)
+    subroutine destroy(parallelepiped_domain)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: parallelepiped_domain
 
         if (allocated(parallelepiped_domain)) then
             call parallelepiped_domain%destroy()
             deallocate(parallelepiped_domain)
         end if
-    end subroutine parallelepiped_domain_destroy
+    end subroutine destroy
 
 end module procedures_parallelepiped_domain_factory

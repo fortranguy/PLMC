@@ -17,7 +17,7 @@ use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper, &
     Dipolar_Interactions_Wrapper
-use procedures_dipoles_field_interaction, only: dipoles_field_visit_component
+use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use types_line_observables, only: Concrete_Line_Observables
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes

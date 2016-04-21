@@ -9,7 +9,7 @@ use classes_external_field, only: Abstract_External_Field
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_factory, only: mixture_set
+use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper
 use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
@@ -79,7 +79,7 @@ contains
         call writers_create(writers%switches, components, "switches.out")
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
         call writers_create(writers%dipolar_energies, dipolar_pairs, "dipolar_energies.out")
-        call mixture_set(are_dipolar, components)
+        call set_are_dipolar(are_dipolar, components)
         call writers_create(writers%dipolar_mixture_energy, any(are_dipolar), &
             "dipolar_mixture_energy.out")
     end subroutine create_all

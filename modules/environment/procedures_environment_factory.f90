@@ -4,16 +4,18 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
 use classes_periodic_box, only: Abstract_Periodic_Box
-use procedures_box_factory, only: box_create, box_destroy
-use procedures_temperature_factory, only: temperature_create, temperature_destroy
+use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_temperature_factory, only: temperature_create => create, &
+    temperature_destroy => destroy
 use classes_field_expression, only: Abstract_Field_Expression
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_field_factory, only: field_create, field_destroy
-use procedures_permittivity_factory, only: permittivity_create, permittivity_destroy
+use procedures_field_factory, only: field_create => create, field_destroy => destroy
+use procedures_permittivity_factory, only: permittivity_create => create, &
+    permittivity_destroy => destroy
 use classes_floor_penetration, only: Abstract_Floor_Penetration
 use classes_walls_potential, only: Abstract_Walls_Potential
-use procedures_walls_factory, only: walls_create, walls_destroy
-use procedures_component_factory, only: component_destroy
+use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
+use procedures_component_factory, only: component_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
     apply_external_field, use_walls

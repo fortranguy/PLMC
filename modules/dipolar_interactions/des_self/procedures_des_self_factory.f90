@@ -3,24 +3,24 @@ module procedures_des_self_factory
 use classes_permittivity, only: Abstract_Permittivity
 use types_component_wrapper, only: Component_Wrapper
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use procedures_des_self_component_factory, only: des_self_component_create, &
-    des_self_component_destroy
+use procedures_des_self_component_factory, only: des_self_component_create => create, &
+    des_self_component_destroy => destroy
 use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper
 
 implicit none
 
 private
-public :: des_self_create, des_self_destroy
+public :: create, destroy
 
-interface des_self_create
+interface create
     module procedure :: create_components
     module procedure :: des_self_component_create
-end interface des_self_create
+end interface create
 
-interface des_self_destroy
+interface destroy
     module procedure :: des_self_component_destroy
     module procedure :: destroy_components
-end interface des_self_destroy
+end interface destroy
 
 contains
 
@@ -35,7 +35,7 @@ contains
 
         allocate(components(size(mixture_components)))
         do i_component = 1, size(components)
-            call des_self_create(components(i_component)%component, permittivity, &
+            call create(components(i_component)%component, permittivity, &
                 mixture_components(i_component)%dipolar_moments, are_dipolar(i_component), alpha)
         end do
     end subroutine create_components
@@ -47,7 +47,7 @@ contains
 
         if (allocated(components)) then
             do i_component = size(components), 1, -1
-                call des_self_destroy(components(i_component)%component)
+                call destroy(components(i_component)%component)
             end do
             deallocate(components)
         end if

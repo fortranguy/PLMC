@@ -10,12 +10,11 @@ use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter,
 implicit none
 
 private
-public :: des_convergence_parameter_create, des_convergence_parameter_destroy
+public :: create, destroy
 
 contains
 
-    subroutine des_convergence_parameter_create(alpha, periodic_box, dipoles_exist, input_data, &
-        prefix)
+    subroutine create(alpha, periodic_box, dipoles_exist, input_data, prefix)
         class(Abstract_DES_Convergence_Parameter), allocatable, intent(out) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: dipoles_exist
@@ -35,15 +34,15 @@ contains
             allocate(Null_DES_Convergence_Parameter :: alpha)
         end if
         call alpha%construct(periodic_box, alpha_x_box)
-    end subroutine des_convergence_parameter_create
+    end subroutine create
 
-    subroutine des_convergence_parameter_destroy(alpha)
+    subroutine destroy(alpha)
         class(Abstract_DES_Convergence_Parameter), allocatable, intent(inout) :: alpha
 
         if (allocated(alpha)) then
             call alpha%destroy()
             deallocate(alpha)
         end if
-    end subroutine des_convergence_parameter_destroy
+    end subroutine destroy
 
 end module procedures_des_convergence_parameter_factory

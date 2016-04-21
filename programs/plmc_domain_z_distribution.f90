@@ -10,7 +10,7 @@ use procedures_checks, only: check_data_found, check_string_not_empty
 use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_box_factory, only: box_create, box_destroy
+use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 use procedures_property_inquirers, only: periodicity_is_xy

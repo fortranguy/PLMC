@@ -9,11 +9,11 @@ use procedures_property_inquirers, only: periodicity_is_xy
 implicit none
 
 private
-public :: dlc_structures_create, dlc_structures_destroy
+public :: create, destroy
 
 contains
 
-    subroutine dlc_structures_create(structures, environment, components, are_dipolar)
+    subroutine create(structures, environment, components, are_dipolar)
         class(Abstract_DLC_Structures), allocatable, intent(out) :: structures
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
@@ -26,15 +26,15 @@ contains
         end if
         call structures%construct(environment%periodic_box, environment%reciprocal_lattice, &
             components, are_dipolar)
-    end subroutine dlc_structures_create
+    end subroutine create
 
-    subroutine dlc_structures_destroy(structures)
+    subroutine destroy(structures)
         class(Abstract_DLC_Structures), allocatable, intent(inout) :: structures
 
         if (allocated(structures)) then
             call structures%destroy()
             deallocate(structures)
         end if
-    end subroutine dlc_structures_destroy
+    end subroutine destroy
 
 end module procedures_dlc_structures_factory

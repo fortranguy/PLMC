@@ -3,12 +3,12 @@ module procedures_changes_component_factory
 use json_module, only: json_file
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
-use procedures_changed_coordinates_factory, only: changed_coordinates_create, &
-    changed_coordinates_destroy
+use procedures_changed_coordinates_factory, only: changed_coordinates_create => create, &
+    changed_coordinates_destroy => destroy
 use module_change_tuning, only: Concrete_Change_Tuning_Parameters
 use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters
-use procedures_change_tuner_factory, only: change_tuner_create_move, change_tuner_create_rotation, &
-    change_tuner_destroy
+use procedures_change_tuner_factory, only: change_tuner_create_move => create_move, &
+    change_tuner_create_rotation => create_rotation, change_tuner_destroy => destroy
 use procedures_component_exchange_factory, only: component_exchange_create, &
     component_exchange_destroy
 use types_changes_component_wrapper, only: Changes_Component_Wrapper

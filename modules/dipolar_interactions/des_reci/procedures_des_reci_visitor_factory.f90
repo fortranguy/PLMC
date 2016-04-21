@@ -11,11 +11,11 @@ use classes_des_reci_visitor, only: Abstract_DES_Reci_Visitor, &
 implicit none
 
 private
-public :: des_reci_visitor_create, des_reci_visitor_destroy
+public :: create, destroy
 
 contains
 
-    subroutine des_reci_visitor_create(visitor, environment, weight, structure)
+    subroutine create(visitor, environment, weight, structure)
         class(Abstract_DES_Reci_Visitor), allocatable, intent(out) :: visitor
         type(Environment_Wrapper), intent(in) :: environment
         class(Abstract_DES_Reci_Weight), intent(in) :: weight
@@ -27,19 +27,20 @@ contains
             type is (Null_DES_Reci_Structure)
                 allocate(Null_DES_Reci_Visitor :: visitor)
             class default
-                call error_exit("des_reci_create: create_visitor: structure type unknown.")
+                call error_exit("procedures_des_reci_visitor_factory: create: structure"//&
+                    " type unknown.")
         end select
         call visitor%construct(environment%periodic_box, environment%reciprocal_lattice, &
             weight, structure)
-    end subroutine des_reci_visitor_create
+    end subroutine create
 
-    subroutine des_reci_visitor_destroy(visitor)
+    subroutine destroy(visitor)
         class(Abstract_DES_Reci_Visitor), allocatable, intent(inout) :: visitor
 
         if (allocated(visitor)) then
             call visitor%destroy()
             deallocate(visitor)
         end if
-    end subroutine des_reci_visitor_destroy
+    end subroutine destroy
 
 end module procedures_des_reci_visitor_factory
