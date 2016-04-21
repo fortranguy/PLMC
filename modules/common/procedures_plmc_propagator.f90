@@ -21,6 +21,7 @@ contains
         integer :: nums_choices(size(algorithms))
         integer :: i_choice
 
+        !conditional pointing?
         algorithms(1)%algorithm => metropolis_algorithms%one_particle_move
         algorithms(2)%algorithm => metropolis_algorithms%one_particle_rotation
         algorithms(3)%algorithm => metropolis_algorithms%two_particles_switch

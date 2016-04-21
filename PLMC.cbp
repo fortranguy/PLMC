@@ -409,6 +409,9 @@
 		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_micro.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="modules/metropolis_algorithms/procedures_one_particle_change_factory.f90">
+			<Option weight="10" />
+		</Unit>
 		<Unit filename="modules/metropolis_algorithms/types_metropolis_algorithms_wrapper.f90">
 			<Option weight="10" />
 		</Unit>
