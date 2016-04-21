@@ -168,7 +168,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: shortest_vector_from_floor(num_dimensions)
         real(DP), intent(in) :: position_from_floor(num_dimensions)
-        shortest_vector_from_floor = 0._DP
+        shortest_vector_from_floor = 0._DP !Is it what I expect from a null object?
         overlap = .false.
     end subroutine Null_meet
 

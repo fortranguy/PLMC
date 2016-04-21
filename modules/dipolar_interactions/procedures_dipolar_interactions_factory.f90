@@ -3,15 +3,11 @@ module procedures_dipolar_interactions_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
-use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_factory, only: mixture_set
-use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter, &
-    Concrete_DES_Convergence_Parameter, Null_DES_Convergence_Parameter
 use procedures_des_convergence_parameter_factory, only: des_convergence_parameter_create, &
     des_convergence_parameter_destroy
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper

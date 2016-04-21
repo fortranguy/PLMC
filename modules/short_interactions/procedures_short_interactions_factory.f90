@@ -7,6 +7,7 @@ use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use classes_walls_potential, only: Abstract_Walls_Potential
+use procedures_walls_factory, only: walls_create, walls_destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_minimum_distance, only: Abstract_Minimum_Distance
 use types_component_wrapper, only: Component_Wrapper
@@ -21,8 +22,6 @@ use classes_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_Li
     Concrete_Visitable_Array, Null_Visitable_List
 use classes_visitable_cells, only: Abstract_Visitable_Cells, XYZ_PBC_Visitable_Cells, &
     XY_PBC_Visitable_Cells, Null_Visitable_Cells
-use classes_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor, &
-    Concrete_Walls_Potential_Visitor, Null_Walls_Potential_Visitor
 use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor, Concrete_Short_Pairs_Visitor, &
     Null_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
@@ -36,7 +35,6 @@ public :: short_interactions_create, short_interactions_destroy
 
 interface short_interactions_create
     module procedure :: create_all
-    module procedure :: create_walls_visitor
     module procedure :: create_components_visitor
     module procedure :: create_components_cells
     module procedure :: create_components_pairs
@@ -52,7 +50,6 @@ interface short_interactions_destroy
     module procedure :: destroy_components_pairs
     module procedure :: destroy_components_cells
     module procedure :: destroy_components_visitor
-    module procedure :: destroy_walls_visitor
     module procedure :: destroy_all
 end interface short_interactions_destroy
 
@@ -70,8 +67,8 @@ contains
 
         call short_interactions_create(short_interactions%wall_pairs, interact_with_walls, &
             mixture%wall_min_distances, input_data, prefix)
-        call short_interactions_create(short_interactions%walls_visitor, environment%&
-            walls_potential, interact_with_walls)
+        call walls_create(short_interactions%walls_visitor, environment%walls_potential, &
+            interact_with_walls)
         call short_interactions_create(short_interactions%components_pairs, interact, mixture%&
             components_min_distances, input_data, prefix)
         call short_interactions_create(short_interactions%components_visitor, environment%&
@@ -85,34 +82,12 @@ contains
     subroutine destroy_all(short_interactions)
         type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
 
-        call short_interactions_destroy(short_interactions%walls_visitor)
-        call short_interactions_destroy(short_interactions%components_visitor)
         call short_interactions_destroy(short_interactions%components_cells)
-        call short_interactions_destroy(short_interactions%wall_pairs)
+        call short_interactions_destroy(short_interactions%components_visitor)
         call short_interactions_destroy(short_interactions%components_pairs)
+        call walls_destroy(short_interactions%walls_visitor)
+        call short_interactions_destroy(short_interactions%wall_pairs)
     end subroutine destroy_all
-
-    subroutine create_walls_visitor(visitor, walls_potential, interact)
-        class(Abstract_Walls_Potential_Visitor), allocatable, intent(out) :: visitor
-        class(Abstract_Walls_Potential), intent(in) :: walls_potential
-        logical, intent(in) :: interact
-
-        if (interact) then
-            allocate(Concrete_Walls_Potential_Visitor :: visitor)
-        else
-            allocate(Null_Walls_Potential_Visitor :: visitor)
-        end if
-        call visitor%construct(walls_potential)
-    end subroutine create_walls_visitor
-
-    subroutine destroy_walls_visitor(visitor)
-        class(Abstract_Walls_Potential_Visitor), allocatable, intent(inout) :: visitor
-
-        if (allocated(visitor)) then
-            call visitor%destroy()
-            deallocate(visitor)
-        end if
-    end subroutine destroy_walls_visitor
 
     subroutine create_wall_pairs(pairs, interact, min_distances, input_data, prefix)
         type(Pair_Potential_Wrapper), allocatable, intent(out) :: pairs(:)

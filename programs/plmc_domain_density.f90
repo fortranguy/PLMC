@@ -8,7 +8,7 @@ use procedures_checks, only: check_data_found
 use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_environment_factory, only: environment_create, environment_destroy
+use procedures_box_factory, only: box_create, box_destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 
@@ -36,11 +36,11 @@ implicit none
     deallocate(data_field)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
     num_snaps = command_argument_count() - 2
-    call environment_create(periodic_box, input_data, environment_prefix)
+    call box_create(periodic_box, input_data, environment_prefix)
     call plmc_destroy(input_data)
 
     call plmc_create(post_data, command_argument_count())
-    call environment_create(parallelepiped_domain, .true., periodic_box, post_data, "Density.")
+    call box_create(parallelepiped_domain, periodic_box, .true., post_data, "Density.")
     call plmc_destroy(post_data)
 
     num_inside_sum = 0
@@ -58,7 +58,7 @@ implicit none
 
     write(output_unit, *) "domain.density", real(num_inside_sum, DP) / real(num_snaps, DP) / &
         product(parallelepiped_domain%get_size())
-    call environment_destroy(periodic_box)
-    call environment_destroy(parallelepiped_domain)
+    call box_destroy(periodic_box)
+    call box_destroy(parallelepiped_domain)
 
 end program plmc_domain_density
