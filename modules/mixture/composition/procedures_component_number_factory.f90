@@ -10,7 +10,8 @@ public :: create, destroy
 
 contains
 
-    !> Number will be set with coordinates, cf. [[Abstract_Coordinates_Reader]]. Is it too fragile?
+    !> Number will be set with coordinates, cf. [[Abstract_Component_Coordinates_Reader]].
+    !> Is it too fragile?
     subroutine create(number, exists)
         class(Abstract_Component_Number), allocatable, intent(out) :: number
         logical, intent(in) :: exists

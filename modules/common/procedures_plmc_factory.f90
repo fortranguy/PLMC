@@ -26,7 +26,7 @@ use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create
     metropolis_algorithms_set, metropolis_algorithms_destroy
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
-use types_readers_wrapper, only: Component_Readers_wrapper, Readers_Wrapper
+use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper, Readers_Wrapper
 use procedures_readers_factory, only: readers_create, readers_destroy
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
@@ -119,7 +119,7 @@ contains
     end subroutine destroy_mixture
 
     subroutine set_mixture_initial_coordinates(components_readers, input_data)
-        type(Component_Readers_wrapper), intent(in) :: components_readers(:)
+        type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
         type(json_file), intent(inout) :: input_data
 
         call mixture_set_initial_coordinates(components_readers, input_data, mixture_prefix)

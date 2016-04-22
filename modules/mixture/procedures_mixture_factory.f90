@@ -8,12 +8,12 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_component_factory, only: component_create => create, component_destroy => destroy
 use types_min_distances_wrapper, only: Min_Distance_Wrapper, Min_Distances_Wrapper
-use procedures_min_distances_factory, only: min_distance_create => create, &
-    min_distance_destroy => destroy
+use procedures_min_distances_factory, only: min_distances_create => create, &
+    min_distances_destroy => destroy
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_readers_wrapper, only: Component_Readers_wrapper
+use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper
 
 implicit none
 
@@ -39,9 +39,9 @@ contains
         character(len=*), intent(in) :: prefix
 
         call mixture_create(mixture%components, environment%periodic_box, input_data, prefix)
-        call min_distance_create(mixture%wall_min_distances, mixture%components, environment%&
+        call min_distances_create(mixture%wall_min_distances, mixture%components, environment%&
             walls, input_data, prefix)
-        call min_distance_create(mixture%components_min_distances, mixture%components, input_data, &
+        call min_distances_create(mixture%components_min_distances, mixture%components, input_data, &
             prefix)
         call mixture_total_moment_create(mixture%total_moment, mixture%components)
     end subroutine create_all
@@ -50,8 +50,8 @@ contains
         type(Mixture_Wrapper), intent(inout) :: mixture
 
         call mixture_total_moment_destroy(mixture%total_moment)
-        call min_distance_destroy(mixture%components_min_distances)
-        call min_distance_destroy(mixture%wall_min_distances)
+        call min_distances_destroy(mixture%components_min_distances)
+        call min_distances_destroy(mixture%wall_min_distances)
         call mixture_destroy(mixture%components)
     end subroutine destroy_all
 
@@ -97,7 +97,7 @@ contains
     end subroutine destroy_components
 
     subroutine mixture_set_initial_coordinates(components_readers, input_data, prefix)
-        type(Component_Readers_wrapper), intent(in) :: components_readers(:)
+        type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
