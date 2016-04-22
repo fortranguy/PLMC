@@ -1,4 +1,4 @@
-module procedures_min_distances_factory
+module procedures_hard_core_factory
 
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
@@ -15,8 +15,8 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_wall_min_distances
-    module procedure :: create_components_min_distances
+    module procedure :: create_wall
+    module procedure :: create_components
     module procedure :: min_distance_create
 end interface
 
@@ -28,7 +28,7 @@ end interface
 
 contains
 
-    subroutine create_wall_min_distances(min_distances, components, walls, input_data, prefix)
+    subroutine create_wall(min_distances, components, walls, input_data, prefix)
         type(Min_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Visitable_Walls), intent(in) :: walls
@@ -45,7 +45,7 @@ contains
             call create(min_distances(i_component)%distance, exists, input_data, &
                 prefix//"Component "//string%get(i_component)//".With Walls.")
         end do
-    end subroutine create_wall_min_distances
+    end subroutine create_wall
 
     subroutine destroy_min_distances(min_distances)
         type(Min_Distance_Wrapper), allocatable, intent(inout) :: min_distances(:)
@@ -60,7 +60,7 @@ contains
         end if
     end subroutine destroy_min_distances
 
-     subroutine create_components_min_distances(min_distances, components, input_data, prefix)
+     subroutine create_components(min_distances, components, input_data, prefix)
         type(Min_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(json_file), intent(inout) :: input_data
@@ -88,7 +88,7 @@ contains
                 deallocate(min_distance_prefix)
             end do
         end do
-    end subroutine create_components_min_distances
+    end subroutine create_components
 
     subroutine destroy_components_min_distances(min_distances)
         type(Min_Distances_Wrapper), allocatable, intent(inout) :: min_distances(:)
@@ -103,4 +103,4 @@ contains
         end if
     end subroutine destroy_components_min_distances
 
-end module procedures_min_distances_factory
+end module procedures_hard_core_factory

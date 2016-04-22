@@ -8,8 +8,8 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_component_factory, only: component_create => create, component_destroy => destroy
 use types_min_distances_wrapper, only: Min_Distance_Wrapper, Min_Distances_Wrapper
-use procedures_min_distances_factory, only: min_distances_create => create, &
-    min_distances_destroy => destroy
+use procedures_hard_core_factory, only: hard_core_create => create, &
+    hard_core_destroy => destroy
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
@@ -39,9 +39,9 @@ contains
         character(len=*), intent(in) :: prefix
 
         call mixture_create(mixture%components, environment%periodic_box, input_data, prefix)
-        call min_distances_create(mixture%wall_min_distances, mixture%components, environment%&
+        call hard_core_create(mixture%wall_min_distances, mixture%components, environment%&
             walls, input_data, prefix)
-        call min_distances_create(mixture%components_min_distances, mixture%components, input_data, &
+        call hard_core_create(mixture%components_min_distances, mixture%components, input_data, &
             prefix)
         call mixture_total_moment_create(mixture%total_moment, mixture%components)
     end subroutine create_all
@@ -50,8 +50,8 @@ contains
         type(Mixture_Wrapper), intent(inout) :: mixture
 
         call mixture_total_moment_destroy(mixture%total_moment)
-        call min_distances_destroy(mixture%components_min_distances)
-        call min_distances_destroy(mixture%wall_min_distances)
+        call hard_core_destroy(mixture%components_min_distances)
+        call hard_core_destroy(mixture%wall_min_distances)
         call mixture_destroy(mixture%components)
     end subroutine destroy_all
 

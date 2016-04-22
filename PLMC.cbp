@@ -463,16 +463,16 @@
 		<Unit filename="modules/mixture/coordinates/procedures_coordinates_micro.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/mixture/min_distances/classes_min_distance.f90">
+		<Unit filename="modules/mixture/hard_core/classes_min_distance.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/mixture/min_distances/procedures_min_distance_factory.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="modules/mixture/min_distances/procedures_min_distances_factory.f90">
+		<Unit filename="modules/mixture/hard_core/procedures_hard_core_factory.f90">
 			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/mixture/min_distances/types_min_distances_wrapper.f90">
+		<Unit filename="modules/mixture/hard_core/procedures_min_distance_factory.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/mixture/hard_core/types_min_distances_wrapper.f90">
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/mixture/procedures_component_factory.f90">
