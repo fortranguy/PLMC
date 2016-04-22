@@ -13,7 +13,7 @@ use procedures_field_factory, only: field_create => create, field_destroy => des
 use procedures_permittivity_factory, only: permittivity_create => create, &
     permittivity_destroy => destroy
 use classes_floor_penetration, only: Abstract_Floor_Penetration
-use classes_walls_potential, only: Abstract_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use procedures_component_factory, only: component_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
@@ -52,13 +52,13 @@ contains
         call box_create(environment%reciprocal_lattice, environment%periodic_box, &
             input_data, prefix)
         call walls_create(floor_penetration, input_data, prefix)
-        call walls_create(environment%walls_potential, environment%periodic_box, &
-            floor_penetration, input_data, prefix)
+        call walls_create(environment%walls, environment%periodic_box, floor_penetration, &
+            input_data, prefix)
         call walls_destroy(floor_penetration)
         call box_create(environment%box_size_checker, environment%reciprocal_lattice, &
-            environment%walls_potential)
+            environment%walls)
 
-        call environment_check(environment%periodic_box, environment%walls_potential)
+        call environment_check(environment%periodic_box, environment%walls)
         call environment%box_size_checker%check()
     end subroutine environment_create
 
@@ -66,7 +66,7 @@ contains
         type(Environment_Wrapper), intent(inout) :: environment
 
         call box_destroy(environment%box_size_checker)
-        call walls_destroy(environment%walls_potential)
+        call walls_destroy(environment%walls)
         call box_destroy(environment%reciprocal_lattice)
         call field_destroy(environment%external_field)
         call permittivity_destroy(environment%permittivity)
@@ -74,14 +74,14 @@ contains
         call box_destroy(environment%periodic_box)
     end subroutine environment_destroy
 
-    subroutine environment_check(periodic_box, walls_potential)
+    subroutine environment_check(periodic_box, walls)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Walls_Potential), intent(in) :: walls_potential
+        class(Abstract_Visitable_Walls), intent(in) :: walls
 
-        if (periodicity_is_xyz(periodic_box) .and. use_walls(walls_potential)) then
+        if (periodicity_is_xyz(periodic_box) .and. use_walls(walls)) then
             call warning_continue("environment_check: periodicity is XYZ but walls are used.")
         end if
-        if (periodicity_is_xy(periodic_box) .and. .not.use_walls(walls_potential)) then
+        if (periodicity_is_xy(periodic_box) .and. .not.use_walls(walls)) then
             call warning_continue("environment_check: periodicity is XY but walls are not used.")
         end if
     end subroutine environment_check

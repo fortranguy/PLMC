@@ -40,7 +40,7 @@ contains
 
         call mixture_create(mixture%components, environment%periodic_box, input_data, prefix)
         call min_distance_create(mixture%wall_min_distances, mixture%components, environment%&
-            walls_potential, input_data, prefix)
+            walls, input_data, prefix)
         call min_distance_create(mixture%components_min_distances, mixture%components, input_data, &
             prefix)
         call mixture_total_moment_create(mixture%total_moment, mixture%components)

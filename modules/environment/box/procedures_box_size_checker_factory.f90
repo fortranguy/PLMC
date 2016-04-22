@@ -1,7 +1,7 @@
 module procedures_box_size_checker_factory
 
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use classes_walls_potential, only: Abstract_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_box_size_checker, only: Abstract_Box_Size_Checker, Concrete_Box_Size_Checker, &
     Null_Box_Size_Checker
 use procedures_property_inquirers, only: use_reciprocal_lattice, use_walls
@@ -13,17 +13,17 @@ public :: create, destroy
 
 contains
 
-    subroutine create(box_size_checker, reciprocal_lattice, walls_potential)
+    subroutine create(box_size_checker, reciprocal_lattice, walls)
         class(Abstract_Box_Size_Checker), allocatable, intent(out) :: box_size_checker
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Walls_Potential), intent(in) :: walls_potential
+        class(Abstract_Visitable_Walls), intent(in) :: walls
 
-        if (use_reciprocal_lattice(reciprocal_lattice) .or. use_walls(walls_potential)) then
+        if (use_reciprocal_lattice(reciprocal_lattice) .or. use_walls(walls)) then
             allocate(Concrete_Box_Size_Checker :: box_size_checker)
         else
             allocate(Null_Box_Size_Checker :: box_size_checker)
         end if
-        call box_size_checker%construct(reciprocal_lattice, walls_potential)
+        call box_size_checker%construct(reciprocal_lattice, walls)
     end subroutine create
 
     subroutine destroy(box_size_checker)

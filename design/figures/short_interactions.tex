@@ -73,7 +73,7 @@
         \begin{scope}[shift={($(VisitableCells) + (9 cm, -1 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{ShortInteractions}{0, 0}
                 \attribute{componentsVisitor: \type{ShortPairsVisitor}}
-                \attribute{wallsVisitor: \type{WallsPotentialVisitor}}
+                \attribute{wallsVisitor: \type{WallsVisitor}}
                 \attribute{wallPairs: \type{PairPotential[:]}}
                 \attribute{componentsPairs: \type{PairPotential[:.]}}
                 \attribute{componentsCells: \type{VisitableCells[::]}}
@@ -95,7 +95,7 @@
 
         \begin{scope}[shift={($(VisitableCells.north -| ShortInteractions)$)}]
             \umlnote[text width=\mediumTextWidth] {\import{}: \\
-                \namespace{Environment} :: PeriodicBox, WallsPotentialVisitor \\
+                \namespace{Environment} :: PeriodicBox, WallsVisitor \\
                 \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
         \end{scope}
 

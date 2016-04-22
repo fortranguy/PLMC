@@ -287,10 +287,10 @@ contains
 
         real(DP) :: energy_new, energy_old
 
-        call this%environment%walls_potential%visit(overlap, energy_new, new%position, this%&
+        call this%environment%walls%visit(overlap, energy_new, new%position, this%&
             short_interactions%wall_pairs(i_actor)%potential)
         if (overlap) return
-        call this%environment%walls_potential%visit(overlap, energy_old, old%position, this%&
+        call this%environment%walls%visit(overlap, energy_old, old%position, this%&
             short_interactions%wall_pairs(i_actor)%potential)
         delta = energy_new - energy_old
     end subroutine Move_visit_walls

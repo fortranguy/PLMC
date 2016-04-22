@@ -2,7 +2,7 @@ module classes_box_size_checker
 
 use procedures_errors, only: error_exit, warning_continue
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use classes_walls_potential, only: Abstract_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls
 
 implicit none
 
@@ -11,7 +11,7 @@ private
     type, abstract, public :: Abstract_Box_Size_Checker
     private
         class(Abstract_Reciprocal_Lattice), pointer :: reciprocal_lattice => null()
-        class(Abstract_Walls_Potential), pointer :: walls_potential => null()
+        class(Abstract_Visitable_Walls), pointer :: walls => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -33,19 +33,19 @@ contains
 
 !implementation Abstract_Box_Size_Checker
 
-    subroutine Abstract_construct(this, reciprocal_lattice, walls_potential)
+    subroutine Abstract_construct(this, reciprocal_lattice, walls)
         class(Abstract_Box_Size_Checker), intent(out) :: this
         class(Abstract_Reciprocal_Lattice), target, intent(in) :: reciprocal_lattice
-        class(Abstract_Walls_Potential), target, intent(in) :: walls_potential
+        class(Abstract_Visitable_Walls), target, intent(in) :: walls
 
         this%reciprocal_lattice => reciprocal_lattice
-        this%walls_potential => walls_potential
+        this%walls => walls
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Box_Size_Checker), intent(out) :: this
 
-        this%walls_potential => null()
+        this%walls => null()
         this%reciprocal_lattice => null()
     end subroutine Abstract_destroy
 
@@ -56,7 +56,7 @@ contains
             call warning_continue("Abstract_Box_Size_Checker: check: reciprocal_lattice is too "//&
                 "sparse in z direction.")
         end if
-        if (this%walls_potential%are_outside_box()) then
+        if (this%walls%are_outside_box()) then
             call error_exit("Abstract_Box_Size_Checker: check: walls are outside the box.")
         end if
     end subroutine Abstract_check
@@ -65,10 +65,10 @@ contains
 
 !implementation Null_Box_Size_Checker
 
-    subroutine Null_construct(this, reciprocal_lattice, walls_potential)
+    subroutine Null_construct(this, reciprocal_lattice, walls)
         class(Null_Box_Size_Checker), intent(out) :: this
         class(Abstract_Reciprocal_Lattice), target, intent(in) :: reciprocal_lattice
-        class(Abstract_Walls_Potential), target, intent(in) :: walls_potential
+        class(Abstract_Visitable_Walls), target, intent(in) :: walls
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

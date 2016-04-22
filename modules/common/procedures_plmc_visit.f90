@@ -5,7 +5,7 @@ use procedures_errors, only: error_exit
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use classes_external_field, only: Abstract_External_Field
-use classes_walls_potential, only: Abstract_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments

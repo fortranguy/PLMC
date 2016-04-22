@@ -6,7 +6,7 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use classes_walls_potential, only: Abstract_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_min_distance, only: Abstract_Min_Distance
@@ -67,8 +67,7 @@ contains
 
         call short_interactions_create(short_interactions%wall_pairs, interact_with_walls, &
             mixture%wall_min_distances, input_data, prefix)
-        call walls_create(short_interactions%walls_visitor, environment%walls_potential, &
-            interact_with_walls)
+        call walls_create(short_interactions%walls_visitor, environment%walls, interact_with_walls)
         call short_interactions_create(short_interactions%components_pairs, interact, mixture%&
             components_min_distances, input_data, prefix)
         call short_interactions_create(short_interactions%components_visitor, environment%&

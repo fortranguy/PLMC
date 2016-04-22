@@ -97,7 +97,7 @@ contains
         this%periodic_box => null()
     end subroutine Variable_destroy
 
-    !> This value may be higher than expected if the are walls, cf. [[Abstract_Walls_Potential]].
+    !> This value may be higher than expected if the are walls, cf. [[Abstract_Visitable_Walls]].
     pure integer function Variable_get(this) result(average_number)
         class(Variable_Component_Average_Number), intent(in) :: this
 

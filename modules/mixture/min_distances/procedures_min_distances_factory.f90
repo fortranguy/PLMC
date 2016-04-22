@@ -2,7 +2,7 @@ module procedures_min_distances_factory
 
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
-use classes_walls_potential, only: Abstract_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls
 use types_component_wrapper, only: Component_Wrapper
 use procedures_min_distance_factory, only: min_distance_create => create, &
     min_distance_destroy => destroy
@@ -28,10 +28,10 @@ end interface
 
 contains
 
-    subroutine create_wall_min_distances(min_distances, components, potential, input_data, prefix)
+    subroutine create_wall_min_distances(min_distances, components, walls, input_data, prefix)
         type(Min_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        class(Abstract_Walls_Potential), intent(in) :: potential
+        class(Abstract_Visitable_Walls), intent(in) :: walls
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -41,7 +41,7 @@ contains
 
         allocate(min_distances(size(components)))
         do i_component = 1, size(min_distances)
-            exists = use_walls(potential) .and. component_exists(components(i_component)%number)
+            exists = use_walls(walls) .and. component_exists(components(i_component)%number)
             call create(min_distances(i_component)%distance, exists, input_data, &
                 prefix//"Component "//string%get(i_component)//".With Walls.")
         end do

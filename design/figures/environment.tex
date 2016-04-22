@@ -31,7 +31,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox.north) - (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableWalls}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}, gap: \type{real},
                     floorPenetration: \type{FloorPenetration}}}
                 \operation{\procedure{destroy}{}}
@@ -42,16 +42,16 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ParallelepipedDomain.north -| WallsPotential)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotentialVisitor}{0, 0}
-                \operation{\procedure{construct}{wallsPotential: \type{WallsPotential}}}
+        \begin{scope}[shift={($(ParallelepipedDomain.north -| VisitableWalls)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{WallsVisitor}{0, 0}
+                \operation{\procedure{construct}{wallsPotential: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
                     positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(WallsPotential.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
                 \operation{\procedure{getMinDepth}{}: \type{real}}
                 \operation{\procedure{meet}{overlap: \type{bool},
@@ -102,20 +102,20 @@
         \begin{scope}[shift={($(PeriodicBox |- FloorPenetration.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BoxSizeChecker}{0, 0}
                 \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
-                    wallsPotential: \type{WallsPotential}}}
+                    wallsPotential: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{check}{}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ExternalField.north -| WallsPotentialVisitor)$)}]
+        \begin{scope}[shift={($(ExternalField.north -| WallsVisitor)$)}]
             \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
                 \attribute{periodicBox: \type{PeriodicBox}}
                 \attribute{temperature: \type{Temperature}}
                 \attribute{permittivity: \type{Permittivity}}
                 \attribute{externalField: \type{ExternalField}}
                 \attribute{reciprocalLattice: \type{ReciprocalLattice}}
-                \attribute{wallsPotential: \type{WallsPotential}}
+                \attribute{wallsPotential: \type{VisitableWalls}}
                 \attribute{boxSizeChecker: \type{BoxSizeChecker}}
             \end{class}
         \end{scope}
@@ -131,10 +131,10 @@
             \composition{ExternalField}{\refName{parallelepipedDomain}}{\numRef{1}}
                 {ParallelepipedDomain}
             \composition{ExternalField}{\refName{fieldExpression}}{\numRef{1}}{FieldExpression}
-            \aggregation{WallsPotential}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
-            \composition{WallsPotential}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
+            \aggregation{VisitableWalls}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
+            \composition{VisitableWalls}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
             \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}
-            \aggregation{BoxSizeChecker}{\refName{wallsPotential}}{\numRef{1}}{WallsPotential}
+            \aggregation{BoxSizeChecker}{\refName{wallsPotential}}{\numRef{1}}{VisitableWalls}
         \end{scope}
     \end{tikzpicture}
 

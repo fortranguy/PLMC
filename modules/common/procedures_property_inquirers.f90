@@ -6,7 +6,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Peri
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
 use classes_external_field, only: Abstract_External_Field, Null_External_Field
-use classes_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
+use classes_visitable_walls, only: Abstract_Visitable_Walls, Concrete_Visitable_Walls
 use classes_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
@@ -48,7 +48,7 @@ end interface use_reciprocal_lattice
 
 interface use_walls
     module procedure :: use_walls_from_json
-    module procedure :: use_walls_from_walls_potential
+    module procedure :: use_walls_from_walls
 end interface use_walls
 
 interface component_exists
@@ -159,16 +159,16 @@ contains
         use_walls = logical_from_json(input_data, prefix//"Walls.use")
     end function use_walls_from_json
 
-    logical function use_walls_from_walls_potential(walls_potential) result(use_walls)
-        class(Abstract_Walls_Potential), intent(in) :: walls_potential
+    logical function use_walls_from_walls(walls) result(use_walls)
+        class(Abstract_Visitable_Walls), intent(in) :: walls
 
-        select type (walls_potential)
-            type is (Concrete_Walls_Potential)
+        select type (walls)
+            type is (Concrete_Visitable_Walls)
                 use_walls = .true.
             class default
                 use_walls = .false.
         end select
-    end function use_walls_from_walls_potential
+    end function use_walls_from_walls
 
     pure logical function component_exists_from_number(component_number) result(component_exists)
         class(Abstract_Component_Number), intent(in) :: component_number
