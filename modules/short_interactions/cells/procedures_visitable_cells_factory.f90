@@ -1,4 +1,4 @@
-module procedures_components_visitable_cells_factory
+module procedures_visitable_cells_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
@@ -61,4 +61,4 @@ contains
         end if
     end subroutine destroy
 
-end module procedures_components_visitable_cells_factory
+end module procedures_visitable_cells_factory

@@ -9,7 +9,7 @@ implicit none
 private
 public :: num_tuning_steps, num_steps, plmc_set_num_steps
 
-    integer, protected :: num_tuning_steps, num_steps
+    integer, protected :: num_tuning_steps = 0, num_steps = 0
 
 contains
 

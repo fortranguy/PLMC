@@ -305,15 +305,15 @@ contains
         real(DP), dimension(size(deltas)) :: energies_new, energies_old
         integer :: i_component, i_exclude
 
-        do i_component = 1, size(this%short_interactions%components_cells, 1)
+        do i_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
-            call this%short_interactions%components_cells(i_component, i_actor)%visit(overlap, &
+            call this%short_interactions%visitable_cells(i_component, i_actor)%visit(overlap, &
                 energies_new(i_component), new, i_exclude)
             if (overlap) return
         end do
-        do i_component = 1, size(this%short_interactions%components_cells, 1)
+        do i_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(old%i, 0, i_component == i_actor)
-            call this%short_interactions%components_cells(i_component, i_actor)%visit(overlap, &
+            call this%short_interactions%visitable_cells(i_component, i_actor)%visit(overlap, &
                 energies_old(i_component), old, i_exclude)
         end do
         deltas = energies_new - energies_old
@@ -349,8 +349,8 @@ contains
         integer :: i_component
 
         call this%mixture%components(i_actor)%positions%set(new%i, new%position)
-        do i_component = 1, size(this%short_interactions%components_cells, 1)
-            call this%short_interactions%components_cells(i_actor, i_component)%move(new%position, &
+        do i_component = 1, size(this%short_interactions%visitable_cells, 1)
+            call this%short_interactions%visitable_cells(i_actor, i_component)%move(new%position, &
                 old)
         end do
         call this%dipolar_interactions%reci_structure%update_move(i_actor, new%position, old)

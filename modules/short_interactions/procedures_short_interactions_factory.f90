@@ -42,16 +42,16 @@ contains
         call cells_create(short_interactions%neighbour_cells, environment%periodic_box, &
             short_interactions%components_pairs, interact)
         call visitable_list_allocate(list, interact, input_data, prefix)
-        call cells_create(short_interactions%components_cells, environment%&
-            periodic_box, mixture%components, short_interactions%components_pairs, &
-            short_interactions%neighbour_cells, list, interact)
+        call cells_create(short_interactions%visitable_cells, environment%periodic_box, mixture%&
+            components, short_interactions%components_pairs, short_interactions%neighbour_cells, &
+            list, interact)
         call visitable_list_deallocate(list)
     end subroutine short_interactions_create
 
     subroutine short_interactions_destroy(short_interactions)
         type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
 
-        call cells_destroy(short_interactions%components_cells)
+        call cells_destroy(short_interactions%visitable_cells)
         call cells_destroy(short_interactions%neighbour_cells)
         call pairs_destroy(short_interactions%components_visitor)
         call pairs_destroy(short_interactions%components_pairs)

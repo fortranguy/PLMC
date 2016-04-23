@@ -241,17 +241,17 @@ contains
         integer :: i_component, i_exclude, i
 
         do i = 1, size(new)
-            do i_component = 1, size(this%short_interactions%components_cells, 1)
+            do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, new)
-                call this%short_interactions%components_cells(i_component, ij_actors(i))%&
+                call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
                     visit(overlap, energies_new(i_component, i), new(i), i_exclude)
                 if (overlap) return
             end do
         end do
         do i = 1, size(old)
-            do i_component = 1, size(this%short_interactions%components_cells, 1)
+            do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, old)
-                call this%short_interactions%components_cells(i_component, ij_actors(i))%&
+                call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
                     visit(overlap, energies_old(i_component, i), old(i), i_exclude)
             end do
         end do
@@ -308,8 +308,8 @@ contains
 
         do i = 1, size(new)
             call this%components(ij_actors(i))%positions%set(new(i)%i, new(i)%position)
-            do i_component = 1, size(this%short_interactions%components_cells, 1)
-                call this%short_interactions%components_cells(ij_actors(i), i_component)%&
+            do i_component = 1, size(this%short_interactions%visitable_cells, 1)
+                call this%short_interactions%visitable_cells(ij_actors(i), i_component)%&
                     move(new(i)%position, old(i))
             end do
         end do

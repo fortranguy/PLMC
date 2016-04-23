@@ -16,7 +16,7 @@ private
         class(Abstract_Short_Pairs_Visitor), allocatable :: components_visitor
         type(Pair_Potentials_Line), allocatable :: components_pairs(:)
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
-        class(Abstract_Visitable_Cells), allocatable :: components_cells(:, :)
+        class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
     end type Short_Interactions_Wrapper
 
 end module types_short_interactions_wrapper

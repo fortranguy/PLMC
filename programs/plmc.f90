@@ -13,12 +13,12 @@ use procedures_plmc_propagator, only: plmc_propagator_create, plmc_propagator_de
 use types_observables_wrapper, only: Observables_Wrapper
 use types_readers_wrapper, only: Readers_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
-use procedures_plmc_factory, only: plmc_create, plmc_set, plmc_destroy
+use module_plmc_iterations, only: num_tuning_steps, num_steps
+use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
 use procedures_plmc_reset, only: plmc_reset
 use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_write, only: plmc_write
-use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
-use procedures_help, only: help_plmc
+use procedures_plmc_help, only: plmc_catch_help
 
 implicit none
 
@@ -36,26 +36,17 @@ implicit none
     integer :: i_step
     logical :: changes_tuned
 
-    call help_plmc()
+    call plmc_catch_help()
     call json_initialize()
     call plmc_create(input_data, 1)
-    call plmc_create(environment, input_data)
-    call plmc_create(mixture, environment, input_data)
-    call plmc_create(short_interactions, environment, mixture, input_data)
-    call plmc_create(dipolar_interactions, environment, mixture, input_data)
-    call plmc_set_num_steps(input_data)
-    call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
-    call plmc_create(metropolis_algorithms, environment, mixture, changes, short_interactions, &
-        dipolar_interactions)
-    call plmc_create(observables, mixture%components)
-    call plmc_create(readers, environment, mixture%components)
-    call plmc_create(writers, environment, mixture%components, changes, short_interactions, &
-        dipolar_interactions, input_data)
+    call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
+        metropolis_algorithms, observables, readers, writers, input_data)
     call plmc_set(readers%components, input_data)
-    call plmc_set(metropolis_algorithms, mixture, changes)
+    call plmc_set(metropolis_algorithms, mixture%components, changes%components)
     call plmc_propagator_create(metropolis_algorithms)
     call plmc_destroy(input_data)
 
+    call plmc_reset(mixture%total_moment, short_interactions, dipolar_interactions)
     call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
     call plmc_write(-num_tuning_steps, writers, observables)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
@@ -73,20 +64,12 @@ implicit none
         call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
-    call plmc_reset(mixture%total_moment)
-    call plmc_reset(dipolar_interactions)
+    call plmc_reset(mixture%total_moment, short_interactions, dipolar_interactions)
     call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
     call plmc_write(i_step-1, writers, observables)
 
-    call plmc_destroy(writers)
-    call plmc_destroy(readers)
-    call plmc_destroy(observables)
     call plmc_propagator_destroy()
-    call plmc_destroy(metropolis_algorithms)
-    call plmc_destroy(changes)
-    call plmc_destroy(dipolar_interactions)
-    call plmc_destroy(short_interactions)
-    call plmc_destroy(mixture)
-    call plmc_destroy(environment)
+    call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
+        metropolis_algorithms, observables, readers, writers)
 
 end program plmc
