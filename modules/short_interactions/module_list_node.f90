@@ -43,7 +43,6 @@ contains
 
         allocate(nodes(increase_factor * num_nodes))
         nodes(1:num_nodes) = nodes_tmp
-        deallocate(nodes_tmp)
     end subroutine increase_nodes_size
 
 end module module_list_node

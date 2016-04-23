@@ -10,7 +10,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
-use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper
+use types_pair_potentials_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper
 use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use classes_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer
