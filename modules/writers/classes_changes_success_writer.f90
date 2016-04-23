@@ -1,4 +1,4 @@
-module classes_changes_writer
+module classes_changes_success_writer
 
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
@@ -107,4 +107,4 @@ contains
 
 !end implementation Null_Changes_Success_Writer
 
-end module classes_changes_writer
+end module classes_changes_success_writer

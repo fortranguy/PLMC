@@ -11,9 +11,9 @@ implicit none
 
 private
 
-    type, public :: Concrete_Line_Selector
+    type, public :: Selectors_Line
         logical, allocatable :: line(:)
-    end type Concrete_Line_Selector
+    end type Selectors_Line
 
     type :: Strings_Wrapper
         type(String_Wrapper), allocatable :: with_component(:)
@@ -45,9 +45,9 @@ contains
 
 !implementation Abstract_Triangle_Writer
 
-    subroutine Abstract_construct(this, selector, filename)
+    subroutine Abstract_construct(this, selectors, filename)
         class(Abstract_Triangle_Writer), intent(out) :: this
-        type(Concrete_Line_Selector), intent(in) :: selector(:)
+        type(Selectors_Line), intent(in) :: selectors(:)
         character(len=*), intent(in) :: filename
 
         character(len=:), allocatable :: legend
@@ -58,23 +58,23 @@ contains
         open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
         this%file_unit = file_unit
         legend = "# i_step"
-        call this%allocate_string(legend, selector)
+        call this%allocate_string(legend, selectors)
         write(this%file_unit, *) legend
     end subroutine Abstract_construct
 
-    subroutine Abstract_allocate_strings(this, legend, selector)
+    subroutine Abstract_allocate_strings(this, legend, selectors)
         class(Abstract_Triangle_Writer), intent(inout) :: this
         character(len=:), allocatable, intent(inout) :: legend
-        type(Concrete_Line_Selector), intent(in) :: selector(:)
+        type(Selectors_Line), intent(in) :: selectors(:)
 
         type(Concrete_Number_to_String) :: string
         integer :: i_component, j_component
 
-        allocate(this%strings(size(selector)))
+        allocate(this%strings(size(selectors)))
         do j_component = 1, size(this%strings)
             allocate(this%strings(j_component)%with_component(j_component))
             do i_component = 1, size(this%strings(j_component)%with_component)
-                if (selector(j_component)%line(i_component)) then
+                if (selectors(j_component)%line(i_component)) then
                     allocate(Concrete_Number_to_String :: this%strings(j_component)%&
                         with_component(i_component)%string)
                     legend = legend//"    "//string%get(i_component)//"<->"//string%get(j_component)
@@ -125,9 +125,9 @@ contains
 
 !implementation Null_Triangle_Writer
 
-    subroutine Null_construct(this, selector, filename)
+    subroutine Null_construct(this, selectors, filename)
         class(Null_Triangle_Writer), intent(out) :: this
-        type(Concrete_Line_Selector), intent(in) :: selector(:)
+        type(Selectors_Line), intent(in) :: selectors(:)
         character(len=*), intent(in) :: filename
     end subroutine Null_construct
 

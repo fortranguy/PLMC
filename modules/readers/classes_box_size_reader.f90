@@ -23,7 +23,16 @@ private
 
     end type Concrete_Box_Size_Reader
 
+    type, extends(Abstract_Box_Size_Reader), public :: Null_Box_Size_Reader
+    contains
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: read => Null_read
+    end type Null_Box_Size_Reader
+
 contains
+
+!implementation Abstract_Box_Size_Reader
 
     subroutine Abstract_construct(this, periodic_box)
         class(Abstract_Box_Size_Reader), intent(out) :: this
@@ -54,5 +63,25 @@ contains
 
         call this%periodic_box%set(size)
     end subroutine Abstract_read
+
+!implementation Abstract_Box_Size_Reader
+
+!implementation Null_Box_Size_Reader
+
+    subroutine Null_construct(this, periodic_box)
+        class(Null_Box_Size_Reader), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+    end subroutine Null_construct
+
+    subroutine Null_destroy(this)
+        class(Null_Box_Size_Reader), intent(inout) :: this
+    end subroutine Null_destroy
+
+    subroutine Null_read(this, filename)
+        class(Null_Box_Size_Reader), intent(in) :: this
+        character(len=*), intent(in) :: filename
+    end subroutine Null_read
+
+!implementation Null_Box_Size_Reader
 
 end module classes_box_size_reader

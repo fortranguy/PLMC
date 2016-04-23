@@ -20,7 +20,10 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call box_size_reader_create(readers%box_size, periodic_box)
+        logical :: in_post_treatment !todo: link to outside
+
+        in_post_treatment = .false.
+        call box_size_reader_create(readers%box_size, periodic_box, in_post_treatment)
         call coordinates_reader_create(readers%components, components)
     end subroutine readers_create
 

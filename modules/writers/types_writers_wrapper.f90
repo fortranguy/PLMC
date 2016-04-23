@@ -4,8 +4,8 @@ use classes_box_size_writer, only: Abstract_Box_Size_Writer
 use classes_component_coordinates_writer, only: Abstract_Coordinates_Writer
 use classes_line_writer, only: Abstract_Line_Writer
 use classes_triangle_writer, only: Abstract_Triangle_Writer
-use classes_energy_writer, only: Abstract_Energy_Writer
-use classes_changes_writer, only: Abstract_Changes_Success_Writer
+use classes_real_writer, only: Abstract_Real_Writer
+use classes_changes_success_writer, only: Abstract_Changes_Success_Writer
 
 implicit none
 
@@ -21,7 +21,7 @@ private
         class(Abstract_Line_Writer), allocatable :: field, walls
         type(Component_Writers_Wrapper), allocatable :: components(:)
         class(Abstract_Triangle_Writer), allocatable :: switches, short_energies, dipolar_energies
-        class(Abstract_Energy_Writer), allocatable :: dipolar_mixture_energy
+        class(Abstract_Real_Writer), allocatable :: dipolar_mixture_energy
     end type Writers_Wrapper
 
 end module types_writers_wrapper
