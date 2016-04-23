@@ -4,9 +4,9 @@ use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use types_component_wrapper, only: Component_Wrapper
+use types_min_distance_wrapper, only: Min_Distance_Wrapper, Min_Distances_Line
 use procedures_min_distance_factory, only: min_distance_create => create, &
     min_distance_destroy => destroy
-use types_min_distances_wrapper, only: Min_Distance_Wrapper, Min_Distances_Wrapper
 use procedures_property_inquirers, only: use_walls, component_exists
 
 implicit none
@@ -61,7 +61,7 @@ contains
     end subroutine destroy_min_distances
 
      subroutine create_components(min_distances, components, input_data, prefix)
-        type(Min_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
+        type(Min_Distances_Line), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -91,7 +91,7 @@ contains
     end subroutine create_components
 
     subroutine destroy_components_min_distances(min_distances)
-        type(Min_Distances_Wrapper), allocatable, intent(inout) :: min_distances(:)
+        type(Min_Distances_Line), allocatable, intent(inout) :: min_distances(:)
 
         integer :: i_component
 

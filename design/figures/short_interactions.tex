@@ -73,10 +73,11 @@
 
         \begin{scope}[shift={($(VisitableCells) + (9 cm, -1 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{ShortInteractions}{0, 0}
-                \attribute{componentsVisitor: \type{ShortPairsVisitor}}
                 \attribute{wallsVisitor: \type{WallsVisitor}}
                 \attribute{wallPairs: \type{PairPotential[:]}}
+                \attribute{componentsVisitor: \type{ShortPairsVisitor}}
                 \attribute{componentsPairs: \type{PairPotential[:.]}}
+                \attribute{neighbourCells: \type{NeighbourCells[:.]}}
                 \attribute{componentsCells: \type{VisitableCells[::]}}
             \end{class}
         \end{scope}

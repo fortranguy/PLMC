@@ -1,7 +1,7 @@
 module module_changes_success
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_line_observables, only: Concrete_Line_Observables
+use types_reals_line, only: Reals_Line
 
 implicit none
 
@@ -62,7 +62,7 @@ contains
     end subroutine changes_counter_set
 
     pure elemental subroutine switches_counters_set(switches_successes, switches_counters)
-        type(Concrete_Line_Observables), intent(inout) :: switches_successes
+        type(Reals_Line), intent(inout) :: switches_successes
         type(Concrete_Switch_Counters), intent(in) :: switches_counters
 
         switches_successes%line = get_ratio(switches_counters%line)

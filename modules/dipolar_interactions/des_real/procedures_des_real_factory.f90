@@ -5,15 +5,16 @@ use json_module, only: json_file
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity
 use types_component_wrapper, only: Component_Wrapper
-use types_min_distances_wrapper, only: Min_Distances_Wrapper
+use types_min_distance_wrapper, only: Min_Distances_Line
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
+use types_des_real_pair_wrapper, only: DES_Real_Pairs_Line
 use procedures_des_real_pair_factory, only: des_real_pair_create => create, &
     des_real_pair_destroy => destroy
+use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
 use procedures_des_real_component_factory, only: des_real_component_create => create, &
     des_real_component_destroy => destroy
 use procedures_des_real_visitor_factory, only: des_real_visitor_create => create, &
     des_real_visitor_destroy => destroy
-use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper, DES_Real_Component_Wrapper
 
 implicit none
 
@@ -42,7 +43,7 @@ contains
         type(DES_Real_Component_Wrapper), allocatable, intent(out) :: components(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: mixture_components(:)
-        type(DES_Real_Pairs_Wrapper), intent(in) :: real_pairs(:)
+        type(DES_Real_Pairs_Line), intent(in) :: real_pairs(:)
 
         integer :: i_component, j_component
         integer :: i_pair, j_pair
@@ -79,9 +80,9 @@ contains
 
     subroutine create_pairs(real_pairs, permittivity, min_distances, are_dipolar, alpha, &
         input_data, prefix)
-        type(DES_Real_Pairs_Wrapper), allocatable, intent(out) :: real_pairs(:)
+        type(DES_Real_Pairs_Line), allocatable, intent(out) :: real_pairs(:)
         class(Abstract_Permittivity), intent(in) :: permittivity
-        type(Min_Distances_Wrapper), intent(in) :: min_distances(:)
+        type(Min_Distances_Line), intent(in) :: min_distances(:)
         logical, intent(in) :: are_dipolar(:)
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
@@ -104,7 +105,7 @@ contains
     end subroutine create_pairs
 
     subroutine destroy_pairs(real_pairs)
-        type(DES_Real_Pairs_Wrapper), allocatable, intent(inout) :: real_pairs(:)
+        type(DES_Real_Pairs_Line), allocatable, intent(inout) :: real_pairs(:)
 
         integer :: i_component, j_component
 

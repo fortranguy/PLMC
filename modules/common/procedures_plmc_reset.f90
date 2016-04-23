@@ -1,7 +1,8 @@
 module procedures_plmc_reset
 
 use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment
-use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper, Dipolar_Interactions_Wrapper
+use types_des_real_pair_wrapper, only: DES_Real_Pairs_Line
+use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 
 implicit none
 
@@ -34,7 +35,7 @@ contains
     end subroutine reset_dipolar
 
     subroutine reset_dipolar_real(real_pairs)
-        type(DES_Real_Pairs_Wrapper), intent(inout) :: real_pairs(:)
+        type(DES_Real_Pairs_Line), intent(inout) :: real_pairs(:)
 
         integer :: i_component, j_component
 

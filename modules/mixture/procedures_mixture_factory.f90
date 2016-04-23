@@ -7,9 +7,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_component_factory, only: component_create => create, component_destroy => destroy
-use types_min_distances_wrapper, only: Min_Distance_Wrapper, Min_Distances_Wrapper
-use procedures_hard_core_factory, only: hard_core_create => create, &
-    hard_core_destroy => destroy
+use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper

@@ -1,7 +1,7 @@
 module procedures_cells_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
-use types_pair_potentials_wrapper, only: Pair_Potentials_Wrapper
+use types_pair_potential_wrapper, only: Pair_Potentials_Line
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use procedures_neighbour_cells_factory, only: neighbour_cells_create => create, &
     neighbour_cells_destroy => destroy
@@ -31,7 +31,7 @@ contains
     subroutine create_components(cells, periodic_box, pairs, interact)
         type(Neighbour_Cells_Line), allocatable, intent(out) :: cells(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
+        type(Pair_Potentials_Line), intent(in) :: pairs(:)
         logical, intent(in) :: interact
 
         integer :: i_component, j_component

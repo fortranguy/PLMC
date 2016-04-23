@@ -10,8 +10,8 @@ use types_environment_wrapper, only: Environment_Wrapper
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
-use types_pair_potentials_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper
-use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper
+use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use types_des_real_pair_wrapper, only: DES_Real_Pairs_Line
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use classes_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer
 use classes_triangle_writer, only: Concrete_Line_Selector, &
@@ -65,8 +65,8 @@ contains
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
-        type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
-        type(DES_Real_Pairs_Wrapper), intent(in) :: dipolar_pairs(:)
+        type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
+        type(DES_Real_Pairs_Line), intent(in) :: dipolar_pairs(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -303,7 +303,7 @@ contains
 
     subroutine create_short_energies(energies, pairs, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
-        type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
+        type(Pair_Potentials_Line), intent(in) :: pairs(:)
         character(len=*), intent(in) :: filename
 
         type(Concrete_Line_Selector) :: selectors(size(pairs))
@@ -331,7 +331,7 @@ contains
 
     subroutine create_dipolar_energies(energies, pairs, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
-        type(DES_Real_Pairs_Wrapper), intent(in) :: pairs(:)
+        type(DES_Real_Pairs_Line), intent(in) :: pairs(:)
         character(len=*), intent(in) :: filename
 
         type(Concrete_Line_Selector) :: selectors(size(pairs))

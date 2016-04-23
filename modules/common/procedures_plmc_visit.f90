@@ -15,10 +15,10 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 use classes_pair_potential, only: Abstract_Pair_Potential
 use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper, &
-    Dipolar_Interactions_Wrapper
+use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
+use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
-use types_line_observables, only: Concrete_Line_Observables
+use types_reals_line, only: Reals_Line
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
 use procedures_triangle_observables, only: triangle_observables_init, &
@@ -91,7 +91,7 @@ contains
     end subroutine visit_walls
 
     subroutine visit_short(energies, components, short_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
@@ -100,7 +100,7 @@ contains
     end subroutine visit_short
 
     subroutine visit_short_intra(energies, components, short_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
@@ -124,7 +124,7 @@ contains
     end subroutine visit_short_intra
 
     subroutine visit_short_inter(energies, components, short_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
@@ -152,12 +152,12 @@ contains
 
     pure subroutine visit_dipolar(energies, dipolar_mixture_energy, components, &
         dipolar_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         real(DP), intent(out) :: dipolar_mixture_energy
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
-        type(Concrete_Line_Observables) :: real_energies(size(components))
+        type(Reals_Line) :: real_energies(size(components))
         real(DP) :: self_energies(size(components))
 
         call triangle_observables_init(energies)
@@ -175,7 +175,7 @@ contains
     end subroutine visit_dipolar
 
     pure subroutine visit_des_real(energies, components, dipolar_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
@@ -184,7 +184,7 @@ contains
     end subroutine visit_des_real
 
     pure subroutine visit_des_real_intra(energies, components, dipolar_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
@@ -203,7 +203,7 @@ contains
     end subroutine visit_des_real_intra
 
     pure subroutine visit_des_real_inter(energies, components, dipolar_interactions)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 

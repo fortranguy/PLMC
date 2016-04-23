@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
-use types_line_observables, only: Concrete_Line_Observables
+use types_reals_line, only: Reals_Line
 use module_string_wrapper, only: String_Wrapper, strings_wrapper_destroy
 
 implicit none
@@ -103,7 +103,7 @@ contains
     subroutine Abstract_write(this, i_step, triangle)
         class(Abstract_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Concrete_Line_Observables), intent(in) :: triangle(:)
+        type(Reals_Line), intent(in) :: triangle(:)
 
         character(len=:), allocatable :: string
         integer :: i_component, j_component
@@ -138,7 +138,7 @@ contains
     subroutine Null_write(this, i_step, triangle)
         class(Null_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Concrete_Line_Observables), intent(in) :: triangle(:)
+        type(Reals_Line), intent(in) :: triangle(:)
     end subroutine Null_write
 
 !end implementation Null_Triangle_Writer

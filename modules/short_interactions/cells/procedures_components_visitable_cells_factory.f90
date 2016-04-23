@@ -2,7 +2,7 @@ module procedures_components_visitable_cells_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
-use types_pair_potentials_wrapper, only: Pair_Potentials_Wrapper
+use types_pair_potential_wrapper, only: Pair_Potentials_Line
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_visitable_cells, only: Abstract_Visitable_Cells, Concrete_Visitable_Cells, &
@@ -19,7 +19,7 @@ contains
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
+        type(Pair_Potentials_Line), intent(in) :: pairs(:)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
         class(Abstract_Visitable_List), intent(in) :: list
         logical, intent(in) :: interact

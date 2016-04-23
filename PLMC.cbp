@@ -235,6 +235,12 @@
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_visitor_factory.f90">
 			<Option weight="6" />
 		</Unit>
+		<Unit filename="modules/dipolar_interactions/des_real/types_des_real_component_wrapper.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/dipolar_interactions/des_real/types_des_real_pair_wrapper.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_structure.f90">
 			<Option weight="6" />
 		</Unit>
@@ -263,7 +269,10 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_self/procedures_des_self_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
+		</Unit>
+		<Unit filename="modules/dipolar_interactions/des_self/types_des_self_component_wrapper.f90">
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/classes_dlc_structures.f90">
 			<Option weight="6" />
@@ -472,7 +481,7 @@
 		<Unit filename="modules/mixture/hard_core/procedures_min_distance_factory.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/mixture/hard_core/types_min_distances_wrapper.f90">
+		<Unit filename="modules/mixture/hard_core/types_min_distance_wrapper.f90">
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/mixture/procedures_component_factory.f90">
@@ -502,11 +511,11 @@
 		<Unit filename="modules/observables/procedures_triangle_observables.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/observables/types_line_observables.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="modules/observables/types_observables_wrapper.f90">
 			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/observables/types_reals_line.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/observables/types_temporary_observables.f90">
 			<Option weight="0" />
@@ -598,7 +607,7 @@
 		<Unit filename="modules/short_interactions/pairs/procedures_short_pairs_visitor_factory.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/short_interactions/pairs/types_pair_potentials_wrapper.f90">
+		<Unit filename="modules/short_interactions/pairs/types_pair_potential_wrapper.f90">
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/short_interactions/procedures_short_interactions_factory.f90">

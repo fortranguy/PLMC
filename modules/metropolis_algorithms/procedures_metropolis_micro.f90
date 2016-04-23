@@ -1,7 +1,7 @@
 module procedures_metropolis_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_line_observables, only: Concrete_Line_Observables
+use types_reals_line, only: Reals_Line
 
 implicit none
 
@@ -11,7 +11,7 @@ public :: update_energies
 contains
 
     subroutine update_energies(energies, deltas, i_actor)
-        type(Concrete_Line_Observables), intent(inout) :: energies(:)
+        type(Reals_Line), intent(inout) :: energies(:)
         real(DP), intent(in) :: deltas(:)
         integer, intent(in) :: i_actor
 

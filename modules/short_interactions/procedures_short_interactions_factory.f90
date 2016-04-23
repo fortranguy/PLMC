@@ -4,14 +4,10 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
-use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use classes_visitable_walls, only: Abstract_Visitable_Walls
+use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only:  Mixture_Wrapper
-use types_potential_domain, only: Short_Potential_Domain
-use types_pair_potentials_wrapper, only: Pair_Potentials_Wrapper
 use procedures_pairs_factory, only: pairs_create => create, pairs_destroy => destroy
 use classes_visitable_list, only: Abstract_Visitable_List
 use procedures_visitable_list_factory, only: visitable_list_allocate => allocate, &

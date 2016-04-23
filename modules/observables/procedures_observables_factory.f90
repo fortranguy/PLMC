@@ -2,17 +2,15 @@ module procedures_observables_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_component_wrapper, only: Component_Wrapper
-use types_line_observables, only: Concrete_Line_Observables
+use types_reals_line, only: Reals_Line
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
-    Concrete_Switch_Counters, &
-    changes_counter_reset, switches_counters_reset
+    Concrete_Switch_Counters, changes_counter_reset, switches_counters_reset
 use types_observables_wrapper, only: Observables_Wrapper
 
 implicit none
 
 private
-public :: observables_create, observables_destroy, create_triangle_nodes, &
-    destroy_triangle_nodes
+public :: observables_create, observables_destroy, create_triangle_nodes, destroy_triangle_nodes
 
 interface observables_create
     module procedure :: create_all
@@ -121,7 +119,7 @@ contains
     end subroutine destroy_changes_successes
 
     pure subroutine create_triangle(triangle, num_components)
-        type(Concrete_Line_Observables), allocatable, intent(out) :: triangle(:)
+        type(Reals_Line), allocatable, intent(out) :: triangle(:)
         integer, intent(in) :: num_components
 
         allocate(triangle(num_components))
@@ -129,7 +127,7 @@ contains
     end subroutine create_triangle
 
     pure subroutine destroy_triangle(triangle)
-        type(Concrete_Line_Observables), allocatable, intent(inout) :: triangle(:)
+        type(Reals_Line), allocatable, intent(inout) :: triangle(:)
 
         if (allocated(triangle)) then
             call destroy_triangle_nodes(triangle)
@@ -138,7 +136,7 @@ contains
     end subroutine destroy_triangle
 
     pure subroutine create_triangle_nodes(triangle)
-        type(Concrete_Line_Observables), intent(out) :: triangle(:)
+        type(Reals_Line), intent(out) :: triangle(:)
 
         integer :: i_component
         do i_component = 1, size(triangle)
@@ -148,7 +146,7 @@ contains
     end subroutine create_triangle_nodes
 
     pure subroutine destroy_triangle_nodes(triangle)
-        type(Concrete_Line_Observables), intent(inout) :: triangle(:)
+        type(Reals_Line), intent(inout) :: triangle(:)
 
         integer :: i_component
 
