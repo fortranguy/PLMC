@@ -13,6 +13,7 @@ use types_readers_wrapper, only: Readers_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
 use procedures_plmc_reset, only: plmc_reset
+use procedures_plmc_help, only: plmc_widom_catch_help
 
 implicit none
 
@@ -29,6 +30,7 @@ implicit none
     type(json_file) :: input_data, post_data
     integer :: i_step
 
+    call plmc_widom_catch_help()
     call json_initialize()
     call plmc_create(input_data, command_argument_count() - 1)
     call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &

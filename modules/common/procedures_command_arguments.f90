@@ -2,7 +2,7 @@ module procedures_command_arguments
 
 use data_strings, only: max_word_length
 use procedures_errors, only: error_exit
-use procedures_checks, only: check_file_exists
+use procedures_checks, only: check_positive, check_string_not_empty, check_file_exists
 
 implicit none
 
@@ -18,6 +18,8 @@ contains
         character(len=max_word_length) :: filename
         integer :: length, argument_stat
 
+        call check_positive("procedures_command_arguments: create_filename_from_argument", &
+            "i_argument", i_argument)
         call get_command_argument(i_argument, filename, length, argument_stat)
         if (argument_stat /= 0) then
             call error_exit("create_filename_from_argument: error")
