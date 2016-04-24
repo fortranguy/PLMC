@@ -1,8 +1,9 @@
 module procedures_coordinates_reader
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, iostat_end
 use data_constants, only: num_dimensions
 use data_strings, only: max_line_length, max_word_length
+use procedures_errors, only: error_exit
 use procedures_checks, only: check_file_exists
 
 implicit none
@@ -27,21 +28,36 @@ contains
         logical, intent(in) :: read_orientations
 
         character(len=max_word_length) :: comment_caracter, number_field
-        integer :: num_particles, i_particle
-        integer :: file_unit
+        integer :: num_particles_written, num_particles_counted, i_particle
+        real(DP) :: dummy_position(num_dimensions)
+        integer :: file_unit, read_stat
 
         call check_file_exists(filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, status="old", action="read")
-        read(file_unit, *) comment_caracter, number_field, num_particles
+        read(file_unit, *) comment_caracter, number_field, num_particles_written
         read(file_unit, *) comment_caracter ! header
-        allocate(positions(num_dimensions, num_particles))
+        num_particles_counted = 0
+        do
+            read(file_unit, fmt=*, iostat=read_stat) dummy_position
+            if (read_stat == iostat_end) exit
+            num_particles_counted = num_particles_counted + 1
+        end do
+        if (num_particles_counted /= num_particles_written) then
+            call error_exit("procedures_coordinates_reader: create_coordinates_from_file: "//&
+                "num_particles_counted /= num_particles_written")
+        end if
+
+        rewind(file_unit)
+        read(file_unit, *) comment_caracter
+        read(file_unit, *) comment_caracter
+        allocate(positions(num_dimensions, num_particles_counted))
         if (read_orientations) then
-            allocate(orientations(num_dimensions, num_particles))
-            do i_particle = 1, num_particles
+            allocate(orientations(num_dimensions, num_particles_counted))
+            do i_particle = 1, num_particles_counted
                 read(file_unit, *) positions(:, i_particle), orientations(:, i_particle)
             end do
         else
-            do i_particle = 1, num_particles
+            do i_particle = 1, num_particles_counted
                 read(file_unit, *) positions(:, i_particle)
             end do
         end if
