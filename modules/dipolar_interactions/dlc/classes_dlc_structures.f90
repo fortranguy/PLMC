@@ -29,8 +29,11 @@ private
         procedure :: get_minus => Abstract_get_minus
         procedure :: update_move => Abstract_update_move
         procedure :: update_rotation => Abstract_update_rotation
+        procedure :: update_add => Abstract_update_add
+        procedure :: update_remove => Abstract_update_remove
         procedure :: update_switch => Abstract_update_switch
         procedure, private :: set => Abstract_set
+        procedure, private :: update_exchange => Abstract_update_exchange
     end type Abstract_DLC_Structures
 
     type, extends(Abstract_DLC_Structures), public :: Concrete_DLC_Structures
@@ -48,6 +51,7 @@ private
         procedure :: update_move => Null_update_move
         procedure :: update_rotation => Null_update_rotation
         procedure :: update_switch => Null_update_switch
+        procedure, private :: update_exchange => Null_update_exchange
     end type Null_DLC_Structures
 
 contains
@@ -291,6 +295,71 @@ contains
         end do
     end subroutine Abstract_update_rotation
 
+    !> cf. [[Abstract_update_exchange]]
+    pure subroutine Abstract_update_add(this, i_component, particle)
+        class(Abstract_DLC_Structures), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        call this%update_exchange(i_component, particle, +1._DP)
+    end subroutine Abstract_update_add
+
+    !> cf. [[Abstract_update_exchange]]
+    pure subroutine Abstract_update_remove(this, i_component, particle)
+        class(Abstract_DLC_Structures), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        call this%update_exchange(i_component, particle, -1._DP)
+    end subroutine Abstract_update_remove
+
+    pure subroutine Abstract_update_exchange(this, i_component, particle, signed)
+        class(Abstract_DLC_Structures), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+
+        real(DP) :: surface_size(2)
+        real(DP), dimension(2) :: wave_1_x_position, wave_vector
+        real(DP) :: wave_dot_moment_12, wave_x_moment_3
+        integer :: n_1, n_2
+
+        complex(DP) :: fourier_position
+        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
+        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
+        real(DP) :: exp_kz
+        real(DP), dimension(0:this%reci_numbers(1), 0:this%reci_numbers(2)) :: exp_kz_tab
+
+        if (.not.this%are_dipolar(i_component)) return
+
+        surface_size = reshape(this%periodic_box%get_size(), [2])
+        wave_1_x_position = 2._DP*PI * particle%position(1:2) / surface_size
+        call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
+        call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
+        call set_exp_kz(exp_kz_tab, surface_size, particle%position(3))
+
+        do n_2 = 0, this%reci_numbers(2)
+            wave_vector(2) = 2._DP*PI * real(n_2, DP) / surface_size(2)
+            do n_1 = -reci_number_1_sym(this%reci_numbers, 0, n_2), this%reci_numbers(1)
+                wave_vector(1) = 2._DP*PI * real(n_1, DP) / surface_size(1)
+
+                if (n_1**2 + n_2**2 > this%reci_numbers(1)**2) cycle
+
+                fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
+                exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
+                wave_dot_moment_12 = dot_product(wave_vector, particle%dipolar_moment(1:2))
+                wave_x_moment_3 = norm2(wave_vector) * particle%dipolar_moment(3)
+
+                this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
+                    signed * cmplx(+wave_x_moment_3, wave_dot_moment_12, DP) * &
+                    fourier_position * exp_kz
+                this%structure_m(n_1, n_2) = this%structure_m(n_1, n_2) + &
+                    signed * cmplx(-wave_x_moment_3, wave_dot_moment_12, DP) * &
+                    fourier_position / exp_kz
+            end do
+        end do
+    end subroutine Abstract_update_exchange
+
     !> Structure factors update when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
     !> \( (\vec{x}_2, \vec{\mu}_2) \) are switched.
     !> \[
@@ -410,6 +479,13 @@ contains
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_rotation
+
+    pure subroutine Null_update_exchange(this, i_component, particle, signed)
+        class(Null_DLC_Structures), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+    end subroutine Null_update_exchange
 
     pure subroutine Null_update_switch(this, ij_components, particles)
         class(Null_DLC_Structures), intent(inout) :: this

@@ -28,6 +28,8 @@ private
         procedure :: get => Abstract_get
         procedure :: update_move => Abstract_update_move
         procedure :: update_rotation => Abstract_update_rotation
+        procedure :: update_add => Abstract_update_add
+        procedure :: update_remove => Abstract_update_remove
         procedure :: update_switch => Abstract_update_switch
         procedure, private :: set => Abstract_set
         procedure, private :: update_exchange => Abstract_update_exchange
@@ -47,6 +49,7 @@ private
         procedure :: update_move => Null_update_move
         procedure :: update_rotation => Null_update_rotation
         procedure :: update_switch => Null_update_switch
+        procedure, private :: update_exchange => Null_update_exchange
     end type Null_DES_Reci_Structure
 
 contains
@@ -253,6 +256,24 @@ contains
         end do
     end subroutine Abstract_update_rotation
 
+    !> cf. [[Abstract_update_exchange]]
+    pure subroutine Abstract_update_add(this, i_component, particle)
+        class(Abstract_DES_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        call this%update_exchange(i_component, particle, +1._DP)
+    end subroutine Abstract_update_add
+
+    !> cf. [[Abstract_update_exchange]]
+    pure subroutine Abstract_update_remove(this, i_component, particle)
+        class(Abstract_DES_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        call this%update_exchange(i_component, particle, -1._DP)
+    end subroutine Abstract_update_remove
+
     !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added
     !> (\( + )\) or removed (\( - \)):
     !> \[
@@ -294,7 +315,7 @@ contains
                         fourier_position_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        signed*dot_product(wave_vector, particle%dipolar_moment) * &
+                        signed * dot_product(wave_vector, particle%dipolar_moment) * &
                         fourier_position
                 end do
             end do
@@ -406,6 +427,13 @@ contains
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_rotation
+
+    pure subroutine Null_update_exchange(this, i_component, particle, signed)
+        class(Null_DES_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+    end subroutine Null_update_exchange
 
     pure subroutine Null_update_switch(this, ij_components, particles)
         class(Null_DES_Reci_Structure), intent(inout) :: this

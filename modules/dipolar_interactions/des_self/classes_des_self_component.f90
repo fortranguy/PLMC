@@ -22,8 +22,8 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_set
         procedure :: visit => Abstract_visit
+        procedure :: meet => Abstract_meet
         procedure, private :: set => Abstract_set
-        procedure, private :: meet => Abstract_meet
     end type Abstract_DES_Self_Component
 
     type, extends(Abstract_DES_Self_Component), public :: Concrete_DES_Self_Component
@@ -36,7 +36,7 @@ private
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_set
         procedure :: visit => Null_visit
-        procedure, private :: meet => Null_meet
+        procedure :: meet => Null_meet
     end type Null_DES_Self_Component
 
 contains

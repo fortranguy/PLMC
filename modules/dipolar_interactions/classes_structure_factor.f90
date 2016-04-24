@@ -12,6 +12,8 @@ private
         procedure(Abstract_is_dipolar), deferred :: is_dipolar
         procedure(Abstract_update_move), deferred :: update_move
         procedure(Abstract_update_rotation), deferred :: update_rotation
+        procedure(Abstract_update_add), deferred :: update_add
+        procedure(Abstract_update_remove), deferred :: update_remove
         procedure(Abstract_update_switch), deferred :: update_switch
     end type Abstract_Structure_Factor
 
@@ -38,6 +40,20 @@ private
             real(DP), intent(in) :: new_dipolar_moment(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end subroutine Abstract_update_rotation
+
+        pure subroutine Abstract_update_add(this, i_component, particle)
+        import :: Concrete_Temporary_Particle, Abstract_Structure_Factor
+            class(Abstract_Structure_Factor), intent(inout) :: this
+            integer, intent(in) :: i_component
+            type(Concrete_Temporary_Particle), intent(in) :: particle
+        end subroutine Abstract_update_add
+
+        pure subroutine Abstract_update_remove(this, i_component, particle)
+        import :: Concrete_Temporary_Particle, Abstract_Structure_Factor
+            class(Abstract_Structure_Factor), intent(inout) :: this
+            integer, intent(in) :: i_component
+            type(Concrete_Temporary_Particle), intent(in) :: particle
+        end subroutine Abstract_update_remove
 
         pure subroutine Abstract_update_switch(this, ij_components, particles)
         import :: Concrete_Temporary_Particle, Abstract_Structure_Factor

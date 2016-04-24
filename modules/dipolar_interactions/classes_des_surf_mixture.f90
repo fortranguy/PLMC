@@ -97,7 +97,7 @@ contains
         integer, intent(in) :: i_component
         real(DP), intent(in) :: dipolar_moment(:)
 
-        energy = this%visit_exchange(i_component, dipolar_moment, 1.0_DP)
+        energy = this%visit_exchange(i_component, dipolar_moment, +1.0_DP)
     end function Abstract_visit_add
 
     pure real(DP) function Abstract_visit_remove(this, i_component, dipolar_moment) result(energy)
