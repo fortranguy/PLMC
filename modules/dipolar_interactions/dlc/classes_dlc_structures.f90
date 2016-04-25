@@ -280,9 +280,11 @@ contains
         call this%update_exchange(i_component, particle, -1._DP)
     end subroutine Abstract_update_remove
 
+    !> Structure factors update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added
+    !> (\( + )\) or removed (\( - \)):
     !> \[
     !>      \Delta S_\pm(\vec{k}_{1:2}) =
-    !>          \bm{\pm} (\pm k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
+    !>          {\bf\pm} (\pm k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
     !>          e^{\pm k_{1:2} x_3} e^{i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}.
     !> \]
     pure subroutine Abstract_update_exchange(this, i_component, particle, signed)

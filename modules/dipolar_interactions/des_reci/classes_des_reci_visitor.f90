@@ -254,7 +254,7 @@ contains
     !> removed (\( - \)).
     !> \[
     !>      \Delta U = \sum_{\vec{k}} w_\alpha(\vec{k}) (\vec{k} \cdot \vec{\mu}) \left[
-    !>              2 \Re\left( e^{i\vec{k}\cdot\vec{x}} S^\ast(\vec{k}) \right) \pm
+    !>              \pm 2 \Re\left( e^{i\vec{k}\cdot\vec{x}} S^\ast(\vec{k}) \right) +
     !>              (\vec{k} \cdot \vec{\mu})
     !>          \right]
     !> \]
@@ -302,8 +302,8 @@ contains
                         conjg(this%structure%get(n_1, n_2, n_3)), DP)
 
                     delta_energy = delta_energy + this%weight%get(n_1, n_2, n_3) * &
-                        wave_dot_moment * (2._DP*real_fourier_x_conjg_structure + &
-                        signed*wave_dot_moment)
+                        wave_dot_moment * (signed * 2._DP * real_fourier_x_conjg_structure + &
+                        wave_dot_moment)
                 end do
             end do
         end do

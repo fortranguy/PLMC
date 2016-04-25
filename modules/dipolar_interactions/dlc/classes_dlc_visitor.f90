@@ -289,6 +289,47 @@ contains
         delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_rotation
 
+    pure real(DP) function Abstract_visit_exchange(this, i_component, particle, signed) &
+        result(delta_energy)
+        class(Abstract_DLC_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+
+        real(DP) :: surface_size(2)
+        real(DP), dimension(2) :: wave_1_x_position, wave_vector
+        real(DP) :: wave_dot_moment_12, wave_x_moment_3
+        integer :: n_1, n_2
+
+        complex(DP) :: fourier_position
+        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
+        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
+        real(DP) :: exp_kz
+        real(DP), dimension(0:this%reci_numbers(1), 0:this%reci_numbers(2)) :: exp_kz_tab
+
+        if (.not.this%structures%is_dipolar(i_component)) return
+
+        surface_size = reshape(this%periodic_box%get_size(), [2])
+        wave_1_x_position = 2._DP*PI * particle%position(1:2) / surface_size
+        call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
+        call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
+        call set_exp_kz(exp_kz_tab, surface_size, particle%position(3))
+
+        do n_2 = 0, this%reci_numbers(2)
+            wave_vector(2) = 2._DP*PI * real(n_2, DP) / surface_size(2)
+            do n_1 = -reci_number_1_sym(this%reci_numbers, 0, n_2), this%reci_numbers(1)
+                wave_vector(1) = 2._DP*PI * real(n_1, DP) / surface_size(1)
+
+                if (n_1**2 + n_2**2 > this%reci_numbers(1)**2) cycle
+
+                fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
+                exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
+                wave_dot_moment_12 = dot_product(wave_vector, particle%dipolar_moment(1:2))
+                wave_x_moment_3 = norm2(wave_vector) * particle%dipolar_moment(3)
+            end do
+        end do
+    end function Abstract_visit_exchange
+
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
     !> \( (\vec{x}_2, \vec{\mu}_2) \) are switched.
     !> \[
