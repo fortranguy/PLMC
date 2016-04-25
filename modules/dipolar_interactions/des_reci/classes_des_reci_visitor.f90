@@ -239,7 +239,7 @@ contains
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        delta_energy = this%visit_exchange(i_component, particle, 1._DP)
+        delta_energy = this%visit_exchange(i_component, particle, +1._DP)
     end function Abstract_visit_add
 
     pure real(DP) function Abstract_visit_remove(this, i_component, particle) result(delta_energy)
@@ -298,11 +298,11 @@ contains
                         fourier_position_3(n_3)
                     wave_dot_moment = dot_product(wave_vector, particle%dipolar_moment)
 
-                    real_fourier_x_conjg_structure = real(fourier_position * &
+                    real_fourier_x_conjg_structure = signed * real(fourier_position * &
                         conjg(this%structure%get(n_1, n_2, n_3)), DP)
 
                     delta_energy = delta_energy + this%weight%get(n_1, n_2, n_3) * &
-                        wave_dot_moment * (signed * 2._DP * real_fourier_x_conjg_structure + &
+                        wave_dot_moment * (2._DP * real_fourier_x_conjg_structure + &
                         wave_dot_moment)
                 end do
             end do
@@ -311,7 +311,7 @@ contains
     end function Abstract_visit_exchange
 
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
-    !> \( (\vec{x}_2, \vec{\mu}_2) \) are switched.
+    !> \( (\vec{x}_2, \vec{\mu}_2) \) switch their positions.
     !> \[
     !>      \Delta U = 2 \sum_{\vec{k}} w_\alpha(\vec{k}) \vec{k}\cdot(\vec{\mu}_1 - \vec{\mu}_2)
     !>      \left\{

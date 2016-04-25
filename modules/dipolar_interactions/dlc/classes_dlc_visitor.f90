@@ -26,7 +26,10 @@ private
         procedure :: visit => Abstract_visit
         procedure :: visit_move => Abstract_visit_move
         procedure :: visit_rotation => Abstract_visit_rotation
+        procedure :: visit_add => Abstract_visit_add
+        procedure :: visit_remove => Abstract_visit_remove
         procedure :: visit_switch => Abstract_visit_switch
+        procedure, private :: visit_exchange => Abstract_visit_exchange
     end type Abstract_DLC_Visitor
 
     type, extends(Abstract_DLC_Visitor), public :: Concrete_DLC_Visitor
@@ -41,6 +44,7 @@ private
         procedure :: visit_move => Null_visit_move
         procedure :: visit_rotation => Null_visit_rotation
         procedure :: visit_switch => Null_visit_switch
+        procedure, private :: visit_exchange => Null_visit_exchange
     end type Null_DLC_Visitor
 
 contains
@@ -92,14 +96,6 @@ contains
     end function Abstract_visit
 
     !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
-    !> \[
-    !>      \Delta U = \sum_{\vec{k}_{1:2}} w(\vec{k}_{1:2}) \Re\left[
-    !>          S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2}) +
-    !>          S_-^\ast(\vec{k}_{1:2}) \Delta S_+(\vec{k}_{1:2}) +
-    !>          \Delta S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2})
-    !>      \right]
-    !> \]
-    !> where:
     !> \[
     !>      \Delta S_-^\ast(\vec{k}_{1:2}) =
     !>          (-k_{1:2} \mu_3 - i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
@@ -202,14 +198,6 @@ contains
 
     !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
     !> \[
-    !>      \Delta U = \sum_{\vec{k}_{1:2}} w(\vec{k}_{1:2}) \Re\left[
-    !>          S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2}) +
-    !>          S_-^\ast(\vec{k}_{1:2}) \Delta S_+(\vec{k}_{1:2}) +
-    !>          \Delta S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2})
-    !>      \right]
-    !> \]
-    !> where:
-    !> \[
     !>      \Delta S_-^\ast(\vec{k}_{1:2}) =
     !>          \left[
     !>              -k_{1:2} (\mu^\prime_3 - \mu_3) -
@@ -289,12 +277,46 @@ contains
         delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_rotation
 
+    pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
+        class(Abstract_DLC_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        delta_energy = this%visit_exchange(i_component, particle, +1._DP)
+    end function Abstract_visit_add
+
+    pure real(DP) function Abstract_visit_remove(this, i_component, particle) result(delta_energy)
+        class(Abstract_DLC_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        delta_energy = this%visit_exchange(i_component, particle, -1._DP)
+    end function Abstract_visit_remove
+
+    !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added (\( + \)) or
+    !> removed (\( - \)).
+    !> \[
+    !>      \Delta S_-^\ast(\vec{k}_{1:2}) =
+    !>          \pm (-k_{1:2} \mu_3 - i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
+    !>          e^{-k_{1:2} x_3} e^{-i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
+    !> \]
+    !> \[
+    !>      \Delta S_+(\vec{k}_{1:2}) =
+    !>          \pm (+k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
+    !>          e^{+k_{1:2} x_3} e^{+i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
+    !> \]
+    !> \[
+    !>      \Re[\Delta S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2})] =
+    !>          -(k_{1:2} \mu_3)^2 + (\vec{k}_{1:2} \cdot \vec{\mu}_{1:2})^2
+    !> \]
     pure real(DP) function Abstract_visit_exchange(this, i_component, particle, signed) &
         result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
+
+        real(DP) :: real_part_1, real_part_2, real_part_3
 
         real(DP) :: surface_size(2)
         real(DP), dimension(2) :: wave_1_x_position, wave_vector
@@ -307,6 +329,7 @@ contains
         real(DP) :: exp_kz
         real(DP), dimension(0:this%reci_numbers(1), 0:this%reci_numbers(2)) :: exp_kz_tab
 
+        delta_energy = 0._DP
         if (.not.this%structures%is_dipolar(i_component)) return
 
         surface_size = reshape(this%periodic_box%get_size(), [2])
@@ -326,20 +349,24 @@ contains
                 exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
                 wave_dot_moment_12 = dot_product(wave_vector, particle%dipolar_moment(1:2))
                 wave_x_moment_3 = norm2(wave_vector) * particle%dipolar_moment(3)
+
+                real_part_1 = signed * real(this%structures%get_plus(n_1, n_2) * &
+                    cmplx(-wave_x_moment_3, -wave_dot_moment_12, DP) * &
+                    conjg(fourier_position) / exp_kz, DP)
+                real_part_2 = signed * real(conjg(this%structures%get_minus(n_1, n_2)) * &
+                    cmplx(+wave_x_moment_3, +wave_dot_moment_12, DP) * &
+                    fourier_position * exp_kz, DP)
+                real_part_3 = -wave_x_moment_3**2 + wave_dot_moment_12**2
+
+                delta_energy = delta_energy + this%weight%get(n_1, n_2) * &
+                    (real_part_1 + real_part_2 + real_part_3)
             end do
         end do
+        delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_exchange
 
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
-    !> \( (\vec{x}_2, \vec{\mu}_2) \) are switched.
-    !> \[
-    !>      \Delta U = \sum_{\vec{k}_{1:2}} w(\vec{k}_{1:2}) \Re\left[
-    !>          S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2}) +
-    !>          S_-^\ast(\vec{k}_{1:2}) \Delta S_+(\vec{k}_{1:2}) +
-    !>          \Delta S_+(\vec{k}_{1:2}) \Delta S_-^\ast(\vec{k}_{1:2})
-    !>      \right]
-    !> \]
-    !> where:
+    !> \( (\vec{x}_2, \vec{\mu}_2) \) switch their positions.
     !> \[
     !>      \Delta S_-^\ast(\vec{k}_{1:2}) =
     !>          \left[
@@ -489,6 +516,15 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_rotation
+
+    pure real(DP) function Null_visit_exchange(this, i_component, particle, signed) &
+        result(delta_energy)
+        class(Null_DLC_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+        delta_energy = 0._DP
+    end function Null_visit_exchange
 
     pure real(DP) function Null_visit_switch(this, ij_components, particles) result(delta_energy)
         class(Null_DLC_Visitor), intent(in) :: this

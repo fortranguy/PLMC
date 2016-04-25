@@ -12,6 +12,8 @@ private
         procedure(Abstract_visit), deferred :: visit
         procedure(Abstract_visit_move), deferred :: visit_move
         procedure(Abstract_visit_rotation), deferred :: visit_rotation
+        procedure(Abstract_visit_add), deferred :: visit_add
+        procedure(Abstract_visit_remove), deferred :: visit_remove
         procedure(Abstract_visit_switch), deferred :: visit_switch
     end type Abstract_Structure_Visitor
 
@@ -39,6 +41,21 @@ private
             real(DP), intent(in) :: new_dipolar_moment(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end function Abstract_visit_rotation
+
+        pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
+        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        class(Abstract_Structure_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        end function Abstract_visit_add
+
+        pure real(DP) function Abstract_visit_remove(this, i_component, particle) &
+            result(delta_energy)
+        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        class(Abstract_Structure_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        end function Abstract_visit_remove
 
         pure real(DP) function Abstract_visit_switch(this, ij_components, particles) &
             result(delta_energy)
