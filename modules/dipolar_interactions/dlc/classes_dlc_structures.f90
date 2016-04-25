@@ -114,7 +114,7 @@ contains
 
     !> Structure factors
     !> \[
-    !>      S\pm(\vec{k}_{1:2}) = \sum_{\vec{x}, \vec{\mu}}
+    !>      S_\pm(\vec{k}_{1:2}) = \sum_{\vec{x}, \vec{\mu}}
     !>          (\pm k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
     !>          e^{\pm k_{1:2} x_3} e^{i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
     !> \]
@@ -204,7 +204,7 @@ contains
 
     !> Structure factors update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
     !>  \[
-    !>      \Delta S\pm(\vec{k}_{1:2}) =
+    !>      \Delta S_\pm(\vec{k}_{1:2}) =
     !>          \left[
     !>              \pm k_{1:2} (\mu^\prime_3 - \mu_3) +
     !>              i \vec{k}_{1:2} \cdot (\vec{\mu}^\prime_{1:2} - \vec{\mu}_{1:2})
@@ -262,7 +262,7 @@ contains
         end do
     end subroutine Abstract_update_rotation
 
-    !> cf. [[Abstract_update_exchange]]
+    !> cf. [[classes_dlc_structures:Abstract_update_exchange]]
     pure subroutine Abstract_update_add(this, i_component, particle)
         class(Abstract_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -271,7 +271,7 @@ contains
         call this%update_exchange(i_component, particle, +1._DP)
     end subroutine Abstract_update_add
 
-    !> cf. [[Abstract_update_exchange]]
+    !> cf. [[classes_dlc_structures:Abstract_update_exchange]]
     pure subroutine Abstract_update_remove(this, i_component, particle)
         class(Abstract_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -280,6 +280,11 @@ contains
         call this%update_exchange(i_component, particle, -1._DP)
     end subroutine Abstract_update_remove
 
+    !> \[
+    !>      \Delta S_\pm(\vec{k}_{1:2}) =
+    !>          \bm{\pm} (\pm k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
+    !>          e^{\pm k_{1:2} x_3} e^{i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}.
+    !> \]
     pure subroutine Abstract_update_exchange(this, i_component, particle, signed)
         class(Abstract_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -330,7 +335,7 @@ contains
     !> Structure factors update when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
     !> \( (\vec{x}_2, \vec{\mu}_2) \) are switched.
     !> \[
-    !>      \Delta S\pm(\vec{k}_{1:2}) =
+    !>      \Delta S_\pm(\vec{k}_{1:2}) =
     !>          \left[
     !>              \pm k_{1:2} (\mu_{1, 3} - \mu_{2, 3}) +
     !>              i \vec{k}_{1:2} \cdot (\vec{\mu}_{1, 1:2} - \vec{\mu}_{2, 1:2})
