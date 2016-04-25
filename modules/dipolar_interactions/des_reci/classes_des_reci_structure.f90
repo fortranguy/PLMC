@@ -93,46 +93,16 @@ contains
     pure subroutine Abstract_set(this)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
 
-        real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
-        real(DP) :: wave_dot_moment
-        integer :: n_1, n_2, n_3
+        type(Concrete_Temporary_Particle) :: particle
         integer :: i_component, i_particle
 
-        complex(DP) :: fourier_position
-        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
-        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
-        complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
-
-        box_size = this%periodic_box%get_size()
         this%structure  = cmplx(0._DP, 0._DP, DP)
         do i_component = 1, size(this%components)
             do i_particle = 1, this%components(i_component)%dipolar_moments%get_num()
-                wave_1_x_position = 2._DP*PI * this%components(i_component)%positions%&
-                    get(i_particle) / box_size
-                call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
-                call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
-                call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
-                do n_3 = 0, this%reci_numbers(3)
-                    wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
-                    do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
-                        wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
-                        do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), &
-                            this%reci_numbers(1)
-                            wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
-
-                            if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
-
-                            fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
-                                fourier_position_3(n_3)
-                            wave_dot_moment = dot_product(wave_vector, this%&
-                                components(i_component)%dipolar_moments%get(i_particle))
-
-                            this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                                wave_dot_moment * fourier_position
-                        end do
-                    end do
-                end do
+                particle%position = this%components(i_component)%positions%get(i_particle)
+                particle%dipolar_moment = this%components(i_component)%dipolar_moments%&
+                    get(i_particle)
+                call this%update_add(i_component, particle)
             end do
         end do
     end subroutine Abstract_set

@@ -90,50 +90,17 @@ contains
     subroutine Abstract_set(this)
         class(Abstract_DLC_Structures), intent(inout) :: this
 
-        real(DP) :: surface_size(2)
-        real(DP), dimension(2) :: wave_1_x_position, wave_vector
-        real(DP) :: wave_dot_moment_12, wave_x_moment_3
-        real(DP), dimension(num_dimensions) :: position, dipolar_moment
-        integer :: n_1, n_2
+        type(Concrete_Temporary_Particle) :: particle
         integer :: i_component, i_particle
 
-        complex(DP) :: fourier_position
-        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
-        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
-        real(DP) :: exp_kz
-        real(DP), dimension(0:this%reci_numbers(1), 0:this%reci_numbers(2)) :: exp_kz_tab
-
-        surface_size = reshape(this%periodic_box%get_size(), [2])
         this%structure_p = cmplx(0._DP, 0._DP, DP)
         this%structure_m = cmplx(0._DP, 0._DP, DP)
         do i_component = 1, size(this%components)
             do i_particle = 1, this%components(i_component)%dipolar_moments%get_num()
-                position = this%components(i_component)%positions%get(i_particle)
-                dipolar_moment = this%components(i_component)%dipolar_moments%get(i_particle)
-                wave_1_x_position = 2._DP*PI * position(1:2) / surface_size
-                call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
-                call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
-                call set_exp_kz(exp_kz_tab, surface_size, position(3))
-                do n_2 = 0, this%reci_numbers(2)
-                    wave_vector(2) = 2._DP*PI * real(n_2, DP) / surface_size(2)
-                    do n_1 = -reci_number_1_sym(this%reci_numbers, 0, n_2), this%reci_numbers(1)
-                        wave_vector(1) = 2._DP*PI * real(n_1, DP) / surface_size(1)
-
-                        if (n_1**2 + n_2**2 > this%reci_numbers(1)**2) cycle
-
-                        fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
-                        exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
-                        wave_dot_moment_12 = dot_product(wave_vector, dipolar_moment(1:2))
-                        wave_x_moment_3 = norm2(wave_vector) * dipolar_moment(3)
-
-                        this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
-                            cmplx(+wave_x_moment_3, wave_dot_moment_12, DP) * &
-                            fourier_position * exp_kz
-                        this%structure_m(n_1, n_2) = this%structure_m(n_1, n_2) + &
-                            cmplx(-wave_x_moment_3, wave_dot_moment_12, DP) * &
-                            fourier_position / exp_kz
-                    end do
-                end do
+                particle%position = this%components(i_component)%positions%get(i_particle)
+                particle%dipolar_moment = this%components(i_component)%dipolar_moments%&
+                    get(i_particle)
+                call this%update_add(i_component, particle)
             end do
         end do
     end subroutine Abstract_set
