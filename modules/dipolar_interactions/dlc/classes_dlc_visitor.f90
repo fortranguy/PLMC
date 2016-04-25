@@ -293,16 +293,16 @@ contains
         delta_energy = this%visit_exchange(i_component, particle, -1._DP)
     end function Abstract_visit_remove
 
-    !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added (\( + \)) or
-    !> removed (\( - \)).
+    !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added
+    !> (\( \pmb{+} \)) or removed (\( \pmb{-} \)).
     !> \[
     !>      \Delta S_-^\ast(\vec{k}_{1:2}) =
-    !>          \pm (-k_{1:2} \mu_3 - i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
+    !>          \pmb{\pm} (-k_{1:2} \mu_3 - i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
     !>          e^{-k_{1:2} x_3} e^{-i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
     !> \]
     !> \[
     !>      \Delta S_+(\vec{k}_{1:2}) =
-    !>          \pm (+k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
+    !>          \pmb{\pm} (+k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
     !>          e^{+k_{1:2} x_3} e^{+i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
     !> \]
     !> \[

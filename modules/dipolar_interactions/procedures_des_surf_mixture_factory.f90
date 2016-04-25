@@ -1,12 +1,13 @@
 module procedures_des_surf_mixture_factory
 
 use procedures_errors, only: error_exit
-use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity
 use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
     Concrete_Mixture_Total_Moment, Null_Mixture_Total_Moment
-use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture, Spheric_DES_Surf_Mixture, &
+use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture, Spherical_DES_Surf_Mixture, &
     Rectangular_DES_Surf_Mixture, Null_DES_Surf_Mixture
+use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 
@@ -23,15 +24,14 @@ contains
 
         select type(total_moment)
             type is (Concrete_Mixture_Total_Moment)
-                select type(periodic_box)
-                    type is (XYZ_Periodic_Box)
-                        allocate(Spheric_DES_Surf_Mixture :: mixture)
-                    type is (XY_Periodic_Box)
-                        allocate(Rectangular_DES_Surf_Mixture :: mixture)
-                    class default
-                        call error_exit("procedures_des_surf_mixture_factory: create: "//&
-                            "periodic_box type unknown.")
-                end select
+                if (periodicity_is_xyz(periodic_box)) then
+                    allocate(Spherical_DES_Surf_Mixture :: mixture)
+                else if (periodicity_is_xy(periodic_box)) then
+                    allocate(Rectangular_DES_Surf_Mixture :: mixture)
+                else
+                    call error_exit("procedures_des_surf_mixture_factory: create: "//&
+                            "box periodicity is unknown.")
+                end if
             type is (Null_Mixture_Total_Moment)
                 allocate(Null_DES_Surf_Mixture :: mixture)
             class default

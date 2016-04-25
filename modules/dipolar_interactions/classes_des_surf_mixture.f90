@@ -49,12 +49,12 @@ private
 
     end interface
 
-    type, extends(Abstract_DES_Surf_Mixture), public :: Spheric_DES_Surf_Mixture
+    type, extends(Abstract_DES_Surf_Mixture), public :: Spherical_DES_Surf_Mixture
     contains
-        procedure :: visit => Spheric_visit
-        procedure :: visit_rotation => Spheric_visit_rotation
-        procedure, private :: visit_exchange => Spheric_visit_exchange
-    end type Spheric_DES_Surf_Mixture
+        procedure :: visit => Spherical_visit
+        procedure :: visit_rotation => Spherical_visit_rotation
+        procedure, private :: visit_exchange => Spherical_visit_exchange
+    end type Spherical_DES_Surf_Mixture
 
     type, extends(Abstract_DES_Surf_Mixture), public :: Rectangular_DES_Surf_Mixture
     contains
@@ -110,15 +110,15 @@ contains
 
 !end implementation Abstract_DES_Surf_Mixture
 
-!implementation Spheric_DES_Surf_Mixture
+!implementation Spherical_DES_Surf_Mixture
 
     !> \[ U = \frac{1}{6\epsilon V} \vec{M}^2 \]
-    pure real(DP) function Spheric_visit(this) result(energy)
-        class(Spheric_DES_Surf_Mixture), intent(in) :: this
+    pure real(DP) function Spherical_visit(this) result(energy)
+        class(Spherical_DES_Surf_Mixture), intent(in) :: this
 
         energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             dot_product(this%total_moment%get(), this%total_moment%get())
-    end function Spheric_visit
+    end function Spherical_visit
 
     !> \[
     !>      \Delta U = \frac{1}{6\epsilon V} [
@@ -128,9 +128,9 @@ contains
     !>                          (\vec{M} - \vec{\mu}_\mathsf{i})
     !>                 ]
     !> \]
-    pure real(DP) function Spheric_visit_rotation(this, i_component, new_dipolar_moment, &
+    pure real(DP) function Spherical_visit_rotation(this, i_component, new_dipolar_moment, &
         old_dipolar_moment) result(delta_energy)
-        class(Spheric_DES_Surf_Mixture), intent(in) :: this
+        class(Spherical_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_dipolar_moment(:), old_dipolar_moment(:)
 
@@ -142,16 +142,16 @@ contains
              dot_product(old_dipolar_moment, old_dipolar_moment) + &
              2._DP*dot_product(new_dipolar_moment - old_dipolar_moment, &
                 this%total_moment%get() - old_dipolar_moment))
-    end function Spheric_visit_rotation
+    end function Spherical_visit_rotation
 
     !> \[
     !>      \Delta U = \frac{1}{6\epsilon V} [
     !>          (\vec{\mu} \cdot \vec{\mu}) \pm 2(\vec{\mu} \cdot \vec{M})
     !>      ]
     !> \]
-    pure real(DP) function Spheric_visit_exchange(this, i_component, dipolar_moment, signed) &
+    pure real(DP) function Spherical_visit_exchange(this, i_component, dipolar_moment, signed) &
         result(delta_energy)
-        class(Spheric_DES_Surf_Mixture), intent(in) :: this
+        class(Spherical_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: dipolar_moment(:), signed
 
@@ -161,9 +161,9 @@ contains
         delta_energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             dot_product(dipolar_moment, dipolar_moment) + &
             signed*2._DP*dot_product(dipolar_moment, this%total_moment%get())
-    end function Spheric_visit_exchange
+    end function Spherical_visit_exchange
 
-!end implementation Spheric_DES_Surf_Mixture
+!end implementation Spherical_DES_Surf_Mixture
 
 !implementation Rectangular_DES_Surf_Mixture
 

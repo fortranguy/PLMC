@@ -1,10 +1,11 @@
 module procedures_neighbour_cells_factory
 
 use procedures_errors, only: error_exit
-use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_pair_potential, only: Abstract_Pair_Potential
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells, XYZ_PBC_Neighbour_Cells, &
     XY_PBC_Neighbour_Cells, Null_Neighbour_Cells
+use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 
@@ -20,15 +21,14 @@ contains
         logical, intent(in) :: interact
 
         if (interact) then
-            select type (periodic_box)
-                type is (XYZ_Periodic_Box)
-                    allocate(XYZ_PBC_Neighbour_Cells :: cells)
-                type is (XY_Periodic_Box)
-                    allocate(XY_PBC_Neighbour_Cells :: cells)
-                class default
-                    call error_exit("procedures_neighbour_cells_factory: create: "//&
-                        "periodic_box type is unknown.")
-            end select
+            if (periodicity_is_xyz(periodic_box)) then
+                allocate(XYZ_PBC_Neighbour_Cells :: cells)
+            else if (periodicity_is_xy(periodic_box)) then
+                allocate(XY_PBC_Neighbour_Cells :: cells)
+            else
+                call error_exit("procedures_neighbour_cells_factory: create: "//&
+                        "box periodicity is unknown.")
+            end if
         else
             allocate(Null_Neighbour_Cells :: cells)
         end if
