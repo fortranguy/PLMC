@@ -85,8 +85,8 @@ contains
         call observables_create(observables, mixture%components)
         call readers_create(readers, environment%periodic_box, mixture%components)
         call writers_create(writers, environment, short_interactions%wall_pairs, mixture%&
-            components, changes%components, short_interactions%components_pairs, &
-            dipolar_interactions%real_pairs, input_data, writers_prefix)
+            components, changes%components, short_interactions%components_pairs, input_data, &
+            writers_prefix)
     end subroutine create_all
 
     subroutine destroy_all(environment, mixture, short_interactions, dipolar_interactions, changes,&

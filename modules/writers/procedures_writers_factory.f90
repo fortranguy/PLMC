@@ -7,7 +7,6 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
-use types_des_real_pair_wrapper, only: DES_Real_Pairs_Line
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy
@@ -45,14 +44,13 @@ end interface writers_destroy
 contains
 
     subroutine create_all(writers, environment, wall_pairs, components, change_components, &
-        short_pairs, dipolar_pairs, input_data, prefix)
+        short_pairs, input_data, prefix)
         type(Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
-        type(DES_Real_Pairs_Line), intent(in) :: dipolar_pairs(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -64,8 +62,8 @@ contains
         call line_writer_create(writers%walls, wall_pairs, "walls_energies.out")
         call triangle_writer_create(writers%switches, components, "switches.out")
         call triangle_writer_create(writers%short_energies, short_pairs, "short_energies.out")
-        call triangle_writer_create(writers%dipolar_energies, dipolar_pairs, "dipolar_energies.out")
         call set_are_dipolar(are_dipolar, components)
+        call triangle_writer_create(writers%dipolar_energies, are_dipolar, "dipolar_energies.out")
         call real_writer_create(writers%dipolar_mixture_energy, any(are_dipolar), &
             "dipolar_mixture_energy.out")
     end subroutine create_all

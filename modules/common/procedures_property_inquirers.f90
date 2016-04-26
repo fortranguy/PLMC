@@ -20,7 +20,6 @@ use classes_moved_positions, only: Concrete_Moved_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
-use classes_des_real_pair, only: Abstract_DES_Real_Pair, Null_DES_Real_Pair
 
 implicit none
 
@@ -69,7 +68,6 @@ end interface component_can_exchange
 interface components_interact
     module procedure :: components_interact_from_min_distance
     module procedure :: components_interact_from_pair_potential
-    module procedure :: components_interact_from_des_real_pair
 end interface components_interact
 
 contains
@@ -215,18 +213,6 @@ contains
                 component_interacts = .true.
         end select
     end function component_interacts_with_wall
-
-    pure logical function components_interact_from_des_real_pair(real_potential) &
-        result(components_interact)
-        class(Abstract_DES_Real_Pair), intent(in) :: real_potential
-
-        select type (real_potential)
-            type is (Null_DES_Real_Pair)
-                components_interact = .false.
-            class default
-                components_interact = .true.
-        end select
-    end function components_interact_from_des_real_pair
 
     pure logical function component_has_positions(partcles_positions)
         class(Abstract_Component_Coordinates), intent(in) :: partcles_positions

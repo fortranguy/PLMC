@@ -1,13 +1,14 @@
 module procedures_des_real_pair_factory
 
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use types_potential_domain, only: Dipolar_Potential_Domain
+use classes_permittivity, only: Abstract_Permittivity
+use types_min_distance_wrapper, only: Min_Distances_Line
+use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 use classes_des_real_pair, only: Abstract_DES_Real_Pair, Tabulated_DES_Real_Pair, &
     Raw_DES_Real_Pair, Null_DES_Real_Pair
-use classes_permittivity, only: Abstract_Permittivity
-use classes_min_distance, only: Abstract_Min_Distance
-use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 
 implicit none
 
@@ -16,29 +17,42 @@ public :: create, destroy
 
 contains
 
-    subroutine create(pair, permittivity, min_distance, interact, alpha, input_data, prefix)
+    subroutine create(pair, permittivity, min_distances, dipoles_exist, alpha, input_data, prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Min_Distance), intent(in) :: min_distance
-        logical, intent(in) :: interact
+        type(Min_Distances_Line), intent(in) :: min_distances(:)
+        logical, intent(in) :: dipoles_exist
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_pair(pair, interact, input_data, prefix)
-        call construct_pair(pair, permittivity, min_distance, interact, alpha, input_data, prefix)
+        real(DP) :: min_distance
+        integer :: i_component, j_component
+
+        min_distance = min_distances(1)%line(1)%distance%get()
+        do j_component = 1, size(min_distances)
+            do i_component = 1, size(min_distances(j_component)%line)
+                associate(min_distance_ij => min_distances(j_component)%line(i_component)%distance%&
+                    get())
+                    if (min_distance > min_distance_ij) min_distance = min_distance_ij
+                end associate
+            end do
+        end do
+
+        call allocate(pair, dipoles_exist, input_data, prefix)
+        call construct(pair, permittivity, min_distance, dipoles_exist, alpha, input_data, prefix)
     end subroutine create
 
-    subroutine allocate_pair(pair, interact, input_data, prefix)
+    subroutine allocate(pair, dipoles_exist, input_data, prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
-        logical, intent(in) :: interact
+        logical, intent(in) :: dipoles_exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found, tabulated_potential
 
-        if (interact) then
+        if (dipoles_exist) then
             data_field = prefix//"tabulated"
             call input_data%get(data_field, tabulated_potential, data_found)
             call check_data_found(data_field, data_found)
@@ -50,14 +64,13 @@ contains
         else
             allocate(Null_DES_Real_Pair :: pair)
         end if
-    end subroutine allocate_pair
+    end subroutine allocate
 
-    subroutine construct_pair(pair, permittivity, min_distance, interact, alpha,  input_data, &
-        prefix)
+    subroutine construct(pair, permittivity, min_distance, dipoles_exist, alpha, input_data, prefix)
         class(Abstract_DES_Real_Pair), intent(inout) :: pair
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Min_Distance), intent(in) :: min_distance
-        logical, intent(in) :: interact
+        real(DP), intent(in) :: min_distance
+        logical, intent(in) :: dipoles_exist
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -66,8 +79,8 @@ contains
         logical :: data_found
         type(Dipolar_Potential_Domain) :: domain
 
-        if (interact) then
-            domain%min = min_distance%get()
+        if (dipoles_exist) then
+            domain%min = min_distance
             data_field = prefix//"max distance over box edge"
             call input_data%get(data_field, domain%max_over_box, data_found)
             call check_data_found(data_field, data_found)
@@ -79,7 +92,7 @@ contains
             end select
         end if
         call pair%construct(permittivity, alpha, domain)
-    end subroutine construct_pair
+    end subroutine construct
 
     subroutine destroy(pair)
         class(Abstract_DES_Real_Pair), allocatable, intent(inout) :: pair

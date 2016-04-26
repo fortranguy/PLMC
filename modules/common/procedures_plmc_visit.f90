@@ -194,10 +194,9 @@ contains
             associate(energy_i => energies(i_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
                     dipolar_moments_i => components(i_component)%dipolar_moments, &
-                    potential_i => dipolar_interactions%real_pairs(i_component)%line(i_component)%&
-                        potential)
+                    pair => dipolar_interactions%real_pair)
                 call dipolar_interactions%real_visitor%visit(energy_i, positions_i, &
-                    dipolar_moments_i, potential_i)
+                    dipolar_moments_i, pair)
             end associate
         end do
     end subroutine visit_des_real_intra
@@ -216,10 +215,9 @@ contains
                     dipolar_moments_i => components(i_component)%dipolar_moments, &
                     positions_j => components(j_component)%positions, &
                     dipolar_moments_j => components(j_component)%dipolar_moments, &
-                    potential_ij => dipolar_interactions%real_pairs(j_component)%line(i_component)%&
-                        potential)
+                    pair => dipolar_interactions%real_pair)
                     call dipolar_interactions%real_visitor%visit(energy_ij, positions_i, &
-                        dipolar_moments_i, positions_j, dipolar_moments_j, potential_ij)
+                        dipolar_moments_i, positions_j, dipolar_moments_j, pair)
                 end associate
             end do
         end do

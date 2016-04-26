@@ -2,7 +2,6 @@ module procedures_triangle_writer_factory
 
 use types_component_wrapper, only: Component_Wrapper
 use types_pair_potential_wrapper, only: Pair_Potentials_Line
-use types_des_real_pair_wrapper, only: DES_Real_Pairs_Line
 use classes_triangle_writer, only: Selectors_Line, &
     Abstract_Triangle_Writer, Concrete_Triangle_Writer, Null_Triangle_Writer
 use procedures_property_inquirers, only: component_exists, components_interact
@@ -76,12 +75,12 @@ contains
         call deallocate_selectors(selectors)
     end subroutine create_short_energies
 
-    subroutine create_dipolar_energies(energies, pairs, filename)
+    subroutine create_dipolar_energies(energies, are_dipolar, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
-        type(DES_Real_Pairs_Line), intent(in) :: pairs(:)
+        logical, intent(in) :: are_dipolar(:)
         character(len=*), intent(in) :: filename
 
-        type(Selectors_Line) :: selectors(size(pairs))
+        type(Selectors_Line) :: selectors(size(are_dipolar))
         logical :: some_components_interact, interact_ij
         integer :: i_component, j_component
 
@@ -89,7 +88,7 @@ contains
         do j_component = 1, size(selectors)
             allocate(selectors(j_component)%line(j_component))
             do i_component = 1, size(selectors(j_component)%line)
-                interact_ij = components_interact(pairs(j_component)%line(i_component)%potential)
+                interact_ij = are_dipolar(i_component) .and. are_dipolar(j_component)
                 some_components_interact = some_components_interact .or. interact_ij
                 selectors(j_component)%line(i_component) = interact_ij
             end do

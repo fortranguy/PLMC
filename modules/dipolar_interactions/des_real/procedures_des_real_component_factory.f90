@@ -4,9 +4,8 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
-use classes_des_real_component, only: Abstract_DES_Real_Component, &
-    Concrete_DES_Real_Component, Null_DES_Real_Component
-use procedures_property_inquirers, only: components_interact
+use classes_des_real_component, only: Abstract_DES_Real_Component, Concrete_DES_Real_Component, &
+    Null_DES_Real_Component
 
 implicit none
 
@@ -15,14 +14,15 @@ public :: create, destroy
 
 contains
 
-    subroutine create(component, periodic_box, positions, dipolar_moments, pair)
+    subroutine create(component, periodic_box, positions, dipolar_moments, interact, pair)
         class(Abstract_DES_Real_Component), allocatable, intent(out) :: component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
         class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
+        logical, intent(in) :: interact
         class(Abstract_DES_Real_Pair), intent(in) :: pair
 
-        if (components_interact(pair)) then
+        if (interact) then
             allocate(Concrete_DES_Real_Component :: component)
         else
             allocate(Null_DES_Real_Component :: component)

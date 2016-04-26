@@ -44,11 +44,11 @@ contains
 
         call des_real_create(dipolar_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
-        call des_real_create(dipolar_interactions%real_pairs, environment%permittivity, mixture%&
-            components_min_distances, are_dipolar, dipolar_interactions%alpha, input_data, &
+        call des_real_create(dipolar_interactions%real_pair, environment%permittivity, mixture%&
+            components_min_distances, any(are_dipolar), dipolar_interactions%alpha, input_data, &
             prefix//"Real.")
         call des_real_create(dipolar_interactions%real_components, environment%periodic_box, &
-            mixture%components, dipolar_interactions%real_pairs)
+            mixture%components, are_dipolar, dipolar_interactions%real_pair)
 
         call des_reci_create(dipolar_interactions%reci_weight, environment, any(are_dipolar), &
             dipolar_interactions%alpha)
@@ -86,7 +86,7 @@ contains
         call des_reci_destroy(dipolar_interactions%reci_weight)
 
         call des_real_destroy(dipolar_interactions%real_components)
-        call des_real_destroy(dipolar_interactions%real_pairs)
+        call des_real_destroy(dipolar_interactions%real_pair)
         call des_real_destroy(dipolar_interactions%real_visitor)
 
         call des_convergence_parameter_destroy(dipolar_interactions%alpha)
