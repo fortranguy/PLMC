@@ -5,11 +5,11 @@ use procedures_random_number, only: random_integer
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_move => visit_move, &
     dipoles_field_visit_rotation => visit_rotation
+use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_temporary_observables, only: Concrete_Single_Delta_Energies
