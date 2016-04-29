@@ -24,7 +24,6 @@ exclude: procedures_box_size_reader_factory.f90
 exclude: procedures_cells_factory.f90
 exclude: procedures_changed_coordinates_factory.f90
 exclude: procedures_changes_component_factory.f90
-exclude: procedures_changes_factory.f90
 exclude: procedures_change_tuner_factory.f90
 exclude: procedures_component_average_number_factory.f90
 exclude: procedures_component_chemical_potential_factory.f90
@@ -50,23 +49,18 @@ exclude: procedures_des_reci_weight_factory.f90
 exclude: procedures_des_self_component_factory.f90
 exclude: procedures_des_self_factory.f90
 exclude: procedures_des_surf_mixture_factory.f90
-exclude: procedures_dipolar_interactions_factory.f90
 exclude: procedures_dlc_factory.f90
 exclude: procedures_dlc_structures_factory.f90
 exclude: procedures_dlc_visitor_factory.f90
 exclude: procedures_dlc_weight_factory.f90
-exclude: procedures_environment_factory.f90
 exclude: procedures_external_field_factory.f90
 exclude: procedures_field_expression_factory.f90
 exclude: procedures_field_factory.f90
 exclude: procedures_floor_penetration_factory.f90
 exclude: procedures_hard_core_factory.f90
-exclude: procedures_metropolis_algorithms_factory.f90
 exclude: procedures_min_distance_factory.f90
-exclude: procedures_mixture_factory.f90
 exclude: procedures_mixture_total_moment_factory.f90
 exclude: procedures_neighbour_cells_factory.f90
-exclude: procedures_observables_factory.f90
 exclude: procedures_one_particle_change_factory.f90
 exclude: procedures_pair_potential_factory.f90
 exclude: procedures_pairs_factory.f90
@@ -75,9 +69,7 @@ exclude: procedures_periodic_box_factory.f90
 exclude: procedures_permittivity_factory.f90
 exclude: procedures_plmc_factory.f90
 exclude: procedures_potential_expression_factory.f90
-exclude: procedures_readers_factory.f90
 exclude: procedures_reciprocal_lattice_factory.f90
-exclude: procedures_short_interactions_factory.f90
 exclude: procedures_short_pairs_visitor_factory.f90
 exclude: procedures_temperature_factory.f90
 exclude: procedures_two_particles_switch_factory.f90
@@ -85,4 +77,3 @@ exclude: procedures_visitable_list_factory.f90
 exclude: procedures_visitable_walls_factory.f90
 exclude: procedures_walls_factory.f90
 exclude: procedures_walls_visitor_factory.f90
-exclude: procedures_writers_factory.f90

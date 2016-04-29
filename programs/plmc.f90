@@ -32,9 +32,9 @@ implicit none
 
     type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
-    type(Changes_Wrapper) :: changes
     type(Short_Interactions_Wrapper) :: short_interactions
     type(Dipolar_Interactions_Wrapper) :: dipolar_interactions
+    type(Changes_Wrapper) :: changes
     type(Metropolis_Algorithms_Wrapper) :: metropolis_algorithms
     class(Abstract_PLMC_Propagator), allocatable :: plmc_propagator
 
