@@ -13,8 +13,6 @@ use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 use classes_plmc_propagator, only: Abstract_PLMC_Propagator
-use procedures_plmc_propagator, only: plmc_propagator_create, plmc_propagator_destroy, &
-    plmc_propagator_try
 use types_observables_wrapper, only: Observables_Wrapper
 use types_readers_wrapper, only: Readers_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
@@ -55,7 +53,6 @@ implicit none
     call plmc_set(readers%components, input_data)
     call plmc_set(metropolis_algorithms, mixture%components, changes%components)
     call plmc_propagator%set_selector()
-    call plmc_propagator_create(metropolis_algorithms)
     call plmc_destroy(input_data)
 
     call plmc_reset(mixture%total_moment, short_interactions, dipolar_interactions)
@@ -63,7 +60,7 @@ implicit none
     call plmc_write(-num_tuning_steps, writers, observables)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
-        call plmc_propagator_try(observables)
+        call plmc_propagator%try(observables)
         call plmc_set(observables)
         call plmc_set(changes_tuned, i_step, changes%components, observables%changes_sucesses)
         call plmc_write(i_step, writers, observables)
@@ -71,7 +68,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
-        call plmc_propagator_try(observables)
+        call plmc_propagator%try(observables)
         call plmc_set(observables)
         call plmc_write(i_step, writers, observables)
     end do
@@ -80,7 +77,6 @@ implicit none
     call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
     call plmc_write(i_step-1, writers, observables)
 
-    call plmc_propagator_destroy()
     call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
         metropolis_algorithms, plmc_propagator, observables, readers, writers)
 

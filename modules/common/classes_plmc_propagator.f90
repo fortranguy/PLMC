@@ -17,6 +17,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: set_selector => Abstract_set_selector
+        procedure :: try => Abstract_try
     end type Abstract_PLMC_Propagator
 
     type, extends(Abstract_PLMC_Propagator), public :: Concrete_PLMC_Propagator
