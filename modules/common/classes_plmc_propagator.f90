@@ -49,10 +49,11 @@ contains
         class(Abstract_PLMC_Propagator), intent(in) :: this
         type(Observables_Wrapper), intent(inout) :: observables
 
-        integer :: i_choice
+        integer :: i_choice, i_random
 
         do i_choice = 1, this%selector%get_num_choices()
-            call this%metropolis_algorithms(this%selector%get())%algorithm%try(observables)
+            i_random = this%selector%get() !gfortran bug?
+            call this%metropolis_algorithms(i_random)%algorithm%try(observables)
         end do
     end subroutine Abstract_try
 
