@@ -12,6 +12,7 @@ use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
+use classes_plmc_propagator, only: Abstract_PLMC_Propagator
 use procedures_plmc_propagator, only: plmc_propagator_create, plmc_propagator_destroy, &
     plmc_propagator_try
 use types_observables_wrapper, only: Observables_Wrapper
@@ -37,6 +38,7 @@ implicit none
     type(Short_Interactions_Wrapper) :: short_interactions
     type(Dipolar_Interactions_Wrapper) :: dipolar_interactions
     type(Metropolis_Algorithms_Wrapper) :: metropolis_algorithms
+    class(Abstract_PLMC_Propagator), allocatable :: plmc_propagator
 
     type(Readers_Wrapper) :: readers
     type(Writers_Wrapper) :: writers
@@ -49,9 +51,10 @@ implicit none
     call json_initialize()
     call plmc_create(input_data, 1)
     call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, observables, readers, writers, input_data)
+        metropolis_algorithms, plmc_propagator, observables, readers, writers, input_data)
     call plmc_set(readers%components, input_data)
     call plmc_set(metropolis_algorithms, mixture%components, changes%components)
+    call plmc_propagator%set_selector()
     call plmc_propagator_create(metropolis_algorithms)
     call plmc_destroy(input_data)
 
@@ -79,6 +82,6 @@ implicit none
 
     call plmc_propagator_destroy()
     call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, observables, readers, writers)
+        metropolis_algorithms, plmc_propagator, observables, readers, writers)
 
 end program plmc

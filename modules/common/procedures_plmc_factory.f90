@@ -25,6 +25,9 @@ use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
 use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, &
     metropolis_algorithms_set, metropolis_algorithms_destroy
+use classes_plmc_propagator, only: Abstract_PLMC_Propagator
+use procedures_plmc_propagator_factory, only: plmc_propagator_create => create, &
+    plmc_propagator_destroy => destroy
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
 use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper, Readers_Wrapper
@@ -59,13 +62,14 @@ end interface plmc_set
 contains
 
     subroutine create_all(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, observables, readers, writers, input_data)
+        metropolis_algorithms, plmc_propagator, observables, readers, writers, input_data)
         type(Environment_Wrapper), intent(out) :: environment
         type(Mixture_Wrapper), intent(out) :: mixture
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(out) :: dipolar_interactions
         type(Changes_Wrapper), intent(out) :: changes
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
+        class(Abstract_PLMC_Propagator), allocatable, intent(out) :: plmc_propagator
         type(Observables_Wrapper), intent(out) :: observables
         type(Readers_Wrapper), intent(out) :: readers
         type(Writers_Wrapper), intent(out) :: writers
@@ -82,6 +86,7 @@ contains
             changes_prefix)
         call metropolis_algorithms_create(metropolis_algorithms, environment, mixture, &
             short_interactions, dipolar_interactions, changes%components)
+        call plmc_propagator_create(plmc_propagator, metropolis_algorithms)
         call observables_create(observables, mixture%components)
         call readers_create(readers, environment%periodic_box, mixture%components)
         call writers_create(writers, environment, short_interactions%wall_pairs, mixture%&
@@ -90,13 +95,14 @@ contains
     end subroutine create_all
 
     subroutine destroy_all(environment, mixture, short_interactions, dipolar_interactions, changes,&
-        metropolis_algorithms, observables, readers, writers)
+        metropolis_algorithms, plmc_propagator, observables, readers, writers)
         type(Environment_Wrapper), intent(inout) :: environment
         type(Mixture_Wrapper), intent(inout) :: mixture
         type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
         type(Changes_Wrapper), intent(inout) :: changes
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
+        class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: plmc_propagator
         type(Observables_Wrapper), intent(inout) :: observables
         type(Readers_Wrapper), intent(inout) :: readers
         type(Writers_Wrapper), intent(inout) :: writers
@@ -104,6 +110,7 @@ contains
         call writers_destroy(writers)
         call readers_destroy(readers)
         call observables_destroy(observables)
+        call plmc_propagator_destroy(plmc_propagator)
         call metropolis_algorithms_destroy(metropolis_algorithms)
         call changes_destroy(changes)
         call dipolar_interactions_destroy(dipolar_interactions)

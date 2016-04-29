@@ -33,15 +33,15 @@ implicit none
     call plmc_widom_catch_help()
     call json_initialize()
     call plmc_create(input_data, command_argument_count() - 1)
-    call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, observables, readers, writers, input_data)
+    !call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
+    !    metropolis_algorithms, observables, readers, writers, input_data)
     call plmc_set(readers%components, input_data)
     call plmc_destroy(input_data)
 
     call plmc_create(post_data, command_argument_count())
     call plmc_destroy(post_data)
 
-    call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, observables, readers, writers)
+    !call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
+    !    metropolis_algorithms, observables, readers, writers)
 
 end program plmc_widom
