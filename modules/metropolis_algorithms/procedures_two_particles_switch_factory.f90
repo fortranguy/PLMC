@@ -72,7 +72,7 @@ contains
         end do
         call selector%construct(nums_candidates)
 
-        call two_particles_switch%allocate_couples_and_selector(couples, selector)
+        call two_particles_switch%set_couples_and_selector(couples, selector)
         call selector%destroy()
         call couples%destroy()
     end subroutine set

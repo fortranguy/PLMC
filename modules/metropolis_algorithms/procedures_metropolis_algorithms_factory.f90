@@ -21,18 +21,18 @@ public :: metropolis_algorithms_create, metropolis_algorithms_destroy, metropoli
 contains
 
     subroutine metropolis_algorithms_create(metropolis_algorithms, environment, mixture, &
-        change_components, short_interactions, dipolar_interactions)
+        short_interactions, dipolar_interactions, change_components)
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         call one_particle_move_create(metropolis_algorithms%one_particle_move, &
-            environment, mixture, change_components, short_interactions, dipolar_interactions)
+            environment, mixture, short_interactions, dipolar_interactions, change_components)
         call one_particle_rotation_create(metropolis_algorithms%one_particle_rotation, &
-            environment, mixture, change_components, short_interactions, dipolar_interactions)
+            environment, mixture, short_interactions, dipolar_interactions, change_components)
         call two_particles_switch_create(metropolis_algorithms%two_particles_switch, environment, &
             mixture%components, short_interactions, dipolar_interactions)
     end subroutine metropolis_algorithms_create

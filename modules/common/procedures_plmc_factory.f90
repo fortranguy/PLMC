@@ -80,8 +80,8 @@ contains
         call plmc_set_num_steps(input_data)
         call changes_create(changes, environment%periodic_box, mixture%components, input_data, &
             changes_prefix)
-        call metropolis_algorithms_create(metropolis_algorithms, environment, mixture, changes%&
-            components, short_interactions, dipolar_interactions)
+        call metropolis_algorithms_create(metropolis_algorithms, environment, mixture, &
+            short_interactions, dipolar_interactions, changes%components)
         call observables_create(observables, mixture%components)
         call readers_create(readers, environment%periodic_box, mixture%components)
         call writers_create(writers, environment, short_interactions%wall_pairs, mixture%&

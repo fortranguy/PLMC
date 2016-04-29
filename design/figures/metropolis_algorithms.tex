@@ -18,11 +18,11 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{OneParticleChange}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
-                    changes: \type{ChangesComponent[:]}, selector: \type{TowerSampler}}}
+                    mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
+                    dipolarInteractions: \type{DipolarInteractions},
+                    changes: \type{ChangesComponent[:]}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setCandidates}{mixture: \type{Mixture},
-                    shortInteractions: \type{ShortInteractions},
-                    dipolarInteractions: \type{DipolarInteractions}}}
+                \operation{\procedure{setSelector}{selector: \type{TowerSampler}}}
             \end{abstractclass}
         \end{scope}
 
@@ -30,11 +30,11 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{TwoParticlesSwitch}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
-                    selector: \type{TowerSampler}, componentsCouples: \type{HeteroCouples}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{setCandidates}{components: \type{Component[:]},
-                    shortInteractions: \type{ShortInteractions},
+                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions},
                     dipolarInteractions: \type{DipolarInteractions}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{setCouplesAndSelector}{couples: \type{HeteroCouples},
+                    selector: \type{TowerSampler}}}
             \end{abstractclass}
         \end{scope}
 

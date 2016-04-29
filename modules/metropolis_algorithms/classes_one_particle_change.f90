@@ -25,15 +25,15 @@ private
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
-        type(Changes_Component_Wrapper), pointer :: change_components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
+        type(Changes_Component_Wrapper), pointer :: change_components(:) => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: try => Abstract_try
-        procedure :: allocate_selector => Abstract_allocate_selector
+        procedure :: set_selector => Abstract_set_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure, private :: test_metropolis => Abstract_test_metropolis
         procedure(Abstract_define_change), private, deferred :: define_change
@@ -136,7 +136,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: allocate_selector => Null_allocate_selector
+        procedure :: set_selector => Null_set_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
         procedure, private :: test_metropolis => Null_test_metropolis
@@ -154,20 +154,20 @@ contains
 
 !implementation Abstract_One_Particle_Change
 
-    subroutine Abstract_construct(this, environment, mixture, change_components, &
-        short_interactions, dipolar_interactions)
+    subroutine Abstract_construct(this, environment, mixture, short_interactions, &
+        dipolar_interactions, change_components)
         class(Abstract_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
-        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
 
         this%environment => environment
         this%mixture => mixture
-        this%change_components => change_components
         this%short_interactions => short_interactions
         this%dipolar_interactions => dipolar_interactions
+        this%change_components => change_components
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -177,19 +177,19 @@ contains
             call this%selector%destroy()
             deallocate(this%selector)
         end if
+        this%change_components => null()
         this%dipolar_interactions => null()
         this%short_interactions => null()
-        this%change_components => null()
         this%mixture => null()
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_allocate_selector(this, selector)
+    subroutine Abstract_set_selector(this, selector)
         class(Abstract_One_Particle_Change), intent(inout) :: this
         class(Abstract_Tower_Sampler), intent(in) :: selector
 
         allocate(this%selector, source=selector)
-    end subroutine Abstract_allocate_selector
+    end subroutine Abstract_set_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_One_Particle_Change), intent(in) :: this
@@ -472,24 +472,24 @@ contains
 
 !implementation Null_One_Particle_Change
 
-    subroutine Null_construct(this, environment, mixture, change_components, short_interactions, &
-        dipolar_interactions)
+    subroutine Null_construct(this, environment, mixture, short_interactions, dipolar_interactions,&
+        change_components)
         class(Null_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
-        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_One_Particle_Change), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_allocate_selector(this, selector)
+    subroutine Null_set_selector(this, selector)
         class(Null_One_Particle_Change), intent(inout) :: this
         class(Abstract_Tower_Sampler), intent(in) :: selector
-    end subroutine Null_allocate_selector
+    end subroutine Null_set_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_One_Particle_Change), intent(in) :: this

@@ -31,7 +31,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: allocate_couples_and_selector => Abstract_allocate_couples_and_selector
+        procedure :: set_couples_and_selector => Abstract_set_couples_and_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: test_metropolis => Abstract_test_metropolis
@@ -51,7 +51,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: allocate_couples_and_selector => Null_allocate_couples_and_selector
+        procedure :: set_couples_and_selector => Null_set_couples_and_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
         procedure, private :: test_metropolis => Null_test_metropolis
@@ -98,14 +98,14 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_allocate_couples_and_selector(this, couples, selector)
+    subroutine Abstract_set_couples_and_selector(this, couples, selector)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
         class(Abstract_Hetero_Couples), intent(in) :: couples
         class(Abstract_Tower_Sampler), intent(in) :: selector
 
         allocate(this%couples, source=couples)
         allocate(this%selector, source=selector)
-    end subroutine Abstract_allocate_couples_and_selector
+    end subroutine Abstract_set_couples_and_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
@@ -334,11 +334,11 @@ contains
         class(Null_Two_Particles_Switch), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_allocate_couples_and_selector(this, couples, selector)
+    subroutine Null_set_couples_and_selector(this, couples, selector)
         class(Null_Two_Particles_Switch), intent(inout) :: this
         class(Abstract_Hetero_Couples), intent(in) :: couples
         class(Abstract_Tower_Sampler), intent(in) :: selector
-    end subroutine Null_allocate_couples_and_selector
+    end subroutine Null_set_couples_and_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Two_Particles_Switch), intent(in) :: this

@@ -18,14 +18,14 @@ public :: create_move, create_rotation, destroy, set_move, set_rotation
 
 contains
 
-    subroutine create_move(one_particle_move, environment, mixture, &
-        change_components, short_interactions, dipolar_interactions)
+    subroutine create_move(one_particle_move, environment, mixture, short_interactions, &
+        dipolar_interactions, change_components)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         logical :: some_components_can_move
         integer :: i_component
@@ -44,12 +44,12 @@ contains
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
 
-        call one_particle_move%construct(environment, mixture, change_components, &
-            short_interactions, dipolar_interactions)
+        call one_particle_move%construct(environment, mixture, short_interactions, &
+            dipolar_interactions, change_components)
     end subroutine create_move
 
-    subroutine create_rotation(one_particle_rotation, environment, mixture, &
-        change_components, short_interactions, dipolar_interactions)
+    subroutine create_rotation(one_particle_rotation, environment, mixture, short_interactions, &
+        dipolar_interactions, change_components)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
@@ -74,8 +74,8 @@ contains
             allocate(Null_One_Particle_Change :: one_particle_rotation)
         end if
 
-        call one_particle_rotation%construct(environment, mixture, change_components, &
-            short_interactions, dipolar_interactions)
+        call one_particle_rotation%construct(environment, mixture, short_interactions, &
+            dipolar_interactions, change_components)
     end subroutine create_rotation
 
     subroutine destroy(one_particle_change)
@@ -101,7 +101,7 @@ contains
                 nums_candidates(i_component) = 0
             end if
         end do
-        call allocate_selector(one_particle_move, nums_candidates)
+        call set_selector(one_particle_move, nums_candidates)
     end subroutine set_move
 
     subroutine set_rotation(one_particle_rotation, components, change_components)
@@ -118,10 +118,10 @@ contains
                 nums_candidates(i_component) = 0
             end if
         end do
-        call allocate_selector(one_particle_rotation, nums_candidates)
+        call set_selector(one_particle_rotation, nums_candidates)
     end subroutine set_rotation
 
-    subroutine allocate_selector(one_particle_change, nums_candidates)
+    subroutine set_selector(one_particle_change, nums_candidates)
         class(Abstract_One_Particle_Change), intent(inout) :: one_particle_change
         integer, intent(in) :: nums_candidates(:)
 
@@ -134,8 +134,8 @@ contains
         end if
 
         call selector%construct(nums_candidates)
-        call one_particle_change%allocate_selector(selector)
+        call one_particle_change%set_selector(selector)
         call selector%destroy()
-    end subroutine allocate_selector
+    end subroutine set_selector
 
 end module procedures_one_particle_change_factory
