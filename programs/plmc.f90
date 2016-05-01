@@ -26,7 +26,7 @@ use procedures_plmc_help, only: plmc_catch_help
 implicit none
 
     type(Physical_Model_Wrapper) :: physics
-    type(Markov_Chain_Generator_Wrapper) :: markov
+    type(Markov_Chain_Generator_Wrapper) :: markov_chain
     type(Observables_Wrapper) :: observables
     type(Input_Output_Wrapper) :: io
 
