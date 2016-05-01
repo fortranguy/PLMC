@@ -24,31 +24,30 @@ private
 
     end type Concrete_PLMC_Propagator
 
+    type, extends(Abstract_PLMC_Propagator), public :: Null_PLMC_Propagator
+    contains
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: set_selector => Null_set_selector
+        procedure :: try => Null_try
+    end type Null_PLMC_Propagator
+
 contains
+
+!implementation Abstract_PLMC_Propagator
 
     subroutine Abstract_construct(this, metropolis_algorithms)
         class(Abstract_PLMC_Propagator), intent(out) :: this
         type(Metropolis_Algorithm_Pointer), target, intent(in) :: metropolis_algorithms(:)
 
-        integer :: i_algorithm
-
-        allocate(this%metropolis_algorithms(size(metropolis_algorithms))) !shorter with source?
-        do i_algorithm = 1, size(this%metropolis_algorithms)
-            this%metropolis_algorithms(i_algorithm)%algorithm => &
-                metropolis_algorithms(i_algorithm)%algorithm
-        end do
+        allocate(this%metropolis_algorithms, source=metropolis_algorithms)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
 
-        integer :: i_algorithm
-
         call this%selector%destroy()
         if (allocated(this%metropolis_algorithms)) then
-            do i_algorithm = size(this%metropolis_algorithms), 1, -1
-                this%metropolis_algorithms(i_algorithm)%algorithm => null()
-            end do
             deallocate(this%metropolis_algorithms)
         end if
     end subroutine Abstract_destroy
@@ -69,12 +68,35 @@ contains
         class(Abstract_PLMC_Propagator), intent(in) :: this
         type(Observables_Wrapper), intent(inout) :: observables
 
-        integer :: i_choice, i_random
+        integer :: i_choice
 
         do i_choice = 1, this%selector%get_num_choices()
-            i_random = this%selector%get() !gfortran bug?
-            call this%metropolis_algorithms(i_random)%algorithm%try(observables)
+            call this%metropolis_algorithms(this%selector%get())%algorithm%try(observables)
         end do
     end subroutine Abstract_try
+
+!end implementation Abstract_PLMC_Propagator
+
+!implementation Null_PLMC_Propagator
+
+    subroutine Null_construct(this, metropolis_algorithms)
+        class(Null_PLMC_Propagator), intent(out) :: this
+        type(Metropolis_Algorithm_Pointer), target, intent(in) :: metropolis_algorithms(:)
+    end subroutine Null_construct
+
+    subroutine Null_destroy(this)
+        class(Null_PLMC_Propagator), intent(inout) :: this
+    end subroutine Null_destroy
+
+    subroutine Null_set_selector(this)
+        class(Null_PLMC_Propagator), intent(inout) :: this
+    end subroutine Null_set_selector
+
+    subroutine Null_try(this, observables)
+        class(Null_PLMC_Propagator), intent(in) :: this
+        type(Observables_Wrapper), intent(inout) :: observables
+    end subroutine Null_try
+
+!end implementation Null_PLMC_Propagator
 
 end module classes_plmc_propagator

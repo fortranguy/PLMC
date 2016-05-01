@@ -2,7 +2,8 @@ module procedures_plmc_propagator_factory
 
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer, &
     Metropolis_Algorithms_Wrapper
-use classes_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator
+use classes_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator, &
+    Null_PLMC_Propagator
 
 implicit none
 
@@ -21,7 +22,7 @@ contains
         algorithms(2)%algorithm => metropolis_algorithms%one_particle_rotation
         algorithms(3)%algorithm => metropolis_algorithms%two_particles_switch
 
-        allocate(Concrete_PLMC_Propagator :: propagator)
+        allocate(Concrete_PLMC_Propagator :: propagator) !What about Null_?
         call propagator%construct(algorithms)
     end subroutine create
 
