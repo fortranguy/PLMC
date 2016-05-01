@@ -1,4 +1,4 @@
-module types_physics_wrappers
+module types_physical_model_wrapper
 
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
@@ -9,11 +9,11 @@ implicit none
 
 private
 
-    type, public :: Physics_Wrapper
+    type, public :: Physical_Model_Wrapper
         type(Environment_Wrapper) :: environment
         type(Mixture_Wrapper) :: mixture
         type(Short_Interactions_Wrapper) :: short_interactions
         type(Dipolar_Interactions_Wrapper) :: dipolar_interactions
-    end type Physics_Wrapper
+    end type Physical_Model_Wrapper
 
-end module types_physics_wrappers
+end module types_physical_model_wrapper

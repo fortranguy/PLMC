@@ -1,7 +1,7 @@
 program plmc_widom
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-use json_module, only: json_file, json_initialize
+use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
@@ -31,7 +31,6 @@ implicit none
     integer :: i_step
 
     call plmc_widom_catch_help()
-    call json_initialize()
     call plmc_create(input_data, command_argument_count() - 1)
     !call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
     !    metropolis_algorithms, observables, readers, writers, input_data)

@@ -1,5 +1,6 @@
 module procedures_plmc_factory
 
+use, intrinsic :: iso_fortran_env, only: error_unit
 use data_prefixes, only:environment_prefix, mixture_prefix, changes_prefix, &
     short_interactions_prefix, dipolar_interactions_prefix, writers_prefix
 use json_module, only: json_file
@@ -125,8 +126,11 @@ contains
 
         character(len=:), allocatable :: data_filename
 
+        call input_data%initialize()
+        if (input_data%failed()) call input_data%print_error_message(error_unit)
         call create_filename_from_argument(data_filename, i_argument)
-        call input_data%load_file(filename = data_filename)
+        call input_data%load_file(data_filename)
+        if (input_data%failed()) call input_data%print_error_message(error_unit)
     end subroutine create_input_data
 
     subroutine destroy_input_data(input_data)

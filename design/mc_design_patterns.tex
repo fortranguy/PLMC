@@ -53,65 +53,81 @@
         \item \type{type[::]}: matrix
     \end{itemize}
 
+    \newpage
+    \tableofcontents
+
     \begin{landscape}
+    \section{Physical model}
+
+        \subsection{Environment}
+
         \begin{figure}[htb]
             \centering
             \includestandalone[mode=\buildMode]{figures/environment}
             \caption{\namespace{Environment}}
         \end{figure}
-    \end{landscape}
+        \clearpage
 
-    \begin{landscape}
+        \subsection{Particles}
+
         \begin{figure}[htb]
             \centering
             \includestandalone[mode=\buildMode]{figures/mixture}
             \caption{\namespace{Mixture}}
         \end{figure}
+        \clearpage
+
+        \subsection{Interactions}
+
+            \subsubsection{Short-range interactions}
+            \begin{figure}[htb]
+                \centering
+                \includestandalone[mode=\buildMode]{figures/short_interactions}
+                \caption{\namespace{Short Interactions}}
+            \end{figure}
+
     \end{landscape}
+        \clearpage
+        \thispagestyle{empty}
+        \KOMAoptions{paper=A3, pagesize}
+        \recalctypearea
+
+            \subsubsection{Long-range interactions}
+            \begin{figure}[htb]
+                \centering
+                \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
+                \caption{\namespace{Dipolar Interactions}}
+            \end{figure}
+
+        \clearpage
+        \KOMAoptions{paper=A4, pagesize}
+        \restoregeometry
+        \recalctypearea
 
     \begin{landscape}
+    \section{Markov chain generator}
+
+        \subsection{Changes}
         \begin{figure}[htb]
             \centering
             \includestandalone[mode=\buildMode]{figures/changes}
             \caption{\namespace{Changes}}
         \end{figure}
-    \end{landscape}
+        \clearpage
 
-    \begin{landscape}
-        \begin{figure}[htb]
-            \centering
-            \includestandalone[mode=\buildMode]{figures/short_interactions}
-            \caption{\namespace{Short Interactions}}
-        \end{figure}
-    \end{landscape}
-
-    \clearpage
-    \thispagestyle{empty}
-    \KOMAoptions{paper=A3, pagesize}
-    \recalctypearea
-    \begin{figure}[htb]
-        \centering
-        \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
-        \caption{\namespace{Dipolar Interactions}}
-    \end{figure}
-    \clearpage
-    \KOMAoptions{paper=A4, pagesize}
-    \restoregeometry
-    \recalctypearea
-
-    \begin{landscape}
-        \begin{figure}[htb]
-            \centering
-            \includestandalone[mode=\buildMode]{figures/observables}
-            \caption{\namespace{Observables}}
-        \end{figure}
-    \end{landscape}
-
-    \begin{landscape}
+        \subsection{Metropolis algorithms}
         \begin{figure}[htb]
             \centering
             \includestandalone[mode=\buildMode]{figures/metropolis_algorithms}
             \caption{\namespace{Metropolis Algorithms}}
+        \end{figure}
+        \clearpage
+
+    \section{Observables}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/observables}
+            \caption{\namespace{Observables}}
         \end{figure}
     \end{landscape}
 

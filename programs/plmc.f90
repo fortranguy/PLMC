@@ -1,10 +1,10 @@
 program plmc
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-use json_module, only: json_file, json_initialize
-use types_physics_wrappers, only: Physics_Wrapper
-use types_markov_wrapper, only: Markov_Wrapper
-use types_io_wrapper, only: IO_Wrapper
+use json_module, only: json_file
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use types_markov_chain_generator_wrapper, only: Markov_Chain_Generator_Wrapper
+use types_input_output_wrapper, only: Input_Output_Wrapper
 
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
@@ -25,10 +25,10 @@ use procedures_plmc_help, only: plmc_catch_help
 
 implicit none
 
-    type(Physics_Wrapper) :: physics
-    type(Markov_Wrapper) :: markov
+    type(Physical_Model_Wrapper) :: physics
+    type(Markov_Chain_Generator_Wrapper) :: markov
     type(Observables_Wrapper) :: observables
-    type(IO_Wrapper) :: io
+    type(Input_Output_Wrapper) :: io
 
     type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
@@ -46,7 +46,6 @@ implicit none
     logical :: changes_tuned
 
     call plmc_catch_help()
-    call json_initialize()
     call plmc_create(input_data, 1)
     call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
         metropolis_algorithms, plmc_propagator, observables, readers, writers, input_data)

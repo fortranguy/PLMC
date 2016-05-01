@@ -1,8 +1,8 @@
-program plmc_domain_density
+program density
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_prefixes, only: environment_prefix
-use json_module, only: json_file, json_initialize
+use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use procedures_command_arguments, only: create_filename_from_argument
@@ -26,8 +26,6 @@ implicit none
     type(json_file) :: input_data, post_data
     character(len=:), allocatable :: data_field
     logical :: data_found
-
-    call json_initialize()
 
     call plmc_create(input_data, command_argument_count() - 1)
     data_field = "Output.Coordinates.write"
@@ -61,4 +59,4 @@ implicit none
     call box_destroy(periodic_box)
     call box_destroy(parallelepiped_domain)
 
-end program plmc_domain_density
+end program density
