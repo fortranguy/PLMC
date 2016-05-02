@@ -194,11 +194,17 @@
 		<Unit filename="modules/common/procedures_geometry.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="modules/common/procedures_markov_chain_generator_factory.f90">
+			<Option weight="13" />
+		</Unit>
+		<Unit filename="modules/common/procedures_observables_factory.f90">
+			<Option weight="7" />
+		</Unit>
 		<Unit filename="modules/common/procedures_physical_model_factory.f90">
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_factory.f90">
-			<Option weight="13" />
+			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_help.f90">
 			<Option weight="1" />
@@ -210,10 +216,10 @@
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_reset.f90">
-			<Option weight="9" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_visit.f90">
-			<Option weight="9" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_write.f90">
 			<Option weight="6" />
@@ -533,13 +539,16 @@
 		<Unit filename="modules/observables/module_changes_success.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/observables/procedures_observables_factory.f90">
+		<Unit filename="modules/observables/procedures_generating_observables_factory.f90">
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/observables/procedures_triangle_observables.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/observables/types_observables_wrapper.f90">
+		<Unit filename="modules/observables/types_exploring_observables_wrapper.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/observables/types_generating_observables_wrapper.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/observables/types_reals_line.f90">
@@ -690,31 +699,27 @@
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="programs/density.f90">
-			<Option weight="14" />
+			<Option weight="15" />
 			<Option target="density" />
 		</Unit>
 		<Unit filename="programs/plmc.f90">
-			<Option weight="14" />
+			<Option weight="15" />
 			<Option target="plmc" />
 		</Unit>
 		<Unit filename="programs/radial_inter.f90">
-			<Option weight="14" />
+			<Option weight="15" />
 			<Option target="radial_inter" />
 		</Unit>
 		<Unit filename="programs/radial_intra.f90">
-			<Option weight="14" />
+			<Option weight="15" />
 			<Option target="radial_intra" />
 		</Unit>
-		<Unit filename="programs/widom.f90">
-			<Option weight="14" />
-			<Option target="widom" />
-		</Unit>
 		<Unit filename="programs/xz_density.f90">
-			<Option weight="14" />
+			<Option weight="15" />
 			<Option target="xz_density" />
 		</Unit>
 		<Unit filename="programs/z_density.f90">
-			<Option weight="14" />
+			<Option weight="15" />
 			<Option target="z_density" />
 		</Unit>
 		<Extensions>

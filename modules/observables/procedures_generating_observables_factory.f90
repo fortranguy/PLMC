@@ -5,7 +5,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_reals_line, only: Reals_Line
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
     Concrete_Switch_Counters, changes_counter_reset, switches_counters_reset
-use types_observables_wrapper, only: Generating_Observables_Wrapper
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
 

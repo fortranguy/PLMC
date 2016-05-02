@@ -3,23 +3,15 @@ module procedures_plmc_visit
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use classes_number_to_string, only: Concrete_Number_to_String
-use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use classes_external_field, only: Abstract_External_Field
-use classes_visitable_walls, only: Abstract_Visitable_Walls
-use types_environment_wrapper, only: Environment_Wrapper
-use classes_component_coordinates, only: Abstract_Component_Coordinates
-use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
-use types_mixture_wrapper, only: Mixture_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
-use classes_pair_potential, only: Abstract_Pair_Potential
-use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use types_reals_line, only: Reals_Line
-use types_observables_wrapper, only: Generating_Observables_Wrapper
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_generating_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
 use procedures_triangle_observables, only: triangle_observables_init, &
     triangle_observables_add
@@ -39,19 +31,18 @@ end interface plmc_visit
 
 contains
 
-    subroutine visit_all(observables, environment, mixture, short_interactions, &
-        dipolar_interactions)
+    subroutine visit_all(observables, physical_model)
         type(Generating_Observables_Wrapper), intent(inout) :: observables
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
 
-        call plmc_visit(observables%field_energies, environment%external_field, mixture%components)
-        call plmc_visit(observables%walls_energies, mixture%components, short_interactions)
-        call plmc_visit(observables%short_energies, mixture%components, short_interactions)
-        call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, mixture%&
-            components, dipolar_interactions)
+        call plmc_visit(observables%field_energies, physical_model%environment%external_field, &
+            physical_model%mixture%components)
+        call plmc_visit(observables%walls_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        call plmc_visit(observables%short_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
+            physical_model%mixture%components, physical_model%dipolar_interactions)
     end subroutine visit_all
 
     pure subroutine visit_field(field_energies, external_field, components)

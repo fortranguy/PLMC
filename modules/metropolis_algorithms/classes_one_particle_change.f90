@@ -13,7 +13,7 @@ use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_temporary_observables, only: Concrete_Single_Delta_Energies
-use types_observables_wrapper, only: Generating_Observables_Wrapper
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 

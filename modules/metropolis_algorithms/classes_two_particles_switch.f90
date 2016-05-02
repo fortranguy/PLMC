@@ -12,7 +12,7 @@ use classes_tower_sampler, only: Abstract_Tower_Sampler
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use module_changes_success, only: Concrete_Switch_Counters
 use types_temporary_observables, only: Concrete_Double_Delta_Energies
-use types_observables_wrapper, only: Generating_Observables_Wrapper
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 

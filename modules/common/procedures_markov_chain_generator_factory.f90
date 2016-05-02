@@ -13,7 +13,7 @@ use types_markov_chain_generator_wrapper, only: Markov_Chain_Generator_Wrapper
 implicit none
 
 private
-public :: create, destroy
+public :: create, destroy, set
 
 contains
 
@@ -39,5 +39,12 @@ contains
         call metropolis_algorithms_destroy(markov_chain_generator%metropolis_algorithms)
         call changes_destroy(markov_chain_generator%changes)
     end subroutine destroy
+
+    subroutine set(markov_chain_generator)
+        type(Markov_Chain_Generator_Wrapper), intent(inout) :: markov_chain_generator
+
+        call metropolis_algorithms_set(markov_chain_generator%metropolis_algorithms)
+        call markov_chain_generator%plmc_propagator%set_selector()
+    end subroutine set
 
 end module procedures_markov_chain_generator_factory

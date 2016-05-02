@@ -1,10 +1,9 @@
 module procedures_plmc_reset
 
-use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
 
 implicit none
 
@@ -13,15 +12,13 @@ public :: plmc_reset
 
 contains
 
-    subroutine plmc_reset(total_moment, short_interactions, dipolar_interactions)
-        class(Abstract_Mixture_Total_Moment), intent(inout) :: total_moment
-        type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
+    subroutine plmc_reset(physical_model)
+        type(Physical_Model_Wrapper), intent(inout) :: physical_model
 
-        call total_moment%reset()
-        call reset_neighbour_cells(short_interactions%neighbour_cells)
-        call reset_visitable_cells(short_interactions%visitable_cells)
-        call reset_dipolar(dipolar_interactions)
+        call physical_model%mixture%total_moment%reset()
+        call reset_neighbour_cells(physical_model%short_interactions%neighbour_cells)
+        call reset_visitable_cells(physical_model%short_interactions%visitable_cells)
+        call reset_dipolar(physical_model%dipolar_interactions)
     end subroutine plmc_reset
 
     subroutine reset_neighbour_cells(cells)

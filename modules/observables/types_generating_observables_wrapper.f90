@@ -1,4 +1,4 @@
-module types_observables_wrapper
+module types_generating_observables_wrapper
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
@@ -19,8 +19,4 @@ private
         real(DP) :: dipolar_mixture_energy = 0._DP
     end type Generating_Observables_Wrapper
 
-    type, public :: Exploring_Observables_Wrapper
-
-    end type Exploring_Observables_Wrapper
-
-end module types_observables_wrapper
+end module types_generating_observables_wrapper

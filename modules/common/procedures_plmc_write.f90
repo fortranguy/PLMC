@@ -1,7 +1,7 @@
 module procedures_plmc_write
 
 use types_writers_wrapper, only: Writers_Wrapper
-use types_observables_wrapper, only: Generating_Observables_Wrapper
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
 

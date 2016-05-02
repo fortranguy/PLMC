@@ -3,7 +3,7 @@ module classes_plmc_propagator
 use classes_tower_sampler, only: Concrete_Tower_Sampler
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer, &
     Metropolis_Algorithms_Wrapper
-use types_observables_wrapper, only: Generating_Observables_Wrapper
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
 
