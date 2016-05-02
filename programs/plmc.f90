@@ -16,7 +16,6 @@ use classes_plmc_propagator, only: Abstract_PLMC_Propagator
 use types_observables_wrapper, only: Observables_Wrapper
 use types_readers_wrapper, only: Readers_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
-use module_plmc_iterations, only: num_tuning_steps, num_steps
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
 use procedures_plmc_reset, only: plmc_reset
 use procedures_plmc_visit, only: plmc_visit
@@ -42,13 +41,15 @@ implicit none
     type(Writers_Wrapper) :: writers
 
     type(json_file) :: input_data
-    integer :: i_step
+    integer :: num_tuning_steps, num_steps, i_step
     logical :: changes_tuned
 
     call plmc_catch_help()
     call plmc_create(input_data, 1)
+    call plmc_set(num_tuning_steps, num_steps, input_data)
     call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, plmc_propagator, observables, readers, writers, input_data)
+        num_tuning_steps, metropolis_algorithms, plmc_propagator, observables, readers, writers, &
+        input_data)
     call plmc_set(readers%components, input_data)
     call plmc_set(metropolis_algorithms)
     call plmc_propagator%set_selector()
@@ -56,25 +57,25 @@ implicit none
 
     call plmc_reset(mixture%total_moment, short_interactions, dipolar_interactions)
     call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
-    call plmc_write(-num_tuning_steps, writers, observables)
+    call plmc_write(num_tuning_steps, num_steps, -num_tuning_steps, writers, observables)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator%try(observables)
         call plmc_set(observables)
         call plmc_set(changes_tuned, i_step, changes%components, observables%changes_sucesses)
-        call plmc_write(i_step, writers, observables)
+        call plmc_write(num_tuning_steps, num_steps, i_step, writers, observables)
         if (changes_tuned) exit
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call plmc_propagator%try(observables)
         call plmc_set(observables)
-        call plmc_write(i_step, writers, observables)
+        call plmc_write(num_tuning_steps, num_steps, i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
     call plmc_reset(mixture%total_moment, short_interactions, dipolar_interactions)
     call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
-    call plmc_write(i_step-1, writers, observables)
+    call plmc_write(num_tuning_steps, num_steps, num_steps, writers, observables)
 
     call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
         metropolis_algorithms, plmc_propagator, observables, readers, writers)

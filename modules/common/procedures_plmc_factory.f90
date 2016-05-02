@@ -20,7 +20,7 @@ use procedures_dipolar_interactions_factory, only: dipolar_interactions_create, 
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter, &
     Concrete_Switch_Counters, &
     changes_counter_reset, changes_counter_set, switches_counters_reset, switches_counters_set
-use module_plmc_iterations, only: plmc_set_num_steps
+use procedures_plmc_iterations, only: plmc_set_num_steps
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
@@ -54,6 +54,7 @@ interface plmc_destroy
 end interface plmc_destroy
 
 interface plmc_set
+    module procedure :: plmc_set_num_steps
     module procedure :: set_mixture_initial_coordinates
     module procedure :: metropolis_algorithms_set
     module procedure :: tune_change_components
@@ -63,12 +64,14 @@ end interface plmc_set
 contains
 
     subroutine create_all(environment, mixture, short_interactions, dipolar_interactions, changes, &
-        metropolis_algorithms, plmc_propagator, observables, readers, writers, input_data)
+        num_tuning_steps, metropolis_algorithms, plmc_propagator, observables, readers, writers, &
+        input_data)
         type(Environment_Wrapper), intent(out) :: environment
         type(Mixture_Wrapper), intent(out) :: mixture
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(out) :: dipolar_interactions
         type(Changes_Wrapper), intent(out) :: changes
+        integer, intent(in) :: num_tuning_steps
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
         class(Abstract_PLMC_Propagator), allocatable, intent(out) :: plmc_propagator
         type(Observables_Wrapper), intent(out) :: observables
@@ -82,9 +85,8 @@ contains
             short_interactions_prefix)
         call dipolar_interactions_create(dipolar_interactions, environment, mixture, input_data, &
             dipolar_interactions_prefix)
-        call plmc_set_num_steps(input_data)
-        call changes_create(changes, environment%periodic_box, mixture%components, input_data, &
-            changes_prefix)
+        call changes_create(changes, environment%periodic_box, mixture%components, &
+            num_tuning_steps, input_data, changes_prefix)
         call metropolis_algorithms_create(metropolis_algorithms, environment, mixture, &
             short_interactions, dipolar_interactions, changes%components)
         call plmc_propagator_create(plmc_propagator, metropolis_algorithms)

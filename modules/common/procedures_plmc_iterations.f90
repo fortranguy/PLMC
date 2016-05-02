@@ -1,4 +1,4 @@
-module module_plmc_iterations
+module procedures_plmc_iterations
 
 use json_module, only: json_file
 use data_prefixes, only: changes_prefix
@@ -7,14 +7,13 @@ use procedures_checks, only: check_data_found, check_positive
 implicit none
 
 private
-public :: num_tuning_steps, num_steps, plmc_set_num_steps
-
-    integer, protected :: num_tuning_steps = 0, num_steps = 0
+public :: plmc_set_num_steps
 
 contains
 
-    subroutine plmc_set_num_steps(input_data)
+    subroutine plmc_set_num_steps(num_tuning_steps, num_steps, input_data)
         type(json_file), intent(inout) :: input_data
+        integer, intent(out) :: num_tuning_steps, num_steps
 
         character(len=:), allocatable :: data_field
         logical :: data_found
@@ -29,4 +28,4 @@ contains
         call check_positive("plmc_set_num_steps", "num_steps", num_steps)
     end subroutine plmc_set_num_steps
 
-end module module_plmc_iterations
+end module procedures_plmc_iterations

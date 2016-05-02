@@ -3,7 +3,6 @@ module classes_change_tuner
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_positive, check_ratio
-use module_plmc_iterations, only: num_tuning_steps
 use classes_changed_coordinates, only: Abstract_Changed_Coordinates
 use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters
 
@@ -38,10 +37,11 @@ contains
 
 !implementation Abstract_Change_Tuner
 
-    subroutine Abstract_construct(this, changed_coordinates, parameters)
+    subroutine Abstract_construct(this, changed_coordinates, parameters, num_tuning_steps)
         class(Abstract_Change_Tuner), intent(out) :: this
         class(Abstract_Changed_Coordinates), target, intent(in) :: changed_coordinates
         type(Concrete_Change_Tuner_Parameters), intent(in) :: parameters
+        integer, intent(in) :: num_tuning_steps
 
         this%changed_coordinates => changed_coordinates
         call check_positive("Abstract_Change_Tuner: construct", "parameters%accumulation_period", &
@@ -95,10 +95,11 @@ contains
 
 !implementation Null_Change_Tuner
 
-    subroutine Null_construct(this, changed_coordinates, parameters)
+    subroutine Null_construct(this, changed_coordinates, parameters, num_tuning_steps)
         class(Null_Change_Tuner), intent(out) :: this
         class(Abstract_Changed_Coordinates), target, intent(in) :: changed_coordinates
         type(Concrete_Change_Tuner_Parameters), intent(in) :: parameters
+        integer, intent(in) :: num_tuning_steps
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

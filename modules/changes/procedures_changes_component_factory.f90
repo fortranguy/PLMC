@@ -21,23 +21,24 @@ public :: changes_component_create, changes_component_destroy
 contains
 
     subroutine changes_component_create(component, periodic_box, mixture_component, &
-        tuning_parameters, tuner_parameters, input_data, prefix)
+        tuning_parameters, tuner_parameters, num_tuning_steps, input_data, prefix)
         type(Changes_Component_Wrapper), intent(out) :: component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: mixture_component
         type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         type(Concrete_Change_Tuner_Parameters), intent(in) :: tuner_parameters
+        integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call changed_coordinates_create(component%moved_positions, periodic_box, mixture_component%&
             positions, tuning_parameters, input_data, prefix)
         call change_tuner_create_move(component%move_tuner, component%moved_positions, &
-            tuner_parameters)
+            tuner_parameters, num_tuning_steps)
         call changed_coordinates_create(component%rotated_orientations, mixture_component%&
             orientations, tuning_parameters, input_data, prefix)
         call change_tuner_create_rotation(component%rotation_tuner, component%&
-            rotated_orientations, tuner_parameters)
+            rotated_orientations, tuner_parameters, num_tuning_steps)
         call component_exchange_create(component%exchange, mixture_component)
     end subroutine changes_component_create
 
