@@ -50,7 +50,7 @@ implicit none
     call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
         metropolis_algorithms, plmc_propagator, observables, readers, writers, input_data)
     call plmc_set(readers%components, input_data)
-    call plmc_set(metropolis_algorithms, mixture%components, changes%components)
+    call plmc_set(metropolis_algorithms, mixture%components)
     call plmc_propagator%set_selector()
     call plmc_destroy(input_data)
 

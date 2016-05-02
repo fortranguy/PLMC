@@ -14,7 +14,7 @@ use procedures_property_inquirers, only: component_can_move, component_can_rotat
 implicit none
 
 private
-public :: create_move, create_rotation, destroy, set_move, set_rotation
+public :: create_move, create_rotation, destroy
 
 contains
 
@@ -27,25 +27,25 @@ contains
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
-        logical :: some_components_can_move
+        class(Abstract_Tower_Sampler), allocatable :: selector_mold
+        logical :: can_move(size(change_components))
         integer :: i_component
 
-        some_components_can_move = .false.
-        do i_component = 1, size(change_components)
-            if (component_can_move(change_components(i_component)%moved_positions)) then
-                some_components_can_move = .true.
-                exit
-            end if
+        do i_component = 1, size(can_move)
+            can_move(i_component) = component_can_move(change_components(i_component)%&
+                moved_positions)
         end do
 
-        if (some_components_can_move) then
+        if (any(can_move)) then
+            allocate(Concrete_Tower_Sampler :: selector_mold)
             allocate(Concrete_One_Particle_Move :: one_particle_move)
         else
+            allocate(Null_Tower_Sampler :: selector_mold)
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
 
         call one_particle_move%construct(environment, mixture, short_interactions, &
-            dipolar_interactions, change_components)
+            dipolar_interactions, change_components, can_move, selector_mold)
     end subroutine create_move
 
     subroutine create_rotation(one_particle_rotation, environment, mixture, short_interactions, &
@@ -53,29 +53,29 @@ contains
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
-        logical :: some_components_can_rotate
+        class(Abstract_Tower_Sampler), allocatable :: selector_mold
+        logical :: can_rotate(size(change_components))
         integer :: i_component
 
-        some_components_can_rotate = .false.
-        do i_component = 1, size(change_components)
-            if (component_can_rotate(change_components(i_component)%rotated_orientations)) then
-                some_components_can_rotate = .true.
-                exit
-            end if
+        do i_component = 1, size(can_rotate)
+            can_rotate(i_component) = component_can_rotate(change_components(i_component)%&
+                rotated_orientations)
         end do
 
-        if (some_components_can_rotate) then
+        if (any(can_rotate)) then
+            allocate(Concrete_Tower_Sampler :: selector_mold)
             allocate(Concrete_One_Particle_Rotation :: one_particle_rotation)
         else
+            allocate(Null_Tower_Sampler :: selector_mold)
             allocate(Null_One_Particle_Change :: one_particle_rotation)
         end if
 
         call one_particle_rotation%construct(environment, mixture, short_interactions, &
-            dipolar_interactions, change_components)
+            dipolar_interactions, change_components, can_rotate, selector_mold)
     end subroutine create_rotation
 
     subroutine destroy(one_particle_change)
@@ -86,56 +86,5 @@ contains
             deallocate(one_particle_change)
         end if
     end subroutine destroy
-
-    subroutine set_move(one_particle_move, components, change_components)
-        class(Abstract_One_Particle_Change), intent(inout) :: one_particle_move
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
-
-        integer :: nums_candidates(size(components)), i_component
-
-        do i_component = 1, size(nums_candidates)
-            if (component_can_move(change_components(i_component)%moved_positions)) then
-                nums_candidates(i_component) = components(i_component)%average_number%get()
-            else
-                nums_candidates(i_component) = 0
-            end if
-        end do
-        call set_selector(one_particle_move, nums_candidates)
-    end subroutine set_move
-
-    subroutine set_rotation(one_particle_rotation, components, change_components)
-        class(Abstract_One_Particle_Change), intent(inout) :: one_particle_rotation
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Changes_Component_Wrapper), intent(in) :: change_components(:)
-
-        integer :: nums_candidates(size(components)), i_component
-
-        do i_component = 1, size(nums_candidates)
-            if (component_can_rotate(change_components(i_component)%rotated_orientations)) then
-                nums_candidates(i_component) = components(i_component)%average_number%get()
-            else
-                nums_candidates(i_component) = 0
-            end if
-        end do
-        call set_selector(one_particle_rotation, nums_candidates)
-    end subroutine set_rotation
-
-    subroutine set_selector(one_particle_change, nums_candidates)
-        class(Abstract_One_Particle_Change), intent(inout) :: one_particle_change
-        integer, intent(in) :: nums_candidates(:)
-
-        class(Abstract_Tower_Sampler), allocatable :: selector
-
-        if (any(nums_candidates /= 0)) then
-            allocate(Concrete_Tower_Sampler :: selector)
-        else
-            allocate(Null_Tower_Sampler :: selector)
-        end if
-
-        call selector%construct(nums_candidates)
-        call one_particle_change%set_selector(selector)
-        call selector%destroy()
-    end subroutine set_selector
 
 end module procedures_one_particle_change_factory
