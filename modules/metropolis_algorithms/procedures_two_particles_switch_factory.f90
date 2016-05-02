@@ -13,7 +13,7 @@ use classes_two_particles_switch, only: Abstract_Two_Particles_Switch, &
 implicit none
 
 private
-public :: create, destroy, set
+public :: create, destroy
 
 contains
 
@@ -25,14 +25,23 @@ contains
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
+        class(Abstract_Hetero_Couples), allocatable :: couples
+        class(Abstract_Tower_Sampler), allocatable :: selector_mold
+
         if (size(components) > 1) then
+            allocate(Concrete_Hetero_Couples :: couples)
+            allocate(Concrete_Tower_Sampler :: selector_mold)
             allocate(Concrete_Two_Particles_Switch :: two_particles_switch)
         else
+            allocate(Null_Hetero_Couples :: couples)
+            allocate(Null_Tower_Sampler :: selector_mold)
             allocate(Null_Two_Particles_Switch :: two_particles_switch)
         end if
 
+        call couples%construct(size(components))
         call two_particles_switch%construct(environment, components, short_interactions, &
-            dipolar_interactions)
+            dipolar_interactions, couples, selector_mold)
+        call couples%destroy()
     end subroutine create
 
     subroutine destroy(two_particles_switch)
@@ -43,38 +52,5 @@ contains
             deallocate(two_particles_switch)
         end if
     end subroutine destroy
-
-    subroutine set(two_particles_switch, components)
-        class(Abstract_Two_Particles_Switch), intent(inout) :: two_particles_switch
-        type(Component_Wrapper), intent(in) :: components(:)
-
-        class(Abstract_Hetero_Couples), allocatable :: couples
-        class(Abstract_Tower_Sampler), allocatable :: selector
-
-        integer, allocatable :: nums_candidates(:)
-        integer :: i_candidate, ij_couple(2)
-
-        if (size(components) > 1) then
-            allocate(Concrete_Hetero_Couples :: couples)
-            allocate(Concrete_Tower_Sampler :: selector)
-        else
-            allocate(Null_Hetero_Couples :: couples)
-            allocate(Null_Tower_Sampler :: selector)
-        end if
-        call couples%construct(size(components))
-
-        allocate(nums_candidates(couples%get_num_indices()))
-        do i_candidate = 1, size(nums_candidates)
-            ij_couple = couples%get(i_candidate)
-            nums_candidates(i_candidate) = minval([components(ij_couple(1))%average_number%get(), &
-                components(ij_couple(2))%average_number%get()])
-                !What is the best compromise: minval, maxval, average?
-        end do
-        call selector%construct(nums_candidates)
-
-        call two_particles_switch%set_couples_and_selector(couples, selector)
-        call selector%destroy()
-        call couples%destroy()
-    end subroutine set
 
 end module procedures_two_particles_switch_factory

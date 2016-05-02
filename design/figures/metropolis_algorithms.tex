@@ -20,9 +20,10 @@
                 \operation{\procedure{construct}{environment: \type{Environment},
                     mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
                     dipolarInteractions: \type{DipolarInteractions},
-                    changes: \type{ChangesComponent[:]}}}
+                    changes: \type{ChangesComponent[:]}, canChange: \type{bool[:]},
+                    selectorMold: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setSelector}{selector: \type{TowerSampler}}}
+                \operation{\procedure{setSelector}{}}
             \end{abstractclass}
         \end{scope}
 
@@ -31,10 +32,10 @@
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
                     components: \type{Component[:]}, shortInteractions: \type{ShortInteractions},
-                    dipolarInteractions: \type{DipolarInteractions}}}
+                    dipolarInteractions: \type{DipolarInteractions},
+                    couples: \type{HeteroCouples}, selectorMold: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setCouplesAndSelector}{couples: \type{HeteroCouples},
-                    selector: \type{TowerSampler}}}
+                \operation{\procedure{setSelector}{}}
             \end{abstractclass}
         \end{scope}
 

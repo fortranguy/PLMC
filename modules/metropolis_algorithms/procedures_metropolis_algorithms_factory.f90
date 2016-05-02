@@ -9,7 +9,7 @@ use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_one_particle_change_factory, only: one_particle_move_create => create_move, &
     one_particle_rotation_create => create_rotation, one_particle_change_destroy => destroy
 use procedures_two_particles_switch_factory, only: two_particles_switch_create => create, &
-    two_particles_switch_destroy => destroy, two_particles_switch_set => set
+    two_particles_switch_destroy => destroy
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 
 implicit none
@@ -44,14 +44,12 @@ contains
         call one_particle_change_destroy(metropolis_algorithms%one_particle_move)
     end subroutine metropolis_algorithms_destroy
 
-    subroutine metropolis_algorithms_set(metropolis_algorithms, components)
+    subroutine metropolis_algorithms_set(metropolis_algorithms)
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
-        type(Component_Wrapper), intent(in) :: components(:)
 
         call metropolis_algorithms%one_particle_move%set_selector()
         call metropolis_algorithms%one_particle_rotation%set_selector()
-
-        call two_particles_switch_set(metropolis_algorithms%two_particles_switch, components)
+        call metropolis_algorithms%two_particles_switch%set_selector()
     end subroutine metropolis_algorithms_set
 
 end module procedures_metropolis_algorithms_factory

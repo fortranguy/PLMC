@@ -31,7 +31,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: set_couples_and_selector => Abstract_set_couples_and_selector
+        procedure :: set_selector => Abstract_set_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: test_metropolis => Abstract_test_metropolis
@@ -51,7 +51,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: set_couples_and_selector => Null_set_couples_and_selector
+        procedure :: set_selector => Null_set_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
         procedure, private :: test_metropolis => Null_test_metropolis
@@ -68,17 +68,21 @@ contains
 !implementation Abstract_Two_Particles_Switch
 
     subroutine Abstract_construct(this, environment, components, short_interactions, &
-        dipolar_interactions)
+        dipolar_interactions, couples, selector_mold)
         class(Abstract_Two_Particles_Switch), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        class(Abstract_Hetero_Couples), intent(in) :: couples
+        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
 
         this%environment => environment
         this%components => components
         this%short_interactions => short_interactions
         this%dipolar_interactions => dipolar_interactions
+        allocate(this%couples, source=couples)
+        allocate(this%selector, mold=selector_mold)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -98,14 +102,20 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_set_couples_and_selector(this, couples, selector)
+    subroutine Abstract_set_selector(this)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
-        class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Tower_Sampler), intent(in) :: selector
 
-        allocate(this%couples, source=couples)
-        allocate(this%selector, source=selector)
-    end subroutine Abstract_set_couples_and_selector
+        integer :: nums_candidates(this%couples%get_num_indices())
+        integer :: i_candidate, ij_couple(2)
+
+        do i_candidate = 1, size(nums_candidates)
+            ij_couple = this%couples%get(i_candidate)
+            nums_candidates(i_candidate) = minval([this%components(ij_couple(1))%average_number%&
+                get(), this%components(ij_couple(2))%average_number%get()])
+                !What is the best compromise: minval(), maxval() or average()?
+        end do
+        call this%selector%construct(nums_candidates)
+    end subroutine Abstract_set_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
@@ -322,23 +332,23 @@ contains
 !implementation Null_Two_Particles_Switch
 
     subroutine Null_construct(this, environment, components, short_interactions, &
-        dipolar_interactions)
+        dipolar_interactions, couples, selector_mold)
         class(Null_Two_Particles_Switch), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        class(Abstract_Hetero_Couples), intent(in) :: couples
+        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Two_Particles_Switch), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_set_couples_and_selector(this, couples, selector)
+    subroutine Null_set_selector(this)
         class(Null_Two_Particles_Switch), intent(inout) :: this
-        class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Tower_Sampler), intent(in) :: selector
-    end subroutine Null_set_couples_and_selector
+    end subroutine Null_set_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Two_Particles_Switch), intent(in) :: this
