@@ -19,8 +19,8 @@ use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use types_reals_line, only: Reals_Line
-use types_observables_wrapper, only: Observables_Wrapper
-use procedures_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
+use types_observables_wrapper, only: Generating_Observables_Wrapper
+use procedures_generating_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
 use procedures_triangle_observables, only: triangle_observables_init, &
     triangle_observables_add
 
@@ -41,7 +41,7 @@ contains
 
     subroutine visit_all(observables, environment, mixture, short_interactions, &
         dipolar_interactions)
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions

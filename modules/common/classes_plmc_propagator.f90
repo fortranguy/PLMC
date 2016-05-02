@@ -3,7 +3,7 @@ module classes_plmc_propagator
 use classes_tower_sampler, only: Concrete_Tower_Sampler
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer, &
     Metropolis_Algorithms_Wrapper
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
 
@@ -66,7 +66,7 @@ contains
 
     subroutine Abstract_try(this, observables)
         class(Abstract_PLMC_Propagator), intent(in) :: this
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         integer :: i_choice, i_random
 
@@ -95,7 +95,7 @@ contains
 
     subroutine Null_try(this, observables)
         class(Null_PLMC_Propagator), intent(in) :: this
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
 
 !end implementation Null_PLMC_Propagator

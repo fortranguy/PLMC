@@ -3,10 +3,7 @@ module procedures_two_particles_switch_factory
 use classes_hetero_couples, only: Abstract_Hetero_Couples, Null_Hetero_Couples, &
     Concrete_Hetero_Couples
 use classes_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
-use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_two_particles_switch, only: Abstract_Two_Particles_Switch, &
     Concrete_Two_Particles_Switch, Null_Two_Particles_Switch
 
@@ -17,18 +14,14 @@ public :: create, destroy
 
 contains
 
-    subroutine create(two_particles_switch, environment, components, short_interactions, &
-        dipolar_interactions)
+    subroutine create(two_particles_switch, physical_model)
         class(Abstract_Two_Particles_Switch), allocatable, intent(out) :: two_particles_switch
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
 
         class(Abstract_Hetero_Couples), allocatable :: couples
         class(Abstract_Tower_Sampler), allocatable :: selector_mold
 
-        if (size(components) > 1) then
+        if (size(physical_model%mixture%components) > 1) then
             allocate(Concrete_Hetero_Couples :: couples)
             allocate(Concrete_Tower_Sampler :: selector_mold)
             allocate(Concrete_Two_Particles_Switch :: two_particles_switch)
@@ -38,9 +31,10 @@ contains
             allocate(Null_Two_Particles_Switch :: two_particles_switch)
         end if
 
-        call couples%construct(size(components))
-        call two_particles_switch%construct(environment, components, short_interactions, &
-            dipolar_interactions, couples, selector_mold)
+        call couples%construct(size(physical_model%mixture%components))
+        call two_particles_switch%construct(physical_model%environment, physical_model%mixture%&
+            components, physical_model%short_interactions, physical_model%dipolar_interactions, &
+            couples, selector_mold)
         call couples%destroy()
     end subroutine create
 

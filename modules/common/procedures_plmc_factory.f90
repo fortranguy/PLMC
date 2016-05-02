@@ -1,38 +1,38 @@
 module procedures_plmc_factory
 
 use, intrinsic :: iso_fortran_env, only: error_unit
-use data_prefixes, only:environment_prefix, mixture_prefix, changes_prefix, &
-    short_interactions_prefix, dipolar_interactions_prefix, writers_prefix
+use data_prefixes, only:environment_prefix, mixture_prefix, short_interactions_prefix, &
+    dipolar_interactions_prefix, changes_prefix, writers_prefix
 use json_module, only: json_file
 use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_factory, only: environment_create, environment_destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_mixture_factory, only: mixture_create, mixture_destroy, &
-    mixture_set_initial_coordinates
+
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use procedures_physical_model_factory, only: physical_model_create => create, &
+    physical_model_destroy => destroy
+use types_markov_chain_generator_wrapper, only: Markov_Chain_Generator_Wrapper
+use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_set
+use procedures_markov_chain_generator_factory, only: markov_chain_generator_create => create, &
+    markov_chain_generator_destroy => destroy
+
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_short_interactions_factory, only: short_interactions_create, &
-    short_interactions_destroy
+
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
-use procedures_dipolar_interactions_factory, only: dipolar_interactions_create, &
-    dipolar_interactions_destroy
+
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter, &
     Concrete_Switch_Counters, &
     changes_counter_reset, changes_counter_set, switches_counters_reset, switches_counters_set
 use procedures_plmc_iterations, only: plmc_set_num_steps
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_changes_factory, only: changes_create, changes_destroy
-use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, &
-    metropolis_algorithms_set, metropolis_algorithms_destroy
+
 use classes_plmc_propagator, only: Abstract_PLMC_Propagator
-use procedures_plmc_propagator_factory, only: plmc_propagator_create => create, &
-    plmc_propagator_destroy => destroy
-use types_observables_wrapper, only: Observables_Wrapper
-use procedures_observables_factory, only: observables_create, observables_destroy
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper, Readers_Wrapper
-use procedures_readers_factory, only: readers_create, readers_destroy
+use procedures_readers_factory, only: readers_create, readers_destroy, &
+    readers_set_initial_coordinates
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper, &
@@ -44,6 +44,8 @@ private
 public :: plmc_create, plmc_destroy, plmc_set
 
 interface plmc_create
+    module procedure :: physical_model_create
+    module procedure :: markov_chain_generator_create
     module procedure :: create_all
     module procedure :: create_input_data
 end interface plmc_create
@@ -51,6 +53,8 @@ end interface plmc_create
 interface plmc_destroy
     module procedure :: destroy_input_data
     module procedure :: destroy_all
+    module procedure :: markov_chain_generator_destroy
+    module procedure :: physical_model_destroy
 end interface plmc_destroy
 
 interface plmc_set
@@ -74,23 +78,11 @@ contains
         integer, intent(in) :: num_tuning_steps
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
         class(Abstract_PLMC_Propagator), allocatable, intent(out) :: plmc_propagator
-        type(Observables_Wrapper), intent(out) :: observables
+        type(Generating_Observables_Wrapper), intent(out) :: observables
         type(Readers_Wrapper), intent(out) :: readers
         type(Writers_Wrapper), intent(out) :: writers
         type(json_file), intent(inout) :: input_data
 
-        call environment_create(environment, input_data, environment_prefix)
-        call mixture_create(mixture, environment, input_data, mixture_prefix)
-        call short_interactions_create(short_interactions, environment, mixture, input_data, &
-            short_interactions_prefix)
-        call dipolar_interactions_create(dipolar_interactions, environment, mixture, input_data, &
-            dipolar_interactions_prefix)
-        call changes_create(changes, environment%periodic_box, mixture%components, &
-            num_tuning_steps, input_data, changes_prefix)
-        call metropolis_algorithms_create(metropolis_algorithms, environment, mixture, &
-            short_interactions, dipolar_interactions, changes%components)
-        call plmc_propagator_create(plmc_propagator, metropolis_algorithms)
-        call observables_create(observables, mixture%components)
         call readers_create(readers, environment%periodic_box, mixture%components)
         call writers_create(writers, environment, short_interactions%wall_pairs, mixture%&
             components, changes%components, short_interactions%components_pairs, input_data, &
@@ -106,20 +98,12 @@ contains
         type(Changes_Wrapper), intent(inout) :: changes
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
         class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: plmc_propagator
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
         type(Readers_Wrapper), intent(inout) :: readers
         type(Writers_Wrapper), intent(inout) :: writers
 
         call writers_destroy(writers)
         call readers_destroy(readers)
-        call observables_destroy(observables)
-        call plmc_propagator_destroy(plmc_propagator)
-        call metropolis_algorithms_destroy(metropolis_algorithms)
-        call changes_destroy(changes)
-        call dipolar_interactions_destroy(dipolar_interactions)
-        call short_interactions_destroy(short_interactions)
-        call mixture_destroy(mixture)
-        call environment_destroy(environment)
     end subroutine destroy_all
 
     subroutine create_input_data(input_data, i_argument)
@@ -160,7 +144,7 @@ contains
     end subroutine tune_change_components
 
     subroutine set_success_and_reset_counter(observables)
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         call changes_counter_set(observables%changes_sucesses, observables%changes_counters)
         call changes_counter_reset(observables%changes_counters)
@@ -173,7 +157,7 @@ contains
         type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
         type(json_file), intent(inout) :: input_data
 
-        call mixture_set_initial_coordinates(components_readers, input_data, mixture_prefix)
+        call readers_set_initial_coordinates(components_readers, input_data, mixture_prefix)
     end subroutine set_mixture_initial_coordinates
 
 end module procedures_plmc_factory

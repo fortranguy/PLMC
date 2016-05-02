@@ -12,7 +12,7 @@ use classes_tower_sampler, only: Abstract_Tower_Sampler
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use module_changes_success, only: Concrete_Switch_Counters
 use types_temporary_observables, only: Concrete_Double_Delta_Energies
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
@@ -125,7 +125,7 @@ contains
 
     subroutine Abstract_try(this, observables)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
         type(Concrete_Double_Delta_Energies) :: deltas
@@ -357,7 +357,7 @@ contains
 
     subroutine Null_try(this, observables)
         class(Null_Two_Particles_Switch), intent(in) :: this
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
 
     subroutine Null_test_metropolis(this, success, deltas, ij_actors)

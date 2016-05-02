@@ -5,6 +5,8 @@ use json_module, only: json_file
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_markov_chain_generator_wrapper, only: Markov_Chain_Generator_Wrapper
 use types_input_output_wrapper, only: Input_Output_Wrapper
+use procedures_generating_observables_factory, only: observables_create => create, &
+    observables_destroy => destroy
 
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
@@ -13,7 +15,7 @@ use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 use classes_plmc_propagator, only: Abstract_PLMC_Propagator
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 use types_readers_wrapper, only: Readers_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
@@ -24,9 +26,9 @@ use procedures_plmc_help, only: plmc_catch_help
 
 implicit none
 
-    type(Physical_Model_Wrapper) :: physics
-    type(Markov_Chain_Generator_Wrapper) :: markov_chain
-    type(Observables_Wrapper) :: observables
+    type(Physical_Model_Wrapper) :: physical_model
+    type(Markov_Chain_Generator_Wrapper) :: markov_chain_generator
+    type(Generating_Observables_Wrapper) :: observables
     type(Input_Output_Wrapper) :: io
 
     type(Environment_Wrapper) :: environment
@@ -45,8 +47,13 @@ implicit none
     logical :: changes_tuned
 
     call plmc_catch_help()
-    call plmc_create(input_data, 1)
-    call plmc_set(num_tuning_steps, num_steps, input_data)
+    call plmc_create(io%input_data, 1)
+    call plmc_create(physical_model, io%input_data)
+    call plmc_set(num_tuning_steps, num_steps, io%input_data)
+    call plmc_create(markov_chain_generator, physical_model, num_tuning_steps, input_data)
+    call observables_create(observables, physical_model%mixture%components)
+    call plmc_destroy(io%input_data)
+
     call plmc_create(environment, mixture, short_interactions, dipolar_interactions, changes, &
         num_tuning_steps, metropolis_algorithms, plmc_propagator, observables, readers, writers, &
         input_data)
@@ -79,5 +86,9 @@ implicit none
 
     call plmc_destroy(environment, mixture, short_interactions, dipolar_interactions, changes, &
         metropolis_algorithms, plmc_propagator, observables, readers, writers)
+
+    call observables_destroy(observables)
+    call plmc_destroy(markov_chain_generator)
+    call plmc_destroy(physical_model)
 
 end program plmc

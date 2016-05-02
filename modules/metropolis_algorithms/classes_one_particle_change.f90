@@ -13,7 +13,7 @@ use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_temporary_observables, only: Concrete_Single_Delta_Energies
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
@@ -212,7 +212,7 @@ contains
 
     subroutine Abstract_try(this, observables)
         class(Abstract_One_Particle_Change), intent(in) :: this
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
         type(Concrete_Single_Delta_Energies) :: deltas
@@ -512,7 +512,7 @@ contains
 
     subroutine Null_try(this, observables)
         class(Null_One_Particle_Change), intent(in) :: this
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
 
     subroutine Null_test_metropolis(this, success, deltas, i_actor)

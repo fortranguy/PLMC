@@ -1,6 +1,6 @@
 module classes_metropolis_algorithm
 
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
 
@@ -20,9 +20,9 @@ private
         end function Abstract_get_num_choices
 
         subroutine Abstract_try(this, observables)
-        import :: Observables_Wrapper, Abstract_Metropolis_Algorithm
+        import :: Generating_Observables_Wrapper, Abstract_Metropolis_Algorithm
             class(Abstract_Metropolis_Algorithm), intent(in) :: this
-            type(Observables_Wrapper), intent(inout) :: observables
+            type(Generating_Observables_Wrapper), intent(inout) :: observables
         end subroutine Abstract_try
 
     end interface

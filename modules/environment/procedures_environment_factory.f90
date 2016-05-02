@@ -58,7 +58,7 @@ contains
         call box_create(environment%box_size_checker, environment%reciprocal_lattice, &
             environment%walls)
 
-        call environment_check(environment%periodic_box, environment%walls)
+        call check(environment%periodic_box, environment%walls)
         call environment%box_size_checker%check()
     end subroutine environment_create
 
@@ -74,16 +74,18 @@ contains
         call box_destroy(environment%periodic_box)
     end subroutine environment_destroy
 
-    subroutine environment_check(periodic_box, walls)
+    subroutine check(periodic_box, walls)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Visitable_Walls), intent(in) :: walls
 
         if (periodicity_is_xyz(periodic_box) .and. use_walls(walls)) then
-            call warning_continue("environment_check: periodicity is XYZ but walls are used.")
+            call warning_continue("procedures_environment_factory: check: "//&
+                "periodicity is XYZ but walls are used.")
         end if
         if (periodicity_is_xy(periodic_box) .and. .not.use_walls(walls)) then
-            call warning_continue("environment_check: periodicity is XY but walls are not used.")
+            call warning_continue("procedures_environment_factory: check: "//&
+                "periodicity is XY but walls are not used.")
         end if
-    end subroutine environment_check
+    end subroutine check
 
 end module procedures_environment_factory

@@ -1,12 +1,8 @@
 module procedures_one_particle_change_factory
 
 use classes_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
-use types_mixture_wrapper, only: Mixture_Wrapper
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use classes_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
 use procedures_property_inquirers, only: component_can_move, component_can_rotate
@@ -18,13 +14,9 @@ public :: create_move, create_rotation, destroy
 
 contains
 
-    subroutine create_move(one_particle_move, environment, mixture, short_interactions, &
-        dipolar_interactions, change_components)
+    subroutine create_move(one_particle_move, physical_model, change_components)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector_mold
@@ -44,17 +36,14 @@ contains
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
 
-        call one_particle_move%construct(environment, mixture, short_interactions, &
-            dipolar_interactions, change_components, can_move, selector_mold)
+        call one_particle_move%construct(physical_model%environment, physical_model%mixture, &
+            physical_model%short_interactions, physical_model%dipolar_interactions, &
+            change_components, can_move, selector_mold)
     end subroutine create_move
 
-    subroutine create_rotation(one_particle_rotation, environment, mixture, short_interactions, &
-        dipolar_interactions, change_components)
+    subroutine create_rotation(one_particle_rotation, physical_model, change_components)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector_mold
@@ -74,8 +63,9 @@ contains
             allocate(Null_One_Particle_Change :: one_particle_rotation)
         end if
 
-        call one_particle_rotation%construct(environment, mixture, short_interactions, &
-            dipolar_interactions, change_components, can_rotate, selector_mold)
+        call one_particle_rotation%construct(physical_model%environment, physical_model%mixture, &
+            physical_model%short_interactions, physical_model%dipolar_interactions, &
+            change_components, can_rotate, selector_mold)
     end subroutine create_rotation
 
     subroutine destroy(one_particle_change)

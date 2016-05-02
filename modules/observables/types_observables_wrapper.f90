@@ -9,7 +9,7 @@ implicit none
 
 private
 
-    type, public :: Observables_Wrapper
+    type, public :: Generating_Observables_Wrapper
         type(Concrete_Changes_Counter), allocatable :: changes_counters(:)
         type(Concrete_Changes_Success), allocatable :: changes_sucesses(:)
         type(Concrete_Switch_Counters), allocatable :: switches_counters(:)
@@ -17,6 +17,10 @@ private
         real(DP), allocatable :: field_energies(:), walls_energies(:)
         type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_mixture_energy = 0._DP
-    end type Observables_Wrapper
+    end type Generating_Observables_Wrapper
+
+    type, public :: Exploring_Observables_Wrapper
+
+    end type Exploring_Observables_Wrapper
 
 end module types_observables_wrapper

@@ -1,11 +1,7 @@
 module procedures_metropolis_algorithms_factory
 
-use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
-use types_mixture_wrapper, only: Mixture_Wrapper
-use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use types_changes_wrapper, only: Changes_Component_Wrapper
 use procedures_one_particle_change_factory, only: one_particle_move_create => create_move, &
     one_particle_rotation_create => create_rotation, one_particle_change_destroy => destroy
 use procedures_two_particles_switch_factory, only: two_particles_switch_create => create, &
@@ -19,21 +15,17 @@ public :: metropolis_algorithms_create, metropolis_algorithms_destroy, metropoli
 
 contains
 
-    subroutine metropolis_algorithms_create(metropolis_algorithms, environment, mixture, &
-        short_interactions, dipolar_interactions, change_components)
+    subroutine metropolis_algorithms_create(metropolis_algorithms, physical_model, &
+        change_components)
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
 
-        call one_particle_move_create(metropolis_algorithms%one_particle_move, &
-            environment, mixture, short_interactions, dipolar_interactions, change_components)
+        call one_particle_move_create(metropolis_algorithms%one_particle_move, physical_model, &
+            change_components)
         call one_particle_rotation_create(metropolis_algorithms%one_particle_rotation, &
-            environment, mixture, short_interactions, dipolar_interactions, change_components)
-        call two_particles_switch_create(metropolis_algorithms%two_particles_switch, environment, &
-            mixture%components, short_interactions, dipolar_interactions)
+            physical_model, change_components)
+        call two_particles_switch_create(metropolis_algorithms%two_particles_switch, physical_model)
     end subroutine metropolis_algorithms_create
 
     subroutine metropolis_algorithms_destroy(metropolis_algorithms)

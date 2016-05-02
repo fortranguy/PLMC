@@ -1,8 +1,8 @@
 module procedures_mixture_factory
 
 use json_module, only: json_file
-use procedures_checks, only: check_data_found, check_positive
 use classes_number_to_string, only: Concrete_Number_to_String
+use procedures_checks, only: check_data_found, check_positive
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
@@ -11,12 +11,11 @@ use procedures_hard_core_factory, only: hard_core_create => create, hard_core_de
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper
 
 implicit none
 
 private
-public :: mixture_create, mixture_destroy, mixture_set_initial_coordinates
+public :: mixture_create, mixture_destroy
 
 interface mixture_create
     module procedure :: create_all
@@ -93,23 +92,5 @@ contains
             deallocate(components)
         end if
     end subroutine destroy_components
-
-    subroutine mixture_set_initial_coordinates(components_readers, input_data, prefix)
-        type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        integer :: i_component
-        type(Concrete_Number_to_String) :: string
-        character(len=:), allocatable :: data_field, filename
-        logical :: data_found
-
-        do i_component = 1, size(components_readers)
-            data_field = prefix//"Component "//string%get(i_component)//"."//"initial coordinates"
-            call input_data%get(data_field, filename, data_found)
-            call check_data_found(data_field, data_found)
-            call components_readers(i_component)%coordinates%read(filename)
-        end do
-    end subroutine mixture_set_initial_coordinates
 
 end module procedures_mixture_factory

@@ -8,7 +8,7 @@ use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 use types_readers_wrapper, only: Readers_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
@@ -23,7 +23,7 @@ implicit none
     type(Short_Interactions_Wrapper) :: short_interactions
     type(Dipolar_Interactions_Wrapper) :: dipolar_interactions
     type(Metropolis_Algorithms_Wrapper) :: metropolis_algorithms
-    type(Observables_Wrapper) :: observables
+    type(Generating_Observables_Wrapper) :: observables
     type(Readers_Wrapper) :: readers
     type(Writers_Wrapper) :: writers
 

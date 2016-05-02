@@ -1,62 +1,62 @@
-module procedures_observables_factory
+module procedures_generating_observables_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_component_wrapper, only: Component_Wrapper
 use types_reals_line, only: Reals_Line
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
     Concrete_Switch_Counters, changes_counter_reset, switches_counters_reset
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
 
 private
-public :: observables_create, observables_destroy, create_triangle_nodes, destroy_triangle_nodes
+public :: create, destroy, create_triangle_nodes, destroy_triangle_nodes
 
-interface observables_create
+interface create
     module procedure :: create_all
     module procedure :: create_changes_counters
     module procedure :: create_switches_counters
     module procedure :: create_changes_successes
     module procedure :: create_triangle
     module procedure :: create_energies
-end interface observables_create
+end interface create
 
-interface observables_destroy
+interface destroy
     module procedure :: destroy_energies
     module procedure :: destroy_triangle
     module procedure :: destroy_changes_successes
     module procedure :: destroy_switches_counters
     module procedure :: destroy_changes_counters
     module procedure :: destroy_all
-end interface observables_destroy
+end interface destroy
 
 contains
 
     pure subroutine create_all(observables, components)
-        type(Observables_Wrapper), intent(out) :: observables
+        type(Generating_Observables_Wrapper), intent(out) :: observables
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call observables_create(observables%changes_counters, size(components))
-        call observables_create(observables%switches_counters, size(components))
-        call observables_create(observables%changes_sucesses, size(components))
-        call observables_create(observables%switches_successes, size(components))
-        call observables_create(observables%walls_energies, size(components))
-        call observables_create(observables%field_energies, size(components))
-        call observables_create(observables%short_energies, size(components))
-        call observables_create(observables%dipolar_energies, size(components))
+        call create(observables%changes_counters, size(components))
+        call create(observables%switches_counters, size(components))
+        call create(observables%changes_sucesses, size(components))
+        call create(observables%switches_successes, size(components))
+        call create(observables%walls_energies, size(components))
+        call create(observables%field_energies, size(components))
+        call create(observables%short_energies, size(components))
+        call create(observables%dipolar_energies, size(components))
     end subroutine create_all
 
     pure subroutine destroy_all(observables)
-        type(Observables_Wrapper), intent(inout) :: observables
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
 
-        call observables_destroy(observables%dipolar_energies)
-        call observables_destroy(observables%short_energies)
-        call observables_destroy(observables%field_energies)
-        call observables_destroy(observables%walls_energies)
-        call observables_destroy(observables%switches_successes)
-        call observables_destroy(observables%changes_sucesses)
-        call observables_destroy(observables%switches_counters)
-        call observables_destroy(observables%changes_counters)
+        call destroy(observables%dipolar_energies)
+        call destroy(observables%short_energies)
+        call destroy(observables%field_energies)
+        call destroy(observables%walls_energies)
+        call destroy(observables%switches_successes)
+        call destroy(observables%changes_sucesses)
+        call destroy(observables%switches_counters)
+        call destroy(observables%changes_counters)
     end subroutine destroy_all
 
     pure subroutine create_changes_counters(counters, num_components)
@@ -170,4 +170,4 @@ contains
         if (allocated(energies)) deallocate(energies)
     end subroutine destroy_energies
 
-end module procedures_observables_factory
+end module procedures_generating_observables_factory
