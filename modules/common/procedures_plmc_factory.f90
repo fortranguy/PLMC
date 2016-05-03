@@ -113,7 +113,7 @@ contains
             call change_components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
                 i_step, changes_sucesses(i_component)%rotation)
         end do
-        tuned = all(move_tuned) .and. all(rotation_tuned)
+        tuned = all(move_tuned) .and. all(rotation_tuned) ! Beware of inertia.
     end subroutine tune_change_components
 
     subroutine set_success_and_reset_counter(observables)
