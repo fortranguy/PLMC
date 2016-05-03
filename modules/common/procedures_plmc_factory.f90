@@ -19,9 +19,10 @@ use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_plmc_iterations, only: plmc_set_num_steps
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper, Readers_Wrapper
-use procedures_readers_factory, only: readers_create, readers_destroy, &
-    readers_set_initial_coordinates
+use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
+use types_generating_readers_wrapper, only: Generating_Readers_Wrapper
+use procedures_generating_readers_factory, only: generating_readers_create, &
+    generating_readers_destroy, generating_readers_set
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use procedures_generating_writers_factory, only: generating_writers_create, &
     generating_writers_destroy
@@ -49,7 +50,7 @@ end interface plmc_destroy
 
 interface plmc_set
     module procedure :: plmc_set_num_steps
-    module procedure :: set_mixture_initial_coordinates
+    module procedure :: set_mixture_coordinates
     module procedure :: markov_chain_generator_set
     module procedure :: tune_change_components
     module procedure :: set_success_and_reset_counter
@@ -58,24 +59,24 @@ end interface plmc_set
 contains
 
     subroutine create_readers_writers(readers, writers, physical_model, changes, input_data)
-        type(Readers_Wrapper), intent(out) :: readers
+        type(Generating_Readers_Wrapper), intent(out) :: readers
         type(Generating_Writers_Wrapper), intent(out) :: writers
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
-        call readers_create(readers, physical_model%mixture%components)
-        call generating_writers_create(writers, physical_model%environment, physical_model%short_interactions%&
-            wall_pairs, physical_model%mixture%components, changes%components, physical_model%&
-            short_interactions%components_pairs, input_data, writers_prefix)
+        call generating_readers_create(readers, physical_model%mixture%components)
+        call generating_writers_create(writers, physical_model%environment, physical_model%&
+            short_interactions%wall_pairs, physical_model%mixture%components, changes%components, &
+            physical_model%short_interactions%components_pairs, input_data, writers_prefix)
     end subroutine create_readers_writers
 
     subroutine destroy_readers_writers(readers, writers)
-        type(Readers_Wrapper), intent(inout) :: readers
+        type(Generating_Readers_Wrapper), intent(inout) :: readers
         type(Generating_Writers_Wrapper), intent(inout) :: writers
 
         call generating_writers_destroy(writers)
-        call readers_destroy(readers)
+        call generating_readers_destroy(readers)
     end subroutine destroy_readers_writers
 
     subroutine create_input_data(input_data, i_argument)
@@ -125,11 +126,11 @@ contains
         call switches_counters_reset(observables%switches_counters)
     end subroutine set_success_and_reset_counter
 
-    subroutine set_mixture_initial_coordinates(components_readers, input_data)
+    subroutine set_mixture_coordinates(components_readers, input_data)
         type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
         type(json_file), intent(inout) :: input_data
 
-        call readers_set_initial_coordinates(components_readers, input_data, mixture_prefix)
-    end subroutine set_mixture_initial_coordinates
+        call generating_readers_set(components_readers, input_data, mixture_prefix)
+    end subroutine set_mixture_coordinates
 
 end module procedures_plmc_factory

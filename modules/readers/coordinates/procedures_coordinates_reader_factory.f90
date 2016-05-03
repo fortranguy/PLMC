@@ -1,6 +1,6 @@
 module procedures_coordinates_reader_factory
 
-use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper
+use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
 use types_component_wrapper, only: Component_Wrapper
 use classes_component_coordinates_reader, only: Concrete_Component_Coordinates_Reader_Selector
 use procedures_component_coordinates_reader_factory, only: &
