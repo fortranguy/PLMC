@@ -15,26 +15,26 @@ public :: create, destroy
 
 contains
 
-    subroutine create(floor_penetration, input_data, prefix)
+    subroutine create(floor_penetration, generating_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_floor_penetration(floor_penetration, input_data, prefix)
-        call set_floor_penetration(floor_penetration, input_data, prefix)
+        call allocate_floor_penetration(floor_penetration, generating_data, prefix)
+        call set_floor_penetration(floor_penetration, generating_data, prefix)
     end subroutine create
 
-    subroutine allocate_floor_penetration(floor_penetration, input_data, prefix)
+    subroutine allocate_floor_penetration(floor_penetration, generating_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: walls_name, data_field
         logical :: data_found
 
-        if (use_walls(input_data, prefix)) then
+        if (use_walls(generating_data, prefix)) then
             data_field = prefix//"Walls.name"
-            call input_data%get(data_field, walls_name, data_found)
+            call generating_data%get(data_field, walls_name, data_found)
             call check_data_found(data_field, data_found)
             select case (walls_name)
                 case ("flat")
@@ -50,9 +50,9 @@ contains
         end if
     end subroutine allocate_floor_penetration
 
-    subroutine set_floor_penetration(floor_penetration, input_data, prefix)
+    subroutine set_floor_penetration(floor_penetration, generating_data, prefix)
         class(Abstract_Floor_Penetration), intent(inout) :: floor_penetration
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP), allocatable :: block_size(:)
@@ -64,10 +64,10 @@ contains
             type is (Flat_Floor_Penetration)
             type is (Centered_Block_Penetration)
                 data_field = prefix//"Walls.size"
-                call input_data%get(data_field, block_size, data_found)
+                call generating_data%get(data_field, block_size, data_found)
                 call check_data_found(data_field, data_found)
                 data_field = prefix//"Walls.radius"
-                call input_data%get(data_field, block_radius, data_found)
+                call generating_data%get(data_field, block_radius, data_found)
                 call check_data_found(data_field, data_found)
                 call floor_penetration%set(block_size, block_radius)
             type is (Null_Floor_Penetration)

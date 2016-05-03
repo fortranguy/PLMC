@@ -36,11 +36,11 @@ end interface
 
 contains
 
-    subroutine create_wall(pairs, interact, min_distances, input_data, prefix)
+    subroutine create_wall(pairs, interact, min_distances, generating_data, prefix)
         type(Pair_Potential_Wrapper), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
         type(Min_Distance_Wrapper), intent(in) :: min_distances(:)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component
@@ -55,19 +55,19 @@ contains
             associate (min_distance => min_distances(i_component)%distance, &
                 interact_i => components_interact(min_distances(i_component)%distance))
                 interact = interact .and. interact_i
-                call create(expression, interact_i, input_data, pair_prefix)
+                call create(expression, interact_i, generating_data, pair_prefix)
                 call create(pairs(i_component)%potential, min_distance, expression, interact_i, &
-                    input_data, pair_prefix)
+                    generating_data, pair_prefix)
             end associate
             call destroy(expression)
         end do
     end subroutine create_wall
 
-    subroutine create_components(pairs, interact, min_distances, input_data, prefix)
+    subroutine create_components(pairs, interact, min_distances, generating_data, prefix)
         type(Pair_Potentials_Line), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
         type(Min_Distances_Line), intent(in) :: min_distances(:)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component, j_component
@@ -90,9 +90,9 @@ contains
                 associate (min_distance => min_distances(j_component)%line(i_component)%distance)
                     interact_ij = components_interact(min_distance)
                     interact = interact .and. interact_ij
-                    call create(expression, interact_ij, input_data, pair_prefix)
+                    call create(expression, interact_ij, generating_data, pair_prefix)
                     call create(pairs(j_component)%line(i_component)%potential, min_distance, &
-                        expression, interact_ij, input_data, pair_prefix)
+                        expression, interact_ij, generating_data, pair_prefix)
                 end associate
                 call destroy(expression)
             end do

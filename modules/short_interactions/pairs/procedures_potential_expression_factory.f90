@@ -15,20 +15,20 @@ public :: create, destroy
 contains
 
 
-    subroutine create(expression, interact, input_data, prefix)
+    subroutine create(expression, interact, generating_data, prefix)
         class(Abstract_Potential_Expression), allocatable, intent(out) :: expression
         logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call allocate(expression, interact, input_data, prefix)
-        call set(expression, input_data, prefix)
+        call allocate(expression, interact, generating_data, prefix)
+        call set(expression, generating_data, prefix)
     end subroutine create
 
-    subroutine allocate(expression, interact, input_data, prefix)
+    subroutine allocate(expression, interact, generating_data, prefix)
         class(Abstract_Potential_Expression), allocatable, intent(out) :: expression
         logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field, potential_name
@@ -36,7 +36,7 @@ contains
 
         if (interact) then
             data_field = prefix//"name"
-            call input_data%get(data_field, potential_name, data_found)
+            call generating_data%get(data_field, potential_name, data_found)
             call check_data_found(data_field, data_found)
             select case (potential_name)
                 case ("null")
@@ -52,9 +52,9 @@ contains
         end if
     end subroutine allocate
 
-    subroutine set(expression, input_data, prefix)
+    subroutine set(expression, generating_data, prefix)
         class(Abstract_Potential_Expression), intent(inout) :: expression
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP) :: LJ_epsilon, LJ_sigma
@@ -64,10 +64,10 @@ contains
         select type(expression)
             type is (Lennard_Jones_Expression)
                 data_field = prefix//"epsilon"
-                call input_data%get(data_field, LJ_epsilon, data_found)
+                call generating_data%get(data_field, LJ_epsilon, data_found)
                 call check_data_found(data_field, data_found)
                 data_field = prefix//"sigma"
-                call input_data%get(data_field, LJ_sigma, data_found)
+                call generating_data%get(data_field, LJ_sigma, data_found)
                 call check_data_found(data_field, data_found)
                 call expression%set(LJ_epsilon, LJ_sigma)
             type is (Null_Potential_Expression)

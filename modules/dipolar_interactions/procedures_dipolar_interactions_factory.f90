@@ -26,12 +26,12 @@ public :: dipolar_interactions_create, dipolar_interactions_destroy
 
 contains
 
-    subroutine dipolar_interactions_create(dipolar_interactions, environment, mixture, input_data, &
-        prefix)
+    subroutine dipolar_interactions_create(dipolar_interactions, environment, mixture, &
+        generating_data, prefix)
         type(Dipolar_Interactions_Wrapper), intent(out) :: dipolar_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         logical :: are_dipolar(size(mixture%components))
@@ -40,13 +40,13 @@ contains
         call check_consistency(environment%reciprocal_lattice, environment%permittivity, &
             any(are_dipolar))
         call des_convergence_parameter_create(dipolar_interactions%alpha, environment%periodic_box,&
-            any(are_dipolar), input_data, prefix)
+            any(are_dipolar), generating_data, prefix)
 
         call des_real_create(dipolar_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
         call des_real_create(dipolar_interactions%real_pair, environment%permittivity, mixture%&
-            components_min_distances, any(are_dipolar), dipolar_interactions%alpha, input_data, &
-            prefix//"Real.")
+            components_min_distances, any(are_dipolar), dipolar_interactions%alpha, &
+            generating_data, prefix//"Real.")
         call des_real_create(dipolar_interactions%real_components, environment%periodic_box, &
             mixture%components, are_dipolar, dipolar_interactions%real_pair)
 

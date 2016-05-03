@@ -19,7 +19,7 @@ use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 use procedures_property_inquirers, only: periodicity_is_xyz
-use types_radial_distribution, only: Concrete_Radial_Distribution_Component
+use types_radial_distribution_component, only: Concrete_Radial_Distribution_Component
 
 implicit none
 
@@ -35,35 +35,35 @@ implicit none
     integer :: bins_unit
     character(len=:), allocatable :: bins_filename
 
-    type(json_file) :: input_data, post_data
+    type(json_file) :: generating_data, exploring_data
     character(len=:), allocatable :: data_field
     logical :: data_found
 
-    call plmc_create(input_data, command_argument_count() - 1)
+    call plmc_create(generating_data, command_argument_count() - 1)
     data_field = "Output.Coordinates.write"
-    call input_data%get(data_field, coordinates_written, data_found)
+    call generating_data%get(data_field, coordinates_written, data_found)
     call check_data_found(data_field, data_found)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
     num_snaps = command_argument_count() - 2
     if (mod(num_snaps, 2) /= 0) call error_exit("Number of snap shots must be even.")
     num_snaps = num_snaps / 2
-    call box_create(periodic_box, input_data, environment_prefix)
+    call box_create(periodic_box, generating_data, environment_prefix)
     if (.not.periodicity_is_xyz(periodic_box)) then
         call warning_continue("Periodicity is not XYZ.")
     end if
-    call plmc_destroy(input_data)
+    call plmc_destroy(generating_data)
     max_distance = minval(periodic_box%get_size())/2._DP
 
-    call plmc_create(post_data, command_argument_count())
+    call plmc_create(exploring_data, command_argument_count())
     data_field = "Distribution.delta"
-    call post_data%get(data_field, delta_distance, data_found)
+    call exploring_data%get(data_field, delta_distance, data_found)
     call check_data_found(data_field, data_found)
     call check_positive("radial_distribution", "delta_distance", delta_distance)
     data_field = "Distribution.file name"
-    call post_data%get(data_field, bins_filename, data_found)
+    call exploring_data%get(data_field, bins_filename, data_found)
     call check_data_found(data_field, data_found)
     call check_string_not_empty(data_field, bins_filename)
-    call plmc_destroy(post_data)
+    call plmc_destroy(exploring_data)
     deallocate(data_field)
 
     allocate(bins_snap(nint(max_distance/delta_distance)))

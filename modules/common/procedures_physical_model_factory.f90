@@ -18,17 +18,17 @@ public :: create, destroy
 
 contains
 
-    subroutine create(physical_model, input_data)
+    subroutine create(physical_model, generating_data)
         type(Physical_Model_Wrapper), intent(out) :: physical_model
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
 
-        call environment_create(physical_model%environment, input_data, environment_prefix)
-        call mixture_create(physical_model%mixture, physical_model%environment, input_data, &
+        call environment_create(physical_model%environment, generating_data, environment_prefix)
+        call mixture_create(physical_model%mixture, physical_model%environment, generating_data, &
             mixture_prefix)
         call short_interactions_create(physical_model%short_interactions, physical_model%&
-            environment, physical_model%mixture, input_data, short_interactions_prefix)
+            environment, physical_model%mixture, generating_data, short_interactions_prefix)
         call dipolar_interactions_create(physical_model%dipolar_interactions, physical_model%&
-            environment, physical_model%mixture, input_data, dipolar_interactions_prefix)
+            environment, physical_model%mixture, generating_data, dipolar_interactions_prefix)
     end subroutine create
 
     subroutine destroy(physical_model)

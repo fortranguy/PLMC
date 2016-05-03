@@ -14,19 +14,19 @@ public :: create, destroy
 
 contains
 
-    subroutine create(reciprocal_lattice, periodic_box, input_data, prefix)
+    subroutine create(reciprocal_lattice, periodic_box, generating_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         integer, allocatable :: numbers(:)
 
-        if (use_reciprocal_lattice(input_data, prefix)) then
+        if (use_reciprocal_lattice(generating_data, prefix)) then
             data_field = prefix//"Reciprocal Lattice.numbers"
-            call input_data%get(data_field, numbers, data_found)
+            call generating_data%get(data_field, numbers, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Reciprocal_Lattice :: reciprocal_lattice)
         else

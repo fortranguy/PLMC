@@ -13,18 +13,18 @@ public :: create, destroy
 
 contains
 
-    subroutine create(permittivity, input_data, prefix)
+    subroutine create(permittivity, generating_data, prefix)
         class(Abstract_Permittivity), allocatable, intent(out) :: permittivity
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         real(DP) :: permittivity_value
 
-        if (use_permittivity(input_data, prefix)) then
+        if (use_permittivity(generating_data, prefix)) then
             data_field = prefix//"Permittivity.value"
-            call input_data%get(data_field, permittivity_value, data_found)
+            call generating_data%get(data_field, permittivity_value, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Permittivity :: permittivity)
         else

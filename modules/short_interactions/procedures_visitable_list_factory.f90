@@ -13,10 +13,10 @@ public :: allocate, deallocate
 
 contains
 
-    subroutine allocate(list, interact, input_data, prefix)
+    subroutine allocate(list, interact, generating_data, prefix)
         class(Abstract_Visitable_List), allocatable, intent(out) :: list
         logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field, cells_data_structure
@@ -24,7 +24,7 @@ contains
 
         if (interact) then
             data_field = prefix//"Cells.data structure"
-            call input_data%get(data_field, cells_data_structure, data_found)
+            call generating_data%get(data_field, cells_data_structure, data_found)
             call check_data_found(data_field, data_found)
             select case (cells_data_structure)
                 case ("list")

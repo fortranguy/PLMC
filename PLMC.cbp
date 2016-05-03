@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="ifort" />
 		<Build>
-			<Target title="plmc">
+			<Target title="plmc_generate">
 				<Option output="bin/Debug/plmc" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin/Debug" />
 				<Option object_output="obj/Debug/" />
@@ -88,22 +88,6 @@
 			</Target>
 			<Target title="radial_intra">
 				<Option output="bin/Debug/plmc_radial_distribution_intra" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin/Debug" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="ifclin" />
-				<Option use_console_runner="0" />
-				<Compiler>
-					<Add option="-warn all" />
-					<Add directory="/home/salomon/usr/local/jsonfortran-intel-4.3.0/lib" />
-				</Compiler>
-				<Linker>
-					<Add library="/home/salomon/usr/local/jsonfortran-intel-4.3.0/lib/libjsonfortran.a" />
-					<Add library="/home/salomon/usr/local/jsonfortran-intel-4.3.0/lib/libjsonfortran.so" />
-				</Linker>
-			</Target>
-			<Target title="widom">
-				<Option output="bin/Debug/plmc" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin/Debug" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
@@ -222,13 +206,16 @@
 			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_write.f90">
-			<Option weight="6" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="7" />
 		</Unit>
-		<Unit filename="modules/common/types_input_output_wrapper.f90">
-			<Option weight="6" />
+		<Unit filename="modules/common/types_exploring_io.f90">
+			<Option weight="7" />
+		</Unit>
+		<Unit filename="modules/common/types_generating_io.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_generator_wrapper.f90">
 			<Option weight="12" />
@@ -237,6 +224,9 @@
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/common/types_potential_domain.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/common/types_radial_distribution_component.f90">
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_des_convergence_parameter.f90">
@@ -557,9 +547,6 @@
 		<Unit filename="modules/observables/types_temporary_observables.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="modules/post_treatments/types_radial_distribution.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="modules/random/classes_tower_sampler.f90">
 			<Option weight="2" />
 		</Unit>
@@ -587,11 +574,17 @@
 		<Unit filename="modules/readers/procedures_box_size_reader_factory.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/readers/procedures_readers_factory.f90">
+		<Unit filename="modules/readers/procedures_generating_readers_factory.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/readers/types_readers_wrapper.f90">
+		<Unit filename="modules/readers/types_component_coordinates_reader_wrapper.f90">
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/readers/types_exploring_readers_wrapper.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/readers/types_generating_readers_wrapper.f90">
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/classes_neighbour_cells.f90">
 			<Option weight="4" />
@@ -683,6 +676,9 @@
 		<Unit filename="modules/writers/procedures_component_coordinates_writer_factory.f90">
 			<Option weight="5" />
 		</Unit>
+		<Unit filename="modules/writers/procedures_generating_writers_factory.f90">
+			<Option weight="9" />
+		</Unit>
 		<Unit filename="modules/writers/procedures_line_writer_factory.f90">
 			<Option weight="8" />
 		</Unit>
@@ -692,19 +688,22 @@
 		<Unit filename="modules/writers/procedures_triangle_writer_factory.f90">
 			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/writers/procedures_writers_factory.f90">
-			<Option weight="9" />
-		</Unit>
-		<Unit filename="modules/writers/types_writers_wrapper.f90">
+		<Unit filename="modules/writers/types_component_writers_wrapper.f90">
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/writers/types_exploring_writers_wrapper.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/writers/types_generating_writers_wrapper.f90">
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="programs/density.f90">
 			<Option weight="15" />
 			<Option target="density" />
 		</Unit>
-		<Unit filename="programs/plmc.f90">
+		<Unit filename="programs/plmc_generate.f90">
 			<Option weight="15" />
-			<Option target="plmc" />
+			<Option target="plmc_generate" />
 		</Unit>
 		<Unit filename="programs/radial_inter.f90">
 			<Option weight="15" />

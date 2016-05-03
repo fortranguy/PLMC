@@ -28,11 +28,11 @@ end interface
 
 contains
 
-    subroutine create_wall(min_distances, components, walls, input_data, prefix)
+    subroutine create_wall(min_distances, components, walls, generating_data, prefix)
         type(Min_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Visitable_Walls), intent(in) :: walls
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component
@@ -42,7 +42,7 @@ contains
         allocate(min_distances(size(components)))
         do i_component = 1, size(min_distances)
             exists = use_walls(walls) .and. component_exists(components(i_component)%number)
-            call create(min_distances(i_component)%distance, exists, input_data, &
+            call create(min_distances(i_component)%distance, exists, generating_data, &
                 prefix//"Component "//string%get(i_component)//".With Walls.")
         end do
     end subroutine create_wall
@@ -60,10 +60,10 @@ contains
         end if
     end subroutine destroy_min_distances
 
-     subroutine create_components(min_distances, components, input_data, prefix)
+     subroutine create_components(min_distances, components, generating_data, prefix)
         type(Min_Distances_Line), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component, j_component
@@ -84,7 +84,7 @@ contains
                         string%get(j_component)//"."
                 end if
                 call create(min_distances(j_component)%line(i_component)%distance, exists, &
-                    input_data, min_distance_prefix)
+                    generating_data, min_distance_prefix)
                 deallocate(min_distance_prefix)
             end do
         end do

@@ -18,13 +18,13 @@ public :: changes_create, changes_destroy
 
 contains
 
-    subroutine changes_create(changes, periodic_box, components, num_tuning_steps, input_data, &
-        prefix)
+    subroutine changes_create(changes, periodic_box, components, num_tuning_steps, &
+        generating_data, prefix)
         type(Changes_Wrapper), intent(out) :: changes
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
         integer, intent(in) :: num_tuning_steps
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
@@ -32,22 +32,22 @@ contains
         type(Concrete_Number_to_String) :: string
         integer :: i_component
 
-        call set_tuning_parameters(tuning_parameters, num_tuning_steps, input_data, &
+        call set_tuning_parameters(tuning_parameters, num_tuning_steps, generating_data, &
             prefix//"Components.")
-        call set_tuner_parameters(tuner_parameters, num_tuning_steps, input_data, &
+        call set_tuner_parameters(tuner_parameters, num_tuning_steps, generating_data, &
             prefix//"Components.")
         allocate(changes%components(size(components)))
         do i_component = 1, size(changes%components)
             call changes_component_create(changes%components(i_component), periodic_box, &
                 components(i_component), tuning_parameters, tuner_parameters, num_tuning_steps, &
-                input_data, prefix//"Component "//string%get(i_component)//".")
+                generating_data, prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine changes_create
 
-    subroutine set_tuning_parameters(parameters, num_tuning_steps, input_data, prefix)
+    subroutine set_tuning_parameters(parameters, num_tuning_steps, generating_data, prefix)
         type(Concrete_Change_Tuning_Parameters), intent(out) :: parameters
         integer, intent(in) :: num_tuning_steps
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -55,10 +55,10 @@ contains
 
         if (num_tuning_steps > 0) then
             data_field = prefix//"increase factor"
-            call input_data%get(data_field, parameters%increase_factor, data_found)
+            call generating_data%get(data_field, parameters%increase_factor, data_found)
             call check_data_found(data_field, data_found)
             data_field = prefix//"maximum increase factor"
-            call input_data%get(data_field, parameters%increase_factor_max, data_found)
+            call generating_data%get(data_field, parameters%increase_factor_max, data_found)
             call check_data_found(data_field, data_found)
         else
             parameters%increase_factor = 1._DP
@@ -66,10 +66,10 @@ contains
         end if
     end subroutine set_tuning_parameters
 
-    subroutine set_tuner_parameters(parameters, num_tuning_steps, input_data, prefix)
+    subroutine set_tuner_parameters(parameters, num_tuning_steps, generating_data, prefix)
         type(Concrete_Change_Tuner_Parameters), intent(out) :: parameters
         integer, intent(in) :: num_tuning_steps
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -77,13 +77,13 @@ contains
 
         if (num_tuning_steps > 0) then
             data_field = prefix//"accumulation period"
-            call input_data%get(data_field, parameters%accumulation_period, data_found)
+            call generating_data%get(data_field, parameters%accumulation_period, data_found)
             call check_data_found(data_field, data_found)
             data_field = prefix//"wanted success ratio"
-            call input_data%get(data_field, parameters%wanted_success_ratio, data_found)
+            call generating_data%get(data_field, parameters%wanted_success_ratio, data_found)
             call check_data_found(data_field, data_found)
             data_field = prefix//"tolerance"
-            call input_data%get(data_field, parameters%tolerance, data_found)
+            call generating_data%get(data_field, parameters%tolerance, data_found)
             call check_data_found(data_field, data_found)
         else
             parameters%accumulation_period = 0

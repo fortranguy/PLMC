@@ -15,21 +15,21 @@ public :: create, destroy
 
 contains
 
-    subroutine create(field_expression, permittivity, field_applied, input_data, prefix)
+    subroutine create(field_expression, permittivity, field_applied, generating_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
         class(Abstract_Permittivity), intent(in) :: permittivity
         logical, intent(in) :: field_applied
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_field_expression(field_expression, field_applied, input_data, prefix)
-        call set_field_expression(field_expression, permittivity, input_data, prefix)
+        call allocate_field_expression(field_expression, field_applied, generating_data, prefix)
+        call set_field_expression(field_expression, permittivity, generating_data, prefix)
     end subroutine create
 
-    subroutine allocate_field_expression(field_expression, field_applied, input_data, prefix)
+    subroutine allocate_field_expression(field_expression, field_applied, generating_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
         logical, intent(in) :: field_applied
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: field_name, data_field
@@ -37,7 +37,7 @@ contains
 
         if (field_applied) then
             data_field = prefix//"External Field.name"
-            call input_data%get(data_field, field_name, data_found)
+            call generating_data%get(data_field, field_name, data_found)
             call check_data_found(data_field, data_found)
             select case (field_name)
                 case ("constant")
@@ -53,10 +53,10 @@ contains
         end if
     end subroutine allocate_field_expression
 
-    subroutine set_field_expression(field_expression, permittivity, input_data, prefix)
+    subroutine set_field_expression(field_expression, permittivity, generating_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
         class(Abstract_Permittivity), intent(in) :: permittivity
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP), allocatable :: field_vector(:)
@@ -69,19 +69,19 @@ contains
                 call field_expression%set()
             type is (Constant_Field_Expression)
                 data_field = prefix//"External Field.vector"
-                call input_data%get(data_field, field_vector, data_found)
+                call generating_data%get(data_field, field_vector, data_found)
                 call check_data_found(data_field, data_found)
                 call field_expression%set(field_vector)
                 deallocate(field_vector)
             type is (Centered_Plates_Expression)
                 data_field = prefix//"External Field.gap"
-                call input_data%get(data_field, gap, data_found)
+                call generating_data%get(data_field, gap, data_found)
                 call check_data_found(data_field, data_found)
                 data_field = prefix//"External Field.size x"
-                call input_data%get(data_field, size_x, data_found)
+                call generating_data%get(data_field, size_x, data_found)
                 call check_data_found(data_field, data_found)
                 data_field = prefix//"External Field.surface density"
-                call input_data%get(data_field, surface_density, data_found)
+                call generating_data%get(data_field, surface_density, data_found)
                 call check_data_found(data_field, data_found)
                 call field_expression%set(permittivity, gap, size_x, surface_density)
             class default

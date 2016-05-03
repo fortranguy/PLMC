@@ -7,17 +7,13 @@ use procedures_errors, only: error_exit
 implicit none
 
 private
-public :: plmc_catch_help, plmc_widom_catch_help
+public :: plmc_catch_help
 
 contains
 
     subroutine plmc_catch_help()
         call plmc_catch_help_core("Please provide a data file in json format.")
     end subroutine plmc_catch_help
-
-    subroutine plmc_widom_catch_help()
-        call plmc_catch_help_core("Please provide snaps, input_data.json and post.json.")
-    end subroutine plmc_widom_catch_help
 
     subroutine plmc_catch_help_core(message)
         character(len=*), intent(in) :: message

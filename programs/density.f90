@@ -23,23 +23,23 @@ implicit none
     integer :: num_inside_sum
     real(DP), dimension(:, :), allocatable :: positions
 
-    type(json_file) :: input_data, post_data
+    type(json_file) :: generating_data, exploring_data
     character(len=:), allocatable :: data_field
     logical :: data_found
 
-    call plmc_create(input_data, command_argument_count() - 1)
+    call plmc_create(generating_data, command_argument_count() - 1)
     data_field = "Output.Coordinates.write"
-    call input_data%get(data_field, coordinates_written, data_found)
+    call generating_data%get(data_field, coordinates_written, data_found)
     call check_data_found(data_field, data_found)
     deallocate(data_field)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
     num_snaps = command_argument_count() - 2
-    call box_create(periodic_box, input_data, environment_prefix)
-    call plmc_destroy(input_data)
+    call box_create(periodic_box, generating_data, environment_prefix)
+    call plmc_destroy(generating_data)
 
-    call plmc_create(post_data, command_argument_count())
-    call box_create(parallelepiped_domain, periodic_box, .true., post_data, "Density.")
-    call plmc_destroy(post_data)
+    call plmc_create(exploring_data, command_argument_count())
+    call box_create(parallelepiped_domain, periodic_box, .true., exploring_data, "Density.")
+    call plmc_destroy(exploring_data)
 
     num_inside_sum = 0
     do i_snap = 1, num_snaps

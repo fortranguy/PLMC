@@ -29,17 +29,17 @@ end interface mixture_destroy
 
 contains
 
-    subroutine create_all(mixture, environment, input_data, prefix)
+    subroutine create_all(mixture, environment, generating_data, prefix)
         type(Mixture_Wrapper), intent(out) :: mixture
         type(Environment_Wrapper), intent(in) :: environment
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call mixture_create(mixture%components, environment%periodic_box, input_data, prefix)
+        call mixture_create(mixture%components, environment%periodic_box, generating_data, prefix)
         call hard_core_create(mixture%wall_min_distances, mixture%components, environment%&
-            walls, input_data, prefix)
-        call hard_core_create(mixture%components_min_distances, mixture%components, input_data, &
-            prefix)
+            walls, generating_data, prefix)
+        call hard_core_create(mixture%components_min_distances, mixture%components, &
+            generating_data, prefix)
         call mixture_total_moment_create(mixture%total_moment, mixture%components)
     end subroutine create_all
 
@@ -52,10 +52,10 @@ contains
         call mixture_destroy(mixture%components)
     end subroutine destroy_all
 
-    subroutine create_components(components, periodic_box, input_data, prefix)
+    subroutine create_components(components, periodic_box, generating_data, prefix)
         type(Component_Wrapper), allocatable, intent(out) :: components(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -64,7 +64,7 @@ contains
         type(Concrete_Number_to_String) :: string
 
         data_field = prefix//"number of components"
-        call input_data%get(data_field, num_components, data_found)
+        call generating_data%get(data_field, num_components, data_found)
         call check_data_found(data_field, data_found)
         call check_positive("create_components", "num_components", num_components)
         if (num_components == 0) then
@@ -76,7 +76,7 @@ contains
         allocate(components(num_components))
         do i_component = 1, size(components)
             call component_create(components(i_component), exists, periodic_box, &
-                input_data, prefix//"Component "//string%get(i_component)//".")
+                generating_data, prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine create_components
 

@@ -11,12 +11,12 @@ public :: create, destroy
 
 contains
 
-    subroutine create(box_size, periodic_box, volume_changes)
+    subroutine create(box_size, periodic_box, box_size_changes)
         class(Abstract_Box_Size_Writer), allocatable, intent(out) :: box_size
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        logical, intent(in) :: volume_changes
+        logical, intent(in) :: box_size_changes
 
-        if (volume_changes) then
+        if (box_size_changes) then
             allocate(Concrete_Box_Size_Writer :: box_size)
         else
             allocate(Null_Box_Size_Writer :: box_size)

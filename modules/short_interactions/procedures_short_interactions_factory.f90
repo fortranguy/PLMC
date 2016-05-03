@@ -22,26 +22,26 @@ public :: short_interactions_create, short_interactions_destroy
 
 contains
 
-    subroutine short_interactions_create(short_interactions, environment, mixture, input_data, &
+    subroutine short_interactions_create(short_interactions, environment, mixture, generating_data,&
         prefix)
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         logical :: interact_with_walls, interact
         class(Abstract_Visitable_List), allocatable :: list
 
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
-            wall_min_distances, input_data, prefix)
+            wall_min_distances, generating_data, prefix)
         call walls_create(short_interactions%walls_visitor, environment%walls, interact_with_walls)
         call pairs_create(short_interactions%components_pairs, interact, mixture%&
-            components_min_distances, input_data, prefix)
+            components_min_distances, generating_data, prefix)
         call pairs_create(short_interactions%components_visitor, environment%periodic_box, interact)
         call cells_create(short_interactions%neighbour_cells, environment%periodic_box, &
             short_interactions%components_pairs, interact)
-        call visitable_list_allocate(list, interact, input_data, prefix)
+        call visitable_list_allocate(list, interact, generating_data, prefix)
         call cells_create(short_interactions%visitable_cells, environment%periodic_box, mixture%&
             components, short_interactions%components_pairs, short_interactions%neighbour_cells, &
             list, interact)

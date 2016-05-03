@@ -13,9 +13,9 @@ public :: create, destroy
 
 contains
 
-    subroutine create(periodic_box, input_data, prefix)
+    subroutine create(periodic_box, generating_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: box_periodicity
@@ -24,7 +24,7 @@ contains
         logical :: data_found
 
         data_field = prefix//"Box.periodicity"
-        call input_data%get(data_field, box_periodicity, data_found)
+        call generating_data%get(data_field, box_periodicity, data_found)
         call check_data_found(data_field, data_found)
         select case (box_periodicity)
             case ("XYZ")
@@ -35,7 +35,7 @@ contains
                 call error_exit(data_field//" unknown. Choose between: 'XYZ' and 'XY'")
         end select
         data_field = prefix//"Box.initial size"
-        call input_data%get(data_field, box_size, data_found)
+        call generating_data%get(data_field, box_size, data_found)
         call check_data_found(data_field, data_found)
         call periodic_box%set(box_size)
     end subroutine create

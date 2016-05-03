@@ -25,12 +25,12 @@ end interface create
 contains
 
     subroutine create_moved_positions(moved_positions, periodic_box, positions, tuning_parameters, &
-        input_data, prefix)
+        generating_data, prefix)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: moved_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
         type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP), allocatable :: delta(:)
@@ -46,7 +46,7 @@ contains
         select type (moved_positions)
             type is (Concrete_Moved_Positions)
                 data_field = prefix//"Small Move.initial delta"
-                call input_data%get(data_field, delta, data_found)
+                call generating_data%get(data_field, delta, data_found)
                 call check_data_found(data_field, data_found)
                 call moved_positions%construct(periodic_box, positions, delta, tuning_parameters)
             type is (Null_Changed_Coordinates)
@@ -57,11 +57,11 @@ contains
     end subroutine create_moved_positions
 
     subroutine create_rotated_orientations(rotated_orientations, orientations, tuning_parameters, &
-        input_data, prefix)
+        generating_data, prefix)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: rotated_orientations
         type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         class(Abstract_Component_Coordinates), intent(in) :: orientations
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP) :: delta
@@ -77,7 +77,7 @@ contains
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)
                 data_field = prefix//"Small Rotation.initial delta"
-                call input_data%get(data_field, delta, data_found)
+                call generating_data%get(data_field, delta, data_found)
                 call check_data_found(data_field, data_found)
                 call rotated_orientations%construct(orientations, delta, tuning_parameters)
             type is (Null_Changed_Coordinates)

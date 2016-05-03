@@ -17,13 +17,14 @@ public :: create, destroy
 
 contains
 
-    subroutine create(pair, permittivity, min_distances, dipoles_exist, alpha, input_data, prefix)
+    subroutine create(pair, permittivity, min_distances, dipoles_exist, alpha, generating_data, &
+        prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
         class(Abstract_Permittivity), intent(in) :: permittivity
         type(Min_Distances_Line), intent(in) :: min_distances(:)
         logical, intent(in) :: dipoles_exist
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP) :: min_distance
@@ -39,14 +40,15 @@ contains
             end do
         end do
 
-        call allocate(pair, dipoles_exist, input_data, prefix)
-        call construct(pair, permittivity, min_distance, dipoles_exist, alpha, input_data, prefix)
+        call allocate(pair, dipoles_exist, generating_data, prefix)
+        call construct(pair, permittivity, min_distance, dipoles_exist, alpha, generating_data, &
+            prefix)
     end subroutine create
 
-    subroutine allocate(pair, dipoles_exist, input_data, prefix)
+    subroutine allocate(pair, dipoles_exist, generating_data, prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
         logical, intent(in) :: dipoles_exist
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -54,7 +56,7 @@ contains
 
         if (dipoles_exist) then
             data_field = prefix//"tabulated"
-            call input_data%get(data_field, tabulated_potential, data_found)
+            call generating_data%get(data_field, tabulated_potential, data_found)
             call check_data_found(data_field, data_found)
             if(tabulated_potential) then
                 allocate(Tabulated_DES_Real_Pair :: pair)
@@ -66,13 +68,14 @@ contains
         end if
     end subroutine allocate
 
-    subroutine construct(pair, permittivity, min_distance, dipoles_exist, alpha, input_data, prefix)
+    subroutine construct(pair, permittivity, min_distance, dipoles_exist, alpha, generating_data, &
+        prefix)
         class(Abstract_DES_Real_Pair), intent(inout) :: pair
         class(Abstract_Permittivity), intent(in) :: permittivity
         real(DP), intent(in) :: min_distance
         logical, intent(in) :: dipoles_exist
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -82,12 +85,12 @@ contains
         if (dipoles_exist) then
             domain%min = min_distance
             data_field = prefix//"max distance over box edge"
-            call input_data%get(data_field, domain%max_over_box, data_found)
+            call generating_data%get(data_field, domain%max_over_box, data_found)
             call check_data_found(data_field, data_found)
             select type (pair)
                 type is (Tabulated_DES_Real_Pair)
                     data_field = prefix//"delta distance"
-                    call input_data%get(data_field, domain%delta, data_found)
+                    call generating_data%get(data_field, domain%delta, data_found)
                     call check_data_found(data_field, data_found)
             end select
         end if

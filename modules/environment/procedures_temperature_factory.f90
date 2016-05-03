@@ -12,9 +12,9 @@ public :: create, destroy
 
 contains
 
-    subroutine create(temperature, input_data, prefix)
+    subroutine create(temperature, generating_data, prefix)
         class(Abstract_Temperature), allocatable, intent(out) :: temperature
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         real(DP) :: temperature_value
@@ -22,7 +22,7 @@ contains
         logical :: data_found
 
         data_field = prefix//"Thermostat.temperature"
-        call input_data%get(data_field, temperature_value, data_found)
+        call generating_data%get(data_field, temperature_value, data_found)
         call check_data_found(data_field, data_found)
         allocate(Concrete_Temperature :: temperature)
         call temperature%set(temperature_value)

@@ -13,11 +13,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(chemical_potential, can_exchange, input_data, prefix)
+    subroutine create(chemical_potential, can_exchange, generating_data, prefix)
         class(Abstract_Component_Chemical_Potential), allocatable, intent(out) :: &
             chemical_potential
         logical, intent(in) :: can_exchange
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -26,10 +26,10 @@ contains
 
         if (can_exchange) then
             data_field = prefix//"Chemical Potential.density"
-            call input_data%get(data_field, density, data_found)
+            call generating_data%get(data_field, density, data_found)
             call check_data_found(data_field, data_found)
             data_field = prefix//"Chemical Potential.excess"
-            call input_data%get(data_field, excess, data_found)
+            call generating_data%get(data_field, excess, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Component_Chemical_Potential :: chemical_potential)
         else

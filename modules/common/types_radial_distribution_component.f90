@@ -1,4 +1,4 @@
-module types_radial_distribution
+module types_radial_distribution_component
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
@@ -12,4 +12,4 @@ private
         real(DP), allocatable :: positions(:, :)
     end type Concrete_Radial_Distribution_Component
 
-end module types_radial_distribution
+end module types_radial_distribution_component

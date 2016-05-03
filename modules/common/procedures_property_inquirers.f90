@@ -94,11 +94,12 @@ contains
         end select
     end function periodicity_is_xy
 
-    logical function apply_external_field_from_json(input_data, prefix) result(apply_external_field)
-        type(json_file), intent(inout) :: input_data
+    logical function apply_external_field_from_json(generating_data, prefix) &
+        result(apply_external_field)
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        apply_external_field = logical_from_json(input_data, prefix//"External Field.apply")
+        apply_external_field = logical_from_json(generating_data, prefix//"External Field.apply")
     end function apply_external_field_from_json
 
     pure logical function apply_external_field_from(external_field) result(apply_external_field)
@@ -112,11 +113,11 @@ contains
         end select
     end function apply_external_field_from
 
-    logical function use_permittivity_from_json(input_data, prefix) result(use_permittivity)
-        type(json_file), intent(inout) :: input_data
+    logical function use_permittivity_from_json(generating_data, prefix) result(use_permittivity)
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        use_permittivity = logical_from_json(input_data, prefix//"Permittivity.use")
+        use_permittivity = logical_from_json(generating_data, prefix//"Permittivity.use")
     end function use_permittivity_from_json
 
     pure logical function use_permittivity_from(permittivity) result(use_permittivity)
@@ -130,12 +131,13 @@ contains
         end select
     end function use_permittivity_from
 
-    logical function use_reciprocal_lattice_from_json(input_data, prefix) &
+    logical function use_reciprocal_lattice_from_json(generating_data, prefix) &
         result(use_reciprocal_lattice)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        use_reciprocal_lattice = logical_from_json(input_data, prefix//"Reciprocal Lattice.use")
+        use_reciprocal_lattice = logical_from_json(generating_data, &
+            prefix//"Reciprocal Lattice.use")
     end function use_reciprocal_lattice_from_json
 
     pure logical function use_reciprocal_lattice_from(reciprocal_lattice) &
@@ -150,11 +152,11 @@ contains
         end select
     end function use_reciprocal_lattice_from
 
-    logical function use_walls_from_json(input_data, prefix) result(use_walls)
-        type(json_file), intent(inout) :: input_data
+    logical function use_walls_from_json(generating_data, prefix) result(use_walls)
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        use_walls = logical_from_json(input_data, prefix//"Walls.use")
+        use_walls = logical_from_json(generating_data, prefix//"Walls.use")
     end function use_walls_from_json
 
     logical function use_walls_from_walls(walls) result(use_walls)
@@ -247,12 +249,12 @@ contains
         end select
     end function component_can_rotate
 
-    logical function component_is_dipolar_from_json(input_data, prefix) &
+    logical function component_is_dipolar_from_json(generating_data, prefix) &
         result(component_is_dipolar)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        component_is_dipolar = logical_from_json(input_data, prefix//"is dipolar")
+        component_is_dipolar = logical_from_json(generating_data, prefix//"is dipolar")
     end function component_is_dipolar_from_json
 
     pure logical function component_has_orientations(component_orientations)
@@ -278,12 +280,12 @@ contains
         end select
     end function component_is_dipolar_from_dipolar_moments
 
-    logical function component_can_exchange_from_json(input_data, prefix) &
+    logical function component_can_exchange_from_json(generating_data, prefix) &
         result(component_can_exchange)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        component_can_exchange = logical_from_json(input_data, prefix//"can exchange")
+        component_can_exchange = logical_from_json(generating_data, prefix//"can exchange")
     end function component_can_exchange_from_json
 
     pure logical function component_can_exchange_from_chemical_potential(&
@@ -320,13 +322,13 @@ contains
             component_can_exchange(component_exchange)
     end function component_can_change
 
-    logical function logical_from_json(input_data, statement)
-        type(json_file), intent(inout) :: input_data
+    logical function logical_from_json(generating_data, statement)
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: statement
 
         logical :: data_found
 
-        call input_data%get(statement, logical_from_json, data_found)
+        call generating_data%get(statement, logical_from_json, data_found)
         call check_data_found(statement, data_found)
     end function logical_from_json
 

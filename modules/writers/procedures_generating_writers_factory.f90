@@ -1,4 +1,4 @@
-module procedures_writers_factory
+module procedures_generating_writers_factory
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
@@ -20,43 +20,45 @@ use procedures_changes_success_writer_factory, only: changes_success_writer_crea
 use classes_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector
 use procedures_component_coordinates_writer_factory, only: &
     component_coordinates_writer_create => create, component_coordinates_writer_destroy => destroy
-use types_writers_wrapper, only: Component_Writers_Wrapper, Writers_Wrapper
+use types_component_writers_wrapper, only: Component_Writers_Wrapper
+use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use procedures_property_inquirers, only:  component_has_positions, component_has_orientations, &
     component_can_move, component_can_rotate, component_can_exchange
 
 implicit none
 
 private
-public :: writers_create, writers_destroy
+public :: generating_writers_create, generating_writers_destroy
 
-interface writers_create
+interface generating_writers_create
     module procedure :: create_all
     module procedure :: create_components
     module procedure :: create_components_coordinates
     module procedure :: create_change_components
-end interface writers_create
+end interface generating_writers_create
 
-interface writers_destroy
+interface generating_writers_destroy
     module procedure :: destroy_components
     module procedure :: destroy_all
-end interface writers_destroy
+end interface generating_writers_destroy
 
 contains
 
     subroutine create_all(writers, environment, wall_pairs, components, change_components, &
-        short_pairs, input_data, prefix)
-        type(Writers_Wrapper), intent(out) :: writers
+        short_pairs, generating_data, prefix)
+        type(Generating_Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
         type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         logical :: are_dipolar(size(components))
 
-        call writers_create(writers%components, components, change_components, input_data, prefix)
+        call generating_writers_create(writers%components, components, change_components, &
+            generating_data, prefix)
         call line_writer_create(writers%field, environment%external_field, components, &
             "field_energies.out")
         call line_writer_create(writers%walls, wall_pairs, "walls_energies.out")
@@ -69,7 +71,7 @@ contains
     end subroutine create_all
 
     subroutine destroy_all(writers)
-        type(Writers_Wrapper), intent(inout) :: writers
+        type(Generating_Writers_Wrapper), intent(inout) :: writers
 
         call real_writer_destroy(writers%dipolar_mixture_energy)
         call triangle_writer_destroy(writers%dipolar_energies)
@@ -77,20 +79,20 @@ contains
         call triangle_writer_destroy(writers%switches)
         call line_writer_destroy(writers%walls)
         call line_writer_destroy(writers%field)
-        call writers_destroy(writers%components)
+        call generating_writers_destroy(writers%components)
     end subroutine destroy_all
 
-    subroutine create_components(components, mixture_components, change_components, input_data, &
-        prefix)
+    subroutine create_components(components, mixture_components, change_components, &
+        generating_data, prefix)
         type(Component_Writers_Wrapper), allocatable, intent(out) :: components(:)
         type(Component_Wrapper), intent(in) :: mixture_components(:)
         type(Changes_Component_Wrapper), intent(in) :: change_components(:)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         allocate(components(size(mixture_components)))
-        call writers_create(components, mixture_components, input_data, prefix)
-        call writers_create(components, change_components)
+        call generating_writers_create(components, mixture_components, generating_data, prefix)
+        call generating_writers_create(components, change_components)
     end subroutine create_components
 
     subroutine destroy_components(components)
@@ -107,10 +109,11 @@ contains
         end if
     end subroutine destroy_components
 
-    subroutine create_components_coordinates(components, mixture_components, input_data, prefix)
+    subroutine create_components_coordinates(components, mixture_components, generating_data, &
+        prefix)
         type(Component_Writers_Wrapper), intent(inout) :: components(:)
         type(Component_Wrapper), intent(in) :: mixture_components(:)
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -120,12 +123,12 @@ contains
         type(Concrete_Number_to_String) :: string
 
         data_field = prefix//"Coordinates.write"
-        call input_data%get(data_field, write_coordinates, data_found)
+        call generating_data%get(data_field, write_coordinates, data_found)
         call check_data_found(data_field, data_found)
 
         if (write_coordinates) then
             data_field = prefix//"Coordinates.period"
-            call input_data%get(data_field, selector_i%period, data_found)
+            call generating_data%get(data_field, selector_i%period, data_found)
             call check_data_found(data_field, data_found)
         end if
         do i_component = 1, size(components)
@@ -160,4 +163,4 @@ contains
         end do
     end subroutine create_change_components
 
-end module procedures_writers_factory
+end module procedures_generating_writers_factory

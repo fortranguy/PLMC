@@ -14,11 +14,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(alpha, periodic_box, dipoles_exist, input_data, prefix)
+    subroutine create(alpha, periodic_box, dipoles_exist, generating_data, prefix)
         class(Abstract_DES_Convergence_Parameter), allocatable, intent(out) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: dipoles_exist
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -27,7 +27,7 @@ contains
 
         if (dipoles_exist) then
             data_field = prefix//"alpha times box edge"
-            call input_data%get(data_field, alpha_x_box, data_found)
+            call generating_data%get(data_field, alpha_x_box, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_DES_Convergence_Parameter :: alpha)
         else

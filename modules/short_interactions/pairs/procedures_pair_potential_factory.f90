@@ -15,22 +15,22 @@ public :: create, destroy
 
 contains
 
-    subroutine create(pair, min_distance, expression, interact, input_data, prefix)
+    subroutine create(pair, min_distance, expression, interact, generating_data, prefix)
         class(Abstract_Pair_Potential), allocatable, intent(out) :: pair
         class(Abstract_Min_Distance), intent(in) :: min_distance
         class(Abstract_Potential_Expression), intent(in) :: expression
         logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call allocate(pair, interact, input_data, prefix)
-        call construct(pair, min_distance, expression, interact, input_data, prefix)
+        call allocate(pair, interact, generating_data, prefix)
+        call construct(pair, min_distance, expression, interact, generating_data, prefix)
     end subroutine create
 
-    subroutine allocate(pair, interact, input_data, prefix)
+    subroutine allocate(pair, interact, generating_data, prefix)
         class(Abstract_Pair_Potential), allocatable, intent(out) :: pair
         logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -38,7 +38,7 @@ contains
 
         if (interact) then
             data_field = prefix//"tabulated"
-            call input_data%get(data_field, tabulated_potential, data_found)
+            call generating_data%get(data_field, tabulated_potential, data_found)
             call check_data_found(data_field, data_found)
             if(tabulated_potential) then
                 allocate(Tabulated_Pair_Potential :: pair)
@@ -50,12 +50,12 @@ contains
         end if
     end subroutine allocate
 
-    subroutine construct(pair, min_distance, expression, interact, input_data, prefix)
+    subroutine construct(pair, min_distance, expression, interact, generating_data, prefix)
         class(Abstract_Pair_Potential), intent(inout) :: pair
         class(Abstract_Min_Distance), intent(in) :: min_distance
         class(Abstract_Potential_Expression), intent(in) :: expression
         logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -69,13 +69,13 @@ contains
                     domain%max = domain%min
                 class default
                     data_field = prefix//"maximum distance"
-                    call input_data%get(data_field, domain%max, data_found)
+                    call generating_data%get(data_field, domain%max, data_found)
                     call check_data_found(data_field, data_found)
             end select
             select type (pair)
                 type is (Tabulated_Pair_Potential)
                     data_field = prefix//"delta distance"
-                    call input_data%get(data_field, domain%delta, data_found)
+                    call generating_data%get(data_field, domain%delta, data_found)
                     call check_data_found(data_field, data_found)
             end select
         end if

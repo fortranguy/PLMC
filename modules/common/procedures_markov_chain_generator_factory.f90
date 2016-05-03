@@ -17,14 +17,14 @@ public :: create, destroy, set
 
 contains
 
-    subroutine create(markov_chain_generator, physical_model, num_tuning_steps, input_data)
+    subroutine create(markov_chain_generator, physical_model, num_tuning_steps, generating_data)
         type(Markov_Chain_Generator_Wrapper), intent(out) :: markov_chain_generator
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         integer, intent(in) :: num_tuning_steps
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
 
         call changes_create(markov_chain_generator%changes, physical_model%environment%&
-            periodic_box, physical_model%mixture%components, num_tuning_steps, input_data, &
+            periodic_box, physical_model%mixture%components, num_tuning_steps, generating_data, &
             changes_prefix)
         call metropolis_algorithms_create(markov_chain_generator%metropolis_algorithms, &
             physical_model, markov_chain_generator%changes%components)

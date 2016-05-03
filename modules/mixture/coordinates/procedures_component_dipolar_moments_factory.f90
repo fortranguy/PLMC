@@ -14,11 +14,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(dipolar_moments, orientations, is_dipolar, input_data, prefix)
+    subroutine create(dipolar_moments, orientations, is_dipolar, generating_data, prefix)
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(out) :: dipolar_moments
         class(Abstract_Component_Coordinates), intent(in) :: orientations
         logical, intent(in) :: is_dipolar
-        type(json_file), intent(inout) :: input_data
+        type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -27,7 +27,7 @@ contains
 
         if (is_dipolar) then
             data_field = prefix//"moment norm"
-            call input_data%get(data_field, moment_norm, data_found)
+            call generating_data%get(data_field, moment_norm, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Component_Dipolar_Moments :: dipolar_moments)
         else

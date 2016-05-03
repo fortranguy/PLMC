@@ -6,7 +6,7 @@ implicit none
 private
 
     type, public :: Exploring_Observables_Wrapper
-        real(DP), allocatable :: inv_pow_activity
+        real(DP), allocatable :: inv_pow_activities(:)
     end type Exploring_Observables_Wrapper
 
 end module types_exploring_observables_wrapper
