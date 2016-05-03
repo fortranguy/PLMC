@@ -1,6 +1,6 @@
 module procedures_plmc_write
 
-use types_writers_wrapper, only: Writers_Wrapper
+use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
@@ -16,7 +16,7 @@ contains
 
     subroutine write_observables(num_tuning_steps, num_steps, i_step, writers, observables)
         integer, intent(in) :: num_tuning_steps, num_steps, i_step
-        type(Writers_Wrapper), intent(in) :: writers
+        type(Generating_Writers_Wrapper), intent(in) :: writers
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
         integer :: i_component

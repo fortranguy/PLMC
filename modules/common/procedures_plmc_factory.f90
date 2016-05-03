@@ -22,8 +22,9 @@ use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_readers_wrapper, only: Component_Coordinates_Reader_wrapper, Readers_Wrapper
 use procedures_readers_factory, only: readers_create, readers_destroy, &
     readers_set_initial_coordinates
-use types_writers_wrapper, only: Writers_Wrapper
-use procedures_writers_factory, only: writers_create, writers_destroy
+use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
+use procedures_generating_writers_factory, only: generating_writers_create, &
+    generating_writers_destroy
 
 implicit none
 
@@ -58,23 +59,22 @@ contains
 
     subroutine create_readers_writers(readers, writers, physical_model, changes, input_data)
         type(Readers_Wrapper), intent(out) :: readers
-        type(Writers_Wrapper), intent(out) :: writers
+        type(Generating_Writers_Wrapper), intent(out) :: writers
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
-        call readers_create(readers, physical_model%environment%periodic_box, physical_model%&
-            mixture%components)
-        call writers_create(writers, physical_model%environment, physical_model%short_interactions%&
+        call readers_create(readers, physical_model%mixture%components)
+        call generating_writers_create(writers, physical_model%environment, physical_model%short_interactions%&
             wall_pairs, physical_model%mixture%components, changes%components, physical_model%&
             short_interactions%components_pairs, input_data, writers_prefix)
     end subroutine create_readers_writers
 
     subroutine destroy_readers_writers(readers, writers)
         type(Readers_Wrapper), intent(inout) :: readers
-        type(Writers_Wrapper), intent(inout) :: writers
+        type(Generating_Writers_Wrapper), intent(inout) :: writers
 
-        call writers_destroy(writers)
+        call generating_writers_destroy(writers)
         call readers_destroy(readers)
     end subroutine destroy_readers_writers
 
