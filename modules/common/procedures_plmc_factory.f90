@@ -52,7 +52,7 @@ interface plmc_set
     module procedure :: plmc_set_num_steps
     module procedure :: set_mixture_coordinates
     module procedure :: markov_chain_generator_set
-    module procedure :: tune_change_components
+    module procedure :: tune_components_moves
     module procedure :: set_success_and_reset_counter
 end interface plmc_set
 
@@ -98,23 +98,25 @@ contains
         call input_data%destroy()
     end subroutine destroy_input_data
 
-    subroutine tune_change_components(tuned, i_step, change_components, changes_sucesses)
+    subroutine tune_components_moves(tuned, i_step, change_components, changes_sucesses)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
         type(Changes_Component_Wrapper), intent(inout) :: change_components(:)
         type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
 
-        logical :: move_tuned(size(change_components)), rotation_tuned(size(change_components))
+        logical :: translation_tuned(size(change_components)), &
+            rotation_tuned(size(change_components))
         integer :: i_component
 
         do i_component = 1, size(change_components)
-            call change_components(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
-                changes_sucesses(i_component)%move)
+            call change_components(i_component)%translation_tuner%&
+                tune(translation_tuned(i_component), i_step, changes_sucesses(i_component)%&
+                translation)
             call change_components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
                 i_step, changes_sucesses(i_component)%rotation)
         end do
-        tuned = all(move_tuned) .and. all(rotation_tuned) ! Beware of inertia.
-    end subroutine tune_change_components
+        tuned = all(translation_tuned) .and. all(rotation_tuned) ! Beware of inertia.
+    end subroutine tune_components_moves
 
     subroutine set_success_and_reset_counter(observables)
         type(Generating_Observables_Wrapper), intent(inout) :: observables

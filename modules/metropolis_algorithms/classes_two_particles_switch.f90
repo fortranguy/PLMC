@@ -7,7 +7,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
-use procedures_dipoles_field_interaction, only: dipoles_field_visit_move => visit_move
+use procedures_dipoles_field_interaction, only: dipoles_field_visit_translation => visit_translation
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use module_changes_success, only: Concrete_Switch_Counters
@@ -213,8 +213,8 @@ contains
         integer :: i
 
         do i = 1, size(deltas)
-            deltas(i) = dipoles_field_visit_move(this%environment%external_field, new(i)%position, &
-                old(i))
+            deltas(i) = dipoles_field_visit_translation(this%environment%external_field, new(i)%&
+                position, old(i))
         end do
     end subroutine Abstract_visit_field
 
@@ -320,7 +320,7 @@ contains
             call this%components(ij_actors(i))%positions%set(new(i)%i, new(i)%position)
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 call this%short_interactions%visitable_cells(ij_actors(i), i_component)%&
-                    move(new(i)%position, old(i))
+                    translate(new(i)%position, old(i))
             end do
         end do
         call this%dipolar_interactions%reci_structure%update_switch(ij_actors, old)

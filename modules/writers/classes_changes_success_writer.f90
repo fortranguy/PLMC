@@ -18,7 +18,7 @@ private
 
     type, abstract, public :: Abstract_Changes_Success_Writer
     private
-        type(Concrete_Number_to_String) :: string_move
+        type(Concrete_Number_to_String) :: string_translation
         class(Abstract_Number_to_String), allocatable :: string_rotation
         class(Abstract_Number_to_String), allocatable :: string_exchange
         integer :: file_unit = 0
@@ -52,7 +52,7 @@ contains
 
         call check_string_not_empty("Abstract_construct: filename", filename)
         open(newunit=this%file_unit, recl=max_line_length, file=filename, action="write")
-        legend = "# i_step    moves"
+        legend = "# i_step    translations"
         if (changes_selector%write_rotations) then
             allocate(Concrete_Number_to_String :: this%string_rotation)
             legend = legend//"    rotations"
@@ -81,7 +81,7 @@ contains
         integer, intent(in) :: i_step
         type(Concrete_Changes_Success), intent(in) :: changes_success
 
-        write(this%file_unit, *) i_step, this%string_move%get(changes_success%move)//&
+        write(this%file_unit, *) i_step, this%string_translation%get(changes_success%translation)//&
             this%string_rotation%get(changes_success%rotation)
     end subroutine Abstract_write
 

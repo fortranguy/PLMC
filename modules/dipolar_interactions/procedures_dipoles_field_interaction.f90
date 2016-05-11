@@ -9,7 +9,7 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 implicit none
 
 private
-public :: visit_component, visit_move, visit_rotation
+public :: visit_component, visit_translation, visit_rotation
 
 contains
 
@@ -28,14 +28,14 @@ contains
         end do
     end function visit_component
 
-    pure real(DP) function visit_move(external_field, new_position, old) result(delta_energy)
+    pure real(DP) function visit_translation(external_field, new_position, old) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
         real(DP), dimension(:), intent(in) :: new_position
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         delta_energy = -dot_product(old%dipolar_moment, external_field%get(new_position) - &
             external_field%get(old%position))
-    end function visit_move
+    end function visit_translation
 
     pure real(DP) function visit_rotation(external_field, new_dipolar_moment, old) &
         result(delta_energy)

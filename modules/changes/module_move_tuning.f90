@@ -1,4 +1,4 @@
-module module_change_tuning
+module module_move_tuning
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: warning_continue
@@ -8,10 +8,10 @@ implicit none
 private
 public :: set_increase_factor
 
-    type, public :: Concrete_Change_Tuning_Parameters
+    type, public :: Concrete_Move_Tuning_Parameters
         real(DP) :: increase_factor
         real(DP) :: increase_factor_max
-    end type Concrete_Change_Tuning_Parameters
+    end type Concrete_Move_Tuning_Parameters
 
 contains
 
@@ -19,7 +19,7 @@ contains
         max_factor_reached)
         character(len=*), intent(in) :: context
         real(DP), intent(inout) :: current_increase_factor
-        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
+        type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
         logical, intent(out) :: max_factor_reached
 
         current_increase_factor = tuning_parameters%increase_factor * current_increase_factor
@@ -32,4 +32,4 @@ contains
         end if
     end subroutine set_increase_factor
 
-end module module_change_tuning
+end module module_move_tuning

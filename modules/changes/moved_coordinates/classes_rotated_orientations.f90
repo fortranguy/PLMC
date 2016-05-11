@@ -5,18 +5,18 @@ use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use procedures_random_number, only: markov_orientation
-use module_change_tuning, only: Concrete_Change_Tuning_Parameters, set_increase_factor
-use classes_changed_coordinates, only: Abstract_Changed_Coordinates
+use module_move_tuning, only: Concrete_Move_Tuning_Parameters, set_increase_factor
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 
 implicit none
 
 private
 
-    type, extends(Abstract_Changed_Coordinates), public :: Concrete_Rotated_Orientations
+    type, extends(Abstract_Moved_Coordinates), public :: Concrete_Rotated_Orientations
     private
         class(Abstract_Component_Coordinates), pointer :: orientations
         real(DP) :: delta = 0._DP
-        type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
+        type(Concrete_Move_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor = 1._DP
         logical :: max_factor_reached = .false.
     contains
@@ -33,7 +33,7 @@ contains
         class(Concrete_Rotated_Orientations), intent(out) :: this
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
         real(DP), intent(in) :: delta
-        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
+        type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
 
         this%orientations => orientations
         call check_positive("Concrete_Rotated_Orientations", "delta", delta)

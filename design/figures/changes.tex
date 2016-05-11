@@ -10,16 +10,16 @@
 
         \begin{scope}
             \begin{class}[text width=\mediumTextWidth]{ChangesComponent}{0, 0}
-                \attribute{movedPositions: \type{ChangedCoordinates}}
-                \attribute{rotatedOrientations: \type{ChangedCoordinates}}
-                \attribute{moveTuner: \type{ChangeTuner}}
-                \attribute{rotationTuner: \type{ChangeTuner}}
+                \attribute{translatedPositions: \type{MovedCoordinates}}
+                \attribute{rotatedOrientations: \type{MovedCoordinates}}
+                \attribute{translationTuner: \type{MoveTuner}}
+                \attribute{rotationTuner: \type{MoveTuner}}
                 \attribute{exchange: \type{ComponentExchange}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ChangesComponent.north) - (7.5 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ChangedCoordinates}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{MovedCoordinates}{0, 0}
                 \operation[0]{\procedure{construct}{...}}
                 \operation[0]{\procedure{destroy}{}}
                 \operation[0]{\procedure{increaseDelta}{}}
@@ -29,16 +29,16 @@
         \end{scope}
 
         \begin{scope}[shift={($(ChangesComponent.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ChangeTuner}{0, 0}
-                \operation{\procedure{construct}{changedCoordinates: \type{ChangedCoordinates},
-                    parameters: \type{ChangeTunerParameters}}}
+            \begin{abstractclass}[text width=\mediumTextWidth]{MoveTuner}{0, 0}
+                \operation{\procedure{construct}{movedCoordinates: \type{MovedCoordinates},
+                    parameters: \type{MoveTunerParameters}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{tune}{tuned: \type{bool}, iStep: \type{int},
                     successRatio: \type{real}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ChangeTuner.north) + (7.5 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(MoveTuner.north) + (7.5 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{ComponentExchange}{0, 0}
                 \operation{\procedure{construct}{component: \type{Component}}}
                 \operation{\procedure{destroy}{}}
@@ -47,8 +47,8 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ChangedCoordinates |- ChangeTuner.north)$)}]
-            \begin{class}[text width=\smallTextWidth]{ChangeTunerParameters}{0, 0}
+        \begin{scope}[shift={($(MovedCoordinates |- MoveTuner.north)$)}]
+            \begin{class}[text width=\smallTextWidth]{MoveTunerParameters}{0, 0}
                 \attribute{accumulationPeriod: \type{int}}
                 \attribute{wantedSuccessRatio: \type{real}}
                 \attribute{tolerance: \type{real}}
@@ -61,7 +61,7 @@
         \end{scope}
 
         \begin{scope}[on background layer]
-            \aggregation{ChangeTuner}{\refName{changedCoordinates}}{\numRef{1}}{ChangedCoordinates}
+            \aggregation{MoveTuner}{\refName{movedCoordinates}}{\numRef{1}}{MovedCoordinates}
         \end{scope}
 
     \end{tikzpicture}

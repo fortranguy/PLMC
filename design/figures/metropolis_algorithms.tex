@@ -15,7 +15,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(MetropolisAlgorithm.south) + (0 cm, -2.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{OneParticleChange}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{OneParticleMove}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
                     mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
@@ -27,7 +27,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(OneParticleChange.north) + (9 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(OneParticleMove.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{TwoParticlesSwitch}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
@@ -39,10 +39,10 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(OneParticleChange.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(OneParticleMove.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{MetropolisAlgorithms}{0, 0}
-                \attribute{oneParticleMove: \type{OneParticleChange}}
-                \attribute{oneParticleRotation: \type{OneParticleChange}}
+                \attribute{oneParticleTranslation: \type{OneParticleMove}}
+                \attribute{oneParticleRotation: \type{OneParticleMove}}
                 \attribute{twoParticlesSwitch: \type{TwoParticlesSwitch}}
             \end{class}
         \end{scope}

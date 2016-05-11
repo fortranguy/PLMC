@@ -26,7 +26,7 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_reset
         procedure :: visit => Abstract_visit
-        procedure :: move => Abstract_move
+        procedure :: translate => Abstract_translate
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
         procedure, private :: construct_visitable_lists => Abstract_construct_visitable_lists
@@ -44,7 +44,7 @@ private
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_reset
         procedure :: visit => Null_visit
-        procedure :: move => Null_move
+        procedure :: translate => Null_translate
         procedure :: add => Null_add
         procedure :: remove => Null_remove
     end type Null_Visitable_Cells
@@ -185,7 +185,7 @@ contains
         end do
     end subroutine Abstract_visit
 
-    subroutine Abstract_move(this, to_position, from)
+    subroutine Abstract_translate(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: to_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: from
@@ -199,7 +199,7 @@ contains
                 remove(from%i)
             call this%visitable_lists(to_ijk_cell(1), to_ijk_cell(2), to_ijk_cell(3))%add(from%i)
         end if
-    end subroutine Abstract_move
+    end subroutine Abstract_translate
 
     subroutine Abstract_add(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -257,11 +257,11 @@ contains
         energy = 0._DP
     end subroutine Null_visit
 
-    subroutine Null_move(this, to_position, from)
+    subroutine Null_translate(this, to_position, from)
         class(Null_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: to_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: from
-    end subroutine Null_move
+    end subroutine Null_translate
 
     subroutine Null_add(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this

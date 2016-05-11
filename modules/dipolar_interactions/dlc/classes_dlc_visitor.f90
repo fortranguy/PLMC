@@ -24,7 +24,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: visit => Abstract_visit
-        procedure :: visit_move => Abstract_visit_move
+        procedure :: visit_translation => Abstract_visit_translation
         procedure :: visit_rotation => Abstract_visit_rotation
         procedure :: visit_add => Abstract_visit_add
         procedure :: visit_remove => Abstract_visit_remove
@@ -41,7 +41,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: visit => Null_visit
-        procedure :: visit_move => Null_visit_move
+        procedure :: visit_translation => Null_visit_translation
         procedure :: visit_rotation => Null_visit_rotation
         procedure :: visit_switch => Null_visit_switch
         procedure, private :: visit_exchange => Null_visit_exchange
@@ -125,7 +125,7 @@ contains
     !>              e^{+k_{1:2} x_3} e^{+i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
     !>          \right)
     !> \]
-    pure real(DP) function Abstract_visit_move(this, i_component, new_position, old) &
+    pure real(DP) function Abstract_visit_translation(this, i_component, new_position, old) &
         result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
@@ -194,7 +194,7 @@ contains
             end do
         end do
         delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
-    end function Abstract_visit_move
+    end function Abstract_visit_translation
 
     !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
     !> \[
@@ -499,14 +499,14 @@ contains
         energy = 0._DP
     end function Null_visit
 
-    pure real(DP) function Null_visit_move(this, i_component, new_position, old) &
+    pure real(DP) function Null_visit_translation(this, i_component, new_position, old) &
         result(delta_energy)
         class(Null_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
         delta_energy = 0._DP
-    end function Null_visit_move
+    end function Null_visit_translation
 
     pure real(DP) function Null_visit_rotation(this, i_component, new_dipolar_moment, old) &
         result(delta_energy)

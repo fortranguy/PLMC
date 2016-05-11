@@ -70,7 +70,7 @@
         \begin{scope}[shift={($(DESselfComponent.north) + (11 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{StructureVisitor}{0, 0}
                 \operation[0]{\procedure{visit}{}: \type{real}}
-                \operation[0]{\procedure{visitMove}{iComponent: \type{int},
+                \operation[0]{\procedure{visitTranslation}{iComponent: \type{int},
                     newPosition: \type{real[3]},
                     old: \type{TemporaryParticle}}: \type{real}}
                 \operation[0]{\procedure{visitRotation}{iComponent: \type{int},
@@ -144,7 +144,7 @@
         \begin{scope}[shift={($(StructureVisitor.north) + (11 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{StructureFactor}{0, 0}
                 \operation[0]{\procedure{isDipolar}{iComponent: \type{int}}: \type{bool}}
-                \operation[0]{\procedure{updateMove}{iComponent: \type{int},
+                \operation[0]{\procedure{updateTranslation}{iComponent: \type{int},
                     newPosition: \type{real[3]}, old: \type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateRotation}{iComponent: \type{int},
                     newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
