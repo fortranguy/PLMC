@@ -20,7 +20,8 @@ use procedures_changes_success_writer_factory, only: changes_success_writer_crea
 use classes_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector
 use procedures_component_coordinates_writer_factory, only: &
     component_coordinates_writer_create => create, component_coordinates_writer_destroy => destroy
-use types_generating_writers_wrapper, only: Component_Writers_Wrapper, Generating_Writers_Wrapper
+use types_component_writers_wrapper, only: Component_Writers_Wrapper
+use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use procedures_property_inquirers, only:  component_has_positions, component_has_orientations, &
     component_can_move, component_can_rotate, component_can_exchange
 
