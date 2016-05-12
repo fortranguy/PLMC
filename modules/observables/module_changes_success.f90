@@ -14,13 +14,13 @@ public :: changes_counter_reset, changes_counter_set, switches_counters_reset, s
     end type Concrete_Change_Counter
 
     type, public :: Concrete_Changes_Counter
-        type(Concrete_Change_Counter) :: move
+        type(Concrete_Change_Counter) :: translation
         type(Concrete_Change_Counter) :: rotation
         type(Concrete_Change_Counter) :: exchange
     end type Concrete_Changes_Counter
 
     type, public :: Concrete_Changes_Success
-        real(DP) :: move
+        real(DP) :: translation
         real(DP) :: rotation
         real(DP) :: exchange
     end type Concrete_Changes_Success
@@ -34,7 +34,7 @@ contains
     pure elemental subroutine changes_counter_reset(changes_counter)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counter
 
-        call reset(changes_counter%move)
+        call reset(changes_counter%translation)
         call reset(changes_counter%rotation)
         call reset(changes_counter%exchange)
     end subroutine changes_counter_reset
@@ -56,7 +56,7 @@ contains
         type(Concrete_Changes_Success), intent(inout) :: changes_success
         type(Concrete_Changes_Counter), intent(in) :: changes_counter
 
-        changes_success%move = get_ratio(changes_counter%move)
+        changes_success%translation = get_ratio(changes_counter%translation)
         changes_success%rotation = get_ratio(changes_counter%rotation)
         changes_success%exchange = get_ratio(changes_counter%exchange)
     end subroutine changes_counter_set

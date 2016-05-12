@@ -27,7 +27,7 @@ private
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get_plus => Abstract_get_plus
         procedure :: get_minus => Abstract_get_minus
-        procedure :: update_move => Abstract_update_move
+        procedure :: update_translation => Abstract_update_translation
         procedure :: update_rotation => Abstract_update_rotation
         procedure :: update_add => Abstract_update_add
         procedure :: update_remove => Abstract_update_remove
@@ -48,7 +48,7 @@ private
         procedure :: is_dipolar => Null_is_dipolar
         procedure :: get_plus => Null_get
         procedure :: get_minus => Null_get
-        procedure :: update_move => Null_update_move
+        procedure :: update_translation => Null_update_translation
         procedure :: update_rotation => Null_update_rotation
         procedure :: update_switch => Null_update_switch
         procedure, private :: update_exchange => Null_update_exchange
@@ -143,7 +143,7 @@ contains
     !>          \right)
     !> \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_move(this, i_component, new_position, old)
+    pure subroutine Abstract_update_translation(this, i_component, new_position, old)
         class(Abstract_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
@@ -200,7 +200,7 @@ contains
                     (fourier_position_new / exp_kz_new - fourier_position_old / exp_kz_old)
             end do
         end do
-    end subroutine Abstract_update_move
+    end subroutine Abstract_update_translation
 
     !> Structure factors update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
     !>  \[
@@ -440,12 +440,12 @@ contains
         structure_pm = cmplx(0._DP, 0._DP, DP)
     end function Null_get
 
-    pure subroutine Null_update_move(this, i_component, new_position, old)
+    pure subroutine Null_update_translation(this, i_component, new_position, old)
         class(Null_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
-    end subroutine Null_update_move
+    end subroutine Null_update_translation
 
     pure subroutine Null_update_rotation(this, i_component, new_dipolar_moment, old)
         class(Null_DLC_Structures), intent(inout) :: this

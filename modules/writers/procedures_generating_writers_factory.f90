@@ -23,7 +23,7 @@ use procedures_component_coordinates_writer_factory, only: &
 use types_component_writers_wrapper, only: Component_Writers_Wrapper
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use procedures_property_inquirers, only:  component_has_positions, component_has_orientations, &
-    component_can_move, component_can_rotate, component_can_exchange
+    component_can_translate, component_can_rotate, component_can_exchange
 
 implicit none
 
@@ -152,8 +152,8 @@ contains
 
         integer :: i_component
         do i_component = 1, size(components)
-            selector_i%write_positions = component_can_move(change_components(i_component)%&
-                moved_positions)
+            selector_i%write_positions = component_can_translate(change_components(i_component)%&
+                translated_positions)
             selector_i%write_rotations = component_can_rotate(change_components(i_component)%&
                 rotated_orientations)
             selector_i%write_exchanges = component_can_exchange(change_components(i_component)%&

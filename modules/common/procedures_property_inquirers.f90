@@ -15,8 +15,8 @@ use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments,
     Concrete_Component_Dipolar_Moments
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential
-use classes_changed_coordinates, only: Abstract_Changed_Coordinates
-use classes_moved_positions, only: Concrete_Moved_Positions
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
+use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
@@ -26,7 +26,7 @@ implicit none
 private
 public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permittivity, &
     use_reciprocal_lattice, use_walls, &
-    component_exists, component_is_dipolar, component_has_positions, component_can_move, &
+    component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
     component_interacts_with_wall, component_can_change
 
@@ -227,19 +227,19 @@ contains
         end select
     end function component_has_positions
 
-    pure logical function component_can_move(moved_positions)
-        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
+    pure logical function component_can_translate(translated_positions)
+        class(Abstract_Moved_Coordinates), intent(in) :: translated_positions
 
-        select type (moved_positions)
-            type is (Concrete_Moved_Positions)
-                component_can_move = .true.
+        select type (translated_positions)
+            type is (Concrete_Translated_Positions)
+                component_can_translate = .true.
             class default
-                component_can_move = .false.
+                component_can_translate = .false.
         end select
-    end function component_can_move
+    end function component_can_translate
 
     pure logical function component_can_rotate(rotated_orientations)
-        class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
+        class(Abstract_Moved_Coordinates), intent(in) :: rotated_orientations
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)
@@ -312,12 +312,12 @@ contains
         end select
     end function component_can_exchange_from_component_exchange
 
-    pure logical function component_can_change(moved_positions, rotated_orientations, &
+    pure logical function component_can_change(translated_positions, rotated_orientations, &
         component_exchange)
-        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions, rotated_orientations
+        class(Abstract_Moved_Coordinates), intent(in) :: translated_positions, rotated_orientations
         class(Abstract_Component_Exchange), intent(in) :: component_exchange
 
-        component_can_change = component_can_move(moved_positions) .or. &
+        component_can_change = component_can_translate(translated_positions) .or. &
             component_can_rotate(rotated_orientations) .or. &
             component_can_exchange(component_exchange)
     end function component_can_change

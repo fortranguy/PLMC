@@ -6,8 +6,8 @@ use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
-use module_change_tuning, only: Concrete_Change_Tuning_Parameters
-use types_change_tuner_parameters, only: Concrete_Change_Tuner_Parameters
+use module_move_tuning, only: Concrete_Move_Tuning_Parameters
+use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_component_factory, only: changes_component_create, changes_component_destroy
 
@@ -27,8 +27,8 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
-        type(Concrete_Change_Tuner_Parameters) :: tuner_parameters
+        type(Concrete_Move_Tuning_Parameters) :: tuning_parameters
+        type(Concrete_Move_Tuner_Parameters) :: tuner_parameters
         type(Concrete_Number_to_String) :: string
         integer :: i_component
 
@@ -45,7 +45,7 @@ contains
     end subroutine changes_create
 
     subroutine set_tuning_parameters(parameters, num_tuning_steps, generating_data, prefix)
-        type(Concrete_Change_Tuning_Parameters), intent(out) :: parameters
+        type(Concrete_Move_Tuning_Parameters), intent(out) :: parameters
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
@@ -67,7 +67,7 @@ contains
     end subroutine set_tuning_parameters
 
     subroutine set_tuner_parameters(parameters, num_tuning_steps, generating_data, prefix)
-        type(Concrete_Change_Tuner_Parameters), intent(out) :: parameters
+        type(Concrete_Move_Tuner_Parameters), intent(out) :: parameters
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix

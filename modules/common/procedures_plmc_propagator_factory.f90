@@ -18,7 +18,7 @@ contains
 
         type(Metropolis_Algorithm_Pointer) :: algorithms(3)
 
-        algorithms(1)%algorithm => metropolis_algorithms%one_particle_move
+        algorithms(1)%algorithm => metropolis_algorithms%one_particle_translation
         algorithms(2)%algorithm => metropolis_algorithms%one_particle_rotation
         algorithms(3)%algorithm => metropolis_algorithms%two_particles_switch
 

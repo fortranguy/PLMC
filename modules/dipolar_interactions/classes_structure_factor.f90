@@ -10,7 +10,7 @@ private
     type, abstract, public :: Abstract_Structure_Factor
     contains
         procedure(Abstract_is_dipolar), deferred :: is_dipolar
-        procedure(Abstract_update_move), deferred :: update_move
+        procedure(Abstract_update_translation), deferred :: update_translation
         procedure(Abstract_update_rotation), deferred :: update_rotation
         procedure(Abstract_update_add), deferred :: update_add
         procedure(Abstract_update_remove), deferred :: update_remove
@@ -25,13 +25,13 @@ private
             integer, intent(in) :: i_component
         end function Abstract_is_dipolar
 
-        pure subroutine Abstract_update_move(this, i_component, new_position, old)
+        pure subroutine Abstract_update_translation(this, i_component, new_position, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Factor
             class(Abstract_Structure_Factor), intent(inout) :: this
             integer, intent(in) :: i_component
             real(DP), intent(in) :: new_position(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
-        end subroutine Abstract_update_move
+        end subroutine Abstract_update_translation
 
         pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Factor

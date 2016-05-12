@@ -1,7 +1,7 @@
 module types_changes_component_wrapper
 
-use classes_changed_coordinates, only: Abstract_Changed_Coordinates
-use classes_change_tuner, only: Abstract_Change_Tuner
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
+use classes_move_tuner, only: Abstract_Move_Tuner
 use classes_component_exchange, only: Abstract_Component_Exchange
 
 implicit none
@@ -9,8 +9,8 @@ implicit none
 private
 
     type, public :: Changes_Component_Wrapper
-        class(Abstract_Changed_Coordinates), allocatable :: moved_positions, rotated_orientations
-        class(Abstract_Change_Tuner), allocatable :: move_tuner, rotation_tuner
+        class(Abstract_Moved_Coordinates), allocatable :: translated_positions, rotated_orientations
+        class(Abstract_Move_Tuner), allocatable :: translation_tuner, rotation_tuner
         class(Abstract_Component_Exchange), allocatable :: exchange
     end type Changes_Component_Wrapper
 
