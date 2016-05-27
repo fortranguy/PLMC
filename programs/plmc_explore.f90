@@ -2,6 +2,7 @@ program plmc_explore
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use types_exploring_io, only: Exploring_IO_Wrapper
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
@@ -12,18 +13,34 @@ use procedures_plmc_help, only: plmc_catch_exploring_help
 implicit none
 
     type(Physical_Model_Wrapper) :: physical_model
+    type(Markov_Chain_Explorer_Wrapper) :: markov_chain_explorer
     type(Exploring_Observables_Wrapper) :: observables
     type(Exploring_IO_Wrapper) :: io
+
+    integer :: num_snaps, i_snap
 
     call plmc_catch_exploring_help()
 
     call plmc_create(io%generating_data, io%exploring_data)
     call plmc_create(physical_model, io%generating_data)
-
+    call plmc_set(num_snaps, physical_model%mixture%components, io%generating_data)
+    call plmc_create(markov_chain_explorer, physical_model, io%exploring_data)
     call plmc_create(observables, physical_model%mixture%components)
+    call plmc_create(io%readers, io%writers, physical_model, num_snaps, markov_chain_explorer, io%&
+        generating_data)
     call plmc_destroy(io%generating_data, io%exploring_data)
 
+    do i_snap = 1, num_snaps
+        call plmc_set(io%readers, i_snap)
+        call plmc_reset(physical_model)
+        call markov_chain_explorer%widom_method%try(observables)
+        call plmc_set(observables)
+        call plmc_write(io%writers, observables, i_snap)
+    end do
+
+    call plmc_destroy(io%readers, io%writers)
     call plmc_destroy(observables)
+    call plmc_destroy(markov_chain_explorer)
     call plmc_destroy(physical_model)
 
 end program plmc_explore

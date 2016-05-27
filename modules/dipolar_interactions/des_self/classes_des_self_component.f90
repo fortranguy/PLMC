@@ -81,11 +81,12 @@ contains
     end function Abstract_visit
 
     !> \[ u(\mu) = \frac{\alpha^3}{6\epsilon\pi^{3/2}} \vec{\mu}\cdot\vec{\mu} \]
-    pure real(DP) function Abstract_meet(this, moment) result(energy)
+    pure real(DP) function Abstract_meet(this, dipolar_moment) result(energy)
         class(Abstract_DES_Self_Component), intent(in) :: this
-        real(DP), intent(in) :: moment(:)
+        real(DP), intent(in) :: dipolar_moment(:)
 
-        energy = this%alpha_cube/this%factor_denominator * dot_product(moment, moment)
+        energy = this%alpha_cube/this%factor_denominator * dot_product(dipolar_moment, &
+            dipolar_moment)
     end function Abstract_meet
 
 !end implementation Abstract_DES_Self_Component
@@ -112,9 +113,9 @@ contains
         energy = 0._DP
     end function Null_visit
 
-    pure real(DP) function Null_meet(this, moment) result(self)
+    pure real(DP) function Null_meet(this, dipolar_moment) result(self)
         class(Null_DES_Self_Component), intent(in) :: this
-        real(DP), intent(in) :: moment(:)
+        real(DP), intent(in) :: dipolar_moment(:)
         self = 0._DP
     end function Null_meet
 

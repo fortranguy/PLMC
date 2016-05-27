@@ -10,7 +10,6 @@ use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_translation => visit_translation
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use classes_hetero_couples, only: Abstract_Hetero_Couples
-use module_changes_success, only: Concrete_Switch_Counters
 use types_temporary_observables, only: Concrete_Double_Delta_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies

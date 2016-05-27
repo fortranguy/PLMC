@@ -9,6 +9,7 @@ private
 
     type, public :: Exploring_Writers_Wrapper
         class(Abstract_Real_Writer), allocatable :: pressure
+        class(Abstract_Line_Writer), allocatable :: widom_successes
         class(Abstract_Line_Writer), allocatable :: inv_pow_activities
     end type Exploring_Writers_Wrapper
 

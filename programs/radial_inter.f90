@@ -20,6 +20,7 @@ use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 use procedures_property_inquirers, only: periodicity_is_xyz
 use types_radial_distribution_component, only: Concrete_Radial_Distribution_Component
+use procedures_plmc_help, only: plmc_catch_radial_help
 
 implicit none
 
@@ -27,7 +28,7 @@ implicit none
     type(Concrete_Radial_Distribution_Component) :: component_1, component_2
     integer :: i_particle, j_particle
     logical :: coordinates_written
-    integer :: num_snaps, i_snap
+    integer :: num_snaps, num_total_snaps, i_snap
     character(len=:), allocatable :: snap_filename
     real(DP) :: max_distance, delta_distance, distance_ij, distance_i
     real(DP), allocatable :: bins_snap(:), bins_function(:)
@@ -39,14 +40,17 @@ implicit none
     character(len=:), allocatable :: data_field
     logical :: data_found
 
-    call plmc_create(generating_data, command_argument_count() - 1)
+    call plmc_catch_radial_help()
+    num_total_snaps = command_argument_count() - 2
+    if (num_total_snaps == 0) call error_exit("No snaps given.")
+    if (mod(num_total_snaps, 2) /= 0) call error_exit("Number of snap shots must be even.")
+    num_snaps = num_total_snaps / 2
+
+    call plmc_create(generating_data, 1)
     data_field = "Output.Coordinates.write"
     call generating_data%get(data_field, coordinates_written, data_found)
     call check_data_found(data_field, data_found)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
-    num_snaps = command_argument_count() - 2
-    if (mod(num_snaps, 2) /= 0) call error_exit("Number of snap shots must be even.")
-    num_snaps = num_snaps / 2
     call box_create(periodic_box, generating_data, environment_prefix)
     if (.not.periodicity_is_xyz(periodic_box)) then
         call warning_continue("Periodicity is not XYZ.")
@@ -54,17 +58,17 @@ implicit none
     call plmc_destroy(generating_data)
     max_distance = minval(periodic_box%get_size())/2._DP
 
-    call plmc_create(exploring_data, command_argument_count())
-    data_field = "Distribution.delta"
+    call plmc_create(exploring_data, 2)
+    data_field = "Radial.delta"
     call exploring_data%get(data_field, delta_distance, data_found)
     call check_data_found(data_field, data_found)
     call check_positive("radial_distribution", "delta_distance", delta_distance)
-    data_field = "Distribution.file name"
+    data_field = "Radial.file name"
     call exploring_data%get(data_field, bins_filename, data_found)
     call check_data_found(data_field, data_found)
     call check_string_not_empty(data_field, bins_filename)
-    call plmc_destroy(exploring_data)
     deallocate(data_field)
+    call plmc_destroy(exploring_data)
 
     allocate(bins_snap(nint(max_distance/delta_distance)))
     allocate(bins_function(size(bins_snap)))
@@ -72,10 +76,10 @@ implicit none
     component_1%num_particles_sum = 0
     bins_function = 0._DP
     do i_snap = 1, num_snaps
-        call create_filename_from_argument(snap_filename, i_snap)
+        call create_filename_from_argument(snap_filename, i_snap + 2)
         call create_positions_from_file(component_1%positions, snap_filename)
         component_1%num_particles = size(component_1%positions, 2)
-        call create_filename_from_argument(snap_filename, num_snaps + i_snap)
+        call create_filename_from_argument(snap_filename, num_snaps + i_snap + 2)
         call create_positions_from_file(component_2%positions, snap_filename)
         component_2%num_particles = size(component_2%positions, 2)
         bins_snap = 0._DP

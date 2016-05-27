@@ -141,10 +141,10 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_dipolar(energies, dipolar_mixture_energy, components, &
+    pure subroutine visit_dipolar(energies, mixture_energy, components, &
         dipolar_interactions)
         type(Reals_Line), intent(inout) :: energies(:)
-        real(DP), intent(out) :: dipolar_mixture_energy
+        real(DP), intent(out) :: mixture_energy
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
@@ -158,7 +158,7 @@ contains
         call triangle_observables_add(energies, real_energies)
         call destroy_triangle_nodes(real_energies)
 
-        dipolar_mixture_energy = dipolar_interactions%reci_visitor%visit() + dipolar_interactions%&
+        mixture_energy = dipolar_interactions%reci_visitor%visit() + dipolar_interactions%&
             surf_mixture%visit() - dipolar_interactions%dlc_visitor%visit()
 
         call visit_des_self(self_energies, dipolar_interactions%self_components)

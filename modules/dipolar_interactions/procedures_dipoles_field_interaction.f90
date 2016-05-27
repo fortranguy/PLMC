@@ -9,7 +9,7 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 implicit none
 
 private
-public :: visit_component, visit_translation, visit_rotation
+public :: visit_component, visit_translation, visit_rotation, visit_add, visit_remove
 
 contains
 
@@ -54,5 +54,28 @@ contains
         delta_energy = dot_product(particles(2)%dipolar_moment - particles(1)%dipolar_moment, &
             external_field%get(particles(2)%position) - external_field%get(particles(1)%position))
     end function visit_switch
+
+    pure real(DP) function visit_add(external_field, particle) result(delta_energy)
+        class(Abstract_External_Field), intent(in) :: external_field
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        delta_energy = visit_exchange(external_field, particle, +1._DP)
+    end function visit_add
+
+    pure real(DP) function visit_remove(external_field, particle) result(delta_energy)
+        class(Abstract_External_Field), intent(in) :: external_field
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        delta_energy = visit_exchange(external_field, particle, -1._DP)
+    end function visit_remove
+
+    pure real(DP) function visit_exchange(external_field, particle, signed) result(delta_energy)
+        class(Abstract_External_Field), intent(in) :: external_field
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+
+        delta_energy = -signed * dot_product(particle%dipolar_moment, external_field%get(particle%&
+            position))
+    end function visit_exchange
 
 end module procedures_dipoles_field_interaction

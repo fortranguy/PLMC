@@ -159,8 +159,8 @@ contains
         if (.not.this%total_moment%is_dipolar(i_component)) return
 
         delta_energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
-            dot_product(dipolar_moment, dipolar_moment) + &
-            signed*2._DP*dot_product(dipolar_moment, this%total_moment%get())
+            (dot_product(dipolar_moment, dipolar_moment) + &
+             signed*2._DP*dot_product(dipolar_moment, this%total_moment%get()))
     end function Spherical_visit_exchange
 
 !end implementation Spherical_DES_Surf_Mixture

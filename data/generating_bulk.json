@@ -2,7 +2,8 @@
     "Environment": {
         "Box": {
             "periodicity": "XYZ",
-            "initial size": [12.0, 12.0, 12.0]
+            "initial size": [12.0, 12.0, 12.0],
+            "size changes": false
         },
         "Thermostat": {
             "temperature": 1.0

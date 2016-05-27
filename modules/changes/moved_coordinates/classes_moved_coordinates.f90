@@ -31,9 +31,9 @@ private
             class(Abstract_Moved_Coordinates), intent(inout) :: this
         end subroutine Abstract_decrease_delta
 
-        function Abstract_get(this, i_particle) result(changed)
+        function Abstract_get(this, i_particle) result(moved_coordinates)
             import :: DP, num_dimensions, Abstract_Moved_Coordinates
-            real(DP) :: changed(num_dimensions)
+            real(DP) :: moved_coordinates(num_dimensions)
             class(Abstract_Moved_Coordinates), intent(in) :: this
             integer, intent(in) :: i_particle
         end function Abstract_get
@@ -69,11 +69,11 @@ contains
         class(Null_Moved_Coordinates), intent(inout) :: this
     end subroutine Null_decrease_delta
 
-    function Null_get(this, i_particle) result(changed)
-        real(DP) :: changed(num_dimensions)
+    function Null_get(this, i_particle) result(moved_coordinates)
+        real(DP) :: moved_coordinates(num_dimensions)
         class(Null_Moved_Coordinates), intent(in) :: this
         integer, intent(in) :: i_particle
-        changed = 0._DP
+        moved_coordinates = 0._DP
     end function Null_get
 
 !end implementation Null_Moved_Coordinates

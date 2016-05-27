@@ -11,11 +11,12 @@ use procedures_hard_core_factory, only: hard_core_create => create, hard_core_de
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
+use procedures_property_inquirers, only: component_has_positions, component_has_orientations
 
 implicit none
 
 private
-public :: mixture_create, mixture_destroy
+public :: mixture_create, mixture_destroy, set_have_positions, set_have_orientations
 
 interface mixture_create
     module procedure :: create_all
@@ -79,6 +80,29 @@ contains
                 generating_data, prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine create_components
+
+    subroutine set_have_positions(have_positions, components)
+        logical, intent(out) :: have_positions(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(have_positions)
+            have_positions(i_component) = component_has_positions(components(i_component)%positions)
+        end do
+    end subroutine set_have_positions
+
+    subroutine set_have_orientations(have_orientations, components)
+        logical, intent(out) :: have_orientations(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(have_orientations)
+            have_orientations(i_component) = component_has_orientations(components(i_component)%&
+                orientations)
+        end do
+    end subroutine set_have_orientations
 
     subroutine destroy_components(components)
         type(Component_Wrapper), allocatable, intent(inout) :: components(:)

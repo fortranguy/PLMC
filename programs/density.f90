@@ -11,6 +11,7 @@ use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
+use procedures_plmc_help, only: plmc_catch_density_help
 
 implicit none
 
@@ -27,23 +28,25 @@ implicit none
     character(len=:), allocatable :: data_field
     logical :: data_found
 
-    call plmc_create(generating_data, command_argument_count() - 1)
+    call plmc_catch_density_help()
+    num_snaps = command_argument_count() - 2
+    if (num_snaps == 0) call error_exit("No snaps given.")
+
+    call plmc_create(generating_data, 1)
     data_field = "Output.Coordinates.write"
     call generating_data%get(data_field, coordinates_written, data_found)
     call check_data_found(data_field, data_found)
     deallocate(data_field)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
-    num_snaps = command_argument_count() - 2
     call box_create(periodic_box, generating_data, environment_prefix)
     call plmc_destroy(generating_data)
-
-    call plmc_create(exploring_data, command_argument_count())
+    call plmc_create(exploring_data, 2)
     call box_create(parallelepiped_domain, periodic_box, .true., exploring_data, "Density.")
     call plmc_destroy(exploring_data)
 
     num_inside_sum = 0
     do i_snap = 1, num_snaps
-        call create_filename_from_argument(snap_filename, i_snap)
+        call create_filename_from_argument(snap_filename, i_snap + 2)
         call create_positions_from_file(positions, snap_filename)
         do i_particle = 1, size(positions, 2)
             if (parallelepiped_domain%is_inside(positions(:, i_particle))) then

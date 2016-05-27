@@ -13,6 +13,7 @@ use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
+use procedures_plmc_help, only: plmc_catch_density_help
 use procedures_property_inquirers, only: periodicity_is_xy
 
 implicit none
@@ -36,29 +37,31 @@ implicit none
     character(len=:), allocatable :: data_field
     logical :: data_found
 
-    call plmc_create(generating_data, command_argument_count() - 1)
+    call plmc_catch_density_help()
+    num_snaps = command_argument_count() - 2
+    if (num_snaps == 0) call error_exit("No snaps given.")
+
+    call plmc_create(generating_data, 1)
     data_field = "Output.Coordinates.write"
     call generating_data%get(data_field, coordinates_written, data_found)
     call check_data_found(data_field, data_found)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
-    num_snaps = command_argument_count() - 2
     call box_create(periodic_box, generating_data, environment_prefix)
     call plmc_destroy(generating_data)
-
-    call plmc_create(exploring_data, command_argument_count())
-    call box_create(parallelepiped_domain, periodic_box, .true., exploring_data, "Z Distribution.")
+    call plmc_create(exploring_data, 2)
+    call box_create(parallelepiped_domain, periodic_box, .true., exploring_data, "Density.")
     if (.not.periodicity_is_xy(periodic_box)) then
         call warning_continue("Periodicity is not XY.")
     end if
-    data_field = "Z Distribution.delta"
+    data_field = "Density.delta"
     call exploring_data%get(data_field, delta, data_found)
     call check_data_found(data_field, data_found)
-    data_field = "Z Distribution.file name"
+    data_field = "Density.file name"
     call exploring_data%get(data_field, bins_filename, data_found)
     call check_data_found(data_field, data_found)
     call check_string_not_empty(data_field, bins_filename)
-    call plmc_destroy(exploring_data)
     deallocate(data_field)
+    call plmc_destroy(exploring_data)
 
     domain_origin = parallelepiped_domain%get_origin()
     domain_size = parallelepiped_domain%get_size()
@@ -68,7 +71,7 @@ implicit none
 
     bins_function = 0._DP
     do i_snap = 1, num_snaps
-        call create_filename_from_argument(snap_filename, i_snap)
+        call create_filename_from_argument(snap_filename, i_snap + 2)
         call create_positions_from_file(positions, snap_filename)
         do i_particle = 1, size(positions, 2)
             if (parallelepiped_domain%is_inside(positions(:, i_particle))) then
@@ -84,7 +87,7 @@ implicit none
 
     open(unit=bins_unit, recl=max_line_length, file=bins_filename, action="write")
     deallocate(bins_filename)
-    write(bins_unit, *) "#  z   distribution"
+    write(bins_unit, *) "# z   distribution"
     do i_z = lbound(bins_function, 1), ubound(bins_function, 1)
         write(bins_unit, *) real(i_z, DP) * delta, bins_function(i_z)
     end do

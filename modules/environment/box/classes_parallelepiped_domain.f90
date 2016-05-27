@@ -3,7 +3,7 @@ module classes_parallelepiped_domain
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_periodic_box, only: Abstract_Periodic_Box
-use procedures_errors, only: error_exit
+use procedures_errors, only: warning_continue
 use procedures_checks, only: check_array_size, check_positive
 
 implicit none
@@ -61,7 +61,7 @@ contains
         this%size = size
 
         if (.not.this%is_boxed()) then
-            call error_exit("Abstract_Parallelepiped_Domain: domain is not boxed.")
+            call warning_continue("Abstract_Parallelepiped_Domain: domain is not boxed.")
         end if
     end subroutine Abstract_construct
 

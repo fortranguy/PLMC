@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_component_wrapper, only: Component_Wrapper
 use types_reals_line, only: Reals_Line
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
-    Concrete_Switch_Counters, changes_counter_reset, switches_counters_reset
+    Concrete_Change_Counters_Line, reset_counters
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
@@ -67,7 +67,7 @@ contains
 
         allocate(counters(num_components))
         do i_counter = 1, size(counters)
-            call changes_counter_reset(counters(i_counter))
+            call reset_counters(counters(i_counter))
         end do
     end subroutine create_changes_counters
 
@@ -78,7 +78,7 @@ contains
     end subroutine destroy_changes_counters
 
     pure subroutine create_switches_counters(counters, num_components)
-        type(Concrete_Switch_Counters), allocatable, intent(out) :: counters(:)
+        type(Concrete_Change_Counters_Line), allocatable, intent(out) :: counters(:)
         integer, intent(in) :: num_components
 
         integer :: i_counter
@@ -87,11 +87,11 @@ contains
         do i_counter = 1, size(counters)
             allocate(counters(i_counter)%line(i_counter))
         end do
-        call switches_counters_reset(counters)
+        call reset_counters(counters)
     end subroutine create_switches_counters
 
     pure subroutine destroy_switches_counters(counters)
-        type(Concrete_Switch_Counters), allocatable, intent(out) :: counters(:)
+        type(Concrete_Change_Counters_Line), allocatable, intent(out) :: counters(:)
 
         integer :: i_counter
 

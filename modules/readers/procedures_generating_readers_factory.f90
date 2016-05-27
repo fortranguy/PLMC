@@ -12,25 +12,25 @@ use types_generating_readers_wrapper, only: Generating_Readers_Wrapper
 implicit none
 
 private
-public :: generating_readers_create, generating_readers_destroy, generating_readers_set
+public :: create, destroy, set
 
 contains
 
-    subroutine generating_readers_create(readers, components)
+    subroutine create(readers, components)
         type(Generating_Readers_Wrapper), intent(out) :: readers
         type(Component_Wrapper), intent(in) :: components(:)
 
         call coordinates_reader_create(readers%components, components)
-    end subroutine generating_readers_create
+    end subroutine create
 
-    subroutine generating_readers_destroy(readers)
+    subroutine destroy(readers)
         type(Generating_Readers_Wrapper), intent(inout) :: readers
 
         call coordinates_reader_destroy(readers%components)
-    end subroutine generating_readers_destroy
+    end subroutine destroy
 
-    subroutine generating_readers_set(components_readers, generating_data, prefix)
-        type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
+    subroutine set(components, generating_data, prefix)
+        type(Component_Coordinates_Reader_wrapper), intent(in) :: components(:)
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
@@ -39,12 +39,12 @@ contains
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
 
-        do i_component = 1, size(components_readers)
+        do i_component = 1, size(components)
             data_field = prefix//"Component "//string%get(i_component)//"."//"initial coordinates"
             call generating_data%get(data_field, filename, data_found)
             call check_data_found(data_field, data_found)
-            call components_readers(i_component)%coordinates%read(filename)
+            call components(i_component)%coordinates%read(filename)
         end do
-    end subroutine generating_readers_set
+    end subroutine set
 
 end module procedures_generating_readers_factory

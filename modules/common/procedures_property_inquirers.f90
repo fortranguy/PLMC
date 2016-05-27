@@ -20,6 +20,7 @@ use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
+use classes_widom_method, only: Abstract_Widom_Method, Concrete_Widom_Method
 
 implicit none
 
@@ -28,7 +29,7 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
     use_reciprocal_lattice, use_walls, &
     component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
-    component_interacts_with_wall, component_can_change
+    component_interacts_with_wall, component_can_change, measure_chemical_potentials
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -69,6 +70,11 @@ interface components_interact
     module procedure :: components_interact_from_min_distance
     module procedure :: components_interact_from_pair_potential
 end interface components_interact
+
+interface measure_chemical_potentials
+    module procedure :: measure_chemical_potentials_from_json
+    module procedure :: measure_chemical_potentials_from_widom_method
+end interface measure_chemical_potentials
 
 contains
 
@@ -322,13 +328,34 @@ contains
             component_can_exchange(component_exchange)
     end function component_can_change
 
-    logical function logical_from_json(generating_data, statement)
-        type(json_file), intent(inout) :: generating_data
+    logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
+        result(measure_chemical_potentials)
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        measure_chemical_potentials = logical_from_json(exploring_data, &
+            prefix//"mesure chemical potentials")
+    end function measure_chemical_potentials_from_json
+
+    pure logical function measure_chemical_potentials_from_widom_method(widom_method) &
+        result(measure_chemical_potentials)
+        class(Abstract_Widom_Method), intent(in) :: widom_method
+
+        select type (widom_method)
+            type is (Concrete_Widom_Method)
+                measure_chemical_potentials = .true.
+            class default
+                measure_chemical_potentials = .false.
+        end select
+    end function measure_chemical_potentials_from_widom_method
+
+    logical function logical_from_json(json_data, statement)
+        type(json_file), intent(inout) :: json_data
         character(len=*), intent(in) :: statement
 
         logical :: data_found
 
-        call generating_data%get(statement, logical_from_json, data_found)
+        call json_data%get(statement, logical_from_json, data_found)
         call check_data_found(statement, data_found)
     end function logical_from_json
 

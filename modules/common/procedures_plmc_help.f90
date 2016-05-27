@@ -7,19 +7,30 @@ use procedures_errors, only: error_exit
 implicit none
 
 private
-public :: plmc_catch_generating_help, plmc_catch_exploring_help
+public :: plmc_catch_generating_help, plmc_catch_exploring_help, plmc_catch_density_help, &
+    plmc_catch_radial_help
 
 contains
 
     subroutine plmc_catch_generating_help()
         call plmc_catch_help_core("plmc_catch_generating_help", &
-            "Please provide a data file in json format.")
+            "Please provide generating.json.")
     end subroutine plmc_catch_generating_help
 
     subroutine plmc_catch_exploring_help()
         call plmc_catch_help_core("plmc_catch_exploring_help", &
-            "Please provide two data files in json format.")
+            "Please provide generating.json, exploring.json and snap shots for all components.")
     end subroutine plmc_catch_exploring_help
+
+    subroutine plmc_catch_density_help()
+        call plmc_catch_help_core("plmc_catch_density_help", &
+            "Please provide generating.json, exploring.json and snap shots.")
+    end subroutine plmc_catch_density_help
+
+    subroutine plmc_catch_radial_help()
+        call plmc_catch_help_core("plmc_catch_radial_help", &
+            "Please provide generating.json, exploring.json and snap shots.")
+    end subroutine plmc_catch_radial_help
 
     subroutine plmc_catch_help_core(procedure_name, message)
         character(len=*), intent(in) :: procedure_name, message

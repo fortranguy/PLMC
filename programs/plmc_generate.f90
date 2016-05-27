@@ -36,26 +36,26 @@ implicit none
 
     call plmc_reset(physical_model)
     call plmc_visit(observables, physical_model)
-    call plmc_write(num_tuning_steps, num_steps, -num_tuning_steps, io%writers, observables)
+    call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call markov_chain_generator%plmc_propagator%try(observables)
         call plmc_set(observables)
         call plmc_set(changes_tuned, i_step, markov_chain_generator%changes%components, &
             observables%changes_sucesses)
-        call plmc_write(num_tuning_steps, num_steps, i_step, io%writers, observables)
+        call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
         if (changes_tuned) exit
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call markov_chain_generator%plmc_propagator%try(observables)
         call plmc_set(observables)
-        call plmc_write(num_tuning_steps, num_steps, i_step, io%writers, observables)
+        call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
     end do
     write(output_unit, *) "Iterations end."
     call plmc_reset(physical_model)
     call plmc_visit(observables, physical_model)
-    call plmc_write(num_tuning_steps, num_steps, num_steps, io%writers, observables)
+    call plmc_write(io%writers, observables, num_tuning_steps, num_steps, num_steps)
 
     call plmc_destroy(io%readers, io%writers)
     call plmc_destroy(observables)

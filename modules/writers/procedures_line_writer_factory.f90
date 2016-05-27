@@ -15,6 +15,7 @@ public :: create, destroy
 interface create
     module procedure :: create_field
     module procedure :: create_walls
+    module procedure :: create_line
 end interface
 
 contains
@@ -59,6 +60,19 @@ contains
         end if
         call walls%construct(selector, filename)
     end subroutine create_walls
+
+    subroutine create_line(line, selector, filename)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: line
+        logical, intent(in) :: selector(:)
+        character(len=*), intent(in) :: filename
+
+        if (any(selector)) then
+            allocate(Concrete_Line_Writer :: line)
+        else
+            allocate(Null_Line_Writer :: line)
+        end if
+        call line%construct(selector, filename)
+    end subroutine create_line
 
     subroutine destroy(line)
         class(Abstract_Line_Writer), allocatable, intent(inout) :: line

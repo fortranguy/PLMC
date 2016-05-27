@@ -8,7 +8,7 @@ use procedures_normal_random_number, only: normal_random_number
 implicit none
 
 private
-public :: random_integer, random_orientation, markov_orientation
+public :: random_integer, markov_orientation
 
 contains
 
@@ -26,14 +26,6 @@ contains
             random_integer = int(rand * real(maximum, DP)) + 1
         end if
     end function random_integer
-
-    !> From SMAC, Algorithm 1.23, p. 43
-    function random_orientation()
-        real(DP), dimension(num_dimensions) :: random_orientation
-
-        call normal_random_number(random_orientation)
-        random_orientation = random_orientation / norm2(random_orientation)
-    end function random_orientation
 
     !> From SMAC, Algorithm 1.24, p.44
     subroutine markov_orientation(orientation, orientation_delta)

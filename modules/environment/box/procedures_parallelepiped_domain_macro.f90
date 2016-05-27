@@ -33,14 +33,4 @@ contains
         end do
     end function domains_overlap
 
-    function domain_random_position(domain) result(random_position)
-        class(Abstract_Parallelepiped_Domain), intent(in) :: domain
-        real(DP), dimension(num_dimensions) :: random_position
-
-        real(DP) :: rand_3d(num_dimensions)
-
-        call random_number(rand_3d)
-        random_position = domain%get_origin() + (rand_3d - 0.5_DP) * domain%get_size()
-    end function domain_random_position
-
 end module procedures_parallelepiped_domain_macro

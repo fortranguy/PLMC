@@ -28,19 +28,19 @@ use procedures_property_inquirers, only:  component_has_positions, component_has
 implicit none
 
 private
-public :: generating_writers_create, generating_writers_destroy
+public :: create, destroy
 
-interface generating_writers_create
+interface create
     module procedure :: create_all
     module procedure :: create_components
     module procedure :: create_components_coordinates
     module procedure :: create_change_components
-end interface generating_writers_create
+end interface create
 
-interface generating_writers_destroy
+interface destroy
     module procedure :: destroy_components
     module procedure :: destroy_all
-end interface generating_writers_destroy
+end interface destroy
 
 contains
 
@@ -57,7 +57,7 @@ contains
 
         logical :: are_dipolar(size(components))
 
-        call generating_writers_create(writers%components, components, change_components, &
+        call create(writers%components, components, change_components, &
             generating_data, prefix)
         call line_writer_create(writers%field, environment%external_field, components, &
             "field_energies.out")
@@ -79,7 +79,7 @@ contains
         call triangle_writer_destroy(writers%switches)
         call line_writer_destroy(writers%walls)
         call line_writer_destroy(writers%field)
-        call generating_writers_destroy(writers%components)
+        call destroy(writers%components)
     end subroutine destroy_all
 
     subroutine create_components(components, mixture_components, change_components, &
@@ -91,8 +91,8 @@ contains
         character(len=*), intent(in) :: prefix
 
         allocate(components(size(mixture_components)))
-        call generating_writers_create(components, mixture_components, generating_data, prefix)
-        call generating_writers_create(components, change_components)
+        call create(components, mixture_components, generating_data, prefix)
+        call create(components, change_components)
     end subroutine create_components
 
     subroutine destroy_components(components)

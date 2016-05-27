@@ -6,9 +6,21 @@ use types_reals_line, only: Reals_Line
 implicit none
 
 private
-public :: changes_counter_reset, changes_counter_set, switches_counters_reset, switches_counters_set
+public :: reset_counters, set_successes
 
-    type :: Concrete_Change_Counter
+interface reset_counters
+    module procedure :: changes_counter_reset
+    module procedure :: change_counters_reset
+    module procedure :: change_counter_reset
+end interface reset_counters
+
+interface set_successes
+    module procedure :: changes_success_set
+    module procedure :: change_successes_set
+    module procedure :: change_success_set
+end interface set_successes
+
+    type, public :: Concrete_Change_Counter
         integer :: num_hits
         integer :: num_success
     end type Concrete_Change_Counter
@@ -25,57 +37,64 @@ public :: changes_counter_reset, changes_counter_set, switches_counters_reset, s
         real(DP) :: exchange
     end type Concrete_Changes_Success
 
-    type, public :: Concrete_Switch_Counters
+    type, public :: Concrete_Change_Counters_Line
         type(Concrete_Change_Counter), allocatable :: line(:)
-    end type Concrete_Switch_Counters
+    end type Concrete_Change_Counters_Line
 
 contains
 
-    pure elemental subroutine changes_counter_reset(changes_counter)
-        type(Concrete_Changes_Counter), intent(inout) :: changes_counter
+    pure elemental subroutine changes_counter_reset(counter)
+        type(Concrete_Changes_Counter), intent(inout) :: counter
 
-        call reset(changes_counter%translation)
-        call reset(changes_counter%rotation)
-        call reset(changes_counter%exchange)
+        call reset_counters(counter%translation)
+        call reset_counters(counter%rotation)
+        call reset_counters(counter%exchange)
     end subroutine changes_counter_reset
 
-    pure elemental subroutine switches_counters_reset(switches_counters)
-        type(Concrete_Switch_Counters), intent(inout) :: switches_counters
+    pure elemental subroutine change_counters_reset(counters)
+        type(Concrete_Change_Counters_Line), intent(inout) :: counters
 
-        call reset(switches_counters%line)
-    end subroutine switches_counters_reset
+        call reset_counters(counters%line)
+    end subroutine change_counters_reset
 
-    pure elemental subroutine reset(changes_counter)
-        type(Concrete_Change_Counter), intent(inout) :: changes_counter
+    pure elemental subroutine change_counter_reset(counter)
+        type(Concrete_Change_Counter), intent(inout) :: counter
 
-        changes_counter%num_hits = 0
-        changes_counter%num_success = 0
-    end subroutine reset
+        counter%num_hits = 0
+        counter%num_success = 0
+    end subroutine change_counter_reset
 
-    pure elemental subroutine changes_counter_set(changes_success, changes_counter)
-        type(Concrete_Changes_Success), intent(inout) :: changes_success
-        type(Concrete_Changes_Counter), intent(in) :: changes_counter
+    pure elemental subroutine changes_success_set(success, counter)
+        type(Concrete_Changes_Success), intent(inout) :: success
+        type(Concrete_Changes_Counter), intent(in) :: counter
 
-        changes_success%translation = get_ratio(changes_counter%translation)
-        changes_success%rotation = get_ratio(changes_counter%rotation)
-        changes_success%exchange = get_ratio(changes_counter%exchange)
-    end subroutine changes_counter_set
+        success%translation = calculate_ratio(counter%translation)
+        success%rotation = calculate_ratio(counter%rotation)
+        success%exchange = calculate_ratio(counter%exchange)
+    end subroutine changes_success_set
 
-    pure elemental subroutine switches_counters_set(switches_successes, switches_counters)
-        type(Reals_Line), intent(inout) :: switches_successes
-        type(Concrete_Switch_Counters), intent(in) :: switches_counters
+    pure elemental subroutine change_successes_set(successes, counters)
+        type(Reals_Line), intent(inout) :: successes
+        type(Concrete_Change_Counters_Line), intent(in) :: counters
 
-        switches_successes%line = get_ratio(switches_counters%line)
-    end subroutine switches_counters_set
+        successes%line = calculate_ratio(counters%line)
+    end subroutine change_successes_set
 
-    pure elemental real(DP) function get_ratio(change_counter)
-        type(Concrete_Change_Counter), intent(in) :: change_counter
+    pure elemental subroutine change_success_set(success, counter)
+        real(DP), intent(inout) :: success
+        type(Concrete_Change_Counter), intent(in) :: counter
 
-        if (change_counter%num_hits > 0) then
-            get_ratio = real(change_counter%num_success, DP) / real(change_counter%num_hits, DP)
+        success = calculate_ratio(counter)
+    end subroutine change_success_set
+
+    pure elemental real(DP) function calculate_ratio(counter) result(ratio)
+        type(Concrete_Change_Counter), intent(in) :: counter
+
+        if (counter%num_hits > 0) then
+            ratio = real(counter%num_success, DP) / real(counter%num_hits, DP)
         else
-            get_ratio = 0._DP
+            ratio = 0._DP
         end if
-    end function get_ratio
+    end function calculate_ratio
 
 end module module_changes_success

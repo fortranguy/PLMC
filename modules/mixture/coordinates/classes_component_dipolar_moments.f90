@@ -67,12 +67,12 @@ contains
         norm = this%norm
     end function Abstract_get_norm
 
-    pure function Abstract_get(this, i_particle) result(moment)
+    pure function Abstract_get(this, i_particle) result(dipolar_moment)
         class(Abstract_Component_Dipolar_Moments), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: moment(num_dimensions)
+        real(DP) :: dipolar_moment(num_dimensions)
 
-        moment = this%norm * this%orientations%get(i_particle)
+        dipolar_moment = this%norm * this%orientations%get(i_particle)
     end function Abstract_get
 
 !end implementation Abstract_Component_Dipolar_Moments
@@ -99,11 +99,11 @@ contains
         norm = 0._DP
     end function Null_get_norm
 
-    pure function Null_get(this, i_particle) result(moment)
+    pure function Null_get(this, i_particle) result(dipolar_moment)
         class(Null_Component_Dipolar_Moments), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: moment(num_dimensions)
-        moment = 0._DP
+        real(DP) :: dipolar_moment(num_dimensions)
+        dipolar_moment = 0._DP
     end function Null_get
 
 !end implementation Null_Component_Dipolar_Moments
