@@ -11,7 +11,7 @@ use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_set
 use procedures_markov_chain_generator_factory, only: markov_chain_generator_create => create, &
     markov_chain_generator_destroy => destroy, markov_chain_generator_set => set
 use procedures_observables_factory, only: observables_create_generating, &
-    observables_destroy_generating
+    observables_create_exploring, observables_destroy_generating, observables_destroy_exploring
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter, &
     Concrete_Switch_Counters, &
     changes_counter_reset, changes_counter_set, switches_counters_reset, switches_counters_set
@@ -36,13 +36,17 @@ interface plmc_create
     module procedure :: physical_model_create
     module procedure :: markov_chain_generator_create
     module procedure :: observables_create_generating
+    module procedure :: observables_create_exploring
     module procedure :: create_readers_writers
-    module procedure :: create_generating_data
+    module procedure :: create_generating_data, create_exploring_data
+    module procedure :: create_json_data
 end interface plmc_create
 
 interface plmc_destroy
-    module procedure :: destroy_generating_data
+    module procedure :: destroy_json_data
+    module procedure :: destroy_exploring_data
     module procedure :: destroy_readers_writers
+    module procedure :: observables_destroy_exploring
     module procedure :: observables_destroy_generating
     module procedure :: markov_chain_generator_destroy
     module procedure :: physical_model_destroy
@@ -79,24 +83,44 @@ contains
         call generating_readers_destroy(readers)
     end subroutine destroy_readers_writers
 
-    subroutine create_generating_data(generating_data, i_argument)
+    subroutine create_generating_data(generating_data)
         type(json_file), intent(out) :: generating_data
+
+        call create_json_data(generating_data, 1)
+    end subroutine create_generating_data
+
+    subroutine create_exploring_data(generating_data, exploring_data)
+        type(json_file), intent(out) :: generating_data, exploring_data
+
+        call create_json_data(generating_data, 1)
+        call create_json_data(exploring_data, 2)
+    end subroutine create_exploring_data
+
+    subroutine create_json_data(json_data, i_argument)
+        type(json_file), intent(out) :: json_data
         integer, intent(in) :: i_argument
 
         character(len=:), allocatable :: data_filename
 
-        call generating_data%initialize()
-        if (generating_data%failed()) call generating_data%print_error_message(error_unit)
+        call json_data%initialize()
+        if (json_data%failed()) call json_data%print_error_message(error_unit)
         call create_filename_from_argument(data_filename, i_argument)
-        call generating_data%load_file(data_filename)
-        if (generating_data%failed()) call generating_data%print_error_message(error_unit)
-    end subroutine create_generating_data
+        call json_data%load_file(data_filename)
+        if (json_data%failed()) call json_data%print_error_message(error_unit)
+    end subroutine create_json_data
 
-    subroutine destroy_generating_data(generating_data)
-        type(json_file), intent(inout) :: generating_data
+    subroutine destroy_exploring_data(generating_data, exploring_data)
+        type(json_file), intent(inout) :: generating_data, exploring_data
 
-        call generating_data%destroy()
-    end subroutine destroy_generating_data
+        call destroy_json_data(exploring_data)
+        call destroy_json_data(generating_data)
+    end subroutine destroy_exploring_data
+
+    subroutine destroy_json_data(json_data)
+        type(json_file), intent(inout) :: json_data
+
+        call json_data%destroy()
+    end subroutine destroy_json_data
 
     subroutine tune_components_moves(tuned, i_step, change_components, changes_sucesses)
         logical, intent(out) :: tuned

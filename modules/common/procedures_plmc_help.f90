@@ -7,22 +7,29 @@ use procedures_errors, only: error_exit
 implicit none
 
 private
-public :: plmc_catch_help
+public :: plmc_catch_generating_help, plmc_catch_exploring_help
 
 contains
 
-    subroutine plmc_catch_help()
-        call plmc_catch_help_core("Please provide a data file in json format.")
-    end subroutine plmc_catch_help
+    subroutine plmc_catch_generating_help()
+        call plmc_catch_help_core("plmc_catch_generating_help", &
+            "Please provide a data file in json format.")
+    end subroutine plmc_catch_generating_help
 
-    subroutine plmc_catch_help_core(message)
-        character(len=*), intent(in) :: message
+    subroutine plmc_catch_exploring_help()
+        call plmc_catch_help_core("plmc_catch_exploring_help", &
+            "Please provide two data files in json format.")
+    end subroutine plmc_catch_exploring_help
+
+    subroutine plmc_catch_help_core(procedure_name, message)
+        character(len=*), intent(in) :: procedure_name, message
 
         character(len=max_word_length) :: argument
         integer :: length, status
 
         call get_command_argument(1, argument, length, status)
-        if (status /= 0) call error_exit("in procedures_plmc_help: plmc_help(). Type -h for help.")
+        if (status /= 0) call error_exit("in procedures_plmc_help: "//procedure_name//&
+            ". Type -h for help.")
 
         select case (argument)
             case ("-h", "--help")

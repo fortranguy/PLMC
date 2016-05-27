@@ -6,7 +6,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/CMakeMacroForceAddFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SetCompilerFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SetArchiverAndLinkingTool.cmake)
 
-find_package(jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.3.0 REQUIRED)
+find_package(jsonfortran-${CMAKE_Fortran_COMPILER_ID} 5.0.0 REQUIRED)
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
 file(GLOB_RECURSE lib_source_files *.f90)

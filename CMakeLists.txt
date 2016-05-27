@@ -12,7 +12,7 @@ set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules ${CMAKE_CURRENT_BINARY_DIR}/lib)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-find_package(jsonfortran-${CMAKE_Fortran_COMPILER_ID} 4.3.0 REQUIRED)
+find_package(jsonfortran-${CMAKE_Fortran_COMPILER_ID} 5.0.0 REQUIRED)
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
 file(GLOB_RECURSE programs_source_files programs/*.f90)

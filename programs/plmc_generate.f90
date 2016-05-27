@@ -9,7 +9,7 @@ use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
 use procedures_plmc_reset, only: plmc_reset
 use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_write, only: plmc_write
-use procedures_plmc_help, only: plmc_catch_help
+use procedures_plmc_help, only: plmc_catch_generating_help
 
 implicit none
 
@@ -21,16 +21,15 @@ implicit none
     integer :: num_tuning_steps, num_steps, i_step
     logical :: changes_tuned
 
-    call plmc_catch_help()
+    call plmc_catch_generating_help()
 
-    call plmc_create(io%generating_data, 1)
+    call plmc_create(io%generating_data)
     call plmc_create(physical_model, io%generating_data)
     call plmc_set(num_tuning_steps, num_steps, io%generating_data)
     call plmc_create(markov_chain_generator, physical_model, num_tuning_steps, io%generating_data)
     call plmc_create(observables, physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_generator%changes, &
         io%generating_data)
-
     call plmc_set(io%readers%components, io%generating_data)
     call plmc_set(markov_chain_generator)
     call plmc_destroy(io%generating_data)
