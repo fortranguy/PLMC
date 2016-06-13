@@ -220,6 +220,8 @@ contains
         ijk_cell = this%neighbour_cells%index(particle%position)
         call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%remove(particle%i)
         if (particle%i < this%positions%get_num()) then
+            ijk_cell = this%neighbour_cells%index(this%positions%get(this%positions%&
+                get_num()))
             call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%set(this%positions%&
                 get_num(), particle%i)
         end if

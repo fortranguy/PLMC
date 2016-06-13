@@ -16,11 +16,14 @@ contains
         class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
         type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis_algorithms
 
-        type(Metropolis_Algorithm_Pointer) :: algorithms(3)
+        type(Metropolis_Algorithm_Pointer) :: algorithms(6)
 
         algorithms(1)%algorithm => metropolis_algorithms%one_particle_translation
         algorithms(2)%algorithm => metropolis_algorithms%one_particle_rotation
         algorithms(3)%algorithm => metropolis_algorithms%two_particles_switch
+        algorithms(4)%algorithm => metropolis_algorithms%one_particle_add
+        algorithms(5)%algorithm => metropolis_algorithms%one_particle_remove
+        algorithms(6)%algorithm => metropolis_algorithms%two_particles_transmutation
 
         allocate(Concrete_PLMC_Propagator :: propagator) !What about Null_?
         call propagator%construct(algorithms)

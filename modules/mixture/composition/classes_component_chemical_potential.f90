@@ -1,3 +1,4 @@
+! remove from composition?
 module classes_component_chemical_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
@@ -40,7 +41,6 @@ contains
 
         call check_positive("Abstract_Component_Chemical_Potential", "density", density)
         this%density = density
-        call check_positive("Abstract_Component_Chemical_Potential", "excess", excess)
         this%excess = excess
     end subroutine Abstract_set
 

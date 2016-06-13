@@ -2,15 +2,19 @@ module types_exploring_observables_wrapper
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_changes_success, only: Concrete_Change_Counter
+use types_reals_line, only: Reals_Line
 
 implicit none
 
 private
 
     type, public :: Exploring_Observables_Wrapper
+        real(DP), allocatable :: inv_pow_activities(:)
+        real(DP), allocatable :: field_energies(:), walls_energies(:)
+        type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
+        real(DP) :: dipolar_mixture_energy = 0._DP
         type(Concrete_Change_Counter), allocatable :: widom_counters(:)
         real(DP), allocatable :: widom_successes(:)
-        real(DP), allocatable :: inv_pow_activities(:)
     end type Exploring_Observables_Wrapper
 
 end module types_exploring_observables_wrapper

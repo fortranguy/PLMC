@@ -20,7 +20,7 @@ contains
         type(Generating_Observables_Wrapper), intent(out) :: observables
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call generating_create(observables, components)
+        call generating_create(observables, size(components))
     end subroutine observables_create_generating
 
     subroutine observables_destroy_generating(observables)
@@ -33,7 +33,7 @@ contains
         type(Exploring_Observables_Wrapper), intent(out) :: observables
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call exploring_create(observables, components)
+        call exploring_create(observables, size(components))
     end subroutine observables_create_exploring
 
     subroutine observables_destroy_exploring(observables)

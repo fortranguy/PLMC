@@ -19,12 +19,12 @@ contains
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
         type(Concrete_Component_Coordinates_Reader_Selector), intent(in) :: selector
 
-        if (selector%read_positions) then
+        if (selector%read_positions .or. selector%read_orientations) then
             allocate(Concrete_Component_Coordinates_Reader :: coordinates)
         else
             allocate(Null_Component_Coordinates_Reader :: coordinates)
         end if
-        call coordinates%construct(number, positions, orientations, selector%read_orientations)
+        call coordinates%construct(number, positions, orientations, selector)
     end subroutine create
 
     subroutine destroy(coordinates)

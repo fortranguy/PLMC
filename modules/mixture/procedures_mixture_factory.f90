@@ -16,7 +16,8 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: mixture_create, mixture_destroy, set_have_positions, set_have_orientations
+public :: mixture_create, mixture_destroy, set_num_particles, set_have_positions, &
+    set_have_orientations
 
 interface mixture_create
     module procedure :: create_all
@@ -81,6 +82,30 @@ contains
         end do
     end subroutine create_components
 
+    subroutine destroy_components(components)
+        type(Component_Wrapper), allocatable, intent(inout) :: components(:)
+
+        integer :: i_component
+
+        if (allocated(components)) then
+            do i_component = size(components), 1, -1
+                call component_destroy(components(i_component))
+            end do
+            deallocate(components)
+        end if
+    end subroutine destroy_components
+
+    subroutine set_num_particles(num_particles, components)
+        integer, intent(inout) :: num_particles(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(num_particles)
+            num_particles(i_component) = components(i_component)%number%get()
+        end do
+    end subroutine set_num_particles
+
     subroutine set_have_positions(have_positions, components)
         logical, intent(out) :: have_positions(:)
         type(Component_Wrapper), intent(in) :: components(:)
@@ -103,18 +128,5 @@ contains
                 orientations)
         end do
     end subroutine set_have_orientations
-
-    subroutine destroy_components(components)
-        type(Component_Wrapper), allocatable, intent(inout) :: components(:)
-
-        integer :: i_component
-
-        if (allocated(components)) then
-            do i_component = size(components), 1, -1
-                call component_destroy(components(i_component))
-            end do
-            deallocate(components)
-        end if
-    end subroutine destroy_components
 
 end module procedures_mixture_factory

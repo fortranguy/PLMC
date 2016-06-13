@@ -11,15 +11,31 @@ private
         integer :: num_indices = 0
         integer, allocatable :: couple(:, :)
     contains
-        procedure :: construct => Abstract_construct
+        procedure(Abstract_construct), deferred :: construct
         procedure :: destroy => Abstract_destroy
         procedure :: get_num_indices => Abstract_get_num_indices
         procedure :: get => Abstract_get
     end type Abstract_Hetero_Couples
 
-    type, extends(Abstract_Hetero_Couples), public :: Concrete_Hetero_Couples
+    abstract interface
 
-    end type Concrete_Hetero_Couples
+        subroutine Abstract_construct(this, num_components)
+        import :: Abstract_Hetero_Couples
+            class(Abstract_Hetero_Couples), intent(out) :: this
+            integer, intent(in) :: num_components
+        end subroutine Abstract_construct
+
+    end interface
+
+    type, extends(Abstract_Hetero_Couples), public :: Half_Hetero_Couples
+    contains
+        procedure :: construct => Half_construct
+    end type Half_Hetero_Couples
+
+    type, extends(Abstract_Hetero_Couples), public :: Full_Hetero_Couples
+    contains
+        procedure :: construct => Full_construct
+    end type Full_Hetero_Couples
 
     type, extends(Abstract_Hetero_Couples), public :: Null_Hetero_Couples
     contains
@@ -32,25 +48,6 @@ private
 contains
 
 !implementation Abstract_Hetero_Couples
-
-    subroutine Abstract_construct(this, num_components)
-        class(Abstract_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_components
-
-        integer :: index, i_component, j_component
-
-        call check_positive("Abstract_Hetero_Couples: construct", "num_components", num_components)
-        this%num_indices = num_components * (num_components - 1) / 2
-        allocate(this%couple(2, this%num_indices))
-        this%couple = 0
-        index = 0
-        do j_component = 2, num_components
-            do i_component = 1, j_component - 1
-                index = index + 1
-                this%couple(:, index) = [j_component, i_component]
-            end do
-        end do
-    end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Hetero_Couples), intent(inout) :: this
@@ -73,6 +70,53 @@ contains
     end function Abstract_get
 
 !implementation Abstract_Hetero_Couples
+
+!implementation Half_Hetero_Couples
+
+    subroutine Half_construct(this, num_components)
+        class(Half_Hetero_Couples), intent(out) :: this
+        integer, intent(in) :: num_components
+
+        integer :: index, i_component, j_component
+
+        call check_positive("Half_Hetero_Couples: construct", "num_components", num_components)
+        this%num_indices = num_components * (num_components - 1) / 2
+        allocate(this%couple(2, this%num_indices))
+        this%couple = 0
+        index = 0
+        do j_component = 2, num_components
+            do i_component = 1, j_component - 1
+                index = index + 1
+                this%couple(:, index) = [j_component, i_component]
+            end do
+        end do
+    end subroutine Half_construct
+
+!end implementation Half_Hetero_Couples
+
+!implementation Full_Hetero_Couples
+
+    subroutine Full_construct(this, num_components)
+        class(Full_Hetero_Couples), intent(out) :: this
+        integer, intent(in) :: num_components
+
+        integer :: index, i_component, j_component
+        call check_positive("Half_Hetero_Couples: construct", "num_components", num_components)
+        this%num_indices = num_components * (num_components - 1)
+        allocate(this%couple(2, this%num_indices))
+        this%couple = 0
+        index = 0
+        do j_component = 1, num_components
+            do i_component = 1, num_components
+                if (i_component /= j_component) then
+                    index = index + 1
+                    this%couple(:, index) = [j_component, i_component]
+                end if
+            end do
+        end do
+    end subroutine Full_construct
+
+!end implementation Full_Hetero_Couples
 
 !implementation Null_Hetero_Couples
 

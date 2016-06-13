@@ -28,6 +28,7 @@ private
         procedure :: get_plus => Abstract_get_plus
         procedure :: get_minus => Abstract_get_minus
         procedure :: update_translation => Abstract_update_translation
+        procedure :: update_transmutation => Abstract_update_transmutation
         procedure :: update_rotation => Abstract_update_rotation
         procedure :: update_add => Abstract_update_add
         procedure :: update_remove => Abstract_update_remove
@@ -49,7 +50,7 @@ private
         procedure :: get_plus => Null_get
         procedure :: get_minus => Null_get
         procedure :: update_translation => Null_update_translation
-        procedure :: update_rotation => Null_update_rotation
+        procedure :: update_transmutation => Null_update_transmutation
         procedure :: update_switch => Null_update_switch
         procedure, private :: update_exchange => Null_update_exchange
     end type Null_DLC_Structures
@@ -133,7 +134,8 @@ contains
         structure_m = this%structure_m(n_1, n_2)
     end function Abstract_get_minus
 
-    !> Structure factors update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
+    !> Structure factors update when a particle is translated:
+    !> \( (\vec{x}, \vec{\mu}) \to (\vec{x}^\prime, \vec{\mu}) \).
     !> \[
     !>      \Delta S_\pm(\vec{k}_{1:2}) =
     !>          (\pm k_{1:2} \mu_3 + i \vec{k}_{1:2} \cdot \vec{\mu}_{1:2})
@@ -202,7 +204,8 @@ contains
         end do
     end subroutine Abstract_update_translation
 
-    !> Structure factors update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
+    !> Structure factors update when a particle is transmuted:
+    !> \( (\vec{x}, \vec{\mu}) \to (\vec{x}, \vec{\mu}^\prime) \).
     !>  \[
     !>      \Delta S_\pm(\vec{k}_{1:2}) =
     !>          \left[
@@ -212,9 +215,9 @@ contains
     !>          e^{\pm k_{1:2} x_3} e^{i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
     !>  \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+    pure subroutine Abstract_update_transmutation(this, ij_components, new_dipolar_moment, old)
         class(Abstract_DLC_Structures), intent(inout) :: this
-        integer, intent(in) :: i_component
+        integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
@@ -229,7 +232,8 @@ contains
         real(DP) :: exp_kz
         real(DP), dimension(0:this%reci_numbers(1), 0:this%reci_numbers(2)) :: exp_kz_tab
 
-        if (.not.this%are_dipolar(i_component)) return
+        if (.not.(this%are_dipolar(ij_components(1)) .or. this%are_dipolar(ij_components(2)))) &
+            return
 
         surface_size = reshape(this%periodic_box%get_size(), [2])
         wave_1_x_position = 2._DP*PI * old%position(1:2) / surface_size
@@ -260,6 +264,15 @@ contains
                     (fourier_position / exp_kz)
             end do
         end do
+    end subroutine Abstract_update_transmutation
+
+    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+        class(Abstract_DLC_Structures), intent(inout) :: this
+        integer, intent(in) :: i_component
+        real(DP), intent(in) :: new_dipolar_moment(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
+
+        call this%update_transmutation([i_component, i_component], new_dipolar_moment, old)
     end subroutine Abstract_update_rotation
 
     !> cf. [[classes_dlc_structures:Abstract_update_exchange]]
@@ -447,12 +460,12 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_translation
 
-    pure subroutine Null_update_rotation(this, i_component, new_dipolar_moment, old)
+    pure subroutine Null_update_transmutation(this, ij_components, new_dipolar_moment, old)
         class(Null_DLC_Structures), intent(inout) :: this
-        integer, intent(in) :: i_component
+        integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
-    end subroutine Null_update_rotation
+    end subroutine Null_update_transmutation
 
     pure subroutine Null_update_exchange(this, i_component, particle, signed)
         class(Null_DLC_Structures), intent(inout) :: this

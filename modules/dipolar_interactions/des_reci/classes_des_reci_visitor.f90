@@ -25,6 +25,7 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: visit => Abstract_visit
         procedure :: visit_translation => Abstract_visit_translation
+        procedure :: visit_transmutation => Abstract_visit_transmutation
         procedure :: visit_rotation => Abstract_visit_rotation
         procedure :: visit_add => Abstract_visit_add
         procedure :: visit_remove => Abstract_visit_remove
@@ -42,7 +43,7 @@ private
         procedure :: destroy => Null_destroy
         procedure :: visit => Null_visit
         procedure :: visit_translation => Null_visit_translation
-        procedure :: visit_rotation => Null_visit_rotation
+        procedure :: visit_transmutation => Null_visit_transmutation
         procedure :: visit_switch => Null_visit_switch
         procedure, private :: visit_exchange => Null_visit_exchange
     end type Null_DES_Reci_Visitor
@@ -95,7 +96,8 @@ contains
         energy = 2._DP * energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit
 
-    !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
+    !> Energy delta when a particle is translated:
+    !> \( (\vec{x}, \vec{\mu}) \to (\vec{x}^\prime, \vec{\mu}) \).
     !> \[
     !>      \Delta U = 2 \sum_{\vec{k}} w_\alpha(\vec{k}) (\vec{k}\cdot\vec{\mu}) \left\{
     !>              \Re\left[
@@ -173,7 +175,8 @@ contains
         delta_energy = 4._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_translation
 
-    !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
+    !> Energy delta when a particle is transmuted:
+    !> \( (\vec{x}, \vec{\mu}) \to (\vec{x}, \vec{\mu}^\prime) \).
     !> \[
     !>      \Delta U = \sum_{\vec{k}} w_\alpha(\vec{k}) \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu})
     !>          \left[
@@ -181,10 +184,10 @@ contains
     !>              \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu})
     !>          \right]
     !> \]
-    pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipolar_moment, old) &
-        result(delta_energy)
+    pure real(DP) function Abstract_visit_transmutation(this, ij_components, new_dipolar_moment, &
+        old) result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
-        integer, intent(in) :: i_component
+        integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
@@ -200,7 +203,8 @@ contains
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
 
         delta_energy = 0._DP
-        if (.not.this%structure%is_dipolar(i_component)) return
+        if (.not.(this%structure%is_dipolar(ij_components(1)) .or. &
+            this%structure%is_dipolar(ij_components(2)))) return !shortcut?
 
         box_size = this%periodic_box%get_size()
         wave_1_x_position = 2._DP*PI * old%position / box_size
@@ -232,6 +236,16 @@ contains
             end do
         end do
         delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
+    end function Abstract_visit_transmutation
+
+    pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipolar_moment, old) &
+        result(delta_energy)
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
+        integer, intent(in) :: i_component
+        real(DP), intent(in) :: new_dipolar_moment(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
+
+        delta_energy = this%visit_transmutation([i_component, i_component], new_dipolar_moment, old)
     end function Abstract_visit_rotation
 
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
@@ -348,7 +362,7 @@ contains
 
         delta_energy = 0._DP
         if (.not.(this%structure%is_dipolar(ij_components(1)) .or. &
-            this%structure%is_dipolar(ij_components(2)))) return
+            this%structure%is_dipolar(ij_components(2)))) return ! move shortcut?
 
         box_size = this%periodic_box%get_size()
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
@@ -419,14 +433,14 @@ contains
         delta_energy = 0._DP
     end function Null_visit_translation
 
-    pure real(DP) function Null_visit_rotation(this, i_component, new_dipolar_moment, old) &
-        result(delta_energy)
+    pure real(DP) function Null_visit_transmutation(this, ij_components, new_dipolar_moment, &
+        old) result(delta_energy)
         class(Null_DES_Reci_Visitor), intent(in) :: this
-        integer, intent(in) :: i_component
+        integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
         delta_energy = 0._DP
-    end function Null_visit_rotation
+    end function Null_visit_transmutation
 
     pure real(DP) function Null_visit_exchange(this, i_component, particle, signed) &
         result(delta_energy)

@@ -28,13 +28,15 @@ end interface set_successes
     type, public :: Concrete_Changes_Counter
         type(Concrete_Change_Counter) :: translation
         type(Concrete_Change_Counter) :: rotation
-        type(Concrete_Change_Counter) :: exchange
+        type(Concrete_Change_Counter) :: add
+        type(Concrete_Change_Counter) :: remove
     end type Concrete_Changes_Counter
 
     type, public :: Concrete_Changes_Success
         real(DP) :: translation
         real(DP) :: rotation
-        real(DP) :: exchange
+        real(DP) :: add
+        real(DP) :: remove
     end type Concrete_Changes_Success
 
     type, public :: Concrete_Change_Counters_Line
@@ -48,7 +50,8 @@ contains
 
         call reset_counters(counter%translation)
         call reset_counters(counter%rotation)
-        call reset_counters(counter%exchange)
+        call reset_counters(counter%add)
+        call reset_counters(counter%remove)
     end subroutine changes_counter_reset
 
     pure elemental subroutine change_counters_reset(counters)
@@ -70,7 +73,8 @@ contains
 
         success%translation = calculate_ratio(counter%translation)
         success%rotation = calculate_ratio(counter%rotation)
-        success%exchange = calculate_ratio(counter%exchange)
+        success%add = calculate_ratio(counter%add)
+        success%remove = calculate_ratio(counter%remove)
     end subroutine changes_success_set
 
     pure elemental subroutine change_successes_set(successes, counters)

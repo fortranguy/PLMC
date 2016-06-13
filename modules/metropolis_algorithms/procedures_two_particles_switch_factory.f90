@@ -1,7 +1,6 @@
 module procedures_two_particles_switch_factory
 
-use classes_hetero_couples, only: Abstract_Hetero_Couples, Null_Hetero_Couples, &
-    Concrete_Hetero_Couples
+use classes_hetero_couples, only: Abstract_Hetero_Couples, Null_Hetero_Couples, Half_Hetero_Couples
 use classes_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_two_particles_switch, only: Abstract_Two_Particles_Switch, &
@@ -22,7 +21,7 @@ contains
         class(Abstract_Tower_Sampler), allocatable :: selector_mold
 
         if (size(physical_model%mixture%components) > 1) then
-            allocate(Concrete_Hetero_Couples :: couples)
+            allocate(Half_Hetero_Couples :: couples)
             allocate(Concrete_Tower_Sampler :: selector_mold)
             allocate(Concrete_Two_Particles_Switch :: two_particles_switch)
         else

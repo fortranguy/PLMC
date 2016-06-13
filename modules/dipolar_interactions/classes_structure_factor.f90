@@ -11,6 +11,7 @@ private
     contains
         procedure(Abstract_is_dipolar), deferred :: is_dipolar
         procedure(Abstract_update_translation), deferred :: update_translation
+        procedure(Abstract_update_transmutation), deferred :: update_transmutation
         procedure(Abstract_update_rotation), deferred :: update_rotation
         procedure(Abstract_update_add), deferred :: update_add
         procedure(Abstract_update_remove), deferred :: update_remove
@@ -32,6 +33,14 @@ private
             real(DP), intent(in) :: new_position(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end subroutine Abstract_update_translation
+
+        pure subroutine Abstract_update_transmutation(this, ij_components, new_dipolar_moment, old)
+        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Factor
+            class(Abstract_Structure_Factor), intent(inout) :: this
+            integer, intent(in) :: ij_components(:)
+            real(DP), intent(in) :: new_dipolar_moment(:)
+            type(Concrete_Temporary_Particle), intent(in) :: old
+        end subroutine Abstract_update_transmutation
 
         pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Factor

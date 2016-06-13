@@ -27,6 +27,7 @@ private
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get => Abstract_get
         procedure :: update_translation => Abstract_update_translation
+        procedure :: update_transmutation => Abstract_update_transmulation
         procedure :: update_rotation => Abstract_update_rotation
         procedure :: update_add => Abstract_update_add
         procedure :: update_remove => Abstract_update_remove
@@ -47,7 +48,7 @@ private
         procedure :: is_dipolar => Null_is_dipolar
         procedure :: get => Null_get
         procedure :: update_translation => Null_update_translation
-        procedure :: update_rotation => Null_update_rotation
+        procedure :: update_transmutation => Null_update_transmulation
         procedure :: update_switch => Null_update_switch
         procedure, private :: update_exchange => Null_update_exchange
     end type Null_DES_Reci_Structure
@@ -118,7 +119,8 @@ contains
         structure = this%structure(n_1, n_2, n_3)
     end function Abstract_get
 
-    !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
+    !> Structure factor update when a particle is translated:
+    !> \( (\vec{x}, \vec{\mu}) \to (\vec{x}^\prime, \vec{\mu}) \).
     !>  \[
     !>      \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu})
     !>          \left( e^{i\vec{k}\cdot\vec{x}^\prime} - e^{i\vec{k}\cdot\vec{x}} \right)
@@ -178,14 +180,15 @@ contains
         end do
     end subroutine Abstract_update_translation
 
-    !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
+    !> Structure factor update when a particle is transmuted:
+    !> \( (\vec{x}, \vec{\mu}) \to (\vec{x}, \vec{\mu}^\prime) \).
     !>  \[
     !>      \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
     !>  \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+    pure subroutine Abstract_update_transmulation(this, ij_components, new_dipolar_moment, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
-        integer, intent(in) :: i_component
+        integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
@@ -198,7 +201,8 @@ contains
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
 
-        if (.not.this%are_dipolar(i_component)) return
+        if (.not.(this%are_dipolar(ij_components(1)) .or. this%are_dipolar(ij_components(2)))) &
+            return
 
         box_size = this%periodic_box%get_size()
         wave_1_x_position = 2._DP*PI * old%position / box_size
@@ -224,6 +228,15 @@ contains
                 end do
             end do
         end do
+    end subroutine Abstract_update_transmulation
+
+    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+        class(Abstract_DES_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: i_component
+        real(DP), intent(in) :: new_dipolar_moment(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
+
+        call this%update_transmutation([i_component, i_component], new_dipolar_moment, old)
     end subroutine Abstract_update_rotation
 
     !> cf. [[Abstract_update_exchange]]
@@ -390,6 +403,13 @@ contains
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_translation
+
+    pure subroutine Null_update_transmulation(this, ij_components, new_dipolar_moment, old)
+        class(Null_DES_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: ij_components(:)
+        real(DP), intent(in) :: new_dipolar_moment(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
+    end subroutine Null_update_transmulation
 
     pure subroutine Null_update_rotation(this, i_component, new_dipolar_moment, old)
         class(Null_DES_Reci_Structure), intent(inout) :: this

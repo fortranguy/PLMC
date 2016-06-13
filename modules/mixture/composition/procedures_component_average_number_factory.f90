@@ -36,8 +36,8 @@ contains
             type is (Null_Component_Average_Number)
                 call average_number%construct()
             class default
-                call error_exit("procedures_component_average_number_factory: create: "//"&
-                    average_number: type unknown.")
+                call error_exit("procedures_component_average_number_factory: create: "//&
+                    "average_number: type unknown.")
         end select
     end subroutine create
 

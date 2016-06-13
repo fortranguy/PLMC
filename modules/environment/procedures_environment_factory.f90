@@ -41,20 +41,20 @@ contains
         call temperature_create(environment%temperature, generating_data, prefix)
         field_applied = apply_external_field(generating_data, prefix)
         call permittivity_create(environment%permittivity, generating_data, prefix)
+        call walls_create(floor_penetration, generating_data, prefix)
+        call walls_create(environment%walls, environment%periodic_box, floor_penetration, &
+            generating_data, prefix)
+        call walls_destroy(floor_penetration)
         call field_create(field_expression, environment%permittivity, field_applied, &
             generating_data, prefix)
-        call box_create(parallelepiped_domain, environment%periodic_box, field_applied, &
-            generating_data, prefix//"External Field.")
+        call box_create(parallelepiped_domain, environment%periodic_box, environment%walls, &
+            field_applied, generating_data, prefix//"External Field.")
         call field_create(environment%external_field, parallelepiped_domain, field_expression, &
             field_applied)
         call field_destroy(field_expression)
         call box_destroy(parallelepiped_domain)
         call box_create(environment%reciprocal_lattice, environment%periodic_box, &
             generating_data, prefix)
-        call walls_create(floor_penetration, generating_data, prefix)
-        call walls_create(environment%walls, environment%periodic_box, floor_penetration, &
-            generating_data, prefix)
-        call walls_destroy(floor_penetration)
         call box_create(environment%box_size_checker, environment%reciprocal_lattice, &
             environment%walls)
 

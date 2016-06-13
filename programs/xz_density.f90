@@ -11,6 +11,9 @@ use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use classes_floor_penetration, only: Abstract_Floor_Penetration
+use classes_visitable_walls, only: Abstract_Visitable_Walls
+use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
 use procedures_plmc_help, only: plmc_catch_density_help
@@ -20,6 +23,8 @@ implicit none
 
     class(Abstract_Periodic_Box), allocatable :: periodic_box
     class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
+    class(Abstract_Visitable_Walls), allocatable :: visitable_walls
+    class(Abstract_Floor_Penetration), allocatable :: floor_penetration
     integer :: i_particle
     logical :: coordinates_written
     integer :: num_snaps, i_snap
@@ -47,9 +52,13 @@ implicit none
     call check_data_found(data_field, data_found)
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
     call box_create(periodic_box, generating_data, environment_prefix)
+    call walls_create(floor_penetration, generating_data, environment_prefix)
+    call walls_create(visitable_walls, periodic_box, floor_penetration, generating_data, &
+        environment_prefix)
     call plmc_destroy(generating_data)
     call plmc_create(exploring_data, 2)
-    call box_create(parallelepiped_domain, periodic_box, .true., exploring_data, "Density.")
+    call box_create(parallelepiped_domain, periodic_box, visitable_walls, .true., exploring_data, &
+        "Density.")
     if (.not.periodicity_is_xy(periodic_box)) then
         call warning_continue("Periodicity is not XY.")
     end if
@@ -90,7 +99,7 @@ implicit none
 
     bins_function = bins_function / real(num_snaps, DP) / domain_size(2) / product(delta)
 
-    open(unit=bins_unit, recl=max_line_length, file=bins_filename, action="write")
+    open(newunit=bins_unit, recl=max_line_length, file=bins_filename, action="write")
     deallocate(bins_filename)
     write(bins_unit, *) "# x   z   distribution"
     do i_z = lbound(bins_function, 2), ubound(bins_function, 2)
@@ -103,7 +112,9 @@ implicit none
 
     deallocate(delta)
     deallocate(bins_function)
-    call box_destroy(periodic_box)
     call box_destroy(parallelepiped_domain)
+    call walls_destroy(visitable_walls)
+    call walls_destroy(floor_penetration)
+    call box_destroy(periodic_box)
 
 end program plmc_domain_xz_distribution

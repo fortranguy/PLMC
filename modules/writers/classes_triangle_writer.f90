@@ -1,6 +1,5 @@
 module classes_triangle_writer
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
@@ -53,8 +52,7 @@ contains
         character(len=:), allocatable :: legend
         integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
 
-        call check_string_not_empty("Abstract_Triangle_Writer: construct: filename", &
-            filename)
+        call check_string_not_empty("Abstract_Triangle_Writer: construct: filename", filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
         this%file_unit = file_unit
         legend = "# i_step"
@@ -112,9 +110,8 @@ contains
         do j_component = 1, size(this%strings)
             do i_component = 1, size(this%strings(j_component)%with_component)
                 associate(string_ij => this%strings(j_component)%with_component(i_component)%&
-                    string, energy_ij => triangle(j_component)%&
-                    line(i_component))
-                    string = string//string_ij%get(energy_ij)
+                    string, real_ij => triangle(j_component)%line(i_component))
+                    string = string//string_ij%get(real_ij)
                 end associate
             end do
         end do

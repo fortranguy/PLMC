@@ -11,14 +11,14 @@ implicit none
 private
 
     type, public :: Concrete_Changes_Selector
-        logical :: write_positions = .false.
+        logical :: write_translations = .false.
         logical :: write_rotations = .false.
         logical :: write_exchanges = .false.
     end type Concrete_Changes_Selector
 
     type, abstract, public :: Abstract_Changes_Success_Writer
     private
-        type(Concrete_Number_to_String) :: string_translation
+        class(Abstract_Number_to_String), allocatable :: string_translation
         class(Abstract_Number_to_String), allocatable :: string_rotation
         class(Abstract_Number_to_String), allocatable :: string_exchange
         integer :: file_unit = 0
@@ -52,7 +52,13 @@ contains
 
         call check_string_not_empty("Abstract_construct: filename", filename)
         open(newunit=this%file_unit, recl=max_line_length, file=filename, action="write")
-        legend = "# i_step    translations"
+        legend = "# i_step"
+        if (changes_selector%write_translations) then
+            allocate(Concrete_Number_to_String :: this%string_translation)
+            legend = legend//"    translations"
+        else
+            allocate(Null_Number_to_String :: this%string_translation)
+        end if
         if (changes_selector%write_rotations) then
             allocate(Concrete_Number_to_String :: this%string_rotation)
             legend = legend//"    rotations"
@@ -61,7 +67,7 @@ contains
         end if
         if (changes_selector%write_exchanges) then
             allocate(Concrete_Number_to_String :: this%string_exchange)
-            legend = legend//"    exchanges"
+            legend = legend//"    additions    removals"
         else
             allocate(Null_Number_to_String :: this%string_exchange)
         end if
@@ -73,6 +79,7 @@ contains
 
         if (allocated(this%string_exchange)) deallocate(this%string_exchange)
         if (allocated(this%string_rotation)) deallocate(this%string_rotation)
+        if (allocated(this%string_translation)) deallocate(this%string_translation)
         close(this%file_unit)
     end subroutine Abstract_destroy
 
@@ -82,7 +89,9 @@ contains
         type(Concrete_Changes_Success), intent(in) :: changes_success
 
         write(this%file_unit, *) i_step, this%string_translation%get(changes_success%translation)//&
-            this%string_rotation%get(changes_success%rotation)
+            this%string_rotation%get(changes_success%rotation)//&
+            this%string_exchange%get(changes_success%add)//&
+            this%string_exchange%get(changes_success%remove)
     end subroutine Abstract_write
 
 !end implementation Abstract_Changes_Success_Writer

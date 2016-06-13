@@ -2,9 +2,7 @@ module procedures_random_coordinates_factory
 
 use json_module, only: json_file
 use procedures_errors, only: error_exit
-use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use classes_random_coordinates, only: Abstract_Random_Coordinates, Null_Random_Coordinates
 use classes_random_position, only: Concrete_Random_Position
 use classes_random_orientation, only: Concrete_Random_Orientation
@@ -21,15 +19,11 @@ end interface create
 
 contains
 
-    subroutine create_random_position(random_position, periodic_box, can_exchange, have_positions, &
-        json_data, prefix)
+    subroutine create_random_position(random_position, parallelepiped_domain, can_exchange, &
+        have_positions)
         class(Abstract_Random_Coordinates), allocatable, intent(out) :: random_position
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
         logical, dimension(:), intent(in) :: can_exchange, have_positions
-        type(json_file), intent(inout) :: json_data
-        character(len=*), intent(in) :: prefix
-
-        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
 
         if (any(can_exchange) .and. any(have_positions)) then
             allocate(Concrete_Random_Position :: random_position)
@@ -38,10 +32,7 @@ contains
         end if
         select type(random_position)
             type is (Concrete_Random_Position)
-                call box_create(parallelepiped_domain, periodic_box, any(can_exchange) .and. &
-                    any(have_positions), json_data, prefix)
-                call random_position%construct(periodic_box, parallelepiped_domain, have_positions)
-                call box_destroy(parallelepiped_domain)
+                call random_position%construct(parallelepiped_domain, have_positions)
             type is (Null_Random_Coordinates)
             class default
                 call error_exit("procedures_random_coordinates_factory: create_random_position: "&

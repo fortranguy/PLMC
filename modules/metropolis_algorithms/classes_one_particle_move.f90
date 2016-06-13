@@ -28,8 +28,8 @@ private
         type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
-        type(Changes_Component_Wrapper), pointer :: change_components(:) => null()
-        logical, allocatable :: can_change(:)
+        type(Changes_Component_Wrapper), pointer :: changes_components(:) => null()
+        logical, allocatable :: can_move(:)
         class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_construct
@@ -50,11 +50,12 @@ private
 
     abstract interface
 
-        subroutine Abstract_define_change(this, i_actor, new, old)
+        subroutine Abstract_define_change(this, abort, new, old, i_actor)
         import :: Concrete_Temporary_Particle, Abstract_One_Particle_Move
             class(Abstract_One_Particle_Move), intent(in) :: this
-            integer, intent(in) :: i_actor
+            logical, intent(out) :: abort
             type(Concrete_Temporary_Particle), intent(out) :: new, old
+            integer, intent(in) :: i_actor
         end subroutine Abstract_define_change
 
         subroutine Abstract_visit_field(this, delta, new, old)
@@ -157,22 +158,22 @@ contains
 !implementation Abstract_One_Particle_Move
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions, change_components, can_change, selector_mold)
+        dipolar_interactions, changes_components, can_move, selector_mold)
         class(Abstract_One_Particle_Move), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
-        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
-        logical, intent(in) :: can_change(:)
+        type(Changes_Component_Wrapper), target, intent(in) :: changes_components(:)
+        logical, intent(in) :: can_move(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector_mold
 
         this%environment => environment
         this%mixture => mixture
         this%short_interactions => short_interactions
         this%dipolar_interactions => dipolar_interactions
-        this%change_components => change_components
-        allocate(this%can_change, source=can_change)
+        this%changes_components => changes_components
+        allocate(this%can_move, source=can_move)
         allocate(this%selector, mold=selector_mold)
         !this%selector: delayed construction in [[Abstract_set_selector]]
     end subroutine Abstract_construct
@@ -184,8 +185,8 @@ contains
             call this%selector%destroy()
             deallocate(this%selector)
         end if
-        !this%can_change: early deallocation in [[Abstract_set_selector]]
-        this%change_components => null()
+        !this%can_move: early deallocation in [[Abstract_set_selector]]
+        this%changes_components => null()
         this%dipolar_interactions => null()
         this%short_interactions => null()
         this%mixture => null()
@@ -195,13 +196,13 @@ contains
     subroutine Abstract_set_selector(this)
         class(Abstract_One_Particle_Move), intent(inout) :: this
 
-        integer :: nums_candidates(size(this%can_change)), i_component
+        integer :: nums_candidates(size(this%can_move)), i_component
 
         do i_component = 1, size(nums_candidates)
             nums_candidates(i_component) = merge(this%mixture%components(i_component)%&
-                average_number%get(), 0, this%can_change(i_component))
+                average_number%get(), 0, this%can_move(i_component))
         end do
-        if (allocated(this%can_change)) deallocate(this%can_change)
+        if (allocated(this%can_move)) deallocate(this%can_move)
         call this%selector%construct(nums_candidates)
     end subroutine Abstract_set_selector
 
@@ -242,13 +243,14 @@ contains
         integer, intent(in) :: i_actor
 
         type(Concrete_Temporary_Particle) :: new, old
-        real(DP) :: energy_delta
-        logical :: overlap
+        real(DP) :: delta_energy
+        logical :: abort, overlap
         real(DP) :: rand
 
-        call this%define_change(i_actor, new, old)
-
         success = .false.
+        call this%define_change(abort, new, old, i_actor)
+        if (abort) return
+
         call this%visit_field(deltas%field, new, old)
         call this%visit_walls(overlap, deltas%walls, i_actor, new, old)
         if (overlap) return
@@ -256,10 +258,10 @@ contains
         if (overlap) return
         call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, i_actor, new, old)
 
-        energy_delta = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
+        delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
         call random_number(rand)
-        if (rand < exp(-energy_delta/this%environment%temperature%get())) then
+        if (rand < exp(-delta_energy/this%environment%temperature%get())) then
             call this%update_actor(i_actor, new, old)
             success = .true.
         end if
@@ -269,17 +271,24 @@ contains
 
 !implementation Concrete_One_Particle_Translation
 
-    subroutine Translation_define_change(this, i_actor, new, old)
+    subroutine Translation_define_change(this, abort, new, old, i_actor)
         class(Concrete_One_Particle_Translation), intent(in) :: this
-        integer, intent(in) :: i_actor
+        logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: new, old
+        integer, intent(in) :: i_actor
 
-        old%i = random_integer(this%mixture%components(i_actor)%positions%get_num())
+        if (this%mixture%components(i_actor)%number%get() == 0) then
+            abort = .true.
+            return
+        else
+            abort = .false.
+        end if
+        old%i = random_integer(this%mixture%components(i_actor)%number%get())
         old%position = this%mixture%components(i_actor)%positions%get(old%i)
         old%orientation = this%mixture%components(i_actor)%orientations%get(old%i)
         old%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
-        new%position = this%change_components(i_actor)%translated_positions%get(new%i)
+        new%position = this%changes_components(i_actor)%translated_positions%get(new%i)
         new%orientation = old%orientation
         new%dipolar_moment = old%dipolar_moment
     end subroutine Translation_define_change
@@ -350,9 +359,9 @@ contains
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
                 visit(real_energies_old(i_component), old, i_exclude)
         end do
-        mixture_delta = this%dipolar_interactions%reci_visitor%visit_translation(i_actor, new%&
-            position, old) - this%dipolar_interactions%dlc_visitor%visit_translation(i_actor, new%&
-            position, old)
+        mixture_delta = &
+            this%dipolar_interactions%reci_visitor%visit_translation(i_actor, new%position, old) - &
+            this%dipolar_interactions%dlc_visitor%visit_translation(i_actor, new%position, old)
         deltas = real_energies_new - real_energies_old
     end subroutine Translation_visit_dipolar
 
@@ -364,7 +373,7 @@ contains
         integer :: i_component
 
         call this%mixture%components(i_actor)%positions%set(new%i, new%position)
-        do i_component = 1, size(this%short_interactions%visitable_cells, 1)
+        do i_component = 1, size(this%short_interactions%visitable_cells, 2)
             call this%short_interactions%visitable_cells(i_actor, i_component)%translate(new%&
                 position, old)
         end do
@@ -388,18 +397,25 @@ contains
 
 !implementation Concrete_One_Particle_Rotation
 
-    subroutine Rotation_define_change(this, i_actor, new, old)
+    subroutine Rotation_define_change(this, abort, new, old, i_actor)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
-        integer, intent(in) :: i_actor
+        logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: new, old
+        integer, intent(in) :: i_actor
 
+        if (this%mixture%components(i_actor)%number%get() == 0) then
+            abort = .true.
+            return
+        else
+            abort = .false.
+        end if
         old%i = random_integer(this%mixture%components(i_actor)%orientations%get_num())
         old%position = this%mixture%components(i_actor)%positions%get(old%i)
         old%orientation = this%mixture%components(i_actor)%orientations%get(old%i)
         old%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
         new%position = old%position
-        new%orientation = this%change_components(i_actor)%rotated_orientations%get(new%i)
+        new%orientation = this%changes_components(i_actor)%rotated_orientations%get(new%i)
         new%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get_norm() * new%&
             orientation
     end subroutine Rotation_define_change
@@ -451,10 +467,12 @@ contains
                 visit(real_energies_old(i_component), old, i_exclude)
         end do
         deltas = real_energies_new - real_energies_old
-        mixture_delta = this%dipolar_interactions%reci_visitor%visit_rotation(i_actor, new%&
-            dipolar_moment, old) + this%dipolar_interactions%surf_mixture%visit_rotation(i_actor, &
-            new%dipolar_moment, old%dipolar_moment) - this%dipolar_interactions%dlc_visitor%&
-            visit_rotation(i_actor, new%dipolar_moment, old)
+        mixture_delta = &
+            this%dipolar_interactions%reci_visitor%visit_rotation(i_actor, new%dipolar_moment, &
+                old) + &
+            this%dipolar_interactions%surf_mixture%visit_rotation(i_actor, new%dipolar_moment, &
+                old%dipolar_moment) - &
+            this%dipolar_interactions%dlc_visitor%visit_rotation(i_actor, new%dipolar_moment, old)
     end subroutine Rotation_visit_dipolar
 
     subroutine Rotation_update_actor(this, i_actor, new, old)
@@ -488,14 +506,14 @@ contains
 !implementation Null_One_Particle_Move
 
     subroutine Null_construct(this, environment, mixture, short_interactions, dipolar_interactions,&
-        change_components, can_change, selector_mold)
+        changes_components, can_move, selector_mold)
         class(Null_One_Particle_Move), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
-        type(Changes_Component_Wrapper), target, intent(in) :: change_components(:)
-        logical, intent(in) :: can_change(:)
+        type(Changes_Component_Wrapper), target, intent(in) :: changes_components(:)
+        logical, intent(in) :: can_move(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector_mold
     end subroutine Null_construct
 
@@ -527,10 +545,12 @@ contains
         deltas%dipolar_mixture = 0._DP
     end subroutine Null_test_metropolis
 
-    subroutine Null_define_change(this, i_actor, new, old)
+    subroutine Null_define_change(this, abort, new, old, i_actor)
          class(Null_One_Particle_Move), intent(in) :: this
-         integer, intent(in) :: i_actor
+         logical, intent(out) :: abort
          type(Concrete_Temporary_Particle), intent(out) :: new, old
+         integer, intent(in) :: i_actor
+         abort = .true.
          new%i = 0; new%position = 0._DP; new%orientation = 0._DP; new%dipolar_moment = 0._DP
          old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipolar_moment = 0._DP
      end subroutine Null_define_change
@@ -568,8 +588,7 @@ contains
          real(DP), intent(out) :: mixture_delta
          type(Concrete_Temporary_Particle), intent(in) :: new, old
          integer, intent(in) :: i_actor
-         deltas = 0._DP
-         mixture_delta = 0._DP
+         deltas = 0._DP; mixture_delta = 0._DP
      end subroutine Null_visit_dipolar
 
      subroutine Null_update_actor(this, i_actor, new, old)

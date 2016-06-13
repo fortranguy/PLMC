@@ -4,7 +4,8 @@ use types_component_wrapper, only: Component_Wrapper
 use types_pair_potential_wrapper, only: Pair_Potentials_Line
 use classes_triangle_writer, only: Selectors_Line, &
     Abstract_Triangle_Writer, Concrete_Triangle_Writer, Null_Triangle_Writer
-use procedures_property_inquirers, only: component_exists, components_interact
+use procedures_property_inquirers, only: component_exists, components_interact, &
+    component_can_exchange
 
 implicit none
 
@@ -12,40 +13,12 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_switches
     module procedure :: create_short_energies
     module procedure :: create_dipolar_energies
+    module procedure :: create_switches
 end interface create
 
 contains
-
-    subroutine create_switches(switches, components, filename)
-        class(Abstract_Triangle_Writer), allocatable, intent(out) :: switches
-        type(Component_Wrapper), intent(in) :: components(:)
-        character(len=*), intent(in) :: filename
-
-        type(Selectors_Line) :: selectors(size(components))
-        logical :: some_components_exist, exist_ij
-        integer :: i_component, j_component
-
-        some_components_exist = .false.
-        do j_component = 1, size(selectors)
-            allocate(selectors(j_component)%line(j_component))
-            do i_component = 1, size(selectors(j_component)%line)
-                exist_ij = component_exists(components(i_component)%number) .and. &
-                    component_exists(components(j_component)%number)
-                some_components_exist = some_components_exist .or. exist_ij
-                selectors(j_component)%line(i_component) = exist_ij .and. i_component /= j_component
-            end do
-        end do
-        if (some_components_exist) then
-            allocate(Concrete_Triangle_Writer :: switches)
-        else
-            allocate(Null_Triangle_Writer :: switches)
-        end if
-        call switches%construct(selectors, filename)
-        call deallocate_selectors(selectors)
-    end subroutine create_switches
 
     subroutine create_short_energies(energies, pairs, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
@@ -102,6 +75,36 @@ contains
         call energies%construct(selectors, filename)
         call deallocate_selectors(selectors)
     end subroutine create_dipolar_energies
+
+    subroutine create_switches(switches, components, filename)
+        class(Abstract_Triangle_Writer), allocatable, intent(out) :: switches
+        type(Component_Wrapper), intent(in) :: components(:)
+        character(len=*), intent(in) :: filename
+
+        type(Selectors_Line) :: selectors(size(components))
+        logical :: some_couples_exist, exist_ij
+        integer :: i_component, j_component
+
+        some_couples_exist = .false.
+        do j_component = 1, size(selectors)
+            allocate(selectors(j_component)%line(j_component))
+            do i_component = 1, size(selectors(j_component)%line)
+                exist_ij = &
+                    component_exists(components(i_component)%number) .and. &
+                    component_exists(components(j_component)%number) .and. &
+                    i_component /= j_component
+                some_couples_exist = some_couples_exist .or. exist_ij
+                selectors(j_component)%line(i_component) = exist_ij
+            end do
+        end do
+        if (some_couples_exist) then
+            allocate(Concrete_Triangle_Writer :: switches)
+        else
+            allocate(Null_Triangle_Writer :: switches)
+        end if
+        call switches%construct(selectors, filename)
+        call deallocate_selectors(selectors)
+    end subroutine create_switches
 
     subroutine deallocate_selectors(selectors)
         type(Selectors_Line), intent(inout) :: selectors(:)

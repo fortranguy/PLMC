@@ -16,8 +16,8 @@ public :: create, destroy
 
 contains
 
-    subroutine create(walls, periodic_box, floor_penetration, generating_data, prefix)
-        class(Abstract_Visitable_Walls), allocatable, intent(out) :: walls
+    subroutine create(visitable_walls, periodic_box, floor_penetration, generating_data, prefix)
+        class(Abstract_Visitable_Walls), allocatable, intent(out) :: visitable_walls
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
         type(json_file), intent(inout) :: generating_data
@@ -28,22 +28,22 @@ contains
         real(DP) :: gap
 
         if (use_walls(generating_data, prefix)) then
-            allocate(Concrete_Visitable_Walls :: walls)
+            allocate(Concrete_Visitable_Walls :: visitable_walls)
             data_field = prefix//"Walls.gap"
             call generating_data%get(data_field, gap, data_found)
             call check_data_found(data_field, data_found)
         else
-            allocate(Null_Visitable_Walls :: walls)
+            allocate(Null_Visitable_Walls :: visitable_walls)
         end if
-        call walls%construct(periodic_box, gap, floor_penetration)
+        call visitable_walls%construct(periodic_box, gap, floor_penetration)
     end subroutine create
 
-    subroutine destroy(walls)
-        class(Abstract_Visitable_Walls), allocatable, intent(inout) :: walls
+    subroutine destroy(visitable_walls)
+        class(Abstract_Visitable_Walls), allocatable, intent(inout) :: visitable_walls
 
-        if (allocated(walls)) then
-            call walls%destroy()
-            deallocate(walls)
+        if (allocated(visitable_walls)) then
+            call visitable_walls%destroy()
+            deallocate(visitable_walls)
         end if
     end subroutine destroy
 

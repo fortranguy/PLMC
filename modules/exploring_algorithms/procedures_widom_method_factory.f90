@@ -46,7 +46,7 @@ contains
             allocate(Null_Widom_Method :: widom_method)
             allocate(Null_Component_Number :: numbers(1))
         end if
-        call widom_method%construct(physical_model%environment, physical_model%mixture, &
+        call widom_method%construct(physical_model%environment, physical_model%mixture%components, &
             physical_model%short_interactions, physical_model%dipolar_interactions, numbers, &
             random_position, random_orientation)
     end subroutine create

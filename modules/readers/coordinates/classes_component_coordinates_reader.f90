@@ -19,6 +19,7 @@ private
         class(Abstract_Component_Number), pointer :: number => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
+        logical :: read_positions = .false.
         logical :: read_orientations = .false.
     contains
         procedure :: construct => Abstract_construct
@@ -43,17 +44,18 @@ contains
 
 !implementation Abstract_Component_Coordinates_Reader
 
-    subroutine Abstract_construct(this, number, positions, orientations, read_orientations)
+    subroutine Abstract_construct(this, number, positions, orientations, selector)
         class(Abstract_Component_Coordinates_Reader), intent(out) :: this
         class(Abstract_Component_Number), target, intent(in) :: number
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
-        logical, intent(in) :: read_orientations
+        type(Concrete_Component_Coordinates_Reader_Selector), intent(in) :: selector
 
         this%number => number
         this%positions => positions
         this%orientations => orientations
-        this%read_orientations = read_orientations
+        this%read_positions = selector%read_positions
+        this%read_orientations = selector%read_orientations
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -70,7 +72,8 @@ contains
 
         real(DP), dimension(:, :), allocatable :: positions, orientations
 
-        call create_coordinates_from_file(positions, orientations, filename, this%read_orientations)
+        call create_coordinates_from_file(positions, orientations, filename, this%read_positions, &
+            this%read_orientations)
         call this%number%set(size(positions, 2))
         call this%positions%set_all(positions)
         call this%orientations%set_all(orientations)
@@ -81,12 +84,12 @@ contains
 
 !implementation Null_Component_Coordinates_Reader
 
-    subroutine Null_construct(this, number, positions, orientations, read_orientations)
+    subroutine Null_construct(this, number, positions, orientations, selector)
         class(Null_Component_Coordinates_Reader), intent(out) :: this
         class(Abstract_Component_Number), target, intent(in) :: number
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
-        logical, intent(in) :: read_orientations
+        type(Concrete_Component_Coordinates_Reader_Selector), intent(in) :: selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

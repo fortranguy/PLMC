@@ -18,7 +18,7 @@ private
     type, abstract, public :: Abstract_Coordinates_Writer
     private
         class(Abstract_Component_Coordinates), pointer :: positions => null()
-        type(Concrete_Number_to_String) :: string_positions
+        class(Abstract_Number_to_String), allocatable :: string_positions
         class(Abstract_Number_to_String), allocatable :: string_orientations
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
         character(len=:), allocatable :: basename
@@ -54,12 +54,18 @@ contains
 
         this%positions => positions
         this%orientations => orientations
-        call check_string_not_empty("Abstract_Coordinates_Writer: construct: basename", basename)
-        this%basename = basename
-        this%legend = "# position_x    position_y    position_z"
         call check_positive("Abstract_Coordinates_Writer: construct", &
             "coordinates_selector%period", coordinates_selector%period)
         this%period = coordinates_selector%period
+        call check_string_not_empty("Abstract_Coordinates_Writer: construct: basename", basename)
+        this%basename = basename
+        this%legend = "#"
+        if (coordinates_selector%write_positions) then
+            allocate(Concrete_Number_to_String :: this%string_positions)
+            this%legend = this%legend//"    position_x    position_y    position_z"
+        else
+            allocate(Null_Number_to_String :: this%string_positions)
+        end if
         if (coordinates_selector%write_orientations) then
             allocate(Concrete_Number_to_String :: this%string_orientations)
             this%legend = this%legend//"    orientation_x    orientation_y    orientation_z"
@@ -72,6 +78,7 @@ contains
         class(Abstract_Coordinates_Writer), intent(inout) :: this
 
         if (allocated(this%string_orientations)) deallocate(this%string_orientations)
+        if (allocated(this%string_positions)) deallocate(this%string_positions)
         if (allocated(this%legend)) deallocate(this%legend)
         if (allocated(this%basename)) deallocate(this%basename)
         this%orientations => null()

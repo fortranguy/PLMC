@@ -1,15 +1,20 @@
 {
     "Environment": {
         "Box": {
-            "periodicity": "XYZ",
-            "initial size": [12.0, 12.0, 12.0],
+            "periodicity": "XY",
+            "initial size": [12.0, 12.0, 18.0],
             "size changes": false
         },
         "Thermostat": {
-            "temperature": 1.0
+            "temperature": 2.0
         },
         "External Field": {
-            "apply": false
+            "apply": true,
+            "name": "constant",
+            "vector": [0.0, 0.0, 1.0],
+            "Parallelepiped Domain": {
+                "name": "walled"
+            }
         },
         "Permittivity": {
             "use": true,
@@ -17,10 +22,12 @@
         },
         "Reciprocal Lattice": {
             "use": true,
-            "numbers": [8, 8, 8]
+            "numbers": [8, 8, 12]
         },
         "Walls": {
-            "use": false
+            "use": true,
+            "name": "flat",
+            "gap": 14.0
         }
     },
     "Mixture": {
@@ -31,23 +38,32 @@
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": false,
-            "initial coordinates": "coordinates_1.in"
+            "initial coordinates": "coordinates_1.in",
+            "With Walls": {
+                "minimum distance": 0.8
+            }
         },
         "Component 2": {
             "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 2.0,
             "can exchange": false,
-            "initial coordinates": "coordinates_2.in"
+            "initial coordinates": "coordinates_2.in",
+            "With Walls": {
+                "minimum distance": 0.8
+            }
         },
         "Component 3": {
             "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 3.0,
             "can exchange": false,
-            "initial coordinates": "coordinates_3.in"
+            "initial coordinates": "coordinates_3.in",
+            "With Walls": {
+                "minimum distance": 0.8
+            }
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -65,21 +81,42 @@
             "tabulated": false,
             "epsilon": 1.0,
             "sigma": 1.0,
-            "maximum distance": 2.5
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
         },
         "Component 2": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 2.0,
             "sigma": 1.0,
-            "maximum distance": 2.5
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
         },
         "Component 3": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 3.0,
             "sigma": 1.0,
-            "maximum distance": 2.5
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
         },
         "Inter 12": {
             "name": "LJ",

@@ -17,7 +17,9 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: write => Abstract_write
+        generic :: write => write_reals, write_integers
+        procedure, private :: write_reals => Abstract_write_reals
+        procedure, private :: write_integers => Abstract_write_integers
         procedure, private :: allocate_strings => Abstract_allocate_strings
     end type Abstract_Line_Writer
 
@@ -29,7 +31,8 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: write => Null_write
+        procedure, private :: write_reals => Null_write_reals
+        procedure, private :: write_integers => Null_write_integers
     end type Null_Line_Writer
 
 contains
@@ -78,7 +81,7 @@ contains
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write(this, i_step, line)
+    subroutine Abstract_write_reals(this, i_step, line)
         class(Abstract_Line_Writer), intent(in) :: this
         integer, intent(in) :: i_step
         real(DP), intent(in) :: line(:)
@@ -91,7 +94,22 @@ contains
             string = string//this%strings(i_component)%string%get(line(i_component))
         end do
         write(this%file_unit, *) i_step, string
-    end subroutine Abstract_write
+    end subroutine Abstract_write_reals
+
+    subroutine Abstract_write_integers(this, i_step, line)
+        class(Abstract_Line_Writer), intent(in) :: this
+        integer, intent(in) :: i_step
+        integer, intent(in) :: line(:)
+
+        character(len=:), allocatable :: string
+        integer :: i_component
+
+        string = ""
+        do i_component = 1, size(this%strings)
+            string = string//"    "//this%strings(i_component)%string%get(line(i_component))
+        end do
+        write(this%file_unit, *) i_step, string
+    end subroutine Abstract_write_integers
 
 !end implementation Abstract_Line_Writer
 
@@ -107,11 +125,17 @@ contains
         class(Null_Line_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write(this, i_step, line)
+    subroutine Null_write_reals(this, i_step, line)
         class(Null_Line_Writer), intent(in) :: this
         integer, intent(in) :: i_step
         real(DP), intent(in) :: line(:)
-    end subroutine Null_write
+    end subroutine Null_write_reals
+
+    subroutine Null_write_integers(this, i_step, line)
+        class(Null_Line_Writer), intent(in) :: this
+        integer, intent(in) :: i_step
+        integer, intent(in) :: line(:)
+    end subroutine Null_write_integers
 
 !end implementation Null_Line_Writer
 

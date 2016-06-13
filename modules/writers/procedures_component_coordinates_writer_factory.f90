@@ -18,7 +18,7 @@ contains
         logical, intent(in) :: write_coordinates
         character(len=*), intent(in) :: basename
 
-        if (write_coordinates .and. selector%write_positions) then
+        if (write_coordinates .and. (selector%write_positions.or.selector%write_orientations)) then
             allocate(Concrete_Coordinates_Writer :: coordinates)
         else
             allocate(Null_Coordinates_Writer :: coordinates)

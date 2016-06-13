@@ -160,13 +160,14 @@ contains
         integer, intent(in) :: ij_actors(:)
 
         type(Concrete_Temporary_Particle) :: new(2), old(2)
-        real(DP) :: energy_delta
-        logical :: overlap
+        real(DP) :: delta_energy
+        logical :: abort, overlap
         real(DP) :: rand
 
-        call this%define_switch(ij_actors, new, old)
-
         success = .false.
+        call this%define_switch(abort, new, old, ij_actors)
+        if (abort) return
+
         call this%visit_field(deltas%field, new, old)
         call this%visit_walls(overlap, deltas%walls, ij_actors, new, old)
         if (overlap) return
@@ -174,24 +175,33 @@ contains
         if (overlap) return
         call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, ij_actors, new, old)
 
-        energy_delta = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
+        delta_energy = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
         call random_number(rand)
-        if (rand < exp(-energy_delta/this%environment%temperature%get())) then
+        if (rand < exp(-delta_energy/this%environment%temperature%get())) then
             call this%update_actors(ij_actors, new, old)
             success = .true.
         end if
     end subroutine Abstract_test_metropolis
 
-    subroutine Abstract_define_switch(this, ij_actors, new, old)
+    subroutine Abstract_define_switch(this, abort, new, old, ij_actors)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
-        integer, intent(in) :: ij_actors(:)
+        logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: new(:), old(:)
+        integer, intent(in) :: ij_actors(:)
 
         integer :: i
 
+        if (this%components(ij_actors(1))%number%get() == 0 .or. &
+            this%components(ij_actors(2))%number%get() == 0) then
+            abort = .true.
+            return
+        else
+            abort = .false.
+        end if
+
         do i = 1, size(old)
-            old(i)%i = random_integer(this%components(ij_actors(i))%positions%get_num())
+            old(i)%i = random_integer(this%components(ij_actors(i))%number%get())
             old(i)%position = this%components(ij_actors(i))%positions%get(old(i)%i)
             old(i)%orientation = this%components(ij_actors(i))%orientations%get(old(i)%i)
             old(i)%dipolar_moment = this%components(ij_actors(i))%dipolar_moments%get(old(i)%i)
@@ -290,8 +300,9 @@ contains
             end do
         end do
         deltas = real_energies_new - real_energies_old
-        mixture_delta = this%dipolar_interactions%reci_visitor%visit_switch(ij_actors, old) - this%&
-            dipolar_interactions%dlc_visitor%visit_switch(ij_actors, old)
+        mixture_delta = &
+            this%dipolar_interactions%reci_visitor%visit_switch(ij_actors, old) - &
+            this%dipolar_interactions%dlc_visitor%visit_switch(ij_actors, old)
     end subroutine Abstract_visit_dipolar
 
     !> Warning: the i_actor <-> j_actor term is ignored.
@@ -317,7 +328,7 @@ contains
 
         do i = 1, size(new)
             call this%components(ij_actors(i))%positions%set(new(i)%i, new(i)%position)
-            do i_component = 1, size(this%short_interactions%visitable_cells, 1)
+            do i_component = 1, size(this%short_interactions%visitable_cells, 2)
                 call this%short_interactions%visitable_cells(ij_actors(i), i_component)%&
                     translate(new(i)%position, old(i))
             end do
@@ -369,11 +380,13 @@ contains
         deltas%dipolar_mixture = 0._DP
     end subroutine Null_test_metropolis
 
-    subroutine Null_define_switch(this, ij_actors, new, old)
+    subroutine Null_define_switch(this, abort, new, old, ij_actors)
         class(Null_Two_Particles_Switch), intent(in) :: this
-        integer, intent(in) :: ij_actors(:)
+        logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: new(:), old(:)
+        integer, intent(in) :: ij_actors(:)
         integer :: i
+        abort = .true.
         do i = 1, size(old)
             old(i)%i = 0; new(i)%i = 0
             old(i)%position = 0._DP; new(i)%position = 0._DP

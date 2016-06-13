@@ -12,7 +12,7 @@ private
 
     type, abstract, public :: Abstract_Reciprocal_Lattice
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: numbers(num_dimensions) = 0
     contains
         procedure :: construct => Abstract_construct

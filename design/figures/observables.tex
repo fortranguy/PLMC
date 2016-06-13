@@ -8,27 +8,30 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{class}[text width=\mediumTextWidth]{Observables}{0, 0}
-                \attribute{changesCounters: \type{ChangesCounter[:]}}
-                \attribute{changesSucesses: \type{ChangesSuccess[:]}}
-                \attribute{switchesCounters: \type{ChangeCounter[:]}}
-                \attribute{switchesSuccesses: \type{real[:.]}}
+            \begin{class}[text width=\mediumTextWidth]{GeneratingObservables}{0, 0}
+                \attribute{numParticles: \type{int[:]}}
                 \attribute{wallsEnergies: \type{real[:]}}
                 \attribute{fieldEnergies: \type{real[:]}}
                 \attribute{shortEnergies: \type{real[:.]}}
                 \attribute{dipolarEnergies: \type{real[:.]}}
                 \attribute{dipolarMixtureEnergy: \type{real}}
+                \attribute{changesCounters: \type{ChangesCounter[:]}}
+                \attribute{changesSucesses: \type{ChangesSuccess[:]}}
+                \attribute{switchesCounters: \type{ChangeCounter[:.]}}
+                \attribute{switchesSuccesses: \type{real[:.]}}
+                \attribute{transmutationsCounters: \type{ChangeCounter[::]}}
+                \attribute{transmutationsSuccesses: \type{real[::]}}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(Observables.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(GeneratingObservables.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\smallTextWidth]{ChangeCounter}{0, 0}
                 \attribute{numHits: \type{int}}
                 \attribute{numSuccess: \type{int}}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(Observables.north) + (8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(GeneratingObservables.north) + (8 cm, 0 cm)$)}]
             \begin{class}[text width=\smallTextWidth]{ChangesCounter}{0, 0}
                 \attribute{translation: \type{ChangeCounter}}
                 \attribute{rotation: \type{ChangeCounter}}

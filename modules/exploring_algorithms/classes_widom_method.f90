@@ -3,7 +3,7 @@ module classes_widom_method
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_component_number, only: Abstract_Component_Number
-use types_mixture_wrapper, only: Mixture_Wrapper
+use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
@@ -19,7 +19,7 @@ private
     type, abstract, public :: Abstract_Widom_Method
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Mixture_Wrapper), pointer :: mixture => null()
+        type(Component_Wrapper), pointer :: components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
         class(Abstract_Random_Coordinates), pointer :: random_position => null(), &
@@ -50,11 +50,11 @@ contains
 
 !implementation Abstract_Widom_Method
 
-    subroutine Abstract_construct(this, environment, mixture, short_interactions, &
+    subroutine Abstract_construct(this, environment, components, short_interactions, &
         dipolar_interactions, numbers, random_position, random_orientation)
         class(Abstract_Widom_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Mixture_Wrapper), target, intent(in) :: mixture
+        type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
         class(Abstract_Component_Number), intent(in) :: numbers(:)
@@ -62,7 +62,7 @@ contains
             random_orientation
 
         this%environment => environment
-        this%mixture => mixture
+        this%components => components
         this%short_interactions => short_interactions
         this%dipolar_interactions => dipolar_interactions
         allocate(this%numbers, source=numbers)
@@ -78,7 +78,7 @@ contains
         if (allocated(this%numbers)) deallocate(this%numbers)
         this%dipolar_interactions => null()
         this%short_interactions => null()
-        this%mixture => null()
+        this%components => null()
         this%environment => null()
     end subroutine Abstract_destroy
 
@@ -86,7 +86,7 @@ contains
         class(Abstract_Widom_Method), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
-        real(DP) :: inv_pow_activity_sum, energy_delta
+        real(DP) :: inv_pow_activity_sum, delta_energy
         type(Concrete_Single_Delta_Energies) :: deltas
         type(Concrete_Temporary_Particle) :: test
         integer :: i_component, i_particle
@@ -104,8 +104,8 @@ contains
                     widom_counters(i_component)%num_hits + 1
                 test%position = this%random_position%get(i_component)
                 test%orientation = this%random_orientation%get(i_component)
-                test%dipolar_moment = this%mixture%components(i_component)%dipolar_moments%&
-                    get_norm() * test%orientation
+                test%dipolar_moment = this%components(i_component)%dipolar_moments%get_norm() * &
+                    test%orientation
 
                 call this%visit_field(deltas%field, test)
                 call this%visit_walls(overlap, deltas%walls, i_component, test)
@@ -113,10 +113,10 @@ contains
                 call this%visit_short(overlap, deltas%short, i_component, test)
                 if (overlap) cycle
                 call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, i_component, test)
-                energy_delta = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
-                    deltas%dipolar_mixture
 
-                inv_pow_activity_sum = inv_pow_activity_sum + exp(-energy_delta/this%environment%&
+                delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
+                    deltas%dipolar_mixture
+                inv_pow_activity_sum = inv_pow_activity_sum + exp(-delta_energy/this%environment%&
                     temperature%get())
                 observables%widom_counters(i_component)%num_success = observables%&
                     widom_counters(i_component)%num_success + 1
@@ -187,11 +187,11 @@ contains
 
 !implementation Null_Widom_Method
 
-    subroutine Null_construct(this, environment, mixture, short_interactions, dipolar_interactions,&
-        numbers, random_position, random_orientation)
+    subroutine Null_construct(this, environment, components, short_interactions, &
+        dipolar_interactions, numbers, random_position, random_orientation)
         class(Null_Widom_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Mixture_Wrapper), target, intent(in) :: mixture
+        type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
         class(Abstract_Component_Number), intent(in) :: numbers(:)

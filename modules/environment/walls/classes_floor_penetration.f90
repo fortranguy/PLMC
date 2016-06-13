@@ -13,6 +13,7 @@ private
     type, abstract, public :: Abstract_Floor_Penetration
     contains
         procedure(Abstract_get_min_depth), deferred :: get_min_depth
+        procedure(Abstract_get_max_depth), deferred :: get_max_depth
         procedure(Abstract_meet), deferred :: meet
     end type Abstract_Floor_Penetration
 
@@ -22,6 +23,11 @@ private
         import :: DP, Abstract_Floor_Penetration
             class(Abstract_Floor_Penetration), intent(in) :: this
         end function Abstract_get_min_depth
+
+        pure real(DP) function Abstract_get_max_depth(this)
+        import :: DP, Abstract_Floor_Penetration
+            class(Abstract_Floor_Penetration), intent(in) :: this
+        end function Abstract_get_max_depth
 
         pure subroutine Abstract_meet(this, overlap, shortest_vector_from_floor, &
             position_from_floor)
@@ -36,7 +42,8 @@ private
 
     type, extends(Abstract_Floor_Penetration), public :: Flat_Floor_Penetration
     contains
-        procedure :: get_min_depth => Flat_get_min_depth
+        procedure :: get_min_depth => Flat_get_depth
+        procedure :: get_max_depth => Flat_get_depth
         procedure :: meet => Flat_meet
     end type Flat_Floor_Penetration
 
@@ -54,12 +61,14 @@ private
     contains
         procedure :: set => Block_set
         procedure :: get_min_depth => Block_get_min_depth
+        procedure :: get_max_depth => Block_get_max_depth
         procedure :: meet => Block_meet
     end type Centered_Block_Penetration
 
     type, extends(Abstract_Floor_Penetration), public :: Null_Floor_Penetration
     contains
-        procedure :: get_min_depth => Null_get_min_depth
+        procedure :: get_min_depth => Null_get_depth
+        procedure :: get_max_depth => Null_get_depth
         procedure :: meet => Null_meet
     end type Null_Floor_Penetration
 
@@ -67,11 +76,11 @@ contains
 
 !implementation Flat_Floor_Penetration
 
-    pure real(DP) function Flat_get_min_depth(this) result(min_depth)
+    pure real(DP) function Flat_get_depth(this) result(depth)
         class(Flat_Floor_Penetration), intent(in) :: this
 
-        min_depth = 0._DP
-    end function Flat_get_min_depth
+        depth = 0._DP
+    end function Flat_get_depth
 
     pure subroutine Flat_meet(this, overlap, shortest_vector_from_floor, position_from_floor)
         class(Flat_Floor_Penetration), intent(in) :: this
@@ -119,6 +128,12 @@ contains
         min_depth = this%size(2)
     end function Block_get_min_depth
 
+    pure real(DP) function Block_get_max_depth(this) result(max_depth)
+        class(Centered_Block_Penetration), intent(in) :: this
+
+        max_depth = 0._DP
+    end function Block_get_max_depth
+
     pure subroutine Block_meet(this, overlap, shortest_vector_from_floor, position_from_floor)
         class(Centered_Block_Penetration), intent(in) :: this
         logical, intent(out) :: overlap
@@ -158,10 +173,10 @@ contains
 
 !implementation Null_Floor_Penetration
 
-    pure real(DP) function Null_get_min_depth(this) result(min_depth)
+    pure real(DP) function Null_get_depth(this) result(depth)
         class(Null_Floor_Penetration), intent(in) :: this
-        min_depth = 0._DP
-    end function Null_get_min_depth
+        depth = 0._DP
+    end function Null_get_depth
 
     pure subroutine Null_meet(this, overlap, shortest_vector_from_floor, position_from_floor)
         class(Null_Floor_Penetration), intent(in) :: this

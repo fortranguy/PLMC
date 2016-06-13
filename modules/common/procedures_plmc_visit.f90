@@ -1,7 +1,9 @@
 module procedures_plmc_visit
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use json_module, only: json_file
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
@@ -12,17 +14,22 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_component =>
 use types_reals_line, only: Reals_Line
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use procedures_generating_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
+use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
+use procedures_observables_factory_micro, only: create_triangle_nodes, destroy_triangle_nodes
 use procedures_triangle_observables, only: triangle_observables_init, &
     triangle_observables_add
 
 implicit none
 
 private
-public :: plmc_visit
+public :: plmc_visit_set, plmc_visit
+
+interface plmc_visit_set
+    module procedure :: set_visit
+end interface plmc_visit_set
 
 interface plmc_visit
-    module procedure :: visit_all
+    module procedure :: visit_generating, visit_exploring
     module procedure :: visit_field
     module procedure :: visit_walls
     module procedure :: visit_short
@@ -31,7 +38,20 @@ end interface plmc_visit
 
 contains
 
-    subroutine visit_all(observables, physical_model)
+    subroutine set_visit(visit, exploring_data, prefix)
+        logical, intent(out) :: visit
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"visit"
+        call exploring_data%get(data_field, visit, data_found)
+        call check_data_found(data_field, data_found)
+    end subroutine set_visit
+
+    subroutine visit_generating(observables, physical_model)
         type(Generating_Observables_Wrapper), intent(inout) :: observables
         type(Physical_Model_Wrapper), intent(in) :: physical_model
 
@@ -43,7 +63,23 @@ contains
             physical_model%short_interactions)
         call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
-    end subroutine visit_all
+    end subroutine visit_generating
+
+    subroutine visit_exploring(observables, physical_model, visit)
+        type(Exploring_Observables_Wrapper), intent(inout) :: observables
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
+        logical, intent(in) :: visit
+
+        if (.not.visit) return
+        call plmc_visit(observables%field_energies, physical_model%environment%external_field, &
+            physical_model%mixture%components)
+        call plmc_visit(observables%walls_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        call plmc_visit(observables%short_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
+            physical_model%mixture%components, physical_model%dipolar_interactions)
+    end subroutine visit_exploring
 
     pure subroutine visit_field(field_energies, external_field, components)
         real(DP), intent(out) :: field_energies(:)

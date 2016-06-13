@@ -18,7 +18,6 @@ use classes_component_chemical_potential, only: Abstract_Component_Chemical_Pote
 use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
-use classes_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
 use classes_widom_method, only: Abstract_Widom_Method, Concrete_Widom_Method
 
@@ -29,7 +28,7 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
     use_reciprocal_lattice, use_walls, &
     component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
-    component_interacts_with_wall, component_can_change, measure_chemical_potentials
+    component_interacts_with_wall, measure_chemical_potentials
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -63,7 +62,6 @@ end interface component_is_dipolar
 interface component_can_exchange
     module procedure :: component_can_exchange_from_json
     module procedure :: component_can_exchange_from_chemical_potential
-    module procedure :: component_can_exchange_from_component_exchange
 end interface component_can_exchange
 
 interface components_interact
@@ -165,10 +163,10 @@ contains
         use_walls = logical_from_json(generating_data, prefix//"Walls.use")
     end function use_walls_from_json
 
-    logical function use_walls_from_walls(walls) result(use_walls)
-        class(Abstract_Visitable_Walls), intent(in) :: walls
+    logical function use_walls_from_walls(visitable_walls) result(use_walls)
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
-        select type (walls)
+        select type (visitable_walls)
             type is (Concrete_Visitable_Walls)
                 use_walls = .true.
             class default
@@ -305,28 +303,6 @@ contains
                 component_can_exchange = .false.
         end select
     end function component_can_exchange_from_chemical_potential
-
-    pure logical function component_can_exchange_from_component_exchange(component_exchange) &
-        result(component_can_exchange)
-        class(Abstract_Component_Exchange), intent(in) :: component_exchange
-
-        select type (component_exchange)
-            type is (Concrete_Component_Exchange)
-                component_can_exchange = .true.
-            class default
-                component_can_exchange = .false.
-        end select
-    end function component_can_exchange_from_component_exchange
-
-    pure logical function component_can_change(translated_positions, rotated_orientations, &
-        component_exchange)
-        class(Abstract_Moved_Coordinates), intent(in) :: translated_positions, rotated_orientations
-        class(Abstract_Component_Exchange), intent(in) :: component_exchange
-
-        component_can_change = component_can_translate(translated_positions) .or. &
-            component_can_rotate(rotated_orientations) .or. &
-            component_can_exchange(component_exchange)
-    end function component_can_change
 
     logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
         result(measure_chemical_potentials)

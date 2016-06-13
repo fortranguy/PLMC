@@ -21,8 +21,7 @@
 
         \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    origin: \type{real[3]}, size: \type{real[3]}}}
+                \operation{\procedure{construct}{...}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getOrigin}{}: \type{real[3]}}
                 \operation{\procedure{getSize}{}: \type{real[3]}}
@@ -36,7 +35,8 @@
                     floorPenetration: \type{FloorPenetration}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{areOutsideBox}{}: \type{bool}}
-                \operation{\procedure{getGap}{}: \type{real}}
+                \operation{\procedure{getMinGap}{}: \type{real}}
+                \operation{\procedure{getMaxGap}{}: \type{real}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
                     position: \type{real[3]}, pairPotential: \type{PairPotential}}}
             \end{abstractclass}
@@ -54,6 +54,7 @@
         \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
                 \operation{\procedure{getMinDepth}{}: \type{real}}
+                \operation{\procedure{getMaxDepth}{}: \type{real}}
                 \operation{\procedure{meet}{overlap: \type{bool},
                     shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
             \end{abstractclass}

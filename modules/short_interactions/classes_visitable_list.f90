@@ -83,9 +83,9 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_set(this, i_target, i_particle)
+    subroutine Abstract_set(this, i_target, i_source)
         class(Abstract_Visitable_List), intent(inout) :: this
-        integer, intent(in) :: i_target, i_particle
+        integer, intent(in) :: i_target, i_source
 
         type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), &
             next => null()
@@ -95,7 +95,7 @@ contains
         do
             next => current%next
             if (current%i == i_target) then
-                current%i = i_particle
+                current%i = i_source
                 return
             else
                 previous => current
@@ -196,15 +196,15 @@ contains
         this%periodic_box => null()
     end subroutine Array_destroy
 
-    subroutine Array_set(this, i_target, i_particle)
+    subroutine Array_set(this, i_target, i_source)
         class(Concrete_Visitable_Array), intent(inout) :: this
-        integer, intent(in) :: i_target, i_particle
+        integer, intent(in) :: i_target, i_source
 
         integer :: i_node
 
         do i_node = 1, this%num_nodes
             if (this%nodes(i_node) == i_target) then
-                this%nodes(i_node) = i_particle
+                this%nodes(i_node) = i_source
                 return
             end if
         end do
@@ -271,9 +271,9 @@ contains
         class(Null_Visitable_List), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_set(this, i_target, i_particle)
+    subroutine Null_set(this, i_target, i_source)
         class(Null_Visitable_List), intent(inout) :: this
-        integer, intent(in) :: i_target, i_particle
+        integer, intent(in) :: i_target, i_source
     end subroutine Null_set
 
     subroutine Null_visit(this, overlap, energy, particle, pair_potential, i_exclude)

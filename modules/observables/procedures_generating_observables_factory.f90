@@ -1,63 +1,88 @@
 module procedures_generating_observables_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_component_wrapper, only: Component_Wrapper
-use types_reals_line, only: Reals_Line
-use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
-    Concrete_Change_Counters_Line, reset_counters
+use module_changes_success, only: Concrete_Change_Counter, Concrete_Changes_Counter, &
+    Concrete_Changes_Success, Concrete_Change_Counters_Line, reset_counters
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
+use procedures_observables_factory_micro, only: create_reals, create_triangle_reals, &
+    create_square_reals, destroy_reals, destroy_triangle_reals, destroy_square_reals
 
 implicit none
 
 private
-public :: create, destroy, create_triangle_nodes, destroy_triangle_nodes
+public :: create, destroy
 
 interface create
     module procedure :: create_all
+    module procedure :: create_num_particles
     module procedure :: create_changes_counters
-    module procedure :: create_switches_counters
+    module procedure :: create_triangle_counters
+    module procedure :: create_square_counters
     module procedure :: create_changes_successes
-    module procedure :: create_triangle
-    module procedure :: create_energies
+    module procedure :: create_reals
+    module procedure :: create_triangle_reals
+    module procedure :: create_square_reals
 end interface create
 
 interface destroy
-    module procedure :: destroy_energies
-    module procedure :: destroy_triangle
+    module procedure :: destroy_square_reals
+    module procedure :: destroy_triangle_reals
+    module procedure :: destroy_reals
     module procedure :: destroy_changes_successes
-    module procedure :: destroy_switches_counters
+    module procedure :: destroy_square_counters
+    module procedure :: destroy_triangle_counters
     module procedure :: destroy_changes_counters
+    module procedure :: destroy_num_particles
     module procedure :: destroy_all
 end interface destroy
 
 contains
 
-    pure subroutine create_all(observables, components)
+    pure subroutine create_all(observables, num_components)
         type(Generating_Observables_Wrapper), intent(out) :: observables
-        type(Component_Wrapper), intent(in) :: components(:)
+        integer, intent(in) :: num_components
 
-        call create(observables%changes_counters, size(components))
-        call create(observables%switches_counters, size(components))
-        call create(observables%changes_sucesses, size(components))
-        call create(observables%switches_successes, size(components))
-        call create(observables%walls_energies, size(components))
-        call create(observables%field_energies, size(components))
-        call create(observables%short_energies, size(components))
-        call create(observables%dipolar_energies, size(components))
+        call create(observables%num_particles, num_components)
+        call create(observables%walls_energies, num_components)
+        call create(observables%field_energies, num_components)
+        call create(observables%short_energies, num_components)
+        call create(observables%dipolar_energies, num_components)
+        call create(observables%changes_counters, num_components)
+        call create(observables%switches_counters, num_components)
+        call create(observables%transmutations_counters, num_components)
+        call create(observables%changes_sucesses, num_components)
+        call create(observables%switches_successes, num_components)
+        call create(observables%transmutations_successes, num_components)
     end subroutine create_all
 
     pure subroutine destroy_all(observables)
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
+        call destroy(observables%transmutations_successes)
+        call destroy(observables%switches_successes)
+        call destroy(observables%changes_sucesses)
+        call destroy(observables%transmutations_counters)
+        call destroy(observables%switches_counters)
+        call destroy(observables%changes_counters)
         call destroy(observables%dipolar_energies)
         call destroy(observables%short_energies)
         call destroy(observables%field_energies)
         call destroy(observables%walls_energies)
-        call destroy(observables%switches_successes)
-        call destroy(observables%changes_sucesses)
-        call destroy(observables%switches_counters)
-        call destroy(observables%changes_counters)
+        call destroy(observables%num_particles)
     end subroutine destroy_all
+
+    pure subroutine create_num_particles(num_particles, num_components)
+        integer, allocatable, intent(out) :: num_particles(:)
+        integer, intent(in) :: num_components
+
+        allocate(num_particles(num_components))
+    end subroutine create_num_particles
+
+    pure subroutine destroy_num_particles(num_particles)
+        integer, allocatable, intent(inout) :: num_particles(:)
+
+        if (allocated(num_particles)) deallocate(num_particles)
+    end subroutine destroy_num_particles
 
     pure subroutine create_changes_counters(counters, num_components)
         type(Concrete_Changes_Counter), allocatable, intent(out) :: counters(:)
@@ -77,7 +102,7 @@ contains
         if (allocated(counters)) deallocate(counters)
     end subroutine destroy_changes_counters
 
-    pure subroutine create_switches_counters(counters, num_components)
+    pure subroutine create_triangle_counters(counters, num_components)
         type(Concrete_Change_Counters_Line), allocatable, intent(out) :: counters(:)
         integer, intent(in) :: num_components
 
@@ -88,9 +113,23 @@ contains
             allocate(counters(i_counter)%line(i_counter))
         end do
         call reset_counters(counters)
-    end subroutine create_switches_counters
+    end subroutine create_triangle_counters
 
-    pure subroutine destroy_switches_counters(counters)
+    pure subroutine create_square_counters(counters, num_components)
+        type(Concrete_Change_Counter), allocatable, intent(out) :: counters(:, :)
+        integer, intent(in) :: num_components
+
+        allocate(counters(num_components, num_components))
+        call reset_counters(counters)
+    end subroutine create_square_counters
+
+    pure subroutine destroy_square_counters(counters)
+        type(Concrete_Change_Counter), allocatable, intent(inout) :: counters(:, :)
+
+        if (allocated(counters)) deallocate(counters)
+    end subroutine destroy_square_counters
+
+    pure subroutine destroy_triangle_counters(counters)
         type(Concrete_Change_Counters_Line), allocatable, intent(out) :: counters(:)
 
         integer :: i_counter
@@ -103,7 +142,7 @@ contains
             end do
             deallocate(counters)
         end if
-    end subroutine destroy_switches_counters
+    end subroutine destroy_triangle_counters
 
     pure subroutine create_changes_successes(successes, num_components)
         type(Concrete_Changes_Success), allocatable, intent(out) :: successes(:)
@@ -117,57 +156,5 @@ contains
 
         if (allocated(successes)) deallocate(successes)
     end subroutine destroy_changes_successes
-
-    pure subroutine create_triangle(triangle, num_components)
-        type(Reals_Line), allocatable, intent(out) :: triangle(:)
-        integer, intent(in) :: num_components
-
-        allocate(triangle(num_components))
-        call create_triangle_nodes(triangle)
-    end subroutine create_triangle
-
-    pure subroutine destroy_triangle(triangle)
-        type(Reals_Line), allocatable, intent(inout) :: triangle(:)
-
-        if (allocated(triangle)) then
-            call destroy_triangle_nodes(triangle)
-            deallocate(triangle)
-        end if
-    end subroutine destroy_triangle
-
-    pure subroutine create_triangle_nodes(triangle)
-        type(Reals_Line), intent(out) :: triangle(:)
-
-        integer :: i_component
-        do i_component = 1, size(triangle)
-            allocate(triangle(i_component)%line(i_component))
-            triangle(i_component)%line = 0._DP
-        end do
-    end subroutine create_triangle_nodes
-
-    pure subroutine destroy_triangle_nodes(triangle)
-        type(Reals_Line), intent(inout) :: triangle(:)
-
-        integer :: i_component
-
-        do i_component = size(triangle), 1, -1
-            if (allocated(triangle(i_component)%line)) then
-                deallocate(triangle(i_component)%line)
-            end if
-        end do
-    end subroutine destroy_triangle_nodes
-
-    pure subroutine create_energies(energies, num_components)
-        real(DP), allocatable, intent(out) :: energies(:)
-        integer, intent(in) :: num_components
-
-        allocate(energies(num_components))
-    end subroutine create_energies
-
-    pure subroutine destroy_energies(energies)
-        real(DP), allocatable, intent(inout) :: energies(:)
-
-        if (allocated(energies)) deallocate(energies)
-    end subroutine destroy_energies
 
 end module procedures_generating_observables_factory

@@ -14,7 +14,7 @@ private
 
     type, extends(Abstract_Moved_Coordinates), public :: Concrete_Rotated_Orientations
     private
-        class(Abstract_Component_Coordinates), pointer :: orientations
+        class(Abstract_Component_Coordinates), pointer :: orientations => null()
         real(DP) :: delta = 0._DP
         type(Concrete_Move_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor = 1._DP

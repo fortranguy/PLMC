@@ -19,17 +19,18 @@ contains
 
         real(DP), dimension(:, :), allocatable :: orientations_dummy
         call create_coordinates_from_file(positions, orientations_dummy, filename, &
-            read_orientations=.false.)
+            read_positions=.true., read_orientations=.false.)
     end subroutine create_positions_from_file
 
-    subroutine create_coordinates_from_file(positions, orientations, filename, read_orientations)
+    subroutine create_coordinates_from_file(positions, orientations, filename, read_positions, &
+        read_orientations)
         real(DP), dimension(:, :), allocatable, intent(out) :: positions, orientations
         character(len=*), intent(in) :: filename
-        logical, intent(in) :: read_orientations
+        logical, intent(in) :: read_positions, read_orientations
 
         character(len=max_word_length) :: comment_caracter, number_field
         integer :: num_particles_written, num_particles_counted, i_particle
-        real(DP) :: dummy_position(num_dimensions)
+        real(DP) :: dummy_coordinates(num_dimensions)
         integer :: file_unit, read_stat
 
         call check_file_exists(filename)
@@ -38,7 +39,7 @@ contains
         read(file_unit, *) comment_caracter ! header
         num_particles_counted = 0
         do
-            read(file_unit, fmt=*, iostat=read_stat) dummy_position
+            read(file_unit, fmt=*, iostat=read_stat) dummy_coordinates
             if (read_stat == iostat_end) exit
             num_particles_counted = num_particles_counted + 1
         end do
@@ -50,15 +51,21 @@ contains
         rewind(file_unit)
         read(file_unit, *) comment_caracter
         read(file_unit, *) comment_caracter
-        allocate(positions(num_dimensions, num_particles_counted))
-        if (read_orientations) then
+        if (read_positions .and. .not.read_orientations) then
+            allocate(positions(num_dimensions, num_particles_counted))
+            do i_particle = 1, num_particles_counted
+                read(file_unit, *) positions(:, i_particle)
+            end do
+        else if (.not.read_positions .and. read_orientations) then
+            allocate(orientations(num_dimensions, num_particles_counted))
+            do i_particle = 1, num_particles_counted
+                read(file_unit, *) orientations(:, i_particle)
+            end do
+        else if (read_positions .and. read_orientations) then
+            allocate(positions(num_dimensions, num_particles_counted))
             allocate(orientations(num_dimensions, num_particles_counted))
             do i_particle = 1, num_particles_counted
                 read(file_unit, *) positions(:, i_particle), orientations(:, i_particle)
-            end do
-        else
-            do i_particle = 1, num_particles_counted
-                read(file_unit, *) positions(:, i_particle)
             end do
         end if
         close(file_unit)

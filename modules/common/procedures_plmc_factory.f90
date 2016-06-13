@@ -5,6 +5,7 @@ use data_prefixes, only: environment_prefix, mixture_prefix, writers_prefix
 use json_module, only: json_file
 use procedures_command_arguments, only: create_filename_from_argument
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_factory, only: set_num_particles
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_physical_model_factory, only: physical_model_create => create, &
     physical_model_destroy => destroy
@@ -62,6 +63,7 @@ end interface plmc_destroy
 
 interface plmc_set
     module procedure :: plmc_set_num_steps, set_num_snaps
+    module procedure :: set_num_particles
     module procedure :: set_mixture_coordinates, exploring_readers_set
     module procedure :: markov_chain_generator_set
     module procedure :: tune_components_moves
@@ -81,8 +83,9 @@ contains
 
         call generating_readers_create(readers, physical_model%mixture%components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
-            short_interactions%wall_pairs, physical_model%mixture%components, changes%components, &
-            physical_model%short_interactions%components_pairs, generating_data, writers_prefix)
+            short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
+            short_interactions%components_pairs, changes%components, generating_data, &
+            writers_prefix)
     end subroutine create_generating_readers_writers
 
     subroutine destroy_generating_readers_writers(readers, writers)
@@ -108,8 +111,9 @@ contains
         call exploring_readers_create(readers, physical_model%environment%periodic_box, &
             physical_model%mixture%components, num_snaps, num_offset, generating_data, &
             environment_prefix)
-        call exploring_writers_create(writers, markov_chain_explorer%widom_method, &
-            size(physical_model%mixture%components))
+        call exploring_writers_create(writers, physical_model%environment, physical_model%&
+            short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
+            short_interactions%components_pairs, markov_chain_explorer%widom_method)
     end subroutine create_exploring_readers_writers
 
     subroutine destroy_exploring_readers_writers(readers, writers)
@@ -159,21 +163,21 @@ contains
         call json_data%destroy()
     end subroutine destroy_json_data
 
-    subroutine tune_components_moves(tuned, i_step, change_components, changes_sucesses)
+    subroutine tune_components_moves(tuned, i_step, changes_components, changes_sucesses)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
-        type(Changes_Component_Wrapper), intent(inout) :: change_components(:)
+        type(Changes_Component_Wrapper), intent(inout) :: changes_components(:)
         type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
 
-        logical :: translation_tuned(size(change_components)), &
-            rotation_tuned(size(change_components))
+        logical :: translation_tuned(size(changes_components)), &
+            rotation_tuned(size(changes_components))
         integer :: i_component
 
-        do i_component = 1, size(change_components)
-            call change_components(i_component)%translation_tuner%&
+        do i_component = 1, size(changes_components)
+            call changes_components(i_component)%translation_tuner%&
                 tune(translation_tuned(i_component), i_step, changes_sucesses(i_component)%&
                 translation)
-            call change_components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
+            call changes_components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
                 i_step, changes_sucesses(i_component)%rotation)
         end do
         tuned = all(translation_tuned) .and. all(rotation_tuned) ! Beware of inertia.
@@ -184,9 +188,11 @@ contains
 
         call set_successes(observables%changes_sucesses, observables%changes_counters)
         call reset_counters(observables%changes_counters)
-
         call set_successes(observables%switches_successes, observables%switches_counters)
         call reset_counters(observables%switches_counters)
+        call set_successes(observables%transmutations_successes, observables%&
+            transmutations_counters)
+        call reset_counters(observables%transmutations_counters)
     end subroutine set_success_and_reset_counter_generating
 
     subroutine set_success_and_reset_counter_exploring(observables)

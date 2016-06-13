@@ -24,10 +24,10 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         call changes_create(markov_chain_generator%changes, physical_model%environment%&
-            periodic_box, physical_model%mixture%components, num_tuning_steps, generating_data, &
-            changes_prefix)
+            periodic_box, physical_model%environment%walls, physical_model%mixture%components, &
+            num_tuning_steps, generating_data, changes_prefix)
         call metropolis_algorithms_create(markov_chain_generator%metropolis_algorithms, &
-            physical_model, markov_chain_generator%changes%components)
+            physical_model, markov_chain_generator%changes)
         call plmc_propagator_create(markov_chain_generator%plmc_propagator, markov_chain_generator%&
             metropolis_algorithms)
     end subroutine create

@@ -21,7 +21,8 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: are_outside_box => Abstract_are_outside_box
-        procedure :: get_gap => Abstract_get_gap
+        procedure :: get_min_gap => Abstract_get_min_gap
+        procedure :: get_max_gap => Abstract_get_max_gap
         procedure :: visit => Abstract_visit
         procedure, private :: position_from_floor => Abstract_position_from_floor
         procedure, private :: position_from_ceiling => Abstract_position_from_ceiling
@@ -32,7 +33,8 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: are_outside_box => Null_are_outside_box
-        procedure :: get_gap => Null_get_gap
+        procedure :: get_min_gap => Null_get_gap
+        procedure :: get_max_gap => Null_get_gap
         procedure :: visit => Null_visit
     end type Null_Visitable_Walls
 
@@ -72,18 +74,24 @@ contains
         real(DP) :: box_size(num_dimensions)
 
         box_size = this%periodic_box%get_size()
-        if (this%gap > box_size(3)) then
+        if (this%get_max_gap() > box_size(3)) then
             are_outside = .true.
         else
             are_outside = .false.
         end if
     end function Abstract_are_outside_box
 
-    pure real(DP) function Abstract_get_gap(this) result(gap)
+    pure real(DP) function Abstract_get_min_gap(this) result(min_gap)
         class(Abstract_Visitable_Walls), intent(in) :: this
 
-        gap = this%gap
-    end function Abstract_get_gap
+        min_gap = this%gap - 2._DP * this%floor_penetration%get_min_depth()
+    end function Abstract_get_min_gap
+
+    pure real(DP) function Abstract_get_max_gap(this) result(max_gap)
+        class(Abstract_Visitable_Walls), intent(in) :: this
+
+        max_gap = this%gap - 2._DP * this%floor_penetration%get_max_depth()
+    end function Abstract_get_max_gap
 
     pure subroutine Abstract_visit(this, overlap, energy, position, pair_potential)
         class(Abstract_Visitable_Walls), intent(in) :: this

@@ -15,7 +15,7 @@ contains
         type(Concrete_Changes_Selector), intent(in) :: selector
         character(len=*), intent(in) :: filename
 
-        if (selector%write_positions) then
+        if (selector%write_translations) then
             allocate(Concrete_Changes_Success_Writer :: changes)
         else
             allocate(Null_Changes_Success_Writer :: changes)
