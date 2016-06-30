@@ -1,6 +1,6 @@
 module procedures_markov_chain_generator_factory
 
-use data_prefixes, only: changes_prefix
+use data_input_prefixes, only: changes_prefix
 use json_module, only: json_file
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy

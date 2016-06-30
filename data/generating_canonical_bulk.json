@@ -37,7 +37,7 @@
             "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 0.5,
             "can exchange": false,
             "initial coordinates": "coordinates_2.in"
         },
@@ -45,7 +45,7 @@
             "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 0.25,
             "can exchange": false,
             "initial coordinates": "coordinates_3.in"
         },
@@ -70,14 +70,14 @@
         "Component 2": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 0.5,
             "sigma": 1.0,
             "maximum distance": 2.5
         },
         "Component 3": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 0.25,
             "sigma": 1.0,
             "maximum distance": 2.5
         },
@@ -113,6 +113,9 @@
             "delta distance": 1.0e-4,
             "max distance over box edge": 0.5
         }
+    },
+    "Random Number Generator": {
+        "name": "urandom"
     },
     "Changes": {
         "number of tuning steps": 50,

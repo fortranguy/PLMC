@@ -1,5 +1,8 @@
 module procedures_plmc_write
 
+use data_output_objects, only: random_number_generator_object
+use json_module, only: json_core, json_value
+use procedures_random_seed_factory, only: random_seed_write => write
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use types_exploring_writers_wrapper, only: Exploring_Writers_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
@@ -11,10 +14,19 @@ private
 public :: plmc_write
 
 interface plmc_write
+    module procedure :: write_json_report
     module procedure :: write_generating_observables, write_exploring_observables
 end interface plmc_write
 
 contains
+
+    subroutine write_json_report(json, output_data)
+        type(json_core), intent(inout) :: json
+        type(json_value), intent(inout), pointer :: output_data
+
+        call random_seed_write(json, output_data, random_number_generator_object)
+        call json%print(output_data, "report.json")
+    end subroutine write_json_report
 
     subroutine write_generating_observables(writers, observables, num_tuning_steps, num_steps, &
         i_step)

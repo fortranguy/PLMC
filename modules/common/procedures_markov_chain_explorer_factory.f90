@@ -1,6 +1,6 @@
 module procedures_markov_chain_explorer_factory
 
-use data_prefixes, only: widom_prefix
+use data_input_prefixes, only: widom_prefix
 use json_module, only: json_file
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_box_factory, only: box_create => create, box_destroy => destroy

@@ -35,7 +35,8 @@ contains
         real(DP) :: rotation(num_dimensions)
         real(DP) :: amplitude, rand
 
-        call check_array_size("markov_orientation", "orientation", orientation, num_dimensions)
+        call check_array_size("procedures_random_number: markov_orientation", "orientation", &
+            orientation, num_dimensions)
 
         call normal_random_number(rotation)
         rotation = rotation - dot_product(rotation, orientation) * orientation

@@ -1,14 +1,17 @@
 module procedures_plmc_factory
 
-use, intrinsic :: iso_fortran_env, only: error_unit
-use data_prefixes, only: environment_prefix, mixture_prefix, writers_prefix
+use data_input_prefixes, only: environment_prefix, mixture_prefix, random_number_generator_prefix, &
+    writers_prefix
 use json_module, only: json_file
-use procedures_command_arguments, only: create_filename_from_argument
+use procedures_json_data_factory, only: json_data_create_input => create_input, &
+    json_data_create_output => create_output, json_data_destroy_input => destroy_input, &
+    json_data_destroy_output => destroy_output
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: set_num_particles
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_physical_model_factory, only: physical_model_create => create, &
     physical_model_destroy => destroy
+use procedures_random_seed_factory, only: random_seed_set => set
 use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_set
 use procedures_markov_chain_generator_factory, only: markov_chain_generator_create => create, &
     markov_chain_generator_destroy => destroy, markov_chain_generator_set => set
@@ -47,21 +50,24 @@ interface plmc_create
     module procedure :: physical_model_create
     module procedure :: markov_chain_generator_create, markov_chain_explorer_create
     module procedure :: observables_create_generating, observables_create_exploring
+    module procedure :: json_data_create_input
     module procedure :: create_generating_data, create_exploring_data
-    module procedure :: create_json_data
     module procedure :: create_generating_readers_writers, create_exploring_readers_writers
+    module procedure :: json_data_create_output
 end interface plmc_create
 
 interface plmc_destroy
+    module procedure :: json_data_destroy_output
     module procedure :: destroy_generating_readers_writers, destroy_exploring_readers_writers
     module procedure :: destroy_exploring_data
-    module procedure :: destroy_json_data
+    module procedure :: json_data_destroy_input
     module procedure :: observables_destroy_generating, observables_destroy_exploring
     module procedure :: markov_chain_generator_destroy, markov_chain_explorer_destroy
     module procedure :: physical_model_destroy
 end interface plmc_destroy
 
 interface plmc_set
+    module procedure :: set_random_seed
     module procedure :: plmc_set_num_steps, set_num_snaps
     module procedure :: set_num_particles
     module procedure :: set_mixture_coordinates, exploring_readers_set
@@ -127,41 +133,28 @@ contains
     subroutine create_generating_data(generating_data)
         type(json_file), intent(out) :: generating_data
 
-        call create_json_data(generating_data, 1)
+        call json_data_create_input(generating_data, 1)
     end subroutine create_generating_data
 
     subroutine create_exploring_data(generating_data, exploring_data)
         type(json_file), intent(out) :: generating_data, exploring_data
 
-        call create_json_data(generating_data, 1)
-        call create_json_data(exploring_data, 2)
+        call json_data_create_input(generating_data, 1)
+        call json_data_create_input(exploring_data, 2)
     end subroutine create_exploring_data
-
-    subroutine create_json_data(json_data, i_argument)
-        type(json_file), intent(out) :: json_data
-        integer, intent(in) :: i_argument
-
-        character(len=:), allocatable :: data_filename
-
-        call json_data%initialize()
-        if (json_data%failed()) call json_data%print_error_message(error_unit)
-        call create_filename_from_argument(data_filename, i_argument)
-        call json_data%load_file(data_filename)
-        if (json_data%failed()) call json_data%print_error_message(error_unit)
-    end subroutine create_json_data
 
     subroutine destroy_exploring_data(generating_data, exploring_data)
         type(json_file), intent(inout) :: generating_data, exploring_data
 
-        call destroy_json_data(exploring_data)
-        call destroy_json_data(generating_data)
+        call json_data_destroy_input(exploring_data)
+        call json_data_destroy_input(generating_data)
     end subroutine destroy_exploring_data
 
-    subroutine destroy_json_data(json_data)
-        type(json_file), intent(inout) :: json_data
+    subroutine set_random_seed(input_data)
+        type(json_file), intent(inout) :: input_data
 
-        call json_data%destroy()
-    end subroutine destroy_json_data
+        call random_seed_set(input_data, random_number_generator_prefix)
+    end subroutine set_random_seed
 
     subroutine tune_components_moves(tuned, i_step, changes_components, changes_sucesses)
         logical, intent(out) :: tuned

@@ -325,13 +325,13 @@ contains
         end select
     end function measure_chemical_potentials_from_widom_method
 
-    logical function logical_from_json(json_data, statement)
-        type(json_file), intent(inout) :: json_data
+    logical function logical_from_json(input_data, statement)
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: statement
 
         logical :: data_found
 
-        call json_data%get(statement, logical_from_json, data_found)
+        call input_data%get(statement, logical_from_json, data_found)
         call check_data_found(statement, data_found)
     end function logical_from_json
 

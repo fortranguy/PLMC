@@ -19,12 +19,12 @@ public :: create_from_json, create_from_box, create_from_walls, destroy
 contains
 
     subroutine create_from_json(parallelepiped_domain, periodic_box, visitable_walls, needed, &
-        json_data, prefix)
+        input_data, prefix)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
         logical, intent(in) :: needed
-        type(json_file), intent(inout) :: json_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: domain_name, data_field
@@ -33,15 +33,15 @@ contains
 
         if (needed) then
             data_field = prefix//"Parallelepiped Domain.name"
-            call json_data%get(data_field, domain_name, data_found)
+            call input_data%get(data_field, domain_name, data_found)
             call check_data_found(data_field, data_found)
             select case (domain_name)
                 case ("domain")
                     data_field = prefix//"Parallelepiped Domain.origin"
-                    call json_data%get(data_field, domain_origin, data_found)
+                    call input_data%get(data_field, domain_origin, data_found)
                     call check_data_found(data_field, data_found)
                     data_field = prefix//"Parallelepiped Domain.size"
-                    call json_data%get(data_field, domain_size, data_found)
+                    call input_data%get(data_field, domain_size, data_found)
                     call check_data_found(data_field, data_found)
                     allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
                 case ("boxed")

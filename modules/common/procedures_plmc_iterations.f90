@@ -1,7 +1,7 @@
 module procedures_plmc_iterations
 
 use json_module, only: json_file
-use data_prefixes, only: changes_prefix
+use data_input_prefixes, only: changes_prefix
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found, check_positive
 

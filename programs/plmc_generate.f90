@@ -25,6 +25,7 @@ implicit none
 
     call plmc_create(io%generating_data)
     call plmc_create(physical_model, io%generating_data)
+    call plmc_set(io%generating_data)
     call plmc_set(num_tuning_steps, num_steps, io%generating_data)
     call plmc_create(markov_chain_generator, physical_model, num_tuning_steps, io%generating_data)
     call plmc_create(observables, physical_model%mixture%components)
@@ -33,6 +34,9 @@ implicit none
     call plmc_set(io%readers%components, io%generating_data)
     call plmc_set(markov_chain_generator)
     call plmc_destroy(io%generating_data)
+    call plmc_create(io%json, io%report_data)
+    call plmc_write(io%json, io%report_data)
+    call plmc_destroy(io%json, io%report_data)
 
     call plmc_reset(physical_model)
     call plmc_set(observables%num_particles, physical_model%mixture%components) !in exploring too?

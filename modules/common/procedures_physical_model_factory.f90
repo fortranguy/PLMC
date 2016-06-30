@@ -1,6 +1,6 @@
 module procedures_physical_model_factory
 
-use data_prefixes, only: environment_prefix, mixture_prefix, short_interactions_prefix, &
+use data_input_prefixes, only: environment_prefix, mixture_prefix, short_interactions_prefix, &
     dipolar_interactions_prefix
 use json_module, only: json_file
 use procedures_environment_factory, only: environment_create, environment_destroy

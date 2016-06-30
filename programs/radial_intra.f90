@@ -8,8 +8,10 @@ program plmc_radial_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_strings, only: max_line_length
-use data_prefixes, only: environment_prefix
+use data_input_prefixes, only: environment_prefix
 use json_module, only: json_file
+use procedures_json_data_factory, only: json_data_create_input => create_input, &
+    json_data_destroy_input => destroy_input
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found, check_positive, check_string_not_empty
 use procedures_geometry, only: sphere_surface
@@ -17,7 +19,6 @@ use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
-use procedures_plmc_factory, only: plmc_create, plmc_destroy
 use procedures_property_inquirers, only: periodicity_is_xyz
 use types_radial_distribution_component, only: Concrete_Radial_Distribution_Component
 use procedures_plmc_help, only: plmc_catch_radial_help
@@ -44,7 +45,7 @@ implicit none
     num_snaps = command_argument_count() - 2
     if (num_snaps == 0) call error_exit("No snaps given.")
 
-    call plmc_create(generating_data, 1)
+    call json_data_create_input(generating_data, 1)
     data_field = "Output.Coordinates.write"
     call generating_data%get(data_field, coordinates_written, data_found)
     call check_data_found(data_field, data_found)
@@ -53,10 +54,10 @@ implicit none
     if (.not.periodicity_is_xyz(periodic_box)) then
         call warning_continue("Periodicity is not XYZ.")
     end if
-    call plmc_destroy(generating_data)
+    call json_data_destroy_input(generating_data)
     max_distance = minval(periodic_box%get_size())/2._DP
 
-    call plmc_create(exploring_data, 2)
+    call json_data_create_input(exploring_data, 2)
     data_field = "Radial.delta"
     call exploring_data%get(data_field, delta_distance, data_found)
     call check_data_found(data_field, data_found)
@@ -66,7 +67,7 @@ implicit none
     call check_data_found(data_field, data_found)
     call check_string_not_empty(data_field, bins_filename)
     deallocate(data_field)
-    call plmc_destroy(exploring_data)
+    call json_data_destroy_input(exploring_data)
 
     allocate(bins_snap(nint(max_distance/delta_distance)))
     allocate(bins_function(size(bins_snap)))
