@@ -1,0 +1,29 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\renewcommand{\familydefault}{\sfdefault}
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\mediumTextWidth]{TowerSampler}{0, 0}
+                \operation{\procedure{construct}{numsCandidates: \type{int[:]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getNumChoices}{}: \type{int}}
+                \operation{\procedure{get}{}: \type{int}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(TowerSampler.south) - (0 cm, 2 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{RandomCoordinates}{0, 0}
+                \operation{\procedure{construct}{...}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{get}{iComponent: \type{int}}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}

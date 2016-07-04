@@ -68,7 +68,7 @@ contains
         call writers%short_energies%write(i_snap, observables%short_energies)
         call writers%dipolar_energies%write(i_snap, observables%dipolar_energies)
         call writers%dipolar_mixture_energy%write(i_snap, observables%dipolar_mixture_energy)
-        call writers%widom_successes%write(i_snap, observables%widom_successes)
+        call writers%insertion_successes%write(i_snap, observables%insertion_successes)
     end subroutine write_exploring_observables
 
 end module procedures_plmc_write

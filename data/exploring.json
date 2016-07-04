@@ -2,7 +2,7 @@
     "Check": {
         "visit": true
     },
-    "Widom": {
+    "Particle Insertion": {
         "mesure chemical potentials": true,
         "Parallelepiped Domain": {
             "name": "boxed"

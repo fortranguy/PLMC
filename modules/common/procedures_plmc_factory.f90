@@ -113,13 +113,13 @@ contains
 
         integer :: num_offset
 
-        num_offset = 2
+        num_offset = 2 ! generating.json + exploring.json, cf. [[create_exploring_data]]
         call exploring_readers_create(readers, physical_model%environment%periodic_box, &
             physical_model%mixture%components, num_snaps, num_offset, generating_data, &
             environment_prefix)
         call exploring_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
-            short_interactions%components_pairs, markov_chain_explorer%widom_method)
+            short_interactions%components_pairs, markov_chain_explorer%particle_insertion_method)
     end subroutine create_exploring_readers_writers
 
     subroutine destroy_exploring_readers_writers(readers, writers)
@@ -191,8 +191,8 @@ contains
     subroutine set_success_and_reset_counter_exploring(observables)
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
-        call set_successes(observables%widom_successes, observables%widom_counters)
-        call reset_counters(observables%widom_counters)
+        call set_successes(observables%insertion_successes, observables%insertion_counters)
+        call reset_counters(observables%insertion_counters)
     end subroutine set_success_and_reset_counter_exploring
 
     subroutine set_mixture_coordinates(components_readers, generating_data)

@@ -4,7 +4,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
-use classes_widom_method, only: Abstract_Widom_Method
+use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy
 use procedures_line_writer_factory, only: line_writer_create => create, &
@@ -21,18 +21,19 @@ public :: create, destroy
 
 contains
 
-    subroutine create(writers, environment, wall_pairs, components, short_pairs, widom_method)
+    subroutine create(writers, environment, wall_pairs, components, short_pairs, &
+        particle_insertion_method)
         type(Exploring_Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
-        class(Abstract_Widom_Method), intent(in) :: widom_method
+        class(Abstract_Particle_Insertion_Method), intent(in) :: particle_insertion_method
 
         logical, dimension(size(components)) :: selector, are_dipolar
 
-        selector = measure_chemical_potentials(widom_method)
-        call line_writer_create(writers%widom_successes, selector, "widom_successes.out")
+        selector = measure_chemical_potentials(particle_insertion_method)
+        call line_writer_create(writers%insertion_successes, selector, "insertion_successes.out")
         call line_writer_create(writers%inv_pow_activities, selector, "inv_pow_activities.out")
         call line_writer_create(writers%field, environment%external_field, components, &
             "field_energies.out") !change filenames?
@@ -53,7 +54,7 @@ contains
         call line_writer_destroy(writers%walls)
         call line_writer_destroy(writers%field)
         call line_writer_destroy(writers%inv_pow_activities)
-        call line_writer_destroy(writers%widom_successes)
+        call line_writer_destroy(writers%insertion_successes)
     end subroutine destroy
 
 end module procedures_exploring_writers_factory

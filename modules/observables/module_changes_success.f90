@@ -22,7 +22,7 @@ end interface set_successes
 
     type, public :: Concrete_Change_Counter
         integer :: num_hits
-        integer :: num_success
+        integer :: num_successes
     end type Concrete_Change_Counter
 
     type, public :: Concrete_Changes_Counter
@@ -64,7 +64,7 @@ contains
         type(Concrete_Change_Counter), intent(inout) :: counter
 
         counter%num_hits = 0
-        counter%num_success = 0
+        counter%num_successes = 0
     end subroutine change_counter_reset
 
     pure elemental subroutine changes_success_set(success, counter)
@@ -95,7 +95,7 @@ contains
         type(Concrete_Change_Counter), intent(in) :: counter
 
         if (counter%num_hits > 0) then
-            ratio = real(counter%num_success, DP) / real(counter%num_hits, DP)
+            ratio = real(counter%num_successes, DP) / real(counter%num_hits, DP)
         else
             ratio = 0._DP
         end if

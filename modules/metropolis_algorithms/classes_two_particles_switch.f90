@@ -148,8 +148,8 @@ contains
             end do
             observables%dipolar_mixture_energy = observables%dipolar_mixture_energy + &
                 deltas%dipolar_mixture
-            observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_success = &
-                observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_success + 1
+            observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_successes = &
+                observables%switches_counters(ij_actors(1))%line(ij_actors(2))%num_successes + 1
         end if
     end subroutine Abstract_try
 

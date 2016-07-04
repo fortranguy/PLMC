@@ -395,7 +395,7 @@ contains
     subroutine Add_increment_success(changes_counters)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        changes_counters%add%num_success = changes_counters%add%num_success + 1
+        changes_counters%add%num_successes = changes_counters%add%num_successes + 1
     end subroutine Add_increment_success
 
 !end implementation Concrete_One_Particle_Add
@@ -526,7 +526,7 @@ contains
     subroutine Remove_increment_success(changes_counters)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        changes_counters%remove%num_success = changes_counters%remove%num_success + 1
+        changes_counters%remove%num_successes = changes_counters%remove%num_successes + 1
     end subroutine Remove_increment_success
 
 !end implementation Concrete_One_Particle_Remove

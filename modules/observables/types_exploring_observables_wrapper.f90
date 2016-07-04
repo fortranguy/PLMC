@@ -13,8 +13,8 @@ private
         real(DP), allocatable :: field_energies(:), walls_energies(:)
         type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_mixture_energy = 0._DP
-        type(Concrete_Change_Counter), allocatable :: widom_counters(:)
-        real(DP), allocatable :: widom_successes(:)
+        type(Concrete_Change_Counter), allocatable :: insertion_counters(:)
+        real(DP), allocatable :: insertion_successes(:)
     end type Exploring_Observables_Wrapper
 
 end module types_exploring_observables_wrapper

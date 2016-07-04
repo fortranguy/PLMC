@@ -36,15 +36,15 @@ contains
         call create(observables%field_energies, num_components)
         call create(observables%short_energies, num_components)
         call create(observables%dipolar_energies, num_components)
-        call create(observables%widom_successes, num_components)
-        call create(observables%widom_counters, num_components)
+        call create(observables%insertion_successes, num_components)
+        call create(observables%insertion_counters, num_components)
     end subroutine create_all
 
     pure subroutine destroy_all(observables)
         type(Exploring_Observables_Wrapper), intent(inout) ::observables
 
-        call destroy(observables%widom_counters)
-        call destroy(observables%widom_successes)
+        call destroy(observables%insertion_counters)
+        call destroy(observables%insertion_successes)
         call destroy(observables%dipolar_energies)
         call destroy(observables%short_energies)
         call destroy(observables%field_energies)

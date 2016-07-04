@@ -14,7 +14,7 @@ private
         class(Abstract_Line_Writer), allocatable :: field, walls
         class(Abstract_Triangle_Writer), allocatable :: short_energies, dipolar_energies
         class(Abstract_Real_Writer), allocatable :: dipolar_mixture_energy
-        class(Abstract_Line_Writer), allocatable :: widom_successes
+        class(Abstract_Line_Writer), allocatable :: insertion_successes
     end type Exploring_Writers_Wrapper
 
 end module types_exploring_writers_wrapper

@@ -66,7 +66,7 @@ contains
                 if (selectors(i_component, j_component)) then
                     allocate(Concrete_Number_to_String :: this%strings(i_component, j_component)%&
                         string)
-                    legend = legend//"    "//string%get(i_component)//"->"//string%get(j_component)!arrow?
+                    legend = legend//"    "//string%get(i_component)//"->"//string%get(j_component)
                 else
                     allocate(Null_Number_to_String :: this%strings(i_component, j_component)%string)
                 end if

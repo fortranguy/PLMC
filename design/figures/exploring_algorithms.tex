@@ -1,0 +1,35 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\renewcommand{\familydefault}{\sfdefault}
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ParticleInsertionMethod}{0, 0}
+                \operation{\procedure{construct}{environment: \type{Environment},
+                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions},
+                    dipolarInteractions: \type{DipolarInteractions},
+                    numbers: \type{ComponentNumber[:]},
+                    randomPosition: \type{RandomCoordinates},
+                    randomOrientation: \type{RandomCoordinates}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{try}{observables: \type{ExploringObservables}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ParticleInsertionMethod.north) + (9 cm, 0 cm)$)}]
+            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+                \namespace{Environment} :: Environment \\
+                \namespace{Mixture} :: Component, ComponentNumber \\
+                \namespace{ShortInteractions} :: ShortInteractions \\
+                \namespace{DipolarInteractions} :: DipolarInteractions \\
+                \namespace{Random} :: RandomCoordinates \\
+                \namespace{Observables} :: ExploringObservables};
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}

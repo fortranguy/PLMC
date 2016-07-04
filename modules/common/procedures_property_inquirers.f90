@@ -19,7 +19,8 @@ use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
-use classes_widom_method, only: Abstract_Widom_Method, Concrete_Widom_Method
+use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method, &
+    Concrete_Particle_Insertion_Method
 
 implicit none
 
@@ -71,7 +72,7 @@ end interface components_interact
 
 interface measure_chemical_potentials
     module procedure :: measure_chemical_potentials_from_json
-    module procedure :: measure_chemical_potentials_from_widom_method
+    module procedure :: measure_chemical_potentials_from_particle_insertion_method
 end interface measure_chemical_potentials
 
 contains
@@ -313,17 +314,17 @@ contains
             prefix//"mesure chemical potentials")
     end function measure_chemical_potentials_from_json
 
-    pure logical function measure_chemical_potentials_from_widom_method(widom_method) &
-        result(measure_chemical_potentials)
-        class(Abstract_Widom_Method), intent(in) :: widom_method
+    pure logical function measure_chemical_potentials_from_particle_insertion_method&
+        (particle_insertion_method) result(measure_chemical_potentials)
+        class(Abstract_Particle_Insertion_Method), intent(in) :: particle_insertion_method
 
-        select type (widom_method)
-            type is (Concrete_Widom_Method)
+        select type (particle_insertion_method)
+            type is (Concrete_Particle_Insertion_Method)
                 measure_chemical_potentials = .true.
             class default
                 measure_chemical_potentials = .false.
         end select
-    end function measure_chemical_potentials_from_widom_method
+    end function measure_chemical_potentials_from_particle_insertion_method
 
     logical function logical_from_json(input_data, statement)
         type(json_file), intent(inout) :: input_data

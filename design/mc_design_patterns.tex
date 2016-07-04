@@ -57,6 +57,23 @@
     \tableofcontents
 
     \begin{landscape}
+    \section{Core}
+
+        \subsection{Common}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/common}
+            \caption{\namespace{Common}}
+        \end{figure}
+
+        \subsection{Random}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/random}
+            \caption{\namespace{Random}}
+        \end{figure}
+        \clearpage
+
     \section{Physical model}
 
         \subsection{Environment}
@@ -92,7 +109,7 @@
         \KOMAoptions{paper=A3, pagesize}
         \recalctypearea
 
-            \subsubsection{Long-range interactions}
+            \subsubsection{Dipolar interactions}
             \begin{figure}[htb]
                 \centering
                 \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
@@ -120,6 +137,16 @@
             \centering
             \includestandalone[mode=\buildMode]{figures/metropolis_algorithms}
             \caption{\namespace{Metropolis Algorithms}}
+        \end{figure}
+        \clearpage
+
+    \section{Markov chain explorer}
+
+        \subsection{Exploring algorithms}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/exploring_algorithms}
+            \caption{\namespace{Exploring Algorithms}}
         \end{figure}
         \clearpage
 

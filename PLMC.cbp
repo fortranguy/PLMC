@@ -415,10 +415,10 @@
 		<Unit filename="modules/environment/walls/procedures_walls_visitor_factory.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/exploring_algorithms/classes_widom_method.f90">
+		<Unit filename="modules/exploring_algorithms/classes_particle_insertion_method.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/exploring_algorithms/procedures_widom_method_factory.f90">
+		<Unit filename="modules/exploring_algorithms/procedures_particle_insertion_method_factory.f90">
 			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/metropolis_algorithms/classes_metropolis_algorithm.f90">

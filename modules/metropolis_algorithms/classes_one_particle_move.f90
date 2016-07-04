@@ -390,7 +390,7 @@ contains
     subroutine Translation_increment_success(changes_counters)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        changes_counters%translation%num_success = changes_counters%translation%num_success + 1
+        changes_counters%translation%num_successes = changes_counters%translation%num_successes + 1
     end subroutine Translation_increment_success
 
 !end implementation Concrete_One_Particle_Translation
@@ -498,7 +498,7 @@ contains
     subroutine Rotation_increment_success(changes_counters)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        changes_counters%rotation%num_success = changes_counters%rotation%num_success + 1
+        changes_counters%rotation%num_successes = changes_counters%rotation%num_successes + 1
     end subroutine Rotation_increment_success
 
 !end implementation Concrete_One_Particle_Rotation
