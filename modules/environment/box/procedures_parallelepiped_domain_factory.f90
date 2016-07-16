@@ -37,12 +37,6 @@ contains
             call check_data_found(data_field, data_found)
             select case (domain_name)
                 case ("domain")
-                    data_field = prefix//"Parallelepiped Domain.origin"
-                    call input_data%get(data_field, domain_origin, data_found)
-                    call check_data_found(data_field, data_found)
-                    data_field = prefix//"Parallelepiped Domain.size"
-                    call input_data%get(data_field, domain_size, data_found)
-                    call check_data_found(data_field, data_found)
                     allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
                 case ("boxed")
                     allocate(Concrete_Boxed_Domain :: parallelepiped_domain)
@@ -63,6 +57,12 @@ contains
 
         select type (parallelepiped_domain)
             type is (Concrete_Parallelepiped_Domain)
+                data_field = prefix//"Parallelepiped Domain.origin"
+                call input_data%get(data_field, domain_origin, data_found)
+                call check_data_found(data_field, data_found)
+                data_field = prefix//"Parallelepiped Domain.size"
+                call input_data%get(data_field, domain_size, data_found)
+                call check_data_found(data_field, data_found)
                 call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
             type is (Concrete_Boxed_Domain)
                 call parallelepiped_domain%construct(periodic_box)
