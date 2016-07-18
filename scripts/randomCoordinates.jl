@@ -110,7 +110,7 @@ for i_component = 1:size(components, 1)
             writedlm(output_file, vcat(components[i_component].positions,
                 components[i_component].orientations)')
         else
-            println(output_file, "# position_x  position_y  position_z\n")
+            println(output_file, "# position_x  position_y  position_z")
             writedlm(output_file, components[i_component].positions')
         end
     else
