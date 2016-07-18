@@ -39,6 +39,11 @@ private
         procedure :: meet => XY_meet
     end type XY_Hard_Contact
 
+    type, extends(Abstract_Hard_Contact), public :: Null_Hard_Contact
+    contains
+        procedure :: meet => Null_meet
+    end type Null_Hard_Contact
+
 contains
 
 !implementation Abstract_Hard_Contact
@@ -110,5 +115,20 @@ contains
     end subroutine XY_meet
 
 !end implementation XY_Hard_Contact
+
+!implementation Null_Hard_Contact
+
+    pure subroutine Null_meet(this, overlap, contact, min_distance, vector)
+        class(Null_Hard_Contact), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: contact
+        real(DP), intent(in) :: min_distance
+        real(DP), intent(in) :: vector(:)
+
+        overlap = .false.
+        contact = 0._DP
+    end subroutine Null_meet
+
+!end implementation Null_Hard_Contact
 
 end module classes_hard_contact
