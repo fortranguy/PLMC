@@ -1,11 +1,14 @@
 module classes_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_temporary_particle, only: Concrete_Temporary_Particle
-use module_list_node, only: Concrete_Linkable_Node, deallocate_list, increase_nodes_size
+use data_constants, only: num_dimensions
+use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_min_distance, only: Abstract_Min_Distance
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_pair_potential, only: Abstract_Pair_Potential
+use module_list_node, only: Concrete_Linkable_Node, deallocate_list, increase_nodes_size
 
 implicit none
 
@@ -16,6 +19,7 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         type(Concrete_Linkable_Node), pointer :: beginning => null()
+        class(Abstract_Hard_Contact), pointer :: hard_contact => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -132,6 +136,31 @@ contains
             current => next
         end do
     end subroutine Abstract_visit
+
+    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, min_distance)
+        class(Abstract_Visitable_List), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: contacts
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        class(Abstract_Min_Distance), intent(in) :: min_distance
+
+        type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
+        real(DP) :: contact_i, vector(num_dimensions)
+
+        overlap = .false.
+        contacts = 0
+        current => this%beginning%next
+        if (.not.associated(current%next)) return
+        do
+            next => current%next
+            vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
+            call this%hard_contact%meet(overlap, contact_i, min_distance%get(), vector)
+            if (overlap) return
+            contacts = contacts + contact_i
+            if (.not.associated(next%next)) return
+            current => next
+        end do
+    end subroutine Abstract_visit_contacts
 
     subroutine Abstract_add(this, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this

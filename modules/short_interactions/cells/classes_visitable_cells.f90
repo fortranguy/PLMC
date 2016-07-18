@@ -25,10 +25,11 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_reset
-        procedure :: visit => Abstract_visit
+        generic :: visit => visit_energy
         procedure :: translate => Abstract_translate
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
+        procedure, private :: visit_energy => Abstract_visit_energy
         procedure, private :: construct_visitable_lists => Abstract_construct_visitable_lists
         procedure, private :: destroy_visitable_lists => Abstract_destroy_visitable_lists
         procedure, private :: fill_with_particles => Abstract_fill_with_particles
@@ -43,10 +44,10 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_reset
-        procedure :: visit => Null_visit
         procedure :: translate => Null_translate
         procedure :: add => Null_add
         procedure :: remove => Null_remove
+        procedure, private :: visit_energy => Null_visit_energy
     end type Null_Visitable_Cells
 
 contains
@@ -151,7 +152,7 @@ contains
         end do
     end subroutine Abstract_destroy_visitable_lists
 
-    subroutine Abstract_visit(this, overlap, energy, particle, i_exclude)
+    subroutine Abstract_visit_energy(this, overlap, energy, particle, i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -183,7 +184,7 @@ contains
         end do
         end do
         end do
-    end subroutine Abstract_visit
+    end subroutine Abstract_visit_energy
 
     subroutine Abstract_translate(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -249,7 +250,7 @@ contains
         class(Null_Visitable_Cells), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_visit(this, overlap, energy, particle, i_exclude)
+    subroutine Null_visit_energy(this, overlap, energy, particle, i_exclude)
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -257,7 +258,7 @@ contains
         integer, intent(in) :: i_exclude
         overlap = .false.
         energy = 0._DP
-    end subroutine Null_visit
+    end subroutine Null_visit_energy
 
     subroutine Null_translate(this, to_position, from)
         class(Null_Visitable_Cells), intent(inout) :: this
