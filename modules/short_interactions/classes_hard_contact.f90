@@ -13,6 +13,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: get_max_distance => Abstract_get_max_distance
         procedure(Abstract_meet), deferred :: meet
     end type Abstract_Hard_Contact
 
@@ -60,6 +61,12 @@ contains
 
         if (allocated(this%half_distribution)) deallocate(this%half_distribution)
     end subroutine Abstract_destroy
+
+    pure real(DP) function Abstract_get_max_distance(this) result(max_distance)
+        class(Abstract_Hard_Contact), intent(in) :: this
+
+        max_distance = this%half_distribution%get_max_distance()
+    end function Abstract_get_max_distance
 
 !implementation Abstract_Hard_Contact
 

@@ -75,7 +75,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{MinDistance}{0, 0}
                 \operation{\procedure{set}{minDistance: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
@@ -101,8 +101,8 @@
         \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
             \begin{class}[text width=\mediumTextWidth]{Mixture}{0, 0}
                 \attribute{components: \type{Component[:]}}
-                \attribute{componentsMinDistances: \type{MinimumDistance[:.]}}
-                \attribute{wallMinDistances: \type{MinimumDistance[:]}}
+                \attribute{componentsMinDistances: \type{MinDistance[:.]}}
+                \attribute{wallMinDistances: \type{MinDistance[:]}}
                 \attribute{totalMoment: \type{MixtureTotalMoment}}
             \end{class}
         \end{scope}

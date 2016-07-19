@@ -2,6 +2,7 @@ module procedures_visitable_cells_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
+use classes_hard_contact, only: Abstract_Hard_Contact
 use types_pair_potential_wrapper, only: Pair_Potentials_Line
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_list, only: Abstract_Visitable_List
@@ -15,10 +16,12 @@ public :: create, destroy
 
 contains
 
-    subroutine create(cells, periodic_box, components, pairs, neighbour_cells, list, interact)
+    subroutine create(cells, periodic_box, components, hard_contact, pairs, neighbour_cells, list, &
+        interact)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
+        class(Abstract_Hard_Contact), intent(in) :: hard_contact
         type(Pair_Potentials_Line), intent(in) :: pairs(:)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
         class(Abstract_Visitable_List), intent(in) :: list
@@ -40,7 +43,8 @@ contains
                 associate (pair_ij => pairs(j_pair)%line(i_pair)%potential, &
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &
-                        components(i_component)%positions, pair_ij, neighbours_ij, list)
+                        components(i_component)%positions, hard_contact, pair_ij, neighbours_ij, &
+                        list)
                 end associate
             end do
         end do

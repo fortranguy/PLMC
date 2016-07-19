@@ -5,7 +5,7 @@ implicit none
 private
 public :: environment_prefix, mixture_prefix, short_interactions_prefix, &
     dipolar_interactions_prefix, random_number_generator_prefix, changes_prefix, writers_prefix, &
-    particle_insertion_prefix
+    particle_insertion_prefix, volume_change_prefix
 
     character(len=*), parameter :: environment_prefix = "Environment."
     character(len=*), parameter :: mixture_prefix = "Mixture."
@@ -15,5 +15,6 @@ public :: environment_prefix, mixture_prefix, short_interactions_prefix, &
     character(len=*), parameter :: changes_prefix = "Changes."
     character(len=*), parameter :: writers_prefix = "Output."
     character(len=*), parameter :: particle_insertion_prefix = "Particle Insertion."
+    character(len=*), parameter :: volume_change_prefix = "Volume Change."
 
 end module data_input_prefixes

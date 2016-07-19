@@ -9,8 +9,8 @@ use procedures_json_data_factory, only: json_data_create_input => create_input, 
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: set_num_particles
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
-use procedures_physical_model_factory, only: physical_model_create => create, &
-    physical_model_destroy => destroy
+use procedures_physical_model_factory, only: physical_model_create_generating => create_generating,&
+    physical_model_create_exploring => create_exploring, physical_model_destroy => destroy
 use procedures_random_seed_factory, only: random_seed_set => set
 use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_set
 use procedures_markov_chain_generator_factory, only: markov_chain_generator_create => create, &
@@ -47,7 +47,7 @@ private
 public :: plmc_create, plmc_destroy, plmc_set
 
 interface plmc_create
-    module procedure :: physical_model_create
+    module procedure :: physical_model_create_generating, physical_model_create_exploring
     module procedure :: markov_chain_generator_create, markov_chain_explorer_create
     module procedure :: observables_create_generating, observables_create_exploring
     module procedure :: json_data_create_input

@@ -18,6 +18,7 @@ private
     contains
         procedure(Abstract_construct), deferred :: construct
         procedure(Abstract_destroy), deferred :: destroy
+        procedure :: get_min_distance => Abstract_get_min_distance
         procedure :: get_max_distance => Abstract_get_max_distance
         procedure(Abstract_meet), deferred :: meet
     end type Abstract_Pair_Potential
@@ -71,13 +72,20 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: get_max_distance => Null_get_max_distance
+        procedure :: get_min_distance => Null_get_distance
+        procedure :: get_max_distance => Null_get_distance
         procedure :: meet => Null_meet
     end type Null_Pair_Potential
 
 contains
 
 !implementation Abstract_Pair_Potential
+
+    pure real(DP) function Abstract_get_min_distance(this) result(min_distance)
+        class(Abstract_Pair_Potential), intent(in) :: this
+
+        min_distance = this%domain%min
+    end function Abstract_get_min_distance
 
     pure real(DP) function Abstract_get_max_distance(this) result(max_distance)
         class(Abstract_Pair_Potential), intent(in) :: this
@@ -218,10 +226,10 @@ contains
         class(Null_Pair_Potential), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure real(DP) function Null_get_max_distance(this) result(max_distance)
+    pure real(DP) function Null_get_distance(this) result(distance)
         class(Null_Pair_Potential), intent(in) :: this
-        max_distance = 0._DP
-    end function Null_get_max_distance
+        distance = 0._DP
+    end function Null_get_distance
 
     pure subroutine Null_meet(this, overlap, energy, distance)
         class(Null_Pair_Potential), intent(in) :: this

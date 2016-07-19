@@ -5,6 +5,7 @@ use data_constants, only: num_dimensions, real_zero
 use data_cells, only: nums_local_cells
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
 use procedures_neighbour_cells_micro, only: pbc_3d_index
 
@@ -81,13 +82,19 @@ contains
 
 !implementation Abstract_Neighbour_Cells
 
-    subroutine Abstract_construct(this, periodic_box, pair_potential)
+    subroutine Abstract_construct(this, periodic_box, hard_contact, pair_potential)
         class(Abstract_Neighbour_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         this%periodic_box => periodic_box
-        this%max_distance = pair_potential%get_max_distance()
+        if (pair_potential%get_max_distance() - pair_potential%get_min_distance() >= &
+            hard_contact%get_max_distance()) then !volume dependency?
+            this%max_distance = pair_potential%get_max_distance()
+        else
+            this%max_distance = pair_potential%get_max_distance() + hard_contact%get_max_distance()
+        end if
         call this%set_skip_layers()
     end subroutine Abstract_construct
 
@@ -261,9 +268,10 @@ contains
 
 !implementation Null_Neighbour_Cells
 
-    subroutine Null_construct(this, periodic_box, pair_potential)
+    subroutine Null_construct(this, periodic_box, hard_contact, pair_potential)
         class(Null_Neighbour_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
     end subroutine Null_construct
 

@@ -6,6 +6,7 @@ use data_cells, only: nums_local_cells
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_temporary_particle, only: Concrete_Temporary_Particle
+use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_pair_potential, only: Abstract_Pair_Potential
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells
@@ -18,6 +19,7 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
+        class(Abstract_Hard_Contact), pointer :: hard_contact => null()
         class(Abstract_Pair_Potential), pointer :: pair_potential => null()
         class(Abstract_Neighbour_Cells), pointer :: neighbour_cells => null()
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :), list_mold
@@ -54,17 +56,19 @@ contains
 
 !implementation Abstract_Visitable_Cells
 
-    subroutine Abstract_construct(this, periodic_box, positions, pair_potential, neighbour_cells, &
-        list_mold)
+    subroutine Abstract_construct(this, periodic_box, positions, hard_contact, pair_potential, &
+        neighbour_cells, list_mold)
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
         class(Abstract_Neighbour_Cells), target, intent(in) :: neighbour_cells
         class(Abstract_Visitable_List), intent(in) :: list_mold
 
         this%periodic_box => periodic_box
         this%positions => positions
+        this%hard_contact => hard_contact
         this%pair_potential => pair_potential
         this%neighbour_cells => neighbour_cells
         allocate(this%list_mold, mold=list_mold)
@@ -102,7 +106,7 @@ contains
         do global_i2 = global_lbounds(2), global_ubounds(2)
         do global_i1 = global_lbounds(1), global_ubounds(1)
             call this%visitable_lists(global_i1, global_i2, global_i3)%construct(this%periodic_box,&
-                this%positions)
+                this%positions, this%hard_contact)
         end do
         end do
         end do
@@ -131,6 +135,7 @@ contains
         if (allocated(this%list_mold)) deallocate(this%list_mold)
         this%neighbour_cells => null()
         this%pair_potential => null()
+        this%hard_contact => null()
         this%positions => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
@@ -186,6 +191,39 @@ contains
         end do
     end subroutine Abstract_visit_energy
 
+    subroutine Abstract_visit_contacts(this, overlap, contacts, particle)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: contacts
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        real(DP) :: contacts_i
+        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
+        integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
+        logical :: at_bottom_layer, at_top_layer
+        integer :: local_i1, local_i2, local_i3
+
+        global_lbounds = this%neighbour_cells%get_global_lbounds()
+        global_ubounds = this%neighbour_cells%get_global_ubounds()
+        ijk_cell = this%neighbour_cells%index(particle%position)
+        at_bottom_layer = (ijk_cell(3) == global_lbounds(3))
+        at_top_layer = (ijk_cell(3) == global_ubounds(3))
+        contacts = 0._DP
+        do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
+            if (this%neighbour_cells%skip(at_bottom_layer, at_top_layer, local_i3)) cycle
+        do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
+        do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
+            ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
+                ijk_cell(2), ijk_cell(3))
+            call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
+                visit(overlap, contacts, particle, this%pair_potential)
+            if (overlap) return
+            contacts = contacts + contacts_i
+        end do
+        end do
+        end do
+    end subroutine Abstract_visit_contacts
+
     subroutine Abstract_translate(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: to_position(:)
@@ -232,11 +270,12 @@ contains
 
 !implementation Null_Visitable_Cells
 
-    subroutine Null_construct(this, periodic_box, positions, pair_potential, neighbour_cells, &
-        list_mold)
+    subroutine Null_construct(this, periodic_box, positions, hard_contact, pair_potential, &
+        neighbour_cells, list_mold)
         class(Null_Visitable_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
         class(Abstract_Neighbour_Cells), target, intent(in) :: neighbour_cells
         class(Abstract_Visitable_List), intent(in) :: list_mold

@@ -29,7 +29,7 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
     use_reciprocal_lattice, use_walls, &
     component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
-    component_interacts_with_wall, measure_chemical_potentials
+    component_interacts_with_wall, measure_chemical_potentials, measure_pressure
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -74,6 +74,10 @@ interface measure_chemical_potentials
     module procedure :: measure_chemical_potentials_from_json
     module procedure :: measure_chemical_potentials_from_particle_insertion_method
 end interface measure_chemical_potentials
+
+interface measure_pressure
+    module procedure :: measure_pressure_from_json
+end interface measure_pressure
 
 contains
 
@@ -325,6 +329,13 @@ contains
                 measure_chemical_potentials = .false.
         end select
     end function measure_chemical_potentials_from_particle_insertion_method
+
+    logical function measure_pressure_from_json(exploring_data, prefix) result(measure_pressure)
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        measure_pressure = logical_from_json(exploring_data, prefix//"measure pressure")
+    end function measure_pressure_from_json
 
     logical function logical_from_json(input_data, statement)
         type(json_file), intent(inout) :: input_data

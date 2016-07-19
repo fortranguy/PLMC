@@ -1,6 +1,7 @@
 module procedures_cells_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_hard_contact, only: Abstract_Hard_Contact
 use types_pair_potential_wrapper, only: Pair_Potentials_Line
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use procedures_neighbour_cells_factory, only: neighbour_cells_create => create, &
@@ -27,9 +28,10 @@ end interface destroy
 
 contains
 
-    subroutine create_components(cells, periodic_box, pairs, interact)
+    subroutine create_components(cells, periodic_box, hard_contact, pairs, interact)
         type(Neighbour_Cells_Line), allocatable, intent(out) :: cells(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Hard_Contact), intent(in) :: hard_contact
         type(Pair_Potentials_Line), intent(in) :: pairs(:)
         logical, intent(in) :: interact
 
@@ -40,8 +42,8 @@ contains
             allocate(cells(j_component)%line(j_component))
             do i_component = 1, size(cells(j_component)%line)
                 associate(pair_ij => pairs(j_component)%line(i_component)%potential)
-                    call create(cells(j_component)%line(i_component)%cells, periodic_box, pair_ij, &
-                        interact)
+                    call create(cells(j_component)%line(i_component)%cells, periodic_box, &
+                        hard_contact, pair_ij, interact)
                 end associate
             end do
         end do

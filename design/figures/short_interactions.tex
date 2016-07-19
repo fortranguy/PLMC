@@ -10,8 +10,9 @@
         \begin{scope}
             \begin{abstractclass}[text width=\mediumTextWidth]{VisitableCells}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential},
-                    neighbourCells: \type{NeighbourCells}, listMold: \type{VisitableList}}}
+                    positions: \type{ComponentCoordinates}, hardContact: \type{HardContact},
+                    pairPotential: \type{PairPotential}, neighbourCells: \type{NeighbourCells},
+                    listMold: \type{VisitableList}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
@@ -28,7 +29,7 @@
         \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{NeighbourCells}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    pairPotential: \type{PairPotential}}}
+                    hardContact: \type{HardContact}, pairPotential: \type{PairPotential}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{getGlobalLbounds}{}: \type{int[3]}}
@@ -53,16 +54,17 @@
                     pairPotential: \type{PairPotential}, iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle},
-                    minDistance: \type{MinimumDistance}}}
+                    pairPotential: \type{PairPotential}}}
                 \operation{\procedure{add}{iParticle: \type{int}}}
                 \operation{\procedure{remove}{iParticle: \type{int}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 4.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{HardContact}{0, 0}
                 \operation{\procedure{construct}{halfDistribution: \type{HalfDistribution}}}
                 \operation{\procedure{destroy}{}}
+                \operation{\procedure{getMaxDistance}{}: \type{real}}
                 \operation{\procedure{meet}{overlap: \type{bool}, contact: \type{real},
                     minDistance: \type{real}, vector: \type{real[3]}}}
             \end{abstractclass}
@@ -81,6 +83,7 @@
                 \operation[0]{\procedure{construct}{domain: \type{ShortPotentialDomain},
                     expression: \type{PotentialExpression}}}
                 \operation[0]{\procedure{destroy}{}}
+                \operation{\procedure{getMinDistance}{}: \type{real}}
                 \operation{\procedure{getMaxDistance}{}: \type{real}}
                 \operation[0]{\procedure{meet}{overlap: \type{bool}, energy: \type{real},
                     distance: \type{real}}}
@@ -120,7 +123,7 @@
         \begin{scope}[shift={($(HardContact.north -| ShortInteractions)$)}]
             \umlnote[text width=\mediumTextWidth] {\import{}: \\
                 \namespace{Environment} :: PeriodicBox, WallsVisitor \\
-                \namespace{Mixture} :: MinimumDistance, ComponentCoordinates, TemporaryParticle};
+                \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
         \end{scope}
 
         \begin{scope}[on background layer]

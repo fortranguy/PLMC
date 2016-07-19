@@ -4,7 +4,6 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_min_distance, only: Abstract_Min_Distance
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_pair_potential, only: Abstract_Pair_Potential
@@ -64,15 +63,17 @@ contains
 
 !implementation Abstract_Visitable_List
 
-    subroutine Abstract_construct(this, periodic_box, positions)
+    subroutine Abstract_construct(this, periodic_box, positions, hard_contact)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
         this%periodic_box => periodic_box
         this%positions => positions
+        this%hard_contact => hard_contact
 
         allocate(this%beginning)
         current => this%beginning
@@ -87,6 +88,7 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
 
         call deallocate_list(this%beginning)
+        this%hard_contact => null()
         this%positions => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
@@ -141,12 +143,12 @@ contains
         end do
     end subroutine Abstract_visit_energy
 
-    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, min_distance)
+    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, pair_potential)
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Min_Distance), intent(in) :: min_distance
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
         real(DP) :: contact_i, vector(num_dimensions)
@@ -158,7 +160,8 @@ contains
         do
             next => current%next
             vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
-            call this%hard_contact%meet(overlap, contact_i, min_distance%get(), vector)
+            call this%hard_contact%meet(overlap, contact_i, pair_potential%get_min_distance(), &
+                vector)
             if (overlap) return
             contacts = contacts + contact_i
             if (.not.associated(next%next)) return
@@ -207,15 +210,17 @@ contains
 
 !implementation Concrete_Visitable_Array
 
-    subroutine Array_construct(this, periodic_box, positions)
+    subroutine Array_construct(this, periodic_box, positions, hard_contact)
         class(Concrete_Visitable_Array), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
 
         integer :: initial_size
 
         this%periodic_box => periodic_box
         this%positions => positions
+        this%hard_contact => hard_contact
         this%num_nodes = 0
         initial_size = 1
         allocate(this%nodes(initial_size))
@@ -225,6 +230,7 @@ contains
         class(Concrete_Visitable_Array), intent(inout) :: this
 
         if (allocated(this%nodes)) deallocate(this%nodes)
+        this%hard_contact => null()
         this%positions => null()
         this%periodic_box => null()
     end subroutine Array_destroy
@@ -266,12 +272,12 @@ contains
         end do
     end subroutine Array_visit_energy
 
-    subroutine Array_visit_contacts(this, overlap, contacts, particle, min_distance)
+    subroutine Array_visit_contacts(this, overlap, contacts, particle, pair_potential)
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Min_Distance), intent(in) :: min_distance
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: contact_i, vector(num_dimensions)
         integer :: i_node
@@ -281,7 +287,8 @@ contains
         do i_node = 1, this%num_nodes
             vector = this%periodic_box%vector(particle%position, this%positions%get(this%&
                 nodes(i_node)))
-            call this%hard_contact%meet(overlap, contact_i, min_distance%get(), vector)
+            call this%hard_contact%meet(overlap, contact_i, pair_potential%get_min_distance(), &
+                vector)
             if (overlap) return
             contacts = contacts + contact_i
         end do
@@ -315,10 +322,11 @@ contains
 
 !implementation Null_Visitable_List
 
-    subroutine Null_construct(this, periodic_box, positions)
+    subroutine Null_construct(this, periodic_box, positions, hard_contact)
         class(Null_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
@@ -341,12 +349,12 @@ contains
         energy = 0._DP
     end subroutine Null_visit_energy
 
-    subroutine Null_visit_contacts(this, overlap, contacts, particle, min_distance)
+    subroutine Null_visit_contacts(this, overlap, contacts, particle, pair_potential)
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Min_Distance), intent(in) :: min_distance
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         contacts = 0._DP
     end subroutine Null_visit_contacts
