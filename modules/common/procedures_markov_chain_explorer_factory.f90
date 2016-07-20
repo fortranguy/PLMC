@@ -33,8 +33,8 @@ contains
         can_exchange = measure_inv_pow_activities ! as if exchange
         call set_have_positions(have_positions, physical_model%mixture%components)
         call box_create(markov_chain_explorer%particle_insertion_domain, physical_model%&
-            environment%periodic_box, physical_model%environment%walls, any(can_exchange) .and. &
-            any(have_positions), exploring_data, particle_insertion_prefix)
+            environment%periodic_box, physical_model%environment%visitable_walls, any(can_exchange)&
+            .and. any(have_positions), exploring_data, particle_insertion_prefix)
         call random_coordinates_create(markov_chain_explorer%random_position, &
             markov_chain_explorer%particle_insertion_domain, can_exchange, have_positions)
         call set_have_orientations(have_orientations, physical_model%mixture%components)

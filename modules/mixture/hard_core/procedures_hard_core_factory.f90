@@ -1,12 +1,14 @@
 module procedures_hard_core_factory
 
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_visitable_walls, only: Abstract_Visitable_Walls
+use classes_min_distance, only: Abstract_Min_Distance
 use types_component_wrapper, only: Component_Wrapper
 use types_min_distance_wrapper, only: Min_Distance_Wrapper, Min_Distances_Line
-use procedures_min_distance_factory, only: min_distance_create => create, &
-    min_distance_destroy => destroy
+use procedures_min_distance_factory, only: min_distance_create_from_json => create_from_json, &
+    min_distance_create_from_value => create_from_value, min_distance_destroy => destroy
 use procedures_property_inquirers, only: use_walls, component_exists
 
 implicit none
@@ -15,9 +17,9 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_wall
+    module procedure :: create_wall_component
     module procedure :: create_components
-    module procedure :: min_distance_create
+    module procedure :: min_distance_create_from_json, min_distance_create_from_value
 end interface
 
 interface destroy
@@ -28,24 +30,26 @@ end interface
 
 contains
 
-    subroutine create_wall(min_distances, components, walls, generating_data, prefix)
+    subroutine create_wall_component(min_distances, wall_min_distance, components_min_distances, &
+        components, walls)
         type(Min_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
+        class(Abstract_Min_Distance), intent(in) :: wall_min_distance
+        type(Min_Distances_Line), intent(in) :: components_min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Visitable_Walls), intent(in) :: walls
-        type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
 
+        real(DP) :: min_distance_i
         integer :: i_component
         logical :: exists
-        type(Concrete_Number_to_String) :: string
 
         allocate(min_distances(size(components)))
         do i_component = 1, size(min_distances)
             exists = use_walls(walls) .and. component_exists(components(i_component)%number)
-            call create(min_distances(i_component)%distance, exists, generating_data, &
-                prefix//"Component "//string%get(i_component)//".With Walls.")
+            min_distance_i = (wall_min_distance%get() + components_min_distances(i_component)%&
+            line(i_component)%distance%get()) / 2._DP
+            call create(min_distances(i_component)%distance, exists, min_distance_i)
         end do
-    end subroutine create_wall
+    end subroutine create_wall_component
 
     subroutine destroy_min_distances(min_distances)
         type(Min_Distance_Wrapper), allocatable, intent(inout) :: min_distances(:)

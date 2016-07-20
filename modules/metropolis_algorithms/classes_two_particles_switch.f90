@@ -239,12 +239,12 @@ contains
         integer :: i
 
         do i = 1, size(new)
-            call this%environment%walls%visit(overlap, energies_new(i), new(i)%position, &
+            call this%environment%visitable_walls%visit(overlap, energies_new(i), new(i)%position, &
                 this%short_interactions%wall_pairs(ij_actors(i))%potential)
             if (overlap) return
         end do
         do i = 1, size(old)
-            call this%environment%walls%visit(overlap, energies_old(i), old(i)%position, &
+            call this%environment%visitable_walls%visit(overlap, energies_old(i), old(i)%position, &
                 this%short_interactions%wall_pairs(ij_actors(i))%potential)
         end do
         deltas = energies_new - energies_old

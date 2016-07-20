@@ -61,16 +61,16 @@ private
         procedure :: is_inside => Parallelepiped_is_inside
     end type Concrete_Parallelepiped_Domain
 
-    type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Boxed_Domain
+    type, extends(Abstract_Parallelepiped_Domain), public :: Boxed_Parallelepiped_Domain
     contains
         procedure :: construct => Boxed_construct
         procedure :: destroy => Boxed_destroy
         procedure :: get_origin => Boxed_get_origin
         procedure :: get_size => Boxed_get_size
         procedure :: is_inside => Boxed_is_inside
-    end type Concrete_Boxed_Domain
+    end type Boxed_Parallelepiped_Domain
 
-    type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Walled_Domain
+    type, extends(Abstract_Parallelepiped_Domain), public :: Walled_Parallelepiped_Domain
     private
         real(DP) :: size_3
     contains
@@ -79,7 +79,7 @@ private
         procedure :: get_origin => Walled_get_origin
         procedure :: get_size => Walled_get_size
         procedure :: is_inside => Walled_is_inside
-    end type Concrete_Walled_Domain
+    end type Walled_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Null_Parallelepiped_Domain
     contains
@@ -155,89 +155,89 @@ contains
 
 !end implementation Concrete_Parallelepiped_Domain
 
-!implementation Concrete_Boxed_Domain
+!implementation Boxed_Parallelepiped_Domain
 
     subroutine Boxed_construct(this, periodic_box)
-        class(Concrete_Boxed_Domain), intent(out) :: this
+        class(Boxed_Parallelepiped_Domain), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
 
         this%periodic_box => periodic_box
         if (.not.this%is_boxed()) then
-            call error_exit("Boxed_construct: domain is not boxed.")
+            call error_exit("Boxed_Parallelepiped_Domain: domain is not boxed.")
         end if
     end subroutine Boxed_construct
 
     subroutine Boxed_destroy(this)
-        class(Concrete_Boxed_Domain), intent(inout) :: this
+        class(Boxed_Parallelepiped_Domain), intent(inout) :: this
 
         this%periodic_box => null()
     end subroutine Boxed_destroy
 
     pure function Boxed_get_origin(this) result(origin)
-        class(Concrete_Boxed_Domain), intent(in) :: this
+        class(Boxed_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: origin(num_dimensions)
 
         origin = 0._DP
     end function Boxed_get_origin
 
     pure function Boxed_get_size(this) result(size)
-        class(Concrete_Boxed_Domain), intent(in) :: this
+        class(Boxed_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: size(num_dimensions)
 
         size = this%periodic_box%get_size()
     end function Boxed_get_size
 
     pure logical function Boxed_is_inside(this, position) result(is_inside)
-        class(Concrete_Boxed_Domain), intent(in) :: this
+        class(Boxed_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
 
         is_inside = .true.
     end function Boxed_is_inside
 
-!end implementation Concrete_Boxed_Domain
+!end implementation Boxed_Parallelepiped_Domain
 
-!implementation Concrete_Walled_Domain
+!implementation Walled_Parallelepiped_Domain
 
     subroutine Walled_construct(this, periodic_box, visitable_walls)
-        class(Concrete_Walled_Domain), intent(inout) :: this
+        class(Walled_Parallelepiped_Domain), intent(inout) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
         this%periodic_box => periodic_box
-        this%size_3 = visitable_walls%get_max_gap()
+        this%size_3 = visitable_walls%get_gap_radii()
         if (.not.this%is_boxed()) then
-            call error_exit("Walled_construct: domain is not boxed.")
+            call error_exit("Walled_Parallelepiped_Domain: domain is not boxed.")
         end if
     end subroutine Walled_construct
 
     subroutine Walled_destroy(this)
-        class(Concrete_Walled_Domain), intent(inout) :: this
+        class(Walled_Parallelepiped_Domain), intent(inout) :: this
 
         this%periodic_box => null()
     end subroutine Walled_destroy
 
     pure function Walled_get_origin(this) result(origin)
-        class(Concrete_Walled_Domain), intent(in) :: this
+        class(Walled_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: origin(num_dimensions)
 
         origin = 0._DP
     end function Walled_get_origin
 
     pure function Walled_get_size(this) result(size)
-        class(Concrete_Walled_Domain), intent(in) :: this
+        class(Walled_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: size(num_dimensions)
 
         size = [reshape(this%periodic_box%get_size(), [2]), this%size_3]
     end function Walled_get_size
 
     pure logical function Walled_is_inside(this, position) result(is_inside)
-        class(Concrete_Walled_Domain), intent(in) :: this
+        class(Walled_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
 
         is_inside = -this%size_3/2._DP <= position(3) .and. position(3) <= this%size_3/2._DP
     end function Walled_is_inside
 
-!end implementation Concrete_Walled_Domain
+!end implementation Walled_Parallelepiped_Domain
 
 !implementation Null_Parallelepiped_Domain
 

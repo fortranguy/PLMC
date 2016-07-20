@@ -142,8 +142,8 @@ contains
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: test
 
-        call this%environment%walls%visit(overlap, delta, test%position, this%short_interactions%&
-            wall_pairs(i_component)%potential)
+        call this%environment%visitable_walls%visit(overlap, delta, test%position, this%&
+            short_interactions%wall_pairs(i_component)%potential)
     end subroutine Abstract_visit_walls
 
     subroutine Abstract_visit_short(this, overlap, deltas, i_component, test)

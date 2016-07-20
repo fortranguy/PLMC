@@ -7,7 +7,7 @@ use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
-    Concrete_Parallelepiped_Domain, Concrete_Boxed_Domain, Concrete_Walled_Domain, &
+    Concrete_Parallelepiped_Domain, Boxed_Parallelepiped_Domain, Walled_Parallelepiped_Domain, &
     Null_Parallelepiped_Domain
 use procedures_property_inquirers, only: use_walls
 
@@ -39,13 +39,13 @@ contains
                 case ("domain")
                     allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
                 case ("boxed")
-                    allocate(Concrete_Boxed_Domain :: parallelepiped_domain)
+                    allocate(Boxed_Parallelepiped_Domain :: parallelepiped_domain)
                 case ("walled")
                     if (.not.use_walls(visitable_walls)) then
                         call warning_continue("procedures_parallelepiped_domain_factory: "//&
                             "create_from_json: walled: walls are not used.")
                     end if
-                    allocate(Concrete_Walled_Domain :: parallelepiped_domain)
+                    allocate(Walled_Parallelepiped_Domain :: parallelepiped_domain)
                 case default
                     call error_exit("procedures_parallelepiped_domain_factory: create_from_json: "&
                         //domain_name//" domain_name unknown. Choose between 'domain', 'boxed' and"&
@@ -64,9 +64,9 @@ contains
                 call input_data%get(data_field, domain_size, data_found)
                 call check_data_found(data_field, data_found)
                 call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
-            type is (Concrete_Boxed_Domain)
+            type is (Boxed_Parallelepiped_Domain)
                 call parallelepiped_domain%construct(periodic_box)
-            type is (Concrete_Walled_Domain)
+            type is (Walled_Parallelepiped_Domain)
                 call parallelepiped_domain%construct(periodic_box, visitable_walls)
             type is (Null_Parallelepiped_Domain)
             class default
@@ -81,13 +81,13 @@ contains
         logical, intent(in) :: needed
 
         if (needed) then
-            allocate(Concrete_Boxed_Domain :: parallelepiped_domain)
+            allocate(Boxed_Parallelepiped_Domain :: parallelepiped_domain)
         else
             allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
         end if
 
         select type (parallelepiped_domain)
-            type is (Concrete_Boxed_Domain)
+            type is (Boxed_Parallelepiped_Domain)
                 call parallelepiped_domain%construct(periodic_box)
             type is (Null_Parallelepiped_Domain)
             class default
@@ -103,13 +103,13 @@ contains
         logical, intent(in) :: needed
 
         if (needed) then
-            allocate(Concrete_Walled_Domain :: parallelepiped_domain)
+            allocate(Walled_Parallelepiped_Domain :: parallelepiped_domain)
         else
             allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
         end if
 
         select type (parallelepiped_domain)
-            type is (Concrete_Walled_Domain)
+            type is (Walled_Parallelepiped_Domain)
                 call parallelepiped_domain%construct(periodic_box, visitable_walls)
             type is (Null_Parallelepiped_Domain)
             class default

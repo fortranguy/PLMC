@@ -2,7 +2,7 @@ module procedures_environment_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use procedures_errors, only: warning_continue
+use procedures_errors, only: error_exit, warning_continue
 use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_temperature_factory, only: temperature_create => create, &
@@ -17,6 +17,7 @@ use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use procedures_component_factory, only: component_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
+use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
     apply_external_field, use_walls
 
@@ -42,13 +43,15 @@ contains
         field_applied = apply_external_field(generating_data, prefix)
         call permittivity_create(environment%permittivity, generating_data, prefix)
         call walls_create(floor_penetration, generating_data, prefix)
-        call walls_create(environment%walls, environment%periodic_box, floor_penetration, &
-            generating_data, prefix)
+        call hard_core_create(environment%wall_min_distance, use_walls(floor_penetration), &
+            generating_data, prefix//"Walls.")
+        call walls_create(environment%visitable_walls, environment%periodic_box, floor_penetration,&
+            environment%wall_min_distance, generating_data, prefix)
         call walls_destroy(floor_penetration)
         call field_create(field_expression, environment%permittivity, field_applied, &
             generating_data, prefix)
-        call box_create(parallelepiped_domain, environment%periodic_box, environment%walls, &
-            field_applied, generating_data, prefix//"External Field.")
+        call box_create(parallelepiped_domain, environment%periodic_box, environment%&
+            visitable_walls, field_applied, generating_data, prefix//"External Field.")
         call field_create(environment%external_field, parallelepiped_domain, field_expression, &
             field_applied)
         call field_destroy(field_expression)
@@ -56,19 +59,30 @@ contains
         call box_create(environment%reciprocal_lattice, environment%periodic_box, &
             generating_data, prefix)
         call box_create(environment%box_size_checker, environment%reciprocal_lattice, &
-            environment%walls)
+            environment%visitable_walls)
+        if (periodicity_is_xyz(environment%periodic_box)) then
+            call box_create(environment%accessible_domain, environment%periodic_box, .true.)
+        else if (periodicity_is_xy(environment%periodic_box)) then
+            call box_create(environment%accessible_domain, environment%periodic_box, environment%&
+                visitable_walls, .true.)
+        else
+            call error_exit("procedures_environment_factory: environment_create: "//&
+                "box periodicity is unknown.")
+        end if
 
-        call check(environment%periodic_box, environment%walls)
+        call check(environment%periodic_box, environment%visitable_walls)
         call environment%box_size_checker%check()
     end subroutine environment_create
 
     subroutine environment_destroy(environment)
         type(Environment_Wrapper), intent(inout) :: environment
 
+        call box_destroy(environment%accessible_domain)
         call box_destroy(environment%box_size_checker)
-        call walls_destroy(environment%walls)
         call box_destroy(environment%reciprocal_lattice)
         call field_destroy(environment%external_field)
+        call walls_destroy(environment%visitable_walls)
+        call hard_core_destroy(environment%wall_min_distance)
         call permittivity_destroy(environment%permittivity)
         call temperature_destroy(environment%temperature)
         call box_destroy(environment%periodic_box)

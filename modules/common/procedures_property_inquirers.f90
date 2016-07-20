@@ -6,6 +6,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Peri
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
 use classes_external_field, only: Abstract_External_Field, Null_External_Field
+use classes_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
 use classes_visitable_walls, only: Abstract_Visitable_Walls, Concrete_Visitable_Walls
 use classes_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates, &
@@ -48,6 +49,7 @@ end interface use_reciprocal_lattice
 
 interface use_walls
     module procedure :: use_walls_from_json
+    module procedure :: use_walls_from_floor_penetration
     module procedure :: use_walls_from_walls
 end interface use_walls
 
@@ -168,7 +170,18 @@ contains
         use_walls = logical_from_json(generating_data, prefix//"Walls.use")
     end function use_walls_from_json
 
-    logical function use_walls_from_walls(visitable_walls) result(use_walls)
+    pure logical function use_walls_from_floor_penetration(floor_penetration) result(use_walls)
+        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
+
+        select type (floor_penetration)
+            type is (Null_Floor_Penetration)
+                use_walls = .false.
+            class default
+                use_walls = .true.
+        end select
+    end function use_walls_from_floor_penetration
+
+    pure logical function use_walls_from_walls(visitable_walls) result(use_walls)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
         select type (visitable_walls)

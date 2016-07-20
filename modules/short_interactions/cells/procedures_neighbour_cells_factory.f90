@@ -2,6 +2,7 @@ module procedures_neighbour_cells_factory
 
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells, XYZ_PBC_Neighbour_Cells, &
@@ -15,9 +16,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(cells, periodic_box, hard_contact, pair_potential, interact)
+    subroutine create(cells, periodic_box, accessible_domain, hard_contact, pair_potential, &
+        interact)
         class(Abstract_Neighbour_Cells), allocatable, intent(out) :: cells
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: interact
@@ -34,7 +37,7 @@ contains
         else
             allocate(Null_Neighbour_Cells :: cells)
         end if
-        call cells%construct(periodic_box, hard_contact, pair_potential)
+        call cells%construct(accessible_domain, hard_contact, pair_potential)
     end subroutine create
 
     subroutine destroy(cells)

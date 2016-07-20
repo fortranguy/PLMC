@@ -3,6 +3,7 @@ module classes_visitable_cells
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use data_cells, only: nums_local_cells
+use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -230,6 +231,7 @@ contains
         end do
     end subroutine Abstract_visit_contacts
 
+    !> No check: to_position & from%position are assumed to be within accessible_domain
     subroutine Abstract_translate(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: to_position(:)
@@ -252,6 +254,10 @@ contains
 
         integer :: ijk_cell(num_dimensions)
 
+        if (.not.this%neighbour_cells%is_inside(particle%position)) then
+            call error_exit("Abstract_Visitable_Cells: add: particle%position is outside "//&
+                "accessible_domain.")
+        end if
         ijk_cell = this%neighbour_cells%index(particle%position)
         call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%add(particle%i)
     end subroutine Abstract_add

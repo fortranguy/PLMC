@@ -14,7 +14,10 @@ use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use classes_floor_penetration, only: Abstract_Floor_Penetration
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
+use classes_min_distance, only: Abstract_Min_Distance
+use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 use procedures_coordinates_reader, only: create_positions_from_file
+use procedures_property_inquirers, only: use_walls
 use procedures_plmc_help, only: plmc_catch_density_help
 
 implicit none
@@ -23,6 +26,7 @@ implicit none
     class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
     class(Abstract_Visitable_Walls), allocatable :: visitable_walls
     class(Abstract_Floor_Penetration), allocatable :: floor_penetration
+    class(Abstract_Min_Distance), allocatable :: wall_min_distance
     integer :: i_particle
     logical :: coordinates_written
     integer :: num_snaps, i_snap
@@ -47,8 +51,10 @@ implicit none
     if (.not.coordinates_written) call error_exit("Coordinates weren't written.")
     call box_create(periodic_box, generating_data, environment_prefix)
     call walls_create(floor_penetration, generating_data, environment_prefix)
-    call walls_create(visitable_walls, periodic_box, floor_penetration, generating_data, &
-        environment_prefix)
+    call hard_core_create(wall_min_distance, use_walls(floor_penetration), generating_data, &
+        environment_prefix//"Walls.")
+    call walls_create(visitable_walls, periodic_box, floor_penetration, wall_min_distance, &
+        generating_data, environment_prefix)
     call json_data_destroy_input(generating_data)
     call json_data_create_input(exploring_data, 2)
     call box_create(parallelepiped_domain, periodic_box, visitable_walls, .true., exploring_data, &
@@ -77,6 +83,7 @@ implicit none
 
     call box_destroy(parallelepiped_domain)
     call walls_destroy(visitable_walls)
+    call hard_core_destroy(wall_min_distance)
     call walls_destroy(floor_penetration)
     call box_destroy(periodic_box)
 

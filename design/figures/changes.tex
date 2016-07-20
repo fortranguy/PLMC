@@ -36,15 +36,6 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MoveTuner.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{CoordinatesCopier}{0, 0}
-                \operation{\procedure{construct}{...}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{copy}{target: \type{real[3]}, source: \type{real[3]},
-                    ijComponents: \type{int[2]}}}
-            \end{abstractclass}
-        \end{scope}
-
         \begin{scope}[shift={($(MovedCoordinates |- MoveTuner.north)$)}]
             \begin{class}[text width=\smallTextWidth]{MoveTunerParameters}{0, 0}
                 \attribute{accumulationPeriod: \type{int}}
@@ -53,18 +44,27 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(MoveTuner.north) + (8.5 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(MoveTuner.north) + (8.5 cm, -1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{CoordinatesCopier}{0, 0}
+                \operation{\procedure{construct}{...}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{copy}{target: \type{real[3]}, source: \type{real[3]},
+                    ijComponents: \type{int[2]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(CoordinatesCopier.north) + (0 cm, 4 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{Changes}{0, 0}
-            \attribute{exchangeDomain: \type{ParallelepipedDomain}}
             \attribute{randomPosition: \type{RandomCoordinates}}
             \attribute{randomOrientation: \type{RandomCoordinates}}
+            \attribute{positionCopier: \type{CoordinatesCopier}}
+            \attribute{orientationCopier: \type{CoordinatesCopier}}
             \attribute{components: \type{ChangesComponent[:]}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ChangesComponent.north -| Changes.north)$)}]
             \umlnote[text width=\mediumTextWidth]{\import{}:\\
-                \namespace{Environment} :: ParallelepipedDomain \\
                 \namespace{Random} :: RandomCoordinates};
         \end{scope}
 

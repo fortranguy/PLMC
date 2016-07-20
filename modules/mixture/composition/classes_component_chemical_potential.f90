@@ -11,11 +11,11 @@ private
     type, abstract, public :: Abstract_Component_Chemical_Potential
     private
         real(DP) :: density = 0._DP ! right place?
-        real(DP) :: excess = 0._DP
+        real(DP) :: inv_pow_activity = 0._DP
     contains
         procedure :: set => Abstract_set
         procedure :: get_density => Abstract_get_density
-        procedure :: get_excess => Abstract_get_excess
+        procedure :: get_inv_pow_activity => Abstract_get_inv_pow_activity
     end type Abstract_Component_Chemical_Potential
 
     type, extends(Abstract_Component_Chemical_Potential), public :: &
@@ -28,20 +28,22 @@ private
     contains
         procedure :: set => Null_set
         procedure :: get_density => Null_get_density
-        procedure :: get_excess => Null_get_excess
+        procedure :: get_inv_pow_activity => Null_get_inv_pow_activity
     end type Null_Component_Chemical_Potential
 
 contains
 
 !implementation Abstract_Component_Chemical_Potential
 
-    subroutine Abstract_set(this, density, excess)
+    subroutine Abstract_set(this, density, inv_pow_activity)
         class(Abstract_Component_Chemical_Potential), intent(inout) :: this
-        real(DP), intent(in) :: density, excess
+        real(DP), intent(in) :: density, inv_pow_activity
 
         call check_positive("Abstract_Component_Chemical_Potential", "density", density)
         this%density = density
-        this%excess = excess
+        call check_positive("Abstract_Component_Chemical_Potential", "inv_pow_activity", &
+            inv_pow_activity)
+        this%inv_pow_activity = inv_pow_activity
     end subroutine Abstract_set
 
     pure function Abstract_get_density(this) result(density)
@@ -51,20 +53,21 @@ contains
         density = this%density
     end function Abstract_get_density
 
-    pure function Abstract_get_excess(this) result(excess)
+    !> \( a^{-N} \)
+    pure function Abstract_get_inv_pow_activity(this) result(inv_pow_activity)
         class(Abstract_Component_Chemical_Potential), intent(in) :: this
-        real(DP) :: excess
+        real(DP) :: inv_pow_activity
 
-        excess = this%excess
-    end function Abstract_get_excess
+        inv_pow_activity = this%inv_pow_activity
+    end function Abstract_get_inv_pow_activity
 
 !end implementation Abstract_Component_Chemical_Potential
 
 !implementation Null_Component_Chemical_Potential
 
-    subroutine Null_set(this, density, excess)
+    subroutine Null_set(this, density, inv_pow_activity)
         class(Null_Component_Chemical_Potential), intent(inout) :: this
-        real(DP), intent(in) :: density, excess
+        real(DP), intent(in) :: density, inv_pow_activity
     end subroutine Null_set
 
     pure function Null_get_density(this) result(density)
@@ -73,11 +76,11 @@ contains
         density = 0._DP
     end function Null_get_density
 
-    pure function Null_get_excess(this) result(excess)
+    pure function Null_get_inv_pow_activity(this) result(inv_pow_activity)
         class(Null_Component_Chemical_Potential), intent(in) :: this
-        real(DP) :: excess
-        excess = 0._DP
-    end function Null_get_excess
+        real(DP) :: inv_pow_activity
+        inv_pow_activity = 0._DP
+    end function Null_get_inv_pow_activity
 
 !end implementation Null_Component_Chemical_Potential
 

@@ -19,44 +19,13 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 4.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
                 \operation{\procedure{construct}{...}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getOrigin}{}: \type{real[3]}}
                 \operation{\procedure{getSize}{}: \type{real[3]}}
                 \operation{\procedure{isInside}{position: \type{real[3]}}: \type{bool}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(PeriodicBox.north) - (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableWalls}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}, gap: \type{real},
-                    floorPenetration: \type{FloorPenetration}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{areOutsideBox}{}: \type{bool}}
-                \operation{\procedure{getMinGap}{}: \type{real}}
-                \operation{\procedure{getMaxGap}{}: \type{real}}
-                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
-                    position: \type{real[3]}, pairPotential: \type{PairPotential}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ParallelepipedDomain.north -| VisitableWalls)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{WallsVisitor}{0, 0}
-                \operation{\procedure{construct}{wallsPotential: \type{VisitableWalls}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
-                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
-                \operation{\procedure{getMinDepth}{}: \type{real}}
-                \operation{\procedure{getMaxDepth}{}: \type{real}}
-                \operation{\procedure{meet}{overlap: \type{bool},
-                    shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -78,20 +47,20 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Temperature.north) + (0 cm, 3.5 cm)$)}]
+        \begin{scope}[shift={($(Temperature.north) + (0 cm, 3 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Permittivity}{0, 0}
                 \operation{\procedure{set}{permittivity: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3.5 cm)$)}]
+        \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{FieldExpression}{0, 0}
                 \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
                 \operation{\procedure{construct}{parallelepipedDomain: \type{ParallelepipedDomain},
                     fieldExpression: \type{FieldExpression}}}
@@ -100,7 +69,51 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox |- FloorPenetration.north)$)}]
+        \begin{scope}[shift={($(ExternalField.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{WallsVisitor}{0, 0}
+                \operation{\procedure{construct}{wallsPotential: \type{VisitableWalls}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
+                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(WallsVisitor.south |- ParallelepipedDomain.north)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+                \operation{\procedure{getHeight}{}: \type{real}}
+                \operation{\procedure{meet}{overlap: \type{bool},
+                    shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(FloorPenetration.south |- PeriodicBox.north) + (0 cm, 0.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableWalls}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}, gap: \type{real},
+                    floorPenetration: \type{FloorPenetration}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{areOutsideBox}{}: \type{bool}}
+                \operation{\procedure{getGapRadii}{}: \type{real}}
+                \operation{\procedure{getGapCenters}{}: \type{real}}
+                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
+                    position: \type{real[3]}, pairPotential: \type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
+                \attribute{periodicBox: \type{PeriodicBox}}
+                \attribute{temperature: \type{Temperature}}
+                \attribute{permittivity: \type{Permittivity}}
+                \attribute{externalField: \type{ExternalField}}
+                \attribute{reciprocalLattice: \type{ReciprocalLattice}}
+                \attribute{wallMinDistance: \type{MinDistance}}
+                \attribute{wallsPotential: \type{VisitableWalls}}
+                \attribute{boxSizeChecker: \type{BoxSizeChecker}}
+                \attribute{accessibleDomain: \type{ParallelepipedDomain}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(PeriodicBox |- Environment.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BoxSizeChecker}{0, 0}
                 \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
                     wallsPotential: \type{VisitableWalls}}}
@@ -109,20 +122,9 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ExternalField.north -| WallsVisitor)$)}]
-            \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
-                \attribute{periodicBox: \type{PeriodicBox}}
-                \attribute{temperature: \type{Temperature}}
-                \attribute{permittivity: \type{Permittivity}}
-                \attribute{externalField: \type{ExternalField}}
-                \attribute{reciprocalLattice: \type{ReciprocalLattice}}
-                \attribute{wallsPotential: \type{VisitableWalls}}
-                \attribute{boxSizeChecker: \type{BoxSizeChecker}}
-            \end{class}
-        \end{scope}
-
         \begin{scope}[shift={($(ExternalField.north -| FieldExpression.north)$)}]
             \umlnote[text width=\smallTextWidth]{\import{}:\\
+                \namespace{Mixutre} :: \type{MinDistance},
                 \namespace{ShortInteractions} :: PairPotential};
         \end{scope}
 

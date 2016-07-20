@@ -94,7 +94,7 @@ contains
 
     !> Let an infinitely thin plate of charge density \( \sigma \)
     !> which is finite in \( \vec{e}_x \) direction but not in \( \vec{e}_y \),
-    !> cf. modules/environment/plate_field.tex.
+    !> cf. modules/environment/field/plate_field.tex.
     !> This plate creates an electric field at \( (x, z) \) of expression:
     !> \[
     !>      \vec{E}(x, z) = \frac{1}{4\pi \epsilon_0} \sigma \vec{b}(x, z)

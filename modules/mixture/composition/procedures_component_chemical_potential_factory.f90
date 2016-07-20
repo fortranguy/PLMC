@@ -22,20 +22,20 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP) :: density, excess
+        real(DP) :: density, inv_pow_activity
 
         if (can_exchange) then
             data_field = prefix//"Chemical Potential.density"
             call generating_data%get(data_field, density, data_found)
             call check_data_found(data_field, data_found)
-            data_field = prefix//"Chemical Potential.excess"
-            call generating_data%get(data_field, excess, data_found)
+            data_field = prefix//"Chemical Potential.inverse powered activity"
+            call generating_data%get(data_field, inv_pow_activity, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Component_Chemical_Potential :: chemical_potential)
         else
             allocate(Null_Component_Chemical_Potential :: chemical_potential)
         end if
-        call chemical_potential%set(density, excess)
+        call chemical_potential%set(density, inv_pow_activity)
     end subroutine create
 
     subroutine destroy(chemical_potential)

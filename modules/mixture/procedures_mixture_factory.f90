@@ -38,10 +38,10 @@ contains
         character(len=*), intent(in) :: prefix
 
         call mixture_create(mixture%components, environment%periodic_box, generating_data, prefix)
-        call hard_core_create(mixture%wall_min_distances, mixture%components, environment%&
-            walls, generating_data, prefix)
         call hard_core_create(mixture%components_min_distances, mixture%components, &
             generating_data, prefix)
+        call hard_core_create(mixture%wall_min_distances, environment%wall_min_distance, mixture%&
+            components_min_distances, mixture%components, environment%visitable_walls)
         call mixture_total_moment_create(mixture%total_moment, mixture%components)
     end subroutine create_all
 
@@ -49,8 +49,8 @@ contains
         type(Mixture_Wrapper), intent(inout) :: mixture
 
         call mixture_total_moment_destroy(mixture%total_moment)
-        call hard_core_destroy(mixture%components_min_distances)
         call hard_core_destroy(mixture%wall_min_distances)
+        call hard_core_destroy(mixture%components_min_distances)
         call mixture_destroy(mixture%components)
     end subroutine destroy_all
 

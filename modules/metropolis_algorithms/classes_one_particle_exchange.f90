@@ -292,9 +292,8 @@ contains
     end subroutine Add_define_exchange
 
     !> \[
-    !>      P[N \to N+1] = \frac{V \rho}{N+1} e^{\beta(\mu_\text{ex} - \Delta U_{N \to N+1})}
+    !>      P[N \to N+1] = \frac{V \rho}{N+1} e^{-\beta \Delta U_{N \to N+1}} a^{N}
     !> \]
-    !> todo: check probability for 1 component.
     pure real(DP) function Add_acceptation_probability(this, i_actor, delta_energy) &
         result(probability)
         class(Concrete_One_Particle_Add), intent(in) :: this
@@ -304,9 +303,9 @@ contains
         associate(temperature => this%environment%temperature%get(), &
             component => this%mixture%components(i_actor))
             probability = &
-                product(this%changes%exchange_domain%get_size()) * component%chemical_potential%&
-                    get_density() / (real(component%number%get() + 1, DP)) * &
-                exp((component%chemical_potential%get_excess() - delta_energy) / temperature)
+                product(this%environment%accessible_domain%get_size()) * component%&
+                    chemical_potential%get_density() / (real(component%number%get() + 1, DP)) * &
+                exp(-delta_energy/temperature) / component%chemical_potential%get_inv_pow_activity()
         end associate
     end function Add_acceptation_probability
 
@@ -325,7 +324,7 @@ contains
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        call this%environment%walls%visit(overlap, delta, particle%position, this%&
+        call this%environment%visitable_walls%visit(overlap, delta, particle%position, this%&
             short_interactions%wall_pairs(i_actor)%potential)
     end subroutine Add_visit_walls
 
@@ -423,7 +422,7 @@ contains
     end subroutine Remove_define_exchange
 
     !> \[
-    !>      P[N \to N-1] = \frac{N}{V \rho} e^{-\beta(\mu_\text{ex} + \Delta U_{N \to N-1})}
+    !>      P[N \to N-1] = \frac{N}{V \rho} e^{-\beta \Delta U_{N \to N-1}} a^{-N}
     !> \]
     pure real(DP) function Remove_acceptation_probability(this, i_actor, delta_energy) &
         result(probability)
@@ -434,9 +433,9 @@ contains
         associate(temperature => this%environment%temperature%get(), &
             component => this%mixture%components(i_actor))
             probability = &
-                real(component%number%get(), DP) / product(this%changes%exchange_domain%&
-                    get_size()) / component%chemical_potential%get_density() * &
-                exp(-(component%chemical_potential%get_excess() + delta_energy)/temperature)
+                real(component%number%get(), DP) / product(this%environment%accessible_domain%&
+                get_size()) / component%chemical_potential%get_density() * &
+                exp(-delta_energy/temperature) * component%chemical_potential%get_inv_pow_activity()
         end associate
     end function Remove_acceptation_probability
 
@@ -455,7 +454,7 @@ contains
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        call this%environment%walls%visit(overlap, delta, particle%position, this%&
+        call this%environment%visitable_walls%visit(overlap, delta, particle%position, this%&
             short_interactions%wall_pairs(i_actor)%potential)
         delta = -delta
     end subroutine Remove_visit_walls

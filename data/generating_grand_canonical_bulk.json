@@ -26,38 +26,38 @@
     "Mixture": {
         "number of components": 3,
         "Component 1": {
-            "initial number": 250,
+            "initial number": 0,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": true,
             "Chemical Potential": {
                 "density": 0.14467592592592593,
-                "excess": 0.0169507
+                "inverse powered activity": 0.9608364858810531
             },
             "initial coordinates": "coordinates_1.in"
         },
         "Component 2": {
-            "initial number": 250,
+            "initial number": 0,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 0.5,
             "can exchange": true,
             "Chemical Potential": {
                 "density": 0.14467592592592593,
-                "excess": 0.0595251
+                "inverse powered activity": 0.6699286761545606
             },
             "initial coordinates": "coordinates_2.in"
         },
         "Component 3": {
-            "initial number": 250,
+            "initial number": 0,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 0.25,
             "can exchange": true,
             "Chemical Potential": {
                 "density": 0.14467592592592593,
-                "excess": 0.10804
+                "inverse powered activity": 0.6054863834073454
             },
             "initial coordinates": "coordinates_3.in"
         },
@@ -82,14 +82,14 @@
         "Component 2": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 0.5,
             "sigma": 1.0,
             "maximum distance": 2.5
         },
         "Component 3": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 0.25,
             "sigma": 1.0,
             "maximum distance": 2.5
         },
@@ -125,6 +125,9 @@
             "delta distance": 1.0e-4,
             "max distance over box edge": 0.5
         }
+    },
+    "Random Number Generator": {
+        "name": "urandom"
     },
     "Changes": {
         "number of tuning steps": 50,

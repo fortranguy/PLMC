@@ -55,12 +55,14 @@ contains
         call half_distribution_destroy(half_distribution)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
             wall_min_distances, generating_data, prefix)
-        call walls_create(short_interactions%walls_visitor, environment%walls, interact_with_walls)
+        call walls_create(short_interactions%walls_visitor, environment%visitable_walls, &
+            interact_with_walls)
         call pairs_create(short_interactions%components_pairs, interact, mixture%&
             components_min_distances, generating_data, prefix)
         call pairs_create(short_interactions%components_visitor, environment%periodic_box, interact)
         call cells_create(short_interactions%neighbour_cells, environment%periodic_box, &
-            short_interactions%hard_contact, short_interactions%components_pairs, interact)
+            environment%accessible_domain, short_interactions%hard_contact, short_interactions%&
+            components_pairs, interact)
         call visitable_list_allocate(list, interact, generating_data, prefix)
         call cells_create(short_interactions%visitable_cells, environment%periodic_box, mixture%&
             components, short_interactions%hard_contact, short_interactions%components_pairs, &

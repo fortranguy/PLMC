@@ -232,7 +232,7 @@ contains
 
     !> \[
     !>      P[i \in I \to j \in J] = \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
-    !>          e^{\beta(\Delta \mu_{\text{ex}, I \to J} - \Delta U_{i \to j})}
+    !>          e^{-\beta \Delta U_{i \to j}} \frac{a_I^{-N_I}}{a_J^{-N_J}}
     !> \]
     pure real(DP) function Abstract_acceptation_probability(this, ij_actors, delta_energy) &
         result(probability)
@@ -247,8 +247,8 @@ contains
                 real(component_i%number%get(), DP) / real(component_j%number%get() + 1, DP) * &
                 component_j%chemical_potential%get_density() / component_i%chemical_potential%&
                     get_density() * &
-                exp((component_j%chemical_potential%get_excess() - &
-                     component_i%chemical_potential%get_excess() - delta_energy)/temperature)
+                exp(-delta_energy/temperature) * component_i%chemical_potential%&
+                get_inv_pow_activity() / component_j%chemical_potential%get_inv_pow_activity()
         end associate
     end function Abstract_acceptation_probability
 
@@ -271,8 +271,8 @@ contains
         integer :: i
 
         do i = size(particles), 1, -1
-            call this%environment%walls%visit(overlap, deltas(i), particles(i)%position, this%&
-                short_interactions%wall_pairs(ij_actors(i))%potential)
+            call this%environment%visitable_walls%visit(overlap, deltas(i), particles(i)%position, &
+                this%short_interactions%wall_pairs(ij_actors(i))%potential)
             if (overlap) return
         end do
         deltas(1) = -deltas(1)

@@ -8,11 +8,11 @@ use classes_min_distance, only: Abstract_Min_Distance, Concrete_Min_Distance, Nu
 implicit none
 
 private
-public :: create, destroy
+public :: create_from_json, create_from_value, destroy
 
 contains
 
-    subroutine create(min_distance, exists, generating_data, prefix)
+    subroutine create_from_json(min_distance, exists, generating_data, prefix)
         class(Abstract_Min_Distance), allocatable, intent(out) :: min_distance
         logical, intent(in) :: exists
         type(json_file), intent(inout) :: generating_data
@@ -31,7 +31,20 @@ contains
             allocate(Null_Min_Distance :: min_distance)
         end if
         call min_distance%set(min_distance_value)
-    end subroutine create
+    end subroutine create_from_json
+
+    subroutine create_from_value(min_distance, exists, min_distance_value)
+        class(Abstract_Min_Distance), allocatable, intent(out) :: min_distance
+        logical, intent(in) :: exists
+        real(DP), intent(in) :: min_distance_value
+
+        if (exists) then
+            allocate(Concrete_Min_Distance :: min_distance)
+        else
+            allocate(Null_Min_Distance :: min_distance)
+        end if
+        call min_distance%set(min_distance_value)
+    end subroutine create_from_value
 
     subroutine destroy(min_distance)
         class(Abstract_Min_Distance), allocatable, intent(inout) :: min_distance

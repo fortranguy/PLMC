@@ -2,12 +2,10 @@ module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use procedures_errors, only: error_exit
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_visitable_walls, only: Abstract_Visitable_Walls
-use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
@@ -21,7 +19,7 @@ use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_component_factory, only: changes_component_create, changes_component_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_property_inquirers, only: component_can_translate, component_can_rotate, &
-    component_can_exchange, periodicity_is_xyz, periodicity_is_xy
+    component_can_exchange
 
 implicit none
 
@@ -30,11 +28,11 @@ public :: changes_create, changes_destroy, set_can_translate, set_can_rotate, se
 
 contains
 
-    subroutine changes_create(changes, periodic_box, visitable_walls, components, num_tuning_steps,&
-        generating_data, prefix)
+    subroutine changes_create(changes, periodic_box, accessible_domain, components, &
+        num_tuning_steps, generating_data, prefix)
         type(Changes_Wrapper), intent(out) :: changes
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
         type(Component_Wrapper), intent(in) :: components(:)
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
@@ -60,18 +58,8 @@ contains
 
         call set_can_exchange(can_exchange, components)
         call set_have_positions(have_positions, components)
-        if (periodicity_is_xyz(periodic_box)) then
-            call box_create(changes%exchange_domain, periodic_box, any(can_exchange) .and. &
-                any(have_positions))
-        else if (periodicity_is_xy(periodic_box)) then
-            call box_create(changes%exchange_domain, periodic_box, visitable_walls, &
-                any(can_exchange) .and. any(have_positions))
-        else
-            call error_exit("procedures_changes_factory: changes_create: "//&
-                "box periodicity is unknown.")
-        end if
-        call random_coordinates_create(changes%random_position, changes%exchange_domain, &
-            can_exchange, have_positions)
+        call random_coordinates_create(changes%random_position, accessible_domain, can_exchange, &
+        have_positions)
         call set_have_orientations(have_orientations, components)
         call random_coordinates_create(changes%random_orientation, can_exchange, have_orientations)
         call coordinates_copier_create_position(changes%position_copier, changes%random_position, &
@@ -173,7 +161,6 @@ contains
         call coordinates_copier_destroy(changes%position_copier)
         call random_coordinates_destroy(changes%random_orientation)
         call random_coordinates_destroy(changes%random_position)
-        call box_destroy(changes%exchange_domain)
         if (allocated(changes%components)) then
             do i_component = size(changes%components), 1, -1
                 call changes_component_destroy(changes%components(i_component))

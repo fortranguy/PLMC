@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
 use data_cells, only: nums_local_cells
 use procedures_errors, only: error_exit
-use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
 use procedures_neighbour_cells_micro, only: pbc_3d_index
@@ -15,7 +15,7 @@ private
 
     type, abstract, public :: Abstract_Neighbour_Cells
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Parallelepiped_Domain), pointer :: accessible_domain => null()
         real(DP) :: max_distance = 0._DP
         integer :: nums(num_dimensions) = 0
         real(DP) :: size(num_dimensions) = 0._DP
@@ -31,6 +31,7 @@ private
         procedure :: get_global_ubounds => Abstract_get_global_ubounds
         procedure :: get => Abstract_get
         procedure :: skip => Abstract_skip
+        procedure :: is_inside => Abstract_is_inside
         procedure :: index => Abstract_index
         procedure(Abstract_set_skip_layers), private, deferred :: set_skip_layers
         procedure(Abstract_check_nums), private, deferred :: check_nums
@@ -73,6 +74,7 @@ private
         procedure :: get_global_ubounds => Null_get_global_bounds
         procedure :: get => Null_get
         procedure :: skip => Null_skip
+        procedure :: is_inside => Null_is_inside
         procedure :: index => Null_index
         procedure, private :: check_nums => Null_check_nums
         procedure, private :: set_skip_layers => Null_set_skip_layers
@@ -82,13 +84,13 @@ contains
 
 !implementation Abstract_Neighbour_Cells
 
-    subroutine Abstract_construct(this, periodic_box, hard_contact, pair_potential)
+    subroutine Abstract_construct(this, accessible_domain, hard_contact, pair_potential)
         class(Abstract_Neighbour_Cells), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), target, intent(in) :: accessible_domain
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
-        this%periodic_box => periodic_box
+        this%accessible_domain => accessible_domain
         if (pair_potential%get_max_distance() - pair_potential%get_min_distance() >= &
             hard_contact%get_max_distance()) then !volume dependency?
             this%max_distance = pair_potential%get_max_distance()
@@ -102,15 +104,15 @@ contains
         class(Abstract_Neighbour_Cells), intent(inout) :: this
 
         if (allocated(this%neighbours)) deallocate(this%neighbours)
-        this%periodic_box => null()
+        this%accessible_domain => null()
     end subroutine Abstract_destroy
 
     subroutine Abstract_reset(this)
         class(Abstract_Neighbour_Cells), intent(inout) :: this
 
-        this%nums = floor(this%periodic_box%get_size()/this%max_distance)
+        this%nums = floor(this%accessible_domain%get_size()/this%max_distance)
         call this%check_nums()
-        this%size = this%periodic_box%get_size() / real(this%nums, DP)
+        this%size = this%accessible_domain%get_size() / real(this%nums, DP)
         call this%check_size()
 
         this%global_lbounds = -this%nums/2
@@ -131,10 +133,10 @@ contains
 
         real(DP) :: box_modulo_cell(num_dimensions)
 
-        box_modulo_cell = modulo(this%periodic_box%get_size(), this%size)
+        box_modulo_cell = modulo(this%accessible_domain%get_size(), this%size)
         if (any(box_modulo_cell > real_zero .and. abs(box_modulo_cell-this%size) > real_zero)) then
             call error_exit("Abstract_Neighbour_Cells: check_size: "//&
-                            "this%size is not a divisor of periodic_box%get_size()")
+                            "this%size is not a divisor of accessible_domain%get_size()")
         end if
     end subroutine Abstract_check_size
 
@@ -202,6 +204,13 @@ contains
             (at_top_layer .and. this%skip_top_layer(local_i3))
     end function Abstract_skip
 
+    pure logical function Abstract_is_inside(this, position) result(is_inside)
+        class(Abstract_Neighbour_Cells), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+
+        is_inside = this%accessible_domain%is_inside(position)
+    end function Abstract_is_inside
+
     pure function Abstract_index(this, position) result(index)
         class(Abstract_Neighbour_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
@@ -268,9 +277,9 @@ contains
 
 !implementation Null_Neighbour_Cells
 
-    subroutine Null_construct(this, periodic_box, hard_contact, pair_potential)
+    subroutine Null_construct(this, accessible_domain, hard_contact, pair_potential)
         class(Null_Neighbour_Cells), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), target, intent(in) :: accessible_domain
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
     end subroutine Null_construct
@@ -304,6 +313,12 @@ contains
         integer, intent(in) :: local_i3
         skip = .false.
     end function Null_skip
+
+    pure logical function Null_is_inside(this, position) result(is_inside)
+        class(Null_Neighbour_Cells), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+        is_inside = .false.
+    end function Null_is_inside
 
     pure function Null_index(this, position) result(index)
         class(Null_Neighbour_Cells), intent(in) :: this
