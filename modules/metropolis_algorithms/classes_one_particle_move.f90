@@ -331,14 +331,16 @@ contains
 
         do i_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
-            call this%short_interactions%visitable_cells(i_component, i_actor)%visit(overlap, &
-                energies_new(i_component), new, visit_condition_different, i_exclude)
+            call this%short_interactions%visitable_cells(i_component, i_actor)%&
+                visit_energy(overlap, energies_new(i_component), new, visit_condition_different, &
+                i_exclude)
             if (overlap) return
         end do
         do i_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(old%i, 0, i_component == i_actor)
-            call this%short_interactions%visitable_cells(i_component, i_actor)%visit(overlap, &
-                energies_old(i_component), old, visit_condition_different, i_exclude)
+            call this%short_interactions%visitable_cells(i_component, i_actor)%&
+                visit_energy(overlap, energies_old(i_component), old, visit_condition_different, &
+                i_exclude)
         end do
         deltas = energies_new - energies_old
     end subroutine Translation_visit_short

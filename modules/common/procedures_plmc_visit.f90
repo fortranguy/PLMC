@@ -199,7 +199,7 @@ contains
                     particle%position = components(j_component)%positions%get(particle%i)
                     i_exclude = merge(particle%i, num_particles_max + 1, i_component == j_component)
                     call short_interactions%visitable_cells(i_component, j_component)%&
-                        visit(overlap, energy_j, particle, visit_condition_lower, i_exclude)
+                        visit_energy(overlap, energy_j, particle, visit_condition_lower, i_exclude)
                     if (overlap) then
                         call error_exit("procedures_plmc_visit: visit_short_cells: components "//&
                             string%get(i_component)//" and "//string%get(j_component)//" overlap.")

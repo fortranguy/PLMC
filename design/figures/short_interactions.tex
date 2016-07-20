@@ -20,28 +20,13 @@
                     inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
-                    particle: \type{TemporaryParticle}}}
+                    particle: \type{TemporaryParticle},
+                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
                 \operation{\procedure{translate}{toPosition: \type{real[3]},
                     from: \type{TemporaryParticle}}}
                 \operation{\procedure{add}{particle: \type{TemporaryParticle}}}
                 \operation{\procedure{remove}{particle: \type{TemporaryParticle}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{NeighbourCells}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    hardContact: \type{HardContact}, pairPotential: \type{PairPotential}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{reset}{}}
-                \operation{\procedure{getGlobalLbounds}{}: \type{int[3]}}
-                \operation{\procedure{getGlobalUbounds}{}: \type{int[3]}}
-                \operation{\procedure{get}{localI1: \type{int}, localI2: \type{int},
-                    localI3: \type{int}, globalI1: \type{int}, globalI2: \type{int},
-                    globalI3: \type{int}}: \type{int[3]}}
-                \operation{\procedure{skip}{atBottomLayer: \type{bool},
-                    atTopLayer: \type{bool}, localI3: \type{int}}: \type{bool}}
-                \operation{\procedure{index}{position: \type{real[3]}}: \type{int[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -58,9 +43,23 @@
                     iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle},
-                    pairPotential: \type{PairPotential}}}
+                    pairPotential: \type{PairPotential},
+                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
                 \operation{\procedure{add}{iParticle: \type{int}}}
                 \operation{\procedure{remove}{iParticle: \type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
+                \operation[0]{\procedure{construct}{domain: \type{ShortPotentialDomain},
+                    expression: \type{PotentialExpression}}}
+                \operation[0]{\procedure{destroy}{}}
+                \operation{\procedure{getMinDistance}{}: \type{real}}
+                \operation{\procedure{getMaxDistance}{}: \type{real}}
+                \operation[0]{\procedure{meet}{overlap: \type{bool}, energy: \type{real},
+                    distance: \type{real}}}
             \end{abstractclass}
         \end{scope}
 
@@ -83,20 +82,19 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
-                \operation[0]{\procedure{construct}{domain: \type{ShortPotentialDomain},
-                    expression: \type{PotentialExpression}}}
-                \operation[0]{\procedure{destroy}{}}
-                \operation{\procedure{getMinDistance}{}: \type{real}}
-                \operation{\procedure{getMaxDistance}{}: \type{real}}
-                \operation[0]{\procedure{meet}{overlap: \type{bool}, energy: \type{real},
-                    distance: \type{real}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(PairPotential.south) - (0 cm, 1.5 cm)$)}]
-        \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
-                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
+            \begin{abstractclass}[text width=\mediumTextWidth]{NeighbourCells}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    hardContact: \type{HardContact}, pairPotential: \type{PairPotential}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{getGlobalLbounds}{}: \type{int[3]}}
+                \operation{\procedure{getGlobalUbounds}{}: \type{int[3]}}
+                \operation{\procedure{get}{localI1: \type{int}, localI2: \type{int},
+                    localI3: \type{int}, globalI1: \type{int}, globalI2: \type{int},
+                    globalI3: \type{int}}: \type{int[3]}}
+                \operation{\procedure{skip}{atBottomLayer: \type{bool},
+                    atTopLayer: \type{bool}, localI3: \type{int}}: \type{bool}}
+                \operation{\procedure{index}{position: \type{real[3]}}: \type{int[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -121,6 +119,12 @@
                     pairPotential: \type{PairPotential}}}
                 \operation{\procedure{visitIntra}{overlap: \type{bool}, energy: \type{real},
                     positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PairPotential -| ShortPairsVisitor)$)}]
+        \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
+                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 

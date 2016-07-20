@@ -9,7 +9,7 @@ implicit none
     end interface
 
 private
-public :: in_range, different, lower
+public :: in_range, different, lower, unconditional
 
 contains
 
@@ -24,5 +24,11 @@ contains
 
         lower = i_inside < i_outside
     end function lower
+
+    pure logical function unconditional(i_inside, i_outside)
+        integer, intent(in) :: i_inside, i_outside
+
+        unconditional = .true.
+    end function unconditional
 
 end module procedures_visit_condition

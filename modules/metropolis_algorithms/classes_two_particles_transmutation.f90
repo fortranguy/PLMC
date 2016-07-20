@@ -291,8 +291,8 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, particles, i)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit(overlap, deltas(i_component, i), particles(i), visit_condition_different,&
-                    i_exclude)
+                    visit_energy(overlap, deltas(i_component, i), particles(i), &
+                    visit_condition_different, i_exclude)
                 if (overlap) return
             end do
         end do

@@ -158,7 +158,8 @@ contains
         do j_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(test%i, 0, j_component == i_component)
             call this%short_interactions%visitable_cells(j_component, i_component)%&
-                visit(overlap, deltas(j_component), test, visit_condition_different, i_exclude)
+                visit_energy(overlap, deltas(j_component), test, visit_condition_different, &
+                i_exclude)
                 if (overlap) return
         end do
     end subroutine Abstract_visit_short

@@ -264,8 +264,8 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, new)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit(overlap, energies_new(i_component, i), new(i), visit_condition_different,&
-                    i_exclude)
+                    visit_energy(overlap, energies_new(i_component, i), new(i), &
+                    visit_condition_different,i_exclude)
                 if (overlap) return
             end do
         end do
@@ -273,8 +273,8 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, old)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit(overlap, energies_old(i_component, i), old(i), visit_condition_different,&
-                    i_exclude)
+                    visit_energy(overlap, energies_old(i_component, i), old(i), &
+                    visit_condition_different, i_exclude)
             end do
         end do
         deltas = energies_new - energies_old

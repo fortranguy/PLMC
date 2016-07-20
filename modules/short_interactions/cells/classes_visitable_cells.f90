@@ -28,12 +28,11 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_reset
-        generic :: visit => visit_energy, visit_contacts
+        procedure :: visit_energy => Abstract_visit_energy
+        procedure :: visit_contacts => Abstract_visit_contacts
         procedure :: translate => Abstract_translate
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
-        procedure, private :: visit_energy => Abstract_visit_energy
-        procedure, private :: visit_contacts => Abstract_visit_contacts
         procedure, private :: construct_visitable_lists => Abstract_construct_visitable_lists
         procedure, private :: destroy_visitable_lists => Abstract_destroy_visitable_lists
         procedure, private :: fill_with_particles => Abstract_fill_with_particles
@@ -48,11 +47,11 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_reset
+        procedure :: visit_energy => Null_visit_energy
+        procedure :: visit_contacts => Null_visit_contacts
         procedure :: translate => Null_translate
         procedure :: add => Null_add
         procedure :: remove => Null_remove
-        procedure, private :: visit_energy => Null_visit_energy
-        procedure, private :: visit_contacts => Null_visit_contacts
     end type Null_Visitable_Cells
 
 contains
@@ -187,7 +186,7 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit(overlap, energy_i, particle, this%pair_potential, in_range, i_exclude)
+                visit_energy(overlap, energy_i, particle, this%pair_potential, in_range, i_exclude)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -195,11 +194,13 @@ contains
         end do
     end subroutine Abstract_visit_energy
 
-    subroutine Abstract_visit_contacts(this, overlap, contacts, particle)
+    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, in_range, i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
+        procedure(visit_condition_in_range) :: in_range
+        integer, intent(in) :: i_exclude
 
         real(DP) :: contacts_i
         integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
@@ -220,7 +221,8 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit(overlap, contacts, particle, this%pair_potential)
+                visit_contacts(overlap, contacts, particle, this%pair_potential, in_range, &
+                i_exclude)
             if (overlap) return
             contacts = contacts + contacts_i
         end do
@@ -304,11 +306,13 @@ contains
         energy = 0._DP
     end subroutine Null_visit_energy
 
-    subroutine Null_visit_contacts(this, overlap, contacts, particle)
+    subroutine Null_visit_contacts(this, overlap, contacts, particle, in_range, i_exclude)
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
+        procedure(visit_condition_in_range) :: in_range
+        integer, intent(in) :: i_exclude
         overlap = .false.
         contacts = 0._DP
     end subroutine Null_visit_contacts
