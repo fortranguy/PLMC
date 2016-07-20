@@ -6,6 +6,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use procedures_visit_condition, only: visit_condition_different => different
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_translation => visit_translation
 use classes_tower_sampler, only: Abstract_Tower_Sampler
@@ -263,7 +264,8 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, new)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit(overlap, energies_new(i_component, i), new(i), i_exclude)
+                    visit(overlap, energies_new(i_component, i), new(i), visit_condition_different,&
+                    i_exclude)
                 if (overlap) return
             end do
         end do
@@ -271,7 +273,8 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, old)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit(overlap, energies_old(i_component, i), old(i), i_exclude)
+                    visit(overlap, energies_old(i_component, i), old(i), visit_condition_different,&
+                    i_exclude)
             end do
         end do
         deltas = energies_new - energies_old

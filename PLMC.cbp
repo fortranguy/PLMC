@@ -686,10 +686,13 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/short_interactions/procedures_hard_contact_factory.f90">
-			<Option weight="4" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/short_interactions/procedures_short_interactions_factory.f90">
 			<Option weight="13" />
+		</Unit>
+		<Unit filename="modules/short_interactions/procedures_visit_condition.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/short_interactions/procedures_visitable_list_factory.f90">
 			<Option weight="5" />

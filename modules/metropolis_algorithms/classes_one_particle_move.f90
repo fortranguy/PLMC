@@ -6,6 +6,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use procedures_visit_condition, only: visit_condition_different => different
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: &
     dipoles_field_visit_translation => visit_translation, &
@@ -331,13 +332,13 @@ contains
         do i_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
             call this%short_interactions%visitable_cells(i_component, i_actor)%visit(overlap, &
-                energies_new(i_component), new, i_exclude)
+                energies_new(i_component), new, visit_condition_different, i_exclude)
             if (overlap) return
         end do
         do i_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(old%i, 0, i_component == i_actor)
             call this%short_interactions%visitable_cells(i_component, i_actor)%visit(overlap, &
-                energies_old(i_component), old, i_exclude)
+                energies_old(i_component), old, visit_condition_different, i_exclude)
         end do
         deltas = energies_new - energies_old
     end subroutine Translation_visit_short

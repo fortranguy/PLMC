@@ -16,7 +16,9 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
-                    particle: \type{TemporaryParticle}, iExclude: \type{int}}}
+                    particle: \type{TemporaryParticle},
+                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle}}}
                 \operation{\procedure{translate}{toPosition: \type{real[3]},
@@ -51,7 +53,9 @@
                 \operation{\procedure{set}{iTarger: \type{int}, iParticle: \type{int}}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{TemporaryParticle},
-                    pairPotential: \type{PairPotential}, iExclude: \type{int}}}
+                    pairPotential: \type{PairPotential},
+                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle},
                     pairPotential: \type{PairPotential}}}

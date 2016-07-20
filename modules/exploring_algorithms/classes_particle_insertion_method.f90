@@ -6,6 +6,7 @@ use classes_component_number, only: Abstract_Component_Number
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use procedures_visit_condition, only: visit_condition_different => different
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add
 use classes_random_coordinates, only: Abstract_Random_Coordinates
@@ -157,7 +158,7 @@ contains
         do j_component = 1, size(this%short_interactions%visitable_cells, 1)
             i_exclude = merge(test%i, 0, j_component == i_component)
             call this%short_interactions%visitable_cells(j_component, i_component)%&
-                visit(overlap, deltas(j_component), test, i_exclude)
+                visit(overlap, deltas(j_component), test, visit_condition_different, i_exclude)
                 if (overlap) return
         end do
     end subroutine Abstract_visit_short

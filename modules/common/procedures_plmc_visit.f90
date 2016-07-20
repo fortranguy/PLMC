@@ -7,7 +7,9 @@ use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use procedures_visit_condition, only: visit_condition_lower => lower
 use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
@@ -22,7 +24,7 @@ use procedures_triangle_observables, only: triangle_observables_init, &
 implicit none
 
 private
-public :: plmc_visit_set, plmc_visit
+public :: plmc_visit_set, plmc_visit, visit_short_full, visit_short_cells
 
 interface plmc_visit_set
     module procedure :: set_visit
@@ -32,7 +34,6 @@ interface plmc_visit
     module procedure :: visit_generating, visit_exploring
     module procedure :: visit_field
     module procedure :: visit_walls
-    module procedure :: visit_short
     module procedure :: visit_dipolar
 end interface plmc_visit
 
@@ -59,7 +60,7 @@ contains
             physical_model%mixture%components)
         call plmc_visit(observables%walls_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
-        call plmc_visit(observables%short_energies, physical_model%mixture%components, &
+        call visit_short_full(observables%short_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
         call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
@@ -75,7 +76,7 @@ contains
             physical_model%mixture%components)
         call plmc_visit(observables%walls_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
-        call plmc_visit(observables%short_energies, physical_model%mixture%components, &
+        call visit_short_cells(observables%short_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
         call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
@@ -111,28 +112,28 @@ contains
                     potential_i)
             end associate
             if (overlap) then
-                call error_exit("visit_walls: component "//string%get(i_component)//&
-                    " overlaps.")
+                call error_exit("procedures_plmc_visit: visit_walls: component "//string%&
+                    get(i_component)//" overlaps.")
             end if
         end do
     end subroutine visit_walls
 
-    subroutine visit_short(energies, components, short_interactions)
+    subroutine visit_short_full(energies, components, short_interactions)
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         call visit_short_intra(energies, components, short_interactions)
         call visit_short_inter(energies, components, short_interactions)
-    end subroutine visit_short
+    end subroutine visit_short_full
 
     subroutine visit_short_intra(energies, components, short_interactions)
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
-        logical :: overlap
         integer :: i_component
+        logical :: overlap
         type(Concrete_Number_to_String) :: string
 
         do i_component = 1, size(components)
@@ -144,8 +145,8 @@ contains
                 potential_i)
             end associate
             if (overlap) then
-                call error_exit("visit_short_intra: component "//string%get(i_component)//&
-                    " overlaps with itself.")
+                call error_exit("procedures_plmc_visit: visit_short_intra: component "//string%&
+                    get(i_component)//" overlaps with itself.")
             end if
         end do
     end subroutine visit_short_intra
@@ -155,8 +156,8 @@ contains
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
-        logical :: overlap
         integer :: i_component, j_component
+        logical :: overlap
         type(Concrete_Number_to_String) :: string
 
         do j_component = 1, size(components)
@@ -170,12 +171,45 @@ contains
                         positions_i, positions_j, potential_ij)
                 end associate
                 if (overlap) then
-                    call error_exit("visit_short_inter: components "//string%get(i_component)//&
-                        " and "//string%get(j_component)//" overlap.")
+                    call error_exit("procedures_plmc_visit: visit_short_inter: components "//&
+                        string%get(i_component)//" and "//string%get(j_component)//" overlap.")
                 end if
             end do
         end do
     end subroutine visit_short_inter
+
+    subroutine visit_short_cells(energies, components, short_interactions)
+        type(Reals_Line), intent(inout) :: energies(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+
+        real(DP) :: energy_ij, energy_j
+        integer :: j_component, i_component, num_particles_max, i_particle, i_exclude
+        logical :: overlap
+        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Number_to_String) :: string
+
+        do j_component = 1, size(short_interactions%visitable_cells, 2)
+            do i_component = 1, j_component
+                num_particles_max = max(components(j_component)%positions%get_num(), &
+                    components(i_component)%positions%get_num())
+                energy_ij = 0._DP
+                do i_particle = 1, components(j_component)%positions%get_num()
+                    particle%i = i_particle
+                    particle%position = components(j_component)%positions%get(particle%i)
+                    i_exclude = merge(particle%i, num_particles_max + 1, i_component == j_component)
+                    call short_interactions%visitable_cells(i_component, j_component)%&
+                        visit(overlap, energy_j, particle, visit_condition_lower, i_exclude)
+                    if (overlap) then
+                        call error_exit("procedures_plmc_visit: visit_short_cells: components "//&
+                            string%get(i_component)//" and "//string%get(j_component)//" overlap.")
+                    end if
+                    energy_ij = energy_ij + energy_j
+                end do
+                energies(j_component)%line(i_component) = energy_ij
+            end do
+        end do
+    end subroutine visit_short_cells
 
     pure subroutine visit_dipolar(energies, mixture_energy, components, &
         dipolar_interactions)
