@@ -22,6 +22,7 @@ use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
 use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method, &
     Concrete_Particle_Insertion_Method
+use classes_volume_change_method, only: Abstract_Volume_Change_Method, Concrete_Volume_Change_Method
 
 implicit none
 
@@ -79,6 +80,7 @@ end interface measure_chemical_potentials
 
 interface measure_pressure
     module procedure :: measure_pressure_from_json
+    module procedure :: measure_pressure_from_volume_change_method
 end interface measure_pressure
 
 contains
@@ -349,6 +351,18 @@ contains
 
         measure_pressure = logical_from_json(exploring_data, prefix//"measure pressure")
     end function measure_pressure_from_json
+
+    pure logical function measure_pressure_from_volume_change_method(volume_change_method) &
+        result(measure_pressure)
+        class(Abstract_Volume_Change_Method), intent(in) :: volume_change_method
+
+        select type (volume_change_method)
+            type is (Concrete_Volume_Change_Method)
+                measure_pressure = .true.
+            class default
+                measure_pressure = .false.
+        end select
+    end function measure_pressure_from_volume_change_method
 
     logical function logical_from_json(input_data, statement)
         type(json_file), intent(inout) :: input_data

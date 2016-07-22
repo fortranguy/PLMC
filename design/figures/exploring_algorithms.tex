@@ -20,6 +20,15 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(ParticleInsertionMethod.south) - (0 cm, 2 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{VolumeChangeMethod}{0, 0}
+                \operation{\procedure{construct}{environment: \type{Environment},
+                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{try}{observables: \type{ExploringObservables}}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(ParticleInsertionMethod.north) + (9 cm, 0 cm)$)}]
             \umlnote[text width=\mediumTextWidth]{\import{}:\\
                 \namespace{Environment} :: Environment \\

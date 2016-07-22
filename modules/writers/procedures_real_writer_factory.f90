@@ -7,36 +7,28 @@ implicit none
 private
 public :: create, destroy
 
-interface create
-    module procedure :: create_dipolar_mixture_energy
-end interface create
-
-interface destroy
-    module procedure :: destroy_dipolar_mixture_energy
-end interface destroy
-
 contains
 
-    subroutine create_dipolar_mixture_energy(dipolar_mixture_energy, dipoles_exist, filename)
-        class(Abstract_Real_Writer), allocatable, intent(out) :: dipolar_mixture_energy
-        logical, intent(in) :: dipoles_exist
+    subroutine create(writer, needed, filename)
+        class(Abstract_Real_Writer), allocatable, intent(out) :: writer
+        logical, intent(in) :: needed
         character(len=*), intent(in) :: filename
 
-        if (dipoles_exist) then
-            allocate(Concrete_Real_Writer :: dipolar_mixture_energy)
+        if (needed) then
+            allocate(Concrete_Real_Writer :: writer)
         else
-            allocate(Null_Real_Writer :: dipolar_mixture_energy)
+            allocate(Null_Real_Writer :: writer)
         end if
-        call dipolar_mixture_energy%construct(filename)
-    end subroutine create_dipolar_mixture_energy
+        call writer%construct(filename)
+    end subroutine create
 
-    subroutine destroy_dipolar_mixture_energy(dipolar_mixture_energy)
-        class(Abstract_Real_Writer), allocatable, intent(inout) :: dipolar_mixture_energy
+    subroutine destroy(writer)
+        class(Abstract_Real_Writer), allocatable, intent(inout) :: writer
 
-        if (allocated(dipolar_mixture_energy)) then
-            call dipolar_mixture_energy%destroy()
-            deallocate(dipolar_mixture_energy)
+        if (allocated(writer)) then
+            call writer%destroy()
+            deallocate(writer)
         end if
-    end subroutine destroy_dipolar_mixture_energy
+    end subroutine destroy
 
 end module procedures_real_writer_factory

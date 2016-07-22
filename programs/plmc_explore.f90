@@ -26,7 +26,7 @@ implicit none
     call plmc_catch_exploring_help()
 
     call plmc_create(io%generating_data, io%exploring_data)
-    call plmc_create(physical_model, io%generating_data)
+    call plmc_create(physical_model, io%generating_data, io%exploring_data)
     call plmc_set(io%generating_data)
     call plmc_set(num_snaps, physical_model%mixture%components, io%generating_data)
     call plmc_visit_set(visit, io%exploring_data, "Check.")
@@ -45,6 +45,7 @@ implicit none
         call plmc_set(io%readers, i_snap)
         call plmc_reset(physical_model)
         call plmc_visit(observables, physical_model, visit)
+        call markov_chain_explorer%volume_change_method%try(observables)
         call markov_chain_explorer%particle_insertion_method%try(observables)
         call plmc_set(observables)
         call plmc_write(io%writers, observables, i_snap)

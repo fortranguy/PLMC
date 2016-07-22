@@ -57,19 +57,21 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        real(DP) :: LJ_epsilon, LJ_sigma
         character(len=:), allocatable :: data_field
         logical :: data_found
 
         select type(expression)
             type is (Lennard_Jones_Expression)
-                data_field = prefix//"epsilon"
-                call generating_data%get(data_field, LJ_epsilon, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"sigma"
-                call generating_data%get(data_field, LJ_sigma, data_found)
-                call check_data_found(data_field, data_found)
-                call expression%set(LJ_epsilon, LJ_sigma)
+                block
+                    real(DP) :: epsilon, sigma
+                    data_field = prefix//"epsilon"
+                    call generating_data%get(data_field, epsilon, data_found)
+                    call check_data_found(data_field, data_found)
+                    data_field = prefix//"sigma"
+                    call generating_data%get(data_field, sigma, data_found)
+                    call check_data_found(data_field, data_found)
+                    call expression%set(epsilon, sigma)
+                end block
             type is (Null_Potential_Expression)
             class default
                 call error_exit("procedures_potential_expression_factory: expression type unknown.")

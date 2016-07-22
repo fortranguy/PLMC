@@ -8,8 +8,10 @@ implicit none
 
 private
 
+    !> beta_pressure_excess becomes the lateral excess pressure in 2D
     type, public :: Exploring_Observables_Wrapper
-        real(DP), allocatable :: inv_pow_activities(:)
+        real(DP) :: beta_pressure_excess = 0._DP !! \( \beta p_\text{ex} \)
+        real(DP), allocatable :: inv_pow_activities(:) !! \( a^{-N} \)
         real(DP), allocatable :: field_energies(:), walls_energies(:)
         type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_mixture_energy = 0._DP

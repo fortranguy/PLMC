@@ -59,8 +59,6 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        real(DP), allocatable :: field_vector(:)
-        real(DP) :: gap, size_x, surface_density
         character(len=:), allocatable :: data_field
         logical :: data_found
 
@@ -68,22 +66,27 @@ contains
             type is (Null_Field_Expression)
                 call field_expression%set()
             type is (Constant_Field_Expression)
-                data_field = prefix//"External Field.vector"
-                call generating_data%get(data_field, field_vector, data_found)
-                call check_data_found(data_field, data_found)
-                call field_expression%set(field_vector)
-                deallocate(field_vector)
+                block
+                    real(DP), allocatable :: field_vector(:)
+                    data_field = prefix//"External Field.vector"
+                    call generating_data%get(data_field, field_vector, data_found)
+                    call check_data_found(data_field, data_found)
+                    call field_expression%set(field_vector)
+                end block
             type is (Centered_Plates_Expression)
-                data_field = prefix//"External Field.gap"
-                call generating_data%get(data_field, gap, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"External Field.size x"
-                call generating_data%get(data_field, size_x, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"External Field.surface density"
-                call generating_data%get(data_field, surface_density, data_found)
-                call check_data_found(data_field, data_found)
-                call field_expression%set(permittivity, gap, size_x, surface_density)
+                block
+                    real(DP) :: gap, size_x, surface_density
+                    data_field = prefix//"External Field.gap"
+                    call generating_data%get(data_field, gap, data_found)
+                    call check_data_found(data_field, data_found)
+                    data_field = prefix//"External Field.size x"
+                    call generating_data%get(data_field, size_x, data_found)
+                    call check_data_found(data_field, data_found)
+                    data_field = prefix//"External Field.surface density"
+                    call generating_data%get(data_field, surface_density, data_found)
+                    call check_data_found(data_field, data_found)
+                    call field_expression%set(permittivity, gap, size_x, surface_density)
+                end block
             class default
                 call error_exit("field_expression type unknown.")
         end select

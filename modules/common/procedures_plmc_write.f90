@@ -62,6 +62,7 @@ contains
         type(Exploring_Observables_Wrapper), intent(in) :: observables
         integer, intent(in) :: i_snap
 
+        call writers%beta_pressure_excess%write(i_snap, observables%beta_pressure_excess)
         call writers%field%write(i_snap, observables%field_energies)
         call writers%walls%write(i_snap, observables%walls_energies)
         call writers%inv_pow_activities%write(i_snap, observables%inv_pow_activities)

@@ -42,7 +42,7 @@ contains
         call check_string_not_empty("Abstract_Real_Writer: construct: filename", filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
         this%file_unit = file_unit
-        legend = "# i_step  energy"
+        legend = "# i_step  observable"
         write(this%file_unit, *) legend
     end subroutine Abstract_construct
 
@@ -52,12 +52,12 @@ contains
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write(this, i_step, energy)
+    subroutine Abstract_write(this, i_step, observable)
         class(Abstract_Real_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP), intent(in) :: energy
+        real(DP), intent(in) :: observable
 
-        write(this%file_unit, *) i_step, energy
+        write(this%file_unit, *) i_step, observable
     end subroutine Abstract_write
 
 !end implementation Abstract_Real_Writer
@@ -73,10 +73,10 @@ contains
         class(Null_Real_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write(this, i_step, energy)
+    subroutine Null_write(this, i_step, observable)
         class(Null_Real_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP), intent(in) :: energy
+        real(DP), intent(in) :: observable
     end subroutine Null_write
 
 !end implementation Null_Real_Writer

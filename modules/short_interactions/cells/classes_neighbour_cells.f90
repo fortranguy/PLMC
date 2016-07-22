@@ -91,11 +91,11 @@ contains
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         this%accessible_domain => accessible_domain
-        if (pair_potential%get_max_distance() - pair_potential%get_min_distance() >= &
-            hard_contact%get_max_distance()) then !volume dependency?
+        if (pair_potential%get_max_distance() - pair_potential%get_min_distance() >= hard_contact%&
+            get_width()) then !volume dependency?
             this%max_distance = pair_potential%get_max_distance()
         else
-            this%max_distance = pair_potential%get_max_distance() + hard_contact%get_max_distance()
+            this%max_distance = pair_potential%get_max_distance() + hard_contact%get_width()
         end if
         call this%set_skip_layers()
     end subroutine Abstract_construct

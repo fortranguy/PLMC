@@ -8,9 +8,9 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only:  Mixture_Wrapper
-use classes_half_distribution, only: Abstract_Half_Distribution
-use procedures_half_distribution_factory, only: half_distribution_create => create, &
-    half_distribution_destroy => destroy
+use classes_dirac_distribution_plus, only: Abstract_Dirac_Distribution_Plus
+use procedures_dirac_distribution_plus_factory, only: dirac_distribution_plus_create => create, &
+    dirac_distribution_plus_destroy => destroy
 use procedures_hard_contact_factory, only: hard_contact_create => create, hard_contact_destroy => &
     destroy
 use procedures_pairs_factory, only: pairs_create => create, pairs_destroy => destroy
@@ -39,7 +39,7 @@ contains
         character(len=*), optional, intent(in) :: volume_change_prefix
 
         logical :: interact_with_walls, interact, pressure_needed
-        class(Abstract_Half_Distribution), allocatable :: half_distribution
+        class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
         class(Abstract_Visitable_List), allocatable :: list
 
         if (present(exploring_data) .and. present(volume_change_prefix)) then
@@ -48,11 +48,11 @@ contains
             pressure_needed = .false.
         end if
 
-        call half_distribution_create(half_distribution, pressure_needed, exploring_data, &
+        call dirac_distribution_plus_create(dirac_plus, pressure_needed, exploring_data, &
             volume_change_prefix)
         call hard_contact_create(short_interactions%hard_contact, environment%periodic_box, &
-            half_distribution, pressure_needed)
-        call half_distribution_destroy(half_distribution)
+            environment%accessible_domain, dirac_plus, pressure_needed)
+        call dirac_distribution_plus_destroy(dirac_plus)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
             wall_min_distances, generating_data, prefix)
         call walls_create(short_interactions%walls_visitor, environment%visitable_walls, &

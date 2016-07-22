@@ -117,7 +117,7 @@
         "Real": {
             "tabulated": true,
             "delta distance": 1.0e-4,
-            "max distance over box edge": 0.5
+            "max distance / box edge": 0.5
         }
     },
     "Random Number Generator": {

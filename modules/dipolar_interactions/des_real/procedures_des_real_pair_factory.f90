@@ -84,7 +84,7 @@ contains
 
         if (dipoles_exist) then
             domain%min = min_distance
-            data_field = prefix//"max distance over box edge"
+            data_field = prefix//"max distance / box edge"
             call generating_data%get(data_field, domain%max_over_box, data_found)
             call check_data_found(data_field, data_found)
             select type (pair)

@@ -2,7 +2,8 @@ module procedures_hard_contact_factory
 
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_half_distribution, only: Abstract_Half_Distribution
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
+use classes_dirac_distribution_plus, only: Abstract_Dirac_Distribution_Plus
 use classes_hard_contact, only: Abstract_Hard_Contact, XYZ_Hard_Contact, XY_Hard_Contact, &
     Null_Hard_Contact
 use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
@@ -14,10 +15,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(hard_contact, periodic_box, half_distribution, count_contacts)
+    subroutine create(hard_contact, periodic_box, accessible_domain, dirac_plus, count_contacts)
         class(Abstract_Hard_Contact), allocatable, intent(out) :: hard_contact
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Half_Distribution), intent(in) :: half_distribution
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
+        class(Abstract_Dirac_Distribution_Plus), intent(in) :: dirac_plus
         logical, intent(in) :: count_contacts
 
         if (count_contacts) then
@@ -32,7 +34,7 @@ contains
         else
             allocate(Null_Hard_Contact :: hard_contact)
         end if
-        call hard_contact%construct(half_distribution)
+        call hard_contact%construct(accessible_domain, dirac_plus)
     end subroutine create
 
     subroutine destroy(hard_contact)

@@ -222,7 +222,7 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit_contacts(overlap, contacts, particle, this%pair_potential, in_range, &
+                visit_contacts(overlap, contacts_i, particle, this%pair_potential, in_range, &
                 i_exclude)
             if (overlap) return
             contacts = contacts + contacts_i

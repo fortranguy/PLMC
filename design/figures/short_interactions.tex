@@ -30,7 +30,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (-9 cm, 1 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (-9 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     positions: \type{ComponentCoordinates}, hardContact: \type{HardContact}}}
@@ -63,20 +63,22 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 5.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{HardContact}{0, 0}
-                \operation{\procedure{construct}{halfDistribution: \type{HalfDistribution}}}
+                \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
+                    diracPlus: \type{DiracDistributionPlus}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getMaxDistance}{}: \type{real}}
+                \operation{\procedure{getWidth}{}: \type{real}}
                 \operation{\procedure{meet}{overlap: \type{bool}, contact: \type{real},
                     minDistance: \type{real}, vector: \type{real[3]}}}
+                \operation{\procedure{getBetaPressureExcess}{contacts: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.north |- HardContact.north)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{HalfDistribution}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{DiracDistributionPlus}{0, 0}
                 \operation[0]{\procedure{set}{\ldots}}
-                \operation{\procedure{getMaxDistance}{}: \type{real}}
+                \operation{\procedure{getWidth}{}: \type{real}}
                 \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
@@ -142,7 +144,7 @@
             \composition{PairPotential}{\refName{potentialExpression}}{\numRef{1}}
                 {PotentialExpression}
             \aggregation{VisitableList}{\refName{hardContact}}{\numRef{1}}{HardContact}
-            \composition{HardContact}{\refName{halfDistribution}}{\numRef{1}}{HalfDistribution}
+            \composition{HardContact}{\refName{diracPlus}}{\numRef{1}}{DiracDistributionPlus}
         \end{scope}
 
     \end{tikzpicture}

@@ -1,6 +1,6 @@
 module procedures_markov_chain_explorer_factory
 
-use data_input_prefixes, only: particle_insertion_prefix
+use data_input_prefixes, only: particle_insertion_prefix, volume_change_prefix
 use json_module, only: json_file
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
@@ -9,8 +9,10 @@ use procedures_random_coordinates_factory, only: random_coordinates_create => cr
     random_coordinates_destroy => destroy
 use procedures_particle_insertion_method_factory, only: particle_insertion_method_create => create,&
     particle_insertion_method_destroy => destroy
+use procedures_volume_change_method_factory, only: volume_change_method_create => create, &
+    volume_change_method_destroy => destroy
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
-use procedures_property_inquirers, only: measure_chemical_potentials
+use procedures_property_inquirers, only: measure_chemical_potentials, measure_pressure
 
 implicit none
 
@@ -24,7 +26,7 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(json_file), intent(inout) :: exploring_data
 
-        logical :: measure_inv_pow_activities
+        logical :: measure_inv_pow_activities, measure_pressure_excess
         logical, dimension(size(physical_model%mixture%components)) :: can_exchange, &
             have_positions, have_orientations
 
@@ -42,13 +44,17 @@ contains
             have_orientations)
         call particle_insertion_method_create(markov_chain_explorer%particle_insertion_method, &
             physical_model, markov_chain_explorer%random_position, markov_chain_explorer%&
-            random_orientation, size(can_exchange), measure_inv_pow_activities, exploring_data, &
+            random_orientation, measure_inv_pow_activities, exploring_data, &
             particle_insertion_prefix)
+        measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
+        call volume_change_method_create(markov_chain_explorer%volume_change_method, &
+            physical_model, measure_pressure_excess)
     end subroutine create
 
     subroutine destroy(markov_chain_explorer)
         type(Markov_Chain_Explorer_Wrapper), intent(inout) :: markov_chain_explorer
 
+        call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
         call particle_insertion_method_destroy(markov_chain_explorer%particle_insertion_method)
         call random_coordinates_destroy(markov_chain_explorer%random_orientation)
         call random_coordinates_destroy(markov_chain_explorer%random_position)
