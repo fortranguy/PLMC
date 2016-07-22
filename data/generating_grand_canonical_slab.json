@@ -39,10 +39,8 @@
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": true,
-            "Chemical Potential": {
-                "density": 0.14378156565656566,
-                "inverse powered activity": 1.1047116981809402
-            },
+            "density": 0.14378156565656566,
+            "inverse powered activity": 1.1047116981809402,
             "initial coordinates": "coordinates_1.in"
         },
         "Component 2": {
@@ -51,10 +49,8 @@
             "is dipolar": true,
             "moment norm": 0.5,
             "can exchange": true,
-            "Chemical Potential": {
-                "density": 0.14378156565656566,
-                "inverse powered activity": 0.7369288591852867
-            },
+            "density": 0.14378156565656566,
+            "inverse powered activity": 0.7369288591852867,
             "initial coordinates": "coordinates_2.in"
         },
         "Component 3": {
@@ -63,10 +59,8 @@
             "is dipolar": true,
             "moment norm": 0.25,
             "can exchange": true,
-            "Chemical Potential": {
-                "density": 0.14351851851851852,
-                "inverse powered activity": 0.6342977003794764
-            },
+            "density": 0.14351851851851852,
+            "inverse powered activity": 0.6342977003794764,
             "initial coordinates": "coordinates_3.in"
         },
         "Inter 12": {

@@ -25,10 +25,10 @@ contains
         real(DP) :: density, inv_pow_activity
 
         if (can_exchange) then
-            data_field = prefix//"Chemical Potential.density"
+            data_field = prefix//"density"
             call generating_data%get(data_field, density, data_found)
             call check_data_found(data_field, data_found)
-            data_field = prefix//"Chemical Potential.inverse powered activity"
+            data_field = prefix//"inverse powered activity"
             call generating_data%get(data_field, inv_pow_activity, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Component_Chemical_Potential :: chemical_potential)
