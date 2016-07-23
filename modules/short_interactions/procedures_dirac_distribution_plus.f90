@@ -54,15 +54,14 @@ contains
             type is (Gaussian_Dirac_Distribution_Plus)
                 block
                     real(DP) :: max_distance
-                    integer :: max_distance_over_std_dev
+                    integer :: num_std_devs
                     data_field = prefix//"Dirac Distribution Plus.maximum distance"
                     call exploring_data%get(data_field, max_distance, data_found)
                     call check_data_found(data_field, data_found)
-                    data_field = prefix//"Dirac Distribution Plus.maximum distance / "//&
-                        "standard deviation"
-                    call exploring_data%get(data_field, max_distance_over_std_dev, data_found)
+                    data_field = prefix//"Dirac Distribution Plus.number of standard deviations"
+                    call exploring_data%get(data_field, num_std_devs, data_found)
                     call check_data_found(data_field, data_found)
-                    call dirac_plus%set(max_distance, max_distance_over_std_dev)
+                    call dirac_plus%set(max_distance, num_std_devs)
                 end block
             type is (Null_Dirac_Distribution_Plus)
             class default

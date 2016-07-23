@@ -41,7 +41,7 @@ private
     type, extends(Abstract_Dirac_Distribution_Plus), public :: Gaussian_Dirac_Distribution_Plus
     private
         real(DP) :: max_distance = 0._DP
-        real(DP) :: std_dev = 0._DP
+        real(DP) :: std_dev = 0._DP !! \( \sigma \)
     contains
         procedure :: set => Gaussian_set
         procedure :: get_width => Gaussian_get_width
@@ -90,16 +90,15 @@ contains
 
 !implementation Gaussian_Dirac_Distribution_Plus
 
-    subroutine Gaussian_set(this, max_distance, max_distance_over_std_dev)
+    subroutine Gaussian_set(this, max_distance, num_std_devs)
         class(Gaussian_Dirac_Distribution_Plus), intent(inout) :: this
         real(DP), intent(in) :: max_distance
-        integer :: max_distance_over_std_dev !! \( \mathsf{n}_\sigma \)
+        integer :: num_std_devs !! \( \mathsf{n}_\sigma \)
 
         call check_positive("Gaussian_Dirac_Distribution_Plus: set", "max_distance", max_distance)
         this%max_distance = max_distance
-        call check_positive("Gaussian_Dirac_Distribution_Plus: set", "max_distance_over_std_dev", &
-            max_distance_over_std_dev)
-        this%std_dev = this%max_distance / real(max_distance_over_std_dev, DP)
+        call check_positive("Gaussian_Dirac_Distribution_Plus: set", "num_std_devs", num_std_devs)
+        this%std_dev = this%max_distance / real(num_std_devs, DP)
     end subroutine Gaussian_set
 
     !> \[ \mathsf{n}_\sigma \sigma \]
@@ -110,13 +109,16 @@ contains
     end function Gaussian_get_width
 
     !> \[
-    !>      \frac{2}{\sigma \sqrt{2\pi}} e^{-\frac{r^2}{2 \sigma^2}}
+    !>      \frac{1}{\sigma \sqrt{2\pi}}
+    !>          \exp\left( -\frac{\left( r - \frac{\mathsf{n}_\sigma}{2}\sigma \right)^2}
+    !>          {2 \sigma^2} \right)
     !> \]
     pure real(DP) function Gaussian_get(this, distance) result(distribution)
         class(Gaussian_Dirac_Distribution_Plus), intent(in) :: this
         real(DP), intent(in) :: distance
 
-        distribution = 2._DP / this%std_dev/sqrt(2._DP*PI) * exp(-distance**2/2._DP/this%std_dev**2)
+        distribution = 1._DP / this%std_dev/sqrt(2._DP*PI) * &
+            exp(-(distance - this%max_distance/2._DP)**2 / 2._DP/this%std_dev**2)
     end function Gaussian_get
 
 !end implementation Gaussian_Dirac_Distribution_Plus
