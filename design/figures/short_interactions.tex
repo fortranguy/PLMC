@@ -69,17 +69,17 @@
                     diracPlus: \type{DiracDistributionPlus}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getWidth}{}: \type{real}}
-                \operation{\procedure{meet}{overlap: \type{bool}, contact: \type{real},
+                \operation[0]{\procedure{meet}{overlap: \type{bool}, contact: \type{real},
                     minDistance: \type{real}, vector: \type{real[3]}}}
-                \operation{\procedure{getBetaPressureExcess}{contacts: \type{real}}: \type{real}}
+                \operation[0]{\procedure{getBetaPressureExcess}{contacts: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.north |- HardContact.north)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{DiracDistributionPlus}{0, 0}
                 \operation[0]{\procedure{set}{\ldots}}
-                \operation{\procedure{getWidth}{}: \type{real}}
-                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
+                \operation[0]{\procedure{getWidth}{}: \type{real}}
+                \operation[0]{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
