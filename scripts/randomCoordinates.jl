@@ -106,7 +106,7 @@ for i_component = 1:size(components, 1)
     if (components[i_component].num != 0)
         if (input_data["Mixture"]["Component $(i_component)"]["is dipolar"])
             components[i_component].orientations = RO.randomOrientations(components[i_component].num)
-            println(output_file, "# position_x    position_y    position_z    orientation_x   orientation_y   orientation_z")
+            println(output_file, "# position_x    position_y    position_z    orientation_x    orientation_y    orientation_z")
             writedlm(output_file, vcat(components[i_component].positions,
                 components[i_component].orientations)')
         else
