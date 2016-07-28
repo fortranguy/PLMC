@@ -97,6 +97,7 @@ contains
         else
             this%max_distance = pair_potential%get_max_distance() + hard_contact%get_width()
         end if
+        this%max_distance = this%max_distance + real_zero !possible edge case dealt with real_zero
         call this%set_skip_layers()
     end subroutine Abstract_construct
 

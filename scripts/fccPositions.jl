@@ -31,7 +31,12 @@ minDistanceDelta = 1e-6
 minDistance = inputData["Mixture"]["Component 1"]["minimum distance"] + minDistanceDelta
 edge = sqrt(2) * minDistance
 numbers = floor(Int64, 2 * boxSize / edge)
-numExcluded =0
+for i = 1:size(numbers, 1)
+    if isodd(numbers[i])
+        numbers[i] -= (boxSize[i] - (numbers[i] - 1) * edge / 2) < minDistance ? 1 : 0
+    end
+end
+numExcluded = 0
 for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
     numExcluded += isodd(i + j + k) ? 1 : 0
 end
@@ -52,6 +57,7 @@ end
 
 positions = zeros(Float64, 3, numParticles)
 iCounter = iParticle = 0
+ijk_offset = map(i -> iseven(i) ? 1 : 0, numbers)
 for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
     if isodd(i + j + k)
         continue
@@ -61,7 +67,7 @@ for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
         continue
     end
     iParticle += 1
-    positions[:, iParticle] = PLMC.folded(boxSize, [i, j, k] * edge/2)
+    positions[:, iParticle] = PLMC.folded(boxSize, ([i, j, k] + ijk_offset) * edge/2 - boxSize/2)
 end
 
 output_file = open(inputData["Mixture"]["Component 1"]["initial coordinates"], "w")

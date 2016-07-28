@@ -20,7 +20,7 @@ private
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_get_origin), deferred :: get_origin
         procedure(Abstract_get_size), deferred :: get_size
-        procedure(Abstract_is_inside), deferred :: is_inside
+        procedure :: is_inside => Abstract_is_inside
     end type Abstract_Parallelepiped_Domain
 
     abstract interface
@@ -42,12 +42,6 @@ private
             real(DP) :: size(num_dimensions)
         end function Abstract_get_size
 
-        pure logical function Abstract_is_inside(this, position)
-        import :: Abstract_Parallelepiped_Domain, DP
-            class(Abstract_Parallelepiped_Domain), intent(in) :: this
-            real(DP), intent(in) :: position(:)
-        end function Abstract_is_inside
-
     end interface
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Parallelepiped_Domain
@@ -58,7 +52,6 @@ private
         procedure :: destroy => Parallelepiped_destroy
         procedure :: get_origin => Parallelepiped_get_origin
         procedure :: get_size => Parallelepiped_get_size
-        procedure :: is_inside => Parallelepiped_is_inside
     end type Concrete_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Boxed_Parallelepiped_Domain
@@ -67,7 +60,6 @@ private
         procedure :: destroy => Boxed_destroy
         procedure :: get_origin => Boxed_get_origin
         procedure :: get_size => Boxed_get_size
-        procedure :: is_inside => Boxed_is_inside
     end type Boxed_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Walled_Parallelepiped_Domain
@@ -78,7 +70,6 @@ private
         procedure :: destroy => Walled_destroy
         procedure :: get_origin => Walled_get_origin
         procedure :: get_size => Walled_get_size
-        procedure :: is_inside => Walled_is_inside
     end type Walled_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Null_Parallelepiped_Domain
@@ -105,6 +96,14 @@ contains
         is_boxed = point_is_inside(box_origin, this%periodic_box%get_size(), corner_m) .and. &
             point_is_inside(box_origin, this%periodic_box%get_size(), corner_p)
     end function Abstract_is_boxed
+
+
+    pure logical function Abstract_is_inside(this, position) result(is_inside)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+
+        is_inside = point_is_inside(this%get_origin(), this%get_size(), position)
+    end function Abstract_is_inside
 
 !end implementation Abstract_Parallelepiped_Domain
 
@@ -146,13 +145,6 @@ contains
         size = this%size
     end function Parallelepiped_get_size
 
-    pure logical function Parallelepiped_is_inside(this, position) result(is_inside)
-        class(Concrete_Parallelepiped_Domain), intent(in) :: this
-        real(DP), intent(in) :: position(:)
-
-        is_inside = point_is_inside(this%origin, this%size, position)
-    end function Parallelepiped_is_inside
-
 !end implementation Concrete_Parallelepiped_Domain
 
 !implementation Boxed_Parallelepiped_Domain
@@ -186,13 +178,6 @@ contains
 
         size = this%periodic_box%get_size()
     end function Boxed_get_size
-
-    pure logical function Boxed_is_inside(this, position) result(is_inside)
-        class(Boxed_Parallelepiped_Domain), intent(in) :: this
-        real(DP), intent(in) :: position(:)
-
-        is_inside = .true.
-    end function Boxed_is_inside
 
 !end implementation Boxed_Parallelepiped_Domain
 
@@ -229,13 +214,6 @@ contains
 
         size = [reshape(this%periodic_box%get_size(), [2]), this%size_3]
     end function Walled_get_size
-
-    pure logical function Walled_is_inside(this, position) result(is_inside)
-        class(Walled_Parallelepiped_Domain), intent(in) :: this
-        real(DP), intent(in) :: position(:)
-
-        is_inside = -this%size_3/2._DP <= position(3) .and. position(3) <= this%size_3/2._DP
-    end function Walled_is_inside
 
 !end implementation Walled_Parallelepiped_Domain
 
