@@ -6,7 +6,8 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_array_size, check_positive
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_visitable_walls, only: Abstract_Visitable_Walls
-use procedures_parallelepiped_domain_micro, only: point_is_inside
+use procedures_parallelepiped_domain_micro, only: point_is_inside, is_inside_included, &
+    is_inside_excluded
 
 implicit none
 
@@ -93,8 +94,9 @@ contains
         box_origin = 0._DP
         corner_m = this%get_origin() - this%get_size()/2._DP
         corner_p = this%get_origin() + this%get_size()/2._DP
-        is_boxed = point_is_inside(box_origin, this%periodic_box%get_size(), corner_m) .and. &
-            point_is_inside(box_origin, this%periodic_box%get_size(), corner_p)
+        is_boxed = point_is_inside(box_origin, this%periodic_box%get_size(), corner_m, &
+            is_inside_included) .and. point_is_inside(box_origin, this%periodic_box%get_size(),&
+            corner_p, is_inside_included)
     end function Abstract_is_boxed
 
 
@@ -102,7 +104,8 @@ contains
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
 
-        is_inside = point_is_inside(this%get_origin(), this%get_size(), position)
+        is_inside = point_is_inside(this%get_origin(), this%get_size(), position, &
+            is_inside_excluded)
     end function Abstract_is_inside
 
 !end implementation Abstract_Parallelepiped_Domain

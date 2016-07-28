@@ -9,7 +9,8 @@ use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_visit_condition, only: visit_condition_lower => lower
+use procedures_visit_condition, only: visit_condition_in_range => in_range, &
+    visit_condition_lower => lower, visit_condition_unconditional => unconditional
 use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
@@ -184,22 +185,27 @@ contains
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         real(DP) :: energy_ij, energy_j
-        integer :: j_component, i_component, num_particles_max, i_particle, i_exclude
-        logical :: overlap
+        integer :: j_component, i_component, i_particle, i_exclude
+        logical :: same_component, overlap
         type(Concrete_Temporary_Particle) :: particle
         type(Concrete_Number_to_String) :: string
+        procedure(visit_condition_in_range), pointer :: in_range => null()
 
         do j_component = 1, size(short_interactions%visitable_cells, 2)
             do i_component = 1, j_component
-                num_particles_max = max(components(j_component)%positions%get_num(), &
-                    components(i_component)%positions%get_num())
+                same_component = i_component == j_component
+                if (same_component) then
+                    in_range => visit_condition_lower
+                else
+                    in_range => visit_condition_unconditional
+                end if
                 energy_ij = 0._DP
                 do i_particle = 1, components(j_component)%positions%get_num()
                     particle%i = i_particle
                     particle%position = components(j_component)%positions%get(particle%i)
-                    i_exclude = merge(particle%i, num_particles_max + 1, i_component == j_component)
+                    i_exclude = merge(particle%i, 0, same_component)
                     call short_interactions%visitable_cells(i_component, j_component)%&
-                        visit_energy(overlap, energy_j, particle, visit_condition_lower, i_exclude)
+                        visit_energy(overlap, energy_j, particle, in_range, i_exclude)
                     if (overlap) then
                         call error_exit("procedures_plmc_visit: visit_short_cells: components "//&
                             string%get(i_component)//" and "//string%get(j_component)//" overlap.")

@@ -7,7 +7,8 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_visit_condition, only: visit_condition_lower => lower
+use procedures_visit_condition, only: visit_condition_in_range => in_range, &
+    visit_condition_lower => lower, visit_condition_unconditional => unconditional
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 
 implicit none
@@ -64,23 +65,27 @@ contains
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
         real(DP) :: contacts, conctacts_j
-        integer :: i_component, j_component, num_particles_max, i_particle, i_exclude
-        logical :: overlap
+        integer :: i_component, j_component, i_particle, i_exclude
+        logical :: same_component, overlap
         type(Concrete_Temporary_Particle) :: particle
         type(Concrete_Number_to_String) :: string
+        procedure(visit_condition_in_range), pointer :: in_range => null()
 
         contacts = 0._DP
         do j_component = 1, size(this%components)
             do i_component = 1, j_component
-                num_particles_max = max(this%components(j_component)%positions%get_num(), this%&
-                    components(i_component)%positions%get_num())
+                same_component = i_component == j_component
+                if (same_component) then
+                    in_range => visit_condition_lower
+                else
+                    in_range => visit_condition_unconditional
+                end if
                 do i_particle = 1, this%components(j_component)%positions%get_num()
                     particle%i = i_particle
                     particle%position = this%components(j_component)%positions%get(particle%i)
-                    i_exclude = merge(particle%i, num_particles_max + 1, i_component == j_component)
+                    i_exclude = merge(particle%i, 0, same_component)
                     call this%short_interactions%visitable_cells(i_component, j_component)%&
-                        visit_contacts(overlap, conctacts_j, particle, visit_condition_lower, &
-                            i_exclude)
+                        visit_contacts(overlap, conctacts_j, particle, in_range, i_exclude)
                     if (overlap) then
                         call error_exit("Abstract_Volume_Change_Method: try: components "//string%&
                             get(i_component)//" and "//string%get(j_component)//" overlap.")
