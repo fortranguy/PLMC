@@ -1,39 +1,24 @@
-module PLMC
-    function folded(boxSize::Array{Float64, 1}, x::Array{Float64, 1})
-        v = mod(x, boxSize)
-        for i=1:3
-            if (v[i] > boxSize[i]/2)
-                v[i] -= boxSize[i]
-            end
-        end
-        return v
-    end
+if size(ARGS, 1) != 1
+    error("Please provide a generating.json file.")
 end
-
-import JSON
 import PLMC
-
-if size(ARGS, 1) == 0
-    error("Please provide a .json file.")
-end
+import JSON
 inputData = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
-boxSize = map(Float64, inputData["Environment"]["Box"]["initial size"])
-numComponents = inputData["Mixture"]["number of components"]
-if numComponents == 0
-    exit(0)
-elseif numComponents > 1
-    error("numComponents must be 1.")
+boxSize, components, interMinDistances = PLMC.set(inputData)
+
+numParticles = 0
+for iComponent = 1:size(components, 1)
+    numParticles += components[iComponent].num
 end
 
-numParticles = inputData["Mixture"]["Component 1"]["initial number"]
 minDistanceDelta = 1e-6
-minDistance = inputData["Mixture"]["Component 1"]["minimum distance"] + minDistanceDelta
-edge = sqrt(2) * minDistance
+minDistanceMax = maximum(interMinDistances) + minDistanceDelta
+edge = sqrt(2) * minDistanceMax
 numbers = floor(Int64, 2 * boxSize / edge)
 for i = 1:size(numbers, 1)
     if isodd(numbers[i])
-        numbers[i] -= (boxSize[i] - (numbers[i] - 1) * edge / 2) < minDistance ? 1 : 0
+        numbers[i] -= (boxSize[i] - (numbers[i] - 1) * edge / 2) < minDistanceMax ? 1 : 0
     end
 end
 numExcluded = 0
@@ -57,7 +42,7 @@ end
 
 positions = zeros(Float64, 3, numParticles)
 iCounter = iParticle = 0
-ijk_offset = map(i -> iseven(i) ? 1 : 0, numbers)
+ijkOffset = map(i -> iseven(i) ? 1 : 0, numbers)
 for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
     if isodd(i + j + k)
         continue
@@ -67,10 +52,16 @@ for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
         continue
     end
     iParticle += 1
-    positions[:, iParticle] = PLMC.folded(boxSize, ([i, j, k] + ijk_offset) * edge/2 - boxSize/2)
+    positions[:, iParticle] = PLMC.folded(boxSize,
+        ([i, j, k] + ijkOffset) * edge/2 - boxSize/2)
 end
+positions = positions[:, randperm(size(positions, 2))]
 
-output_file = open(inputData["Mixture"]["Component 1"]["initial coordinates"], "w")
-println(output_file, "# number    ", numParticles)
-println(output_file, "# position_x  position_y  position_z")
-writedlm(output_file, positions')
+iParticleMin = 1
+for iComponent = 1:size(components, 1)
+    iParticleMax = iParticleMin - 1 + components[iComponent].num
+    components[iComponent].positions = positions[:, iParticleMin:iParticleMax]
+    iParticleMin = iParticleMax + 1
+
+    PLMC.write(components, iComponent, inputData)
+end
