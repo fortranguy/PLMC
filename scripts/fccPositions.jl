@@ -27,7 +27,9 @@ for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
 end
 numParticlesMax = prod(numbers) - numExcluded
 if numParticles > numParticlesMax
-    error("Too many particles. Max =", numParticlesMax)
+    error("Too many particles. Max = ", numParticlesMax)
+else
+    println("Capacity = ", numParticles / numParticlesMax * 100, "%")
 end
 
 toDelete = zeros(Int64, numParticlesMax - numParticles)
