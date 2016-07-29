@@ -261,11 +261,13 @@ contains
 
         delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        call random_number(rand)
-        if (rand < exp(-delta_energy/this%environment%temperature%get())) then
-            call this%update_actor(i_actor, new, old)
+        if (delta_energy <= 0._DP) then
             success = .true.
+        else
+            call random_number(rand)
+            if (rand < exp(-delta_energy/this%environment%temperature%get())) success = .true.
         end if
+        if (success) call this%update_actor(i_actor, new, old)
     end subroutine Abstract_test_metropolis
 
 !end implementation Abstract_One_Particle_Move

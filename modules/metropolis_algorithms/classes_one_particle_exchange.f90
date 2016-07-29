@@ -251,7 +251,7 @@ contains
         type(Concrete_Temporary_Particle) :: particle
         real(DP) :: delta_energy
         logical :: abort, overlap
-        real(DP) :: rand
+        real(DP) :: acceptation_probability, rand
 
         success = .false.
         call this%define_exchange(abort, particle, i_actor)
@@ -266,11 +266,14 @@ contains
 
         delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        call random_number(rand)
-        if (rand < this%acceptation_probability(i_actor, delta_energy)) then
-            call this%update_actor(i_actor, particle)
+        acceptation_probability = this%acceptation_probability(i_actor, delta_energy)
+        if (acceptation_probability >= 1._DP) then
             success = .true.
+        else
+            call random_number(rand)
+            if (rand < acceptation_probability) success = .true.
         end if
+        if (success) call this%update_actor(i_actor, particle)
     end subroutine Abstract_test_metropolis
 
 !end implementation Abstract_One_Particle_Exchange

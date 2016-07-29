@@ -181,7 +181,7 @@ contains
         type(Concrete_Temporary_Particle) :: particles(2)
         real(DP) :: delta_energy
         logical :: abort, overlap
-        real(DP) :: rand
+        real(DP) :: acceptation_probability, rand
 
         success = .false.
         call this%define_transmutation(abort, particles, ij_actors)
@@ -196,11 +196,14 @@ contains
 
         delta_energy = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        call random_number(rand)
-        if (rand < this%acceptation_probability(ij_actors, delta_energy)) then
-            call this%update_actors(ij_actors, particles)
+        acceptation_probability = this%acceptation_probability(ij_actors, delta_energy)
+        if (acceptation_probability >= 1._DP) then
             success = .true.
+        else
+            call random_number(rand)
+            if (rand < acceptation_probability) success = .true.
         end if
+        if (success) call this%update_actors(ij_actors, particles)
     end subroutine Abstract_test_metropolis
 
     subroutine Abstract_define_transmutation(this, abort, particles, ij_actors)
