@@ -1,6 +1,6 @@
 module classes_component_average_number
 
-use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_component_number, only: Abstract_Component_Number
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential
 
@@ -39,7 +39,7 @@ private
 
     type, extends(Abstract_Component_Average_Number), public :: Variable_Component_Average_Number
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Parallelepiped_Domain), pointer :: accessible_domain => null()
         class(Abstract_Component_Chemical_Potential), pointer :: chemical_potential => null()
     contains
         procedure :: construct => Variable_construct
@@ -81,12 +81,12 @@ contains
 
 !implementation Variable_Component_Average_Number
 
-    subroutine Variable_construct(this, periodic_box, chemical_potential)
+    subroutine Variable_construct(this, accessible_domain, chemical_potential)
         class(Variable_Component_Average_Number), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), target, intent(in) :: accessible_domain
         class(Abstract_Component_Chemical_Potential), target, intent(in) :: chemical_potential
 
-        this%periodic_box => periodic_box
+        this%accessible_domain => accessible_domain
         this%chemical_potential => chemical_potential
     end subroutine Variable_construct
 
@@ -94,14 +94,14 @@ contains
         class(Variable_Component_Average_Number), intent(inout) :: this
 
         this%chemical_potential => null()
-        this%periodic_box => null()
+        this%accessible_domain => null()
     end subroutine Variable_destroy
 
-    !> This value may be higher than expected if the are walls, cf. [[Abstract_Visitable_Walls]].
+    !> Warning: this value may fluctuate if the volume changes. Average volume needed?
     pure integer function Variable_get(this) result(average_number)
         class(Variable_Component_Average_Number), intent(in) :: this
 
-        average_number = this%chemical_potential%get_density() * product(this%periodic_box%&
+        average_number = this%chemical_potential%get_density() * product(this%accessible_domain%&
             get_size())
     end function Variable_get
 

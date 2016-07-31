@@ -4,6 +4,7 @@ use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found, check_positive
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_component_factory, only: component_create => create, component_destroy => destroy
@@ -37,7 +38,8 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call mixture_create(mixture%components, environment%periodic_box, generating_data, prefix)
+        call mixture_create(mixture%components, environment%periodic_box, environment%&
+            accessible_domain, generating_data, prefix)
         call hard_core_create(mixture%components_min_distances, mixture%components, &
             generating_data, prefix)
         call hard_core_create(mixture%wall_min_distances, environment%wall_min_distance, mixture%&
@@ -54,9 +56,11 @@ contains
         call mixture_destroy(mixture%components)
     end subroutine destroy_all
 
-    subroutine create_components(components, periodic_box, generating_data, prefix)
+    subroutine create_components(components, periodic_box, accessible_domain, generating_data, &
+        prefix)
         type(Component_Wrapper), allocatable, intent(out) :: components(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
@@ -77,7 +81,7 @@ contains
         end if
         allocate(components(num_components))
         do i_component = 1, size(components)
-            call component_create(components(i_component), exists, periodic_box, &
+            call component_create(components(i_component), exists, periodic_box, accessible_domain,&
                 generating_data, prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine create_components

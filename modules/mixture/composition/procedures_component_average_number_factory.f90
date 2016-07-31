@@ -1,7 +1,7 @@
 module procedures_component_average_number_factory
 
 use procedures_errors, only: error_exit
-use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_component_number, only: Abstract_Component_Number
 use classes_component_chemical_potential, only : Abstract_Component_Chemical_Potential
 use classes_component_average_number, only: Abstract_Component_Average_Number, &
@@ -16,9 +16,9 @@ public :: create, destroy
 
 contains
 
-    subroutine create(average_number, periodic_box, number, chemical_potential)
+    subroutine create(average_number, accessible_domain, number, chemical_potential)
         class(Abstract_Component_Average_Number), allocatable, intent(out) :: average_number
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
         class(Abstract_Component_Number), intent(in) :: number
         class(Abstract_Component_Chemical_Potential), intent(in) :: chemical_potential
 
@@ -32,7 +32,7 @@ contains
             type is (Constant_Component_Average_Number)
                 call average_number%construct(number)
             type is (Variable_Component_Average_Number)
-                call average_number%construct(periodic_box, chemical_potential)
+                call average_number%construct(accessible_domain, chemical_potential)
             type is (Null_Component_Average_Number)
                 call average_number%construct()
             class default

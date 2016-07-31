@@ -2,6 +2,7 @@ module procedures_component_factory
 
 use json_module, only: json_file
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_coordinates_factory, only: coordinates_create => create, &
     coordinates_destroy => destroy
 use procedures_composition_factory, only: composition_create => create, &
@@ -16,10 +17,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(component, exists, periodic_box, generating_data, prefix)
+    subroutine create(component, exists, periodic_box, accessible_domain, generating_data, prefix)
         type(Component_Wrapper), intent(out) :: component
         logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
@@ -33,7 +35,7 @@ contains
             generating_data, prefix)
         can_exchange = exists .and. component_can_exchange(generating_data, prefix)
         call composition_create(component%chemical_potential, can_exchange, generating_data, prefix)
-        call composition_create(component%average_number, periodic_box, component%number, &
+        call composition_create(component%average_number, accessible_domain, component%number, &
             component%chemical_potential)
     end subroutine create
 
