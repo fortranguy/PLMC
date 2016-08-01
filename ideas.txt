@@ -1,0 +1,1 @@
+- NeighbourCells: pointer to VisitableCells when reset?

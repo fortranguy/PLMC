@@ -20,6 +20,7 @@ private
     contains
         procedure(Abstract_destroy), deferred :: destroy
         procedure :: set_all => Abstract_set_all
+        !procedure :: rescale_all
         procedure(Abstract_set), deferred :: set
         procedure :: get_num => Abstract_get_num
         procedure :: get => Abstract_get

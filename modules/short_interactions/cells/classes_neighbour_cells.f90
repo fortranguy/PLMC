@@ -92,7 +92,7 @@ contains
 
         this%accessible_domain => accessible_domain
         if (pair_potential%get_max_distance() - pair_potential%get_min_distance() >= hard_contact%&
-            get_width()) then !volume dependency?
+            get_width()) then
             this%max_distance = pair_potential%get_max_distance()
         else
             this%max_distance = pair_potential%get_max_distance() + hard_contact%get_width()
@@ -110,7 +110,11 @@ contains
     subroutine Abstract_reset(this)
         class(Abstract_Neighbour_Cells), intent(inout) :: this
 
-        this%nums = floor(this%accessible_domain%get_size()/this%max_distance)
+        integer :: nums(num_dimensions)
+
+        nums = floor(this%accessible_domain%get_size() / this%max_distance)
+        if (all(this%nums == nums)) return
+        this%nums = nums
         call this%check_nums()
         this%size = this%accessible_domain%get_size() / real(this%nums, DP)
         call this%check_size()
@@ -138,6 +142,7 @@ contains
             call error_exit("Abstract_Neighbour_Cells: check_size: "//&
                             "this%size is not a divisor of accessible_domain%get_size()")
         end if
+        ! rewrite to be smarter: handle exception
     end subroutine Abstract_check_size
 
     subroutine Abstract_set_neighbours(this)

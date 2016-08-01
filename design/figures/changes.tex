@@ -18,7 +18,7 @@
 
         \begin{scope}[shift={($(ChangesComponent.north) - (7.5 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{MovedCoordinates}{0, 0}
-                \operation[0]{\procedure{construct}{...}}
+                \operation[0]{\procedure{construct}{\ldots}}
                 \operation[0]{\procedure{destroy}{}}
                 \operation[0]{\procedure{increaseDelta}{}}
                 \operation[0]{\procedure{decreaseDelta}{}}
@@ -46,7 +46,7 @@
 
         \begin{scope}[shift={($(MoveTuner.north) + (8.5 cm, -1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{CoordinatesCopier}{0, 0}
-                \operation{\procedure{construct}{...}}
+                \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{copy}{target: \type{real[3]}, source: \type{real[3]},
                     ijComponents: \type{int[2]}}}
