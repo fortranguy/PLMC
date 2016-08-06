@@ -1,5 +1,6 @@
 \documentclass{standalone}
 
+\usepackage{luatex85}
 \input figures/figures.sty
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -101,15 +102,15 @@
 
         \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
-                \attribute{periodicBox: \type{PeriodicBox}}
-                \attribute{temperature: \type{Temperature}}
-                \attribute{permittivity: \type{Permittivity}}
-                \attribute{externalField: \type{ExternalField}}
-                \attribute{reciprocalLattice: \type{ReciprocalLattice}}
-                \attribute{wallMinDistance: \type{MinDistance}}
-                \attribute{wallsPotential: \type{VisitableWalls}}
-                \attribute{boxSizeChecker: \type{BoxSizeChecker}}
-                \attribute{accessibleDomain: \type{ParallelepipedDomain}}
+                \UMLattribute{periodicBox: \type{PeriodicBox}}
+                \UMLattribute{temperature: \type{Temperature}}
+                \UMLattribute{permittivity: \type{Permittivity}}
+                \UMLattribute{externalField: \type{ExternalField}}
+                \UMLattribute{reciprocalLattice: \type{ReciprocalLattice}}
+                \UMLattribute{wallMinDistance: \type{MinDistance}}
+                \UMLattribute{wallsPotential: \type{VisitableWalls}}
+                \UMLattribute{boxSizeChecker: \type{BoxSizeChecker}}
+                \UMLattribute{accessibleDomain: \type{ParallelepipedDomain}}
             \end{class}
         \end{scope}
 

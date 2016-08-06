@@ -12,7 +12,11 @@
 \newcommand{\procedure}[2]{\textcolor{blue}{#1(}{#2}\textcolor{blue}{)}}
 \def\import{\textcolor{olive}{Import}}
 
+%lualatex can't compile because of \attribute conflict
+\usepackage{savesym}
+\savesymbol{attribute}
 \usepackage[simplified]{pgf-umlcd}
+\restoresymbol{UML}{attribute}
 \usetikzlibrary{calc, backgrounds}
 \def\scale{0.75}
 \pgfmathsetmacro{\smallTextWidth}{5 cm}

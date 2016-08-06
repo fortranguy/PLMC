@@ -1,5 +1,6 @@
 \documentclass{standalone}
 
+\usepackage{luatex85}
 \input figures/figures.sty
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -190,18 +191,18 @@
 
         \begin{scope}[shift={($(DESreciWeight.north -| DESreciStructure)$)}]
             \begin{class}[text width=\mediumTextWidth]{DipolarInteractions}{0, 0}
-                \attribute{alpha: \type{DESconvergenceParameter}}
-                \attribute{realPair: \type{DESrealPair}}
-                \attribute{realComponents: \type{DESrealComponent[::]}}
-                \attribute{realVisitor: \type{DESrealVisitor}}
-                \attribute{reciWeight: \type{DESreciWeight}}
-                \attribute{reciStructure: \type{DESreciStructure}}
-                \attribute{reciVisitor: \type{DESreciVisitor}}
-                \attribute{selfComponents: \type{DESselfComponent[:]}}
-                \attribute{surfMixture: \type{DESsurfMixture}}
-                \attribute{dlcWeight: \type{DLCweight}}
-                \attribute{dlcStructures: \type{DLCstructures}}
-                \attribute{dlcVisitor: \type{DLCvisitor}}
+                \UMLattribute{alpha: \type{DESconvergenceParameter}}
+                \UMLattribute{realPair: \type{DESrealPair}}
+                \UMLattribute{realComponents: \type{DESrealComponent[::]}}
+                \UMLattribute{realVisitor: \type{DESrealVisitor}}
+                \UMLattribute{reciWeight: \type{DESreciWeight}}
+                \UMLattribute{reciStructure: \type{DESreciStructure}}
+                \UMLattribute{reciVisitor: \type{DESreciVisitor}}
+                \UMLattribute{selfComponents: \type{DESselfComponent[:]}}
+                \UMLattribute{surfMixture: \type{DESsurfMixture}}
+                \UMLattribute{dlcWeight: \type{DLCweight}}
+                \UMLattribute{dlcStructures: \type{DLCstructures}}
+                \UMLattribute{dlcVisitor: \type{DLCvisitor}}
             \end{class}
         \end{scope}
 

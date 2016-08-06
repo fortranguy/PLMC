@@ -1,5 +1,6 @@
 \documentclass{standalone}
 
+\usepackage{luatex85}
 \input figures/figures.sty
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -18,22 +19,22 @@
 
         \begin{scope}[shift={($(HeteroCouples.south) - (0 cm, 2 cm)$)}]
             \begin{class}[text width=\smallTextWidth]{PotentialDomain}{0, 0}
-                \attribute{min: \type{real}}
-                \attribute{delta: \type{real}}
+                \UMLattribute{min: \type{real}}
+                \UMLattribute{delta: \type{real}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(PotentialDomain.south) + (-4 cm, -2 cm)$)}]
             \begin{class}[text width=\smallTextWidth]{ShortPotentialDomain}{0, 0}
                 \inherit{PotentialDomain}
-                \attribute{max: \type{real}}
+                \UMLattribute{max: \type{real}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(PotentialDomain.south) + (4 cm, -2 cm)$)}]
             \begin{class}[text width=\smallTextWidth]{DipolarPotentialDomain}{0, 0}
                 \inherit{PotentialDomain}
-                \attribute{maxOverBox: \type{real}}
+                \UMLattribute{maxOverBox: \type{real}}
             \end{class}
         \end{scope}
 

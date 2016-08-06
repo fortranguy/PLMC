@@ -40,15 +40,16 @@ contains
 
         this%periodic_box => periodic_box
         this%positions => positions
-        call check_array_size("Concrete_Translated_Positions", "delta", delta, num_dimensions)
-        call check_positive("Concrete_Translated_Positions", "delta", delta)
+        call check_array_size("Concrete_Translated_Positions: construct", "delta", delta, &
+            num_dimensions)
+        call check_positive("Concrete_Translated_Positions: construct", "delta", delta)
         this%delta = delta
-        call check_increase_factor("Concrete_Translated_Positions", "increase_factor", &
+        call check_increase_factor("Concrete_Translated_Positions: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
         this%current_increase_factor = this%tuning_parameters%increase_factor
-        call check_increase_factor("Concrete_Translated_Positions", "increase_factor_max", &
-            tuning_parameters%increase_factor_max)
+        call check_increase_factor("Concrete_Translated_Positions: construct", &
+            "increase_factor_max", tuning_parameters%increase_factor_max)
         this%tuning_parameters%increase_factor_max = tuning_parameters%increase_factor_max
     end subroutine Concrete_construct
 

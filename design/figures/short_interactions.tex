@@ -1,5 +1,6 @@
 \documentclass{standalone}
 
+\usepackage{luatex85}
 \input figures/figures.sty
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -103,12 +104,12 @@
 
         \begin{scope}[shift={($(VisitableCells.north) + (9 cm, 0 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{ShortInteractions}{0, 0}
-                \attribute{wallsVisitor: \type{WallsVisitor}}
-                \attribute{wallPairs: \type{PairPotential[:]}}
-                \attribute{componentsVisitor: \type{ShortPairsVisitor}}
-                \attribute{componentsPairs: \type{PairPotential[:.]}}
-                \attribute{neighbourCells: \type{NeighbourCells[:.]}}
-                \attribute{visitableCells: \type{VisitableCells[::]}}
+                \UMLattribute{wallsVisitor: \type{WallsVisitor}}
+                \UMLattribute{wallPairs: \type{PairPotential[:]}}
+                \UMLattribute{componentsVisitor: \type{ShortPairsVisitor}}
+                \UMLattribute{componentsPairs: \type{PairPotential[:.]}}
+                \UMLattribute{neighbourCells: \type{NeighbourCells[:.]}}
+                \UMLattribute{visitableCells: \type{VisitableCells[::]}}
             \end{class}
         \end{scope}
 

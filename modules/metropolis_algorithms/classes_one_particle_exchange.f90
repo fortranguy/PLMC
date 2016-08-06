@@ -543,7 +543,7 @@ contains
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: particle
         integer, intent(in) :: i_actor
-        particle%i = 0; particle%position = 0._DP; particle%orientation = 0._DP
+        abort = .true.; particle%i = 0; particle%position = 0._DP; particle%orientation = 0._DP
         particle%dipolar_moment = 0._DP
     end subroutine Null_define_exchange
 
@@ -568,7 +568,7 @@ contains
         real(DP), intent(out) :: delta
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        delta = 0._DP
+        overlap = .false.; delta = 0._DP
     end subroutine Null_visit_walls
 
     subroutine Null_visit_short(this, overlap, deltas, i_actor, particle)
@@ -577,7 +577,7 @@ contains
         real(DP), intent(out) :: deltas(:)
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        deltas = 0._DP
+        overlap = .false.; deltas = 0._DP
     end subroutine Null_visit_short
 
     subroutine Null_visit_dipolar(this, deltas, mixture_delta, i_actor, particle)

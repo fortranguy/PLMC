@@ -36,14 +36,14 @@ contains
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
 
         this%orientations => orientations
-        call check_positive("Concrete_Rotated_Orientations", "delta", delta)
+        call check_positive("Concrete_Rotated_Orientations: construct", "delta", delta)
         this%delta = delta
-        call check_increase_factor("Concrete_Rotated_Orientations", "increase_factor", &
+        call check_increase_factor("Concrete_Rotated_Orientations: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
         this%current_increase_factor = this%tuning_parameters%increase_factor
-        call check_increase_factor("Concrete_Rotated_Orientations", "increase_factor_max", &
-            tuning_parameters%increase_factor_max)
+        call check_increase_factor("Concrete_Rotated_Orientations: construct", &
+            "increase_factor_max", tuning_parameters%increase_factor_max)
         this%tuning_parameters%increase_factor_max = tuning_parameters%increase_factor_max
     end subroutine Concrete_construct
 

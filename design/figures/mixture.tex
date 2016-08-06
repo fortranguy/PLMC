@@ -1,5 +1,6 @@
 \documentclass{standalone}
 
+\usepackage{luatex85}
 \input figures/figures.sty
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -53,11 +54,11 @@
 
         \begin{scope}[shift={($(ComponentDipolarMoments.north) + (0 cm, 4.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{Component}{0, 0}
-                \attribute{number: \type{ComponentNumber}}
-                \attribute{positions: \type{ComponentCoordinates}}
-                \attribute{orientations: \type{ComponentCoordinates}}
-                \attribute{chemicalPotential: \type{ComponentChemicalPotential}}
-                \attribute{dipolarMoments: \type{ComponentDipolarMoments}}
+                \UMLattribute{number: \type{ComponentNumber}}
+                \UMLattribute{positions: \type{ComponentCoordinates}}
+                \UMLattribute{orientations: \type{ComponentCoordinates}}
+                \UMLattribute{chemicalPotential: \type{ComponentChemicalPotential}}
+                \UMLattribute{dipolarMoments: \type{ComponentDipolarMoments}}
             \end{class}
         \end{scope}
 
@@ -92,19 +93,19 @@
 
         \begin{scope}[shift={($(Coordinates.north |- Component.north)$)}]
             \begin{class}[text width=\smallTextWidth]{TemporaryParticle}{0, 0}
-                \attribute{i: \type{int}}
-                \attribute{position: \type{real[3]}}
-                \attribute{orientation: \type{real[3]}}
-                \attribute{dipolarMoment: \type{real[3]}}
+                \UMLattribute{i: \type{int}}
+                \UMLattribute{position: \type{real[3]}}
+                \UMLattribute{orientation: \type{real[3]}}
+                \UMLattribute{dipolarMoment: \type{real[3]}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
             \begin{class}[text width=\mediumTextWidth]{Mixture}{0, 0}
-                \attribute{components: \type{Component[:]}}
-                \attribute{componentsMinDistances: \type{MinDistance[:.]}}
-                \attribute{wallMinDistances: \type{MinDistance[:]}}
-                \attribute{totalMoment: \type{MixtureTotalMoment}}
+                \UMLattribute{components: \type{Component[:]}}
+                \UMLattribute{componentsMinDistances: \type{MinDistance[:.]}}
+                \UMLattribute{wallMinDistances: \type{MinDistance[:]}}
+                \UMLattribute{totalMoment: \type{MixtureTotalMoment}}
             \end{class}
         \end{scope}
 

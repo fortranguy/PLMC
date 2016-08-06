@@ -1,5 +1,6 @@
 \documentclass{standalone}
 
+\usepackage{luatex85}
 \input figures/figures.sty
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -9,10 +10,10 @@
 
         \begin{scope}
             \begin{class}[text width=\mediumTextWidth]{ChangesComponent}{0, 0}
-                \attribute{translatedPositions: \type{MovedCoordinates}}
-                \attribute{rotatedOrientations: \type{MovedCoordinates}}
-                \attribute{translationTuner: \type{MoveTuner}}
-                \attribute{rotationTuner: \type{MoveTuner}}
+                \UMLattribute{translatedPositions: \type{MovedCoordinates}}
+                \UMLattribute{rotatedOrientations: \type{MovedCoordinates}}
+                \UMLattribute{translationTuner: \type{MoveTuner}}
+                \UMLattribute{rotationTuner: \type{MoveTuner}}
             \end{class}
         \end{scope}
 
@@ -38,13 +39,20 @@
 
         \begin{scope}[shift={($(MovedCoordinates |- MoveTuner.north)$)}]
             \begin{class}[text width=\smallTextWidth]{MoveTunerParameters}{0, 0}
-                \attribute{accumulationPeriod: \type{int}}
-                \attribute{wantedSuccessRatio: \type{real}}
-                \attribute{tolerance: \type{real}}
+                \UMLattribute{accumulationPeriod: \type{int}}
+                \UMLattribute{wantedSuccessRatio: \type{real}}
+                \UMLattribute{tolerance: \type{real}}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(MoveTuner.north) + (8.5 cm, -1.5 cm)$)}]
+        \begin{scope}[shift={($(MoveTunerParameters.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ChangedBoxSize}{0, 0}
+                \operation{\procedure{set}{delta: \type{real}}}
+                \operation{\procedure{getRatio}{}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(MoveTuner.north) + (8.5 cm, -2 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{CoordinatesCopier}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
@@ -53,13 +61,14 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(CoordinatesCopier.north) + (0 cm, 4 cm)$)}]
+        \begin{scope}[shift={($(CoordinatesCopier.north) + (0 cm, 4.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{Changes}{0, 0}
-            \attribute{randomPosition: \type{RandomCoordinates}}
-            \attribute{randomOrientation: \type{RandomCoordinates}}
-            \attribute{positionCopier: \type{CoordinatesCopier}}
-            \attribute{orientationCopier: \type{CoordinatesCopier}}
-            \attribute{components: \type{ChangesComponent[:]}}
+                \UMLattribute{changedVolume: \type{ChangedVolume}}
+                \UMLattribute{randomPosition: \type{RandomCoordinates}}
+                \UMLattribute{randomOrientation: \type{RandomCoordinates}}
+                \UMLattribute{positionCopier: \type{CoordinatesCopier}}
+                \UMLattribute{orientationCopier: \type{CoordinatesCopier}}
+                \UMLattribute{components: \type{ChangesComponent[:]}}
             \end{class}
         \end{scope}
 

@@ -1,1 +1,2 @@
 - NeighbourCells: pointer to VisitableCells when reset?
+- Make an AdaptableChange inherited by MovedCoordinates & ChangedVolume
