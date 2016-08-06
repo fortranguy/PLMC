@@ -20,7 +20,7 @@ private
     contains
         procedure(Abstract_destroy), deferred :: destroy
         procedure :: set_all => Abstract_set_all
-        !procedure :: rescale_all
+        procedure(Abstract_rescale_all), deferred :: rescale_all
         procedure(Abstract_set), deferred :: set
         procedure :: get_num => Abstract_get_num
         procedure :: get => Abstract_get
@@ -35,6 +35,12 @@ private
         import Abstract_Component_Coordinates
             class(Abstract_Component_Coordinates), intent(inout) :: this
         end subroutine Abstract_destroy
+
+        subroutine Abstract_rescale_all(this, ratio)
+        import :: DP, num_dimensions, Abstract_Component_Coordinates
+            class(Abstract_Component_Coordinates), intent(inout) :: this
+            real(DP), intent(in) :: ratio(num_dimensions)
+        end subroutine Abstract_rescale_all
 
         subroutine Abstract_set(this, i_particle, vector)
         import :: DP, Abstract_Component_Coordinates
@@ -51,6 +57,7 @@ private
     contains
         procedure :: construct => Positions_construct
         procedure :: destroy => Positions_destroy
+        procedure :: rescale_all => Positions_rescale_all
         procedure :: set => Positions_set
     end type Concrete_Component_Positions
 
@@ -58,6 +65,7 @@ private
     contains
         procedure :: construct => Orientations_construct
         procedure :: destroy => Orientations_destroy
+        procedure :: rescale_all => Orientations_rescale_all
         procedure :: set => Orientations_set
     end type Concrete_Component_Orientations
 
@@ -66,6 +74,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: set_all => Null_set_all
+        procedure :: rescale_all => Null_rescale_all
         procedure :: set => Null_set
         procedure :: get_num => Null_get_num
         procedure :: get => Null_get
@@ -83,15 +92,15 @@ contains
 
         integer :: i_particle
 
-        if (this%get_num() /= size(coordinates, 2)) then
+        if (this%number%get() /= size(coordinates, 2)) then
             call error_exit("Abstract_Component_Coordinates: set_all: numbers do not match.")
         end if
-        if (size(this%coordinates, 2) < this%get_num()) then
+        if (size(this%coordinates, 2) < this%number%get()) then
             deallocate(this%coordinates)
-            allocate(this%coordinates(num_dimensions, this%get_num()))
+            allocate(this%coordinates(num_dimensions, this%number%get()))
         end if
 
-        do i_particle = 1, this%get_num()
+        do i_particle = 1, this%number%get()
             call this%set(i_particle, coordinates(:, i_particle))
         end do
     end subroutine Abstract_set_all
@@ -163,6 +172,18 @@ contains
         this%periodic_box => null()
     end subroutine Positions_destroy
 
+    subroutine Positions_rescale_all(this, ratio)
+        class(Concrete_Component_Positions), intent(inout) :: this
+        real(DP), intent(in) :: ratio(num_dimensions)
+
+        integer :: i_particle
+
+        call check_positive("Concrete_Component_Positions: rescale_all", "ratio", ratio)
+        do i_particle = 1, this%number%get()
+            this%coordinates(:, i_particle) = ratio * this%coordinates(:, i_particle)
+        end do
+    end subroutine Positions_rescale_all
+
     subroutine Positions_set(this, i_particle, vector)
         class(Concrete_Component_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
@@ -195,6 +216,11 @@ contains
         this%number => null()
     end subroutine Orientations_destroy
 
+    subroutine Orientations_rescale_all(this, ratio)
+        class(Concrete_Component_Orientations), intent(inout) :: this
+        real(DP), intent(in) :: ratio(num_dimensions)
+    end subroutine Orientations_rescale_all
+
     subroutine Orientations_set(this, i_particle, vector)
         class(Concrete_Component_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
@@ -225,6 +251,11 @@ contains
         class(Null_Component_Coordinates), intent(inout) :: this
         real(DP), intent(in) :: coordinates(:, :)
     end subroutine Null_set_all
+
+    subroutine Null_rescale_all(this, ratio)
+        class(Null_Component_Coordinates), intent(inout) :: this
+        real(DP), intent(in) :: ratio(num_dimensions)
+    end subroutine Null_rescale_all
 
     subroutine Null_set(this, i_particle, vector)
         class(Null_Component_Coordinates), intent(inout) :: this
