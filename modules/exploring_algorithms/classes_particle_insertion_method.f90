@@ -10,7 +10,7 @@ use procedures_visit_condition, only: visit_condition_different => different
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add
 use classes_random_coordinates, only: Abstract_Random_Coordinates
-use types_temporary_observables, only: Concrete_Single_Delta_Energies
+use types_temporary_observables, only: Concrete_Single_Energies
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 
 implicit none
@@ -88,7 +88,7 @@ contains
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
         real(DP) :: inv_pow_activity_sum, delta_energy
-        type(Concrete_Single_Delta_Energies) :: deltas
+        type(Concrete_Single_Energies) :: deltas
         type(Concrete_Temporary_Particle) :: test
         integer :: i_component, i_particle
         logical :: overlap

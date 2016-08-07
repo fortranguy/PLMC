@@ -14,6 +14,8 @@ private
         real(DP), allocatable :: field_energies(:), walls_energies(:)
         type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_mixture_energy = 0._DP
+        type(Concrete_Change_Counter) :: volume_change_counter
+        real(DP) :: volume_change_success
         type(Concrete_Changes_Counter), allocatable :: changes_counters(:)
         type(Concrete_Changes_Success), allocatable :: changes_sucesses(:)
         type(Concrete_Change_Counters_Line), allocatable :: switches_counters(:)

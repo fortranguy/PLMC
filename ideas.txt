@@ -1,2 +1,3 @@
 - NeighbourCells: pointer to VisitableCells when reset?
 - Make an AdaptableChange inherited by MovedCoordinates & ChangedVolume
+- Concrete_Energies in Generating/ExplorgingObservables?

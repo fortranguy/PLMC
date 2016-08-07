@@ -14,8 +14,8 @@ use procedures_visit_condition, only: visit_condition_in_range => in_range, &
 use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
-use types_reals_line, only: Reals_Line
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use types_reals_line, only: Reals_Line
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use procedures_observables_factory_micro, only: create_triangle_nodes, destroy_triangle_nodes

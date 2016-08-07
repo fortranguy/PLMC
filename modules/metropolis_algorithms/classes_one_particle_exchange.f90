@@ -13,7 +13,7 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_changes_wrapper, only: Changes_Wrapper
-use types_temporary_observables, only: Concrete_Single_Delta_Energies
+use types_temporary_observables, only: Concrete_Single_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
@@ -222,7 +222,7 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        type(Concrete_Single_Delta_Energies) :: deltas
+        type(Concrete_Single_Energies) :: deltas
         integer :: i_actor
 
         i_actor = this%selector%get()
@@ -245,7 +245,7 @@ contains
     subroutine Abstract_test_metropolis(this, success, deltas, i_actor)
         class(Abstract_One_Particle_Exchange), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Single_Delta_Energies), intent(inout) :: deltas
+        type(Concrete_Single_Energies), intent(inout) :: deltas
         integer, intent(in) :: i_actor
 
         type(Concrete_Temporary_Particle) :: particle

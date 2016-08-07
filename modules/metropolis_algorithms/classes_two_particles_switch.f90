@@ -11,7 +11,7 @@ use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_translation => visit_translation
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use classes_hetero_couples, only: Abstract_Hetero_Couples
-use types_temporary_observables, only: Concrete_Double_Delta_Energies
+use types_temporary_observables, only: Concrete_Double_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
@@ -128,7 +128,7 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        type(Concrete_Double_Delta_Energies) :: deltas
+        type(Concrete_Double_Energies) :: deltas
         integer :: ij_actors(2), i
 
         ij_actors = this%couples%get(this%selector%get())
@@ -157,7 +157,7 @@ contains
     subroutine Abstract_test_metropolis(this, success, deltas, ij_actors)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Double_Delta_Energies), intent(inout) :: deltas
+        type(Concrete_Double_Energies), intent(inout) :: deltas
         integer, intent(in) :: ij_actors(:)
 
         type(Concrete_Temporary_Particle) :: new(2), old(2)
@@ -378,7 +378,7 @@ contains
     subroutine Null_test_metropolis(this, success, deltas, ij_actors)
         class(Null_Two_Particles_Switch), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Double_Delta_Energies), intent(inout) :: deltas
+        type(Concrete_Double_Energies), intent(inout) :: deltas
         integer, intent(in) :: ij_actors(:)
         success = .false.
         deltas%field = 0._DP; deltas%walls = 0._DP; deltas%short = 0._DP; deltas%dipolar = 0._DP
