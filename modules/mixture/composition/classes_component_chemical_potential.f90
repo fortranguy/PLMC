@@ -37,7 +37,8 @@ contains
 
     subroutine Abstract_set(this, density, inv_pow_activity)
         class(Abstract_Component_Chemical_Potential), intent(inout) :: this
-        real(DP), intent(in) :: density, inv_pow_activity
+        real(DP), intent(in) :: density !! if with walls: \( \frac{N}{(H-\sigma) S} \)
+        real(DP), intent(in) :: inv_pow_activity
 
         call check_positive("Abstract_Component_Chemical_Potential", "density", density)
         this%density = density
@@ -46,6 +47,7 @@ contains
         this%inv_pow_activity = inv_pow_activity
     end subroutine Abstract_set
 
+    !> \( \rho \)
     pure function Abstract_get_density(this) result(density)
         class(Abstract_Component_Chemical_Potential), intent(in) :: this
         real(DP) :: density

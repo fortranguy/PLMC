@@ -28,6 +28,7 @@ contains
         type(json_file), intent(inout) :: input_data
 
         call input_data%destroy()
+        if (input_data%failed()) call input_data%print_error_message(error_unit)
     end subroutine destroy_input
 
     subroutine create_output(json, output_data)

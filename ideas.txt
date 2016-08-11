@@ -1,3 +1,5 @@
 - NeighbourCells: pointer to VisitableCells when reset?
 - Make an AdaptableChange inherited by MovedCoordinates & ChangedVolume
 - Concrete_Energies in Generating/ExplorgingObservables?
+- In MetropolisAlgorithms: acceptation_probability: not really
+- Hide DLC in EwaldReci?

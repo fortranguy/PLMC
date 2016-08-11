@@ -8,7 +8,12 @@ use types_physical_model_wrapper, only: Physical_Model_Wrapper
 implicit none
 
 private
-public :: plmc_reset
+public :: plmc_reset, plmc_reset_cells
+
+interface plmc_reset_cells
+    module procedure :: reset_neighbour_cells
+    module procedure :: reset_visitable_cells
+end interface plmc_reset_cells
 
 contains
 

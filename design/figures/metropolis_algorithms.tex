@@ -65,6 +65,16 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(OneParticleExchange.south |- TwoParticlesTransmutation.north)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{BoxVolumeChange}{0, 0}
+                \inherit{MetropolisAlgorithm}
+                \operation{\procedure{construct}{environment: \type{Environment},
+                    mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
+                    changedBoxSize: \type{ChangedBoxSize}}}
+                \operation{\procedure{destroy}{}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(OneParticleExchange.north |- MetropolisAlgorithm.north)$)}]
             \begin{class}[text width=\mediumTextWidth]{MetropolisAlgorithms}{0, 0}
                 \UMLattribute{oneParticleTranslation: \type{OneParticleMove}}
@@ -79,7 +89,7 @@
                 \namespace{Mixture} :: Mixture, Component \\
                 \namespace{ShortInteractions} :: ShortInteractions \\
                 \namespace{DipolarInteractions} :: DipolarInteractions \\
-                \namespace{Changes} :: ChangesComponent, Changes \\
+                \namespace{Changes} :: ChangesComponent, Changes, ChangedBoxSize \\
                 \namespace{Observables} :: Observables};
         \end{scope}
 
