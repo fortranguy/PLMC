@@ -4,7 +4,7 @@
 !> \]
 !> with \( S(r) \) the area of a sphere.
 
-program plmc_radial_distribution
+program radial_intra
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_strings, only: max_line_length
@@ -114,4 +114,4 @@ implicit none
     close(bins_unit)
     deallocate(bins_function)
 
-end program plmc_radial_distribution
+end program radial_intra

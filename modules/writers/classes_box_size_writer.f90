@@ -18,8 +18,10 @@ private
         integer :: period = 0
         type(Concrete_Number_to_String) :: string_step
     contains
+        procedure :: construct_new => Abstract_construct_new
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: write_new => Abstract_write_new
         procedure :: write => Abstract_write
     end type Abstract_Box_Size_Writer
 
@@ -38,16 +40,23 @@ contains
 
 !implementation Abstract_Box_Size_Writer
 
+    subroutine Abstract_construct_new(this, periodic_box)
+        class(Abstract_Box_Size_Writer), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+
+        this%periodic_box => periodic_box
+        this%legend = "# box_size:"
+    end subroutine Abstract_construct_new
+
     subroutine Abstract_construct(this, periodic_box, period, basename)
         class(Abstract_Box_Size_Writer), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         integer, intent(in) :: period
         character(len=*), intent(in) :: basename
 
-        this%periodic_box => periodic_box
         call check_string_not_empty("Abstract_Box_Size_Writer: construct: basename", basename)
         this%basename = basename
-        this%legend = "# size_x    size_y    size_z"
+
         call check_positive("Abstract_Box_Size_Writer: construct", "period", period)
         this%period = period
     end subroutine Abstract_construct
@@ -59,6 +68,13 @@ contains
         if (allocated(this%basename)) deallocate(this%basename)
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_write_new(this, coordinates_unit)
+        class(Abstract_Box_Size_Writer), intent(in) :: this
+        integer, intent(in) :: coordinates_unit
+
+        write(coordinates_unit, *) this%legend, this%periodic_box%get_size()
+    end subroutine Abstract_write_new
 
     subroutine Abstract_write(this, i_step)
         class(Abstract_Box_Size_Writer), intent(in) :: this

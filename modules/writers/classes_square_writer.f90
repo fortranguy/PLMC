@@ -84,7 +84,7 @@ contains
     subroutine Abstract_write(this, i_step, square)
         class(Abstract_Square_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP) :: square(:, :)
+        real(DP), intent(in) :: square(:, :)
 
         character(len=:), allocatable :: string
         integer :: i_component, j_component
@@ -116,7 +116,7 @@ contains
     subroutine Null_write(this, i_step, square)
         class(Null_Square_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP) :: square(:, :)
+        real(DP), intent(in) :: square(:, :)
     end subroutine Null_write
 
 !end implementation Null_Square_Writer

@@ -1,4 +1,4 @@
-program plmc_domain_z_distribution
+program z_density
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_constants, only: num_dimensions
@@ -115,4 +115,4 @@ implicit none
     call walls_destroy(floor_penetration)
     call box_destroy(periodic_box)
 
-end program plmc_domain_z_distribution
+end program z_density
