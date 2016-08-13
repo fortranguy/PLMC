@@ -712,9 +712,6 @@
 		<Unit filename="modules/short_interactions/types_short_interactions_wrapper.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/writers/classes_box_size_writer.f90">
-			<Option weight="3" />
-		</Unit>
 		<Unit filename="modules/writers/classes_changes_success_writer.f90">
 			<Option weight="2" />
 		</Unit>
@@ -736,11 +733,11 @@
 		<Unit filename="modules/writers/classes_triangle_writer.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/writers/procedures_box_size_writer_factory.f90">
-			<Option weight="4" />
-		</Unit>
 		<Unit filename="modules/writers/procedures_changes_success_writer_factory.f90">
 			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/writers/procedures_complete_coordinates_writer_factory.f90">
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_component_coordinates_writer_factory.f90">
 			<Option weight="5" />
@@ -763,10 +760,8 @@
 		<Unit filename="modules/writers/procedures_triangle_writer_factory.f90">
 			<Option weight="13" />
 		</Unit>
+		<Unit filename="modules/writers/types_changes_success_writer_wrapper.f90" />
 		<Unit filename="modules/writers/types_component_coordinates_writer_wrapper.f90">
-			<Option weight="5" />
-		</Unit>
-		<Unit filename="modules/writers/types_component_writers_wrapper.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/writers/types_exploring_writers_wrapper.f90">

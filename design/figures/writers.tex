@@ -9,14 +9,17 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\smallTextWidth]{BoxSizeWriter}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
+            \begin{abstractclass}[text width=\mediumTextWidth]{CompleteCoordinatesWriter}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    componentsCoordinates: \type{ComponentCoordinatesWriter[:]},
+                    componentsSelectors: \type{ComponentCoordinatesWriterSelector[:]},
+                    basename: \type{char[:]}, period: \type{int}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{write}{coordinatesUnit: \type{int}}}
+                \operation{\procedure{write}{iStep: \type{int}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxSizeWriter.south) - (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(CompleteCoordinatesWriter.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinatesWriter}{0, 0}
                 \operation{\procedure{construct}{iComponent: \type{int},
                     positions: \type{ComponentCoordinates},
@@ -28,21 +31,15 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentCoordinatesWriter.north) + (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{CompleteCoordinatesWriter}{0, 0}
-                \operation{\procedure{construct}{boxSize: \type{BoxSizeWriter},
-                    componentsCoordinates: \type{ComponentCoordinatesWriter[:]},
-                    componentsCoordinatesSelectors: \type{ComponentCoordinatesWriterSelector[:]},
-                    basename: \type{char[:]}, period: \type{int}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{write}{iStep: \type{int}}}
-            \end{abstractclass}
+        \begin{scope}[shift={($(CompleteCoordinatesWriter.north) + (9 cm, 0 cm)$)}]
+            \umlnote[text width=\mediumTextWidth]{\import{}: \\
+                \namespace{Environment} :: PeriodicBox \\
+                \namespace{Mixture} :: ComponentCoordinates};
         \end{scope}
 
-        \begin{scope}[shift={($(BoxSizeWriter.north) + (7.5 cm, 0 cm)$)}]
-            \umlnote[text width=\mediumTextWidth]{\import{}: \\
-                \namespace{Environment} :: Environment \\
-                \namespace{Mixture} :: ComponentCoordinates};
+        \begin{scope}[on background layer]
+            \composition{CompleteCoordinatesWriter}{\refName{componentsCoordinates}}{\numRef{1..,}}
+                {ComponentCoordinatesWriter}
         \end{scope}
 
     \end{tikzpicture}

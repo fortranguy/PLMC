@@ -40,13 +40,11 @@ contains
         call writers%field%write(i_step, observables%field_energies)
         call writers%walls%write(i_step, observables%walls_energies)
         if (0 <= i_step) then
-            do i_component = 1, size(writers%components)
-                call writers%components(i_component)%coordinates%write(i_step)
-            end do
+            call writers%complete_coordinates%write(i_step)
         end if
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
-            do i_component = 1, size(writers%components)
-                call writers%components(i_component)%changes%write(i_step, observables%&
+            do i_component = 1, size(writers%components_changes)
+                call writers%components_changes(i_component)%writer%write(i_step, observables%&
                     changes_sucesses(i_component))
             end do
         end if

@@ -24,11 +24,9 @@ private
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
         type(Concrete_Number_to_String) :: string_step
     contains
-        procedure :: construct_new => Abstract_construct_new
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: get_num => Abstract_get_num
-        procedure :: write_new => Abstract_write_new
         procedure :: write => Abstract_write
     end type Abstract_Component_Coordinates_Writer
 
@@ -50,8 +48,7 @@ contains
 
 !implementation Abstract_Component_Coordinates_Writer
 
-    subroutine Abstract_construct_new(this, i_component, positions, orientations, &
-        coordinates_selector)
+    subroutine Abstract_construct(this, i_component, positions, orientations, coordinates_selector)
         class(Abstract_Component_Coordinates_Writer), intent(out) :: this
         integer, intent(in) :: i_component
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
@@ -72,13 +69,6 @@ contains
         else
             allocate(Null_Number_to_String :: this%string_orientations)
         end if
-    end subroutine Abstract_construct_new
-
-    subroutine Abstract_construct(this, positions, orientations, coordinates_selector, basename)
-        class(Abstract_Component_Coordinates_Writer), intent(out) :: this
-        class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
-        character(len=*), intent(in) :: basename
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -96,7 +86,7 @@ contains
         num_coordinates = this%positions%get_num()
     end function Abstract_get_num
 
-    subroutine Abstract_write_new(this, coordinates_unit)
+    subroutine Abstract_write(this, coordinates_unit)
         class(Abstract_Component_Coordinates_Writer), intent(in) :: this
         integer, intent(in) :: coordinates_unit
 
@@ -107,29 +97,17 @@ contains
                 this%string_positions%get(this%positions%get(i_particle)), &
                 this%string_orientations%get(this%orientations%get(i_particle))
         end do
-    end subroutine Abstract_write_new
-
-    subroutine Abstract_write(this, i_step)
-        class(Abstract_Component_Coordinates_Writer), intent(in) :: this
-        integer, intent(in) :: i_step
     end subroutine Abstract_write
 
 !end implementation Abstract_Component_Coordinates_Writer
 
 !implementation Null_Component_Coordinates_Writer
 
-    subroutine Null_construct_new(this, i_component, positions, orientations, coordinates_selector)
+    subroutine Null_construct(this, i_component, positions, orientations, coordinates_selector)
         class(Null_Component_Coordinates_Writer), intent(out) :: this
         integer, intent(in) :: i_component
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
         type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
-    end subroutine Null_construct_new
-
-    subroutine Null_construct(this, positions, orientations, coordinates_selector, basename)
-        class(Null_Component_Coordinates_Writer), intent(out) :: this
-        class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
-        character(len=*), intent(in) :: basename
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
@@ -141,9 +119,9 @@ contains
         num_coordinates = 0
     end function Null_get_num
 
-    subroutine Null_write(this, i_step)
+    subroutine Null_write(this, coordinates_unit)
         class(Null_Component_Coordinates_Writer), intent(in) :: this
-        integer, intent(in) :: i_step
+        integer, intent(in) :: coordinates_unit
     end subroutine Null_write
 
 !end implementation Null_Component_Coordinates_Writer
