@@ -71,16 +71,9 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Complete_Coordinates_Writer), intent(inout) :: this
 
-        integer :: i_component
-
         if (allocated(this%basename)) deallocate(this%basename)
         if (allocated(this%components_legend)) deallocate(this%components_legend)
-        if (allocated(this%components_coordinates)) then
-            do i_component = size(this%components_coordinates), 1, -1
-                call component_coordinates_writer_destroy(this%components_coordinates(i_component)%&
-                    writer)
-            end do
-        end if
+        call component_coordinates_writer_destroy(this%components_coordinates)
         this%periodic_box => null()
     end subroutine Abstract_destroy
 

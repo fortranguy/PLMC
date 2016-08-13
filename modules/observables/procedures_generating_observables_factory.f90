@@ -115,6 +115,21 @@ contains
         call reset_counters(counters)
     end subroutine create_triangle_counters
 
+    pure subroutine destroy_triangle_counters(counters)
+        type(Concrete_Change_Counters_Line), allocatable, intent(inout) :: counters(:)
+
+        integer :: i_counter
+
+        if (allocated(counters)) then
+            do i_counter = size(counters), 1, -1
+                if (allocated(counters(i_counter)%line)) then
+                    deallocate(counters(i_counter)%line)
+                end if
+            end do
+            deallocate(counters)
+        end if
+    end subroutine destroy_triangle_counters
+
     pure subroutine create_square_counters(counters, num_components)
         type(Concrete_Change_Counter), allocatable, intent(out) :: counters(:, :)
         integer, intent(in) :: num_components
@@ -128,21 +143,6 @@ contains
 
         if (allocated(counters)) deallocate(counters)
     end subroutine destroy_square_counters
-
-    pure subroutine destroy_triangle_counters(counters)
-        type(Concrete_Change_Counters_Line), allocatable, intent(out) :: counters(:)
-
-        integer :: i_counter
-
-        if (allocated(counters)) then
-            do i_counter = size(counters), 1, -1
-                if (allocated(counters(i_counter)%line)) then
-                    deallocate(counters(i_counter)%line)
-                end if
-            end do
-            deallocate(counters)
-        end if
-    end subroutine destroy_triangle_counters
 
     pure subroutine create_changes_successes(successes, num_components)
         type(Concrete_Changes_Success), allocatable, intent(out) :: successes(:)
