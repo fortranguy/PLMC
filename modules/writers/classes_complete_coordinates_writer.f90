@@ -56,7 +56,7 @@ contains
         this%components_legend = "# i_component"
         if (any(components_selectors%write_positions)) then
             this%components_legend = this%components_legend//&
-                "    position_x    position_y    position_y"
+                "    position_x    position_y    position_z"
         end if
         if (any(components_selectors%write_orientations)) then
             this%components_legend = this%components_legend//&
