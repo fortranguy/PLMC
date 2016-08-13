@@ -20,7 +20,7 @@ use procedures_square_writer_factory, only: square_writer_create => create_trans
 use classes_changes_success_writer, only: Concrete_Changes_Selector
 use procedures_changes_success_writer_factory, only: changes_success_writer_create => create, &
     changes_success_writer_destroy => destroy
-use classes_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector
+use classes_component_coordinates_writer, only: Concrete_Component_Coordinates_Writer_Selector
 use procedures_component_coordinates_writer_factory, only: &
     component_coordinates_writer_create => create, component_coordinates_writer_destroy => destroy
 use types_component_writers_wrapper, only: Component_Writers_Wrapper
@@ -125,7 +125,7 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found, write_coordinates
-        type(Concrete_Coordinates_Writer_Selector) :: selector_i
+        type(Concrete_Component_Coordinates_Writer_Selector) :: selector_i
         integer :: i_component
         type(Concrete_Number_to_String) :: string
 

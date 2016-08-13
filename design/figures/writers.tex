@@ -1,0 +1,39 @@
+\documentclass{standalone}
+
+\usepackage{luatex85}
+\renewcommand{\familydefault}{\sfdefault}
+\input figures/figures.sty
+
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\smallTextWidth]{BoxSizeWriter}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{write}{coordinatesUnit: \type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(BoxSizeWriter.south) - (0 cm, 2 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinatesWriter}{0, 0}
+                \operation{\procedure{construct}{iComponent: \type{int},
+                    positions: \type{ComponentCoordinates},
+                    orientations: \type{ComponentCoordinates},
+                    coordinatesSelector: \type{ComponentCoordinatesWriterSelector}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getNum}{}: \type{int}}
+                \operation{\procedure{write}{coordinatesUnit: \type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(BoxSizeWriter.north) + (7.5 cm, 0 cm)$)}]
+            \umlnote[text width=\mediumTextWidth]{\import{}: \\
+                \namespace{Environment} :: Environment \\
+                \namespace{Mixture} :: ComponentCoordinates};
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}

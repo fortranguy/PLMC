@@ -15,10 +15,9 @@ private
 
     abstract interface
 
-        pure function Abstract_get_num(this) result(num_coordinates)
+        pure integer function Abstract_get_num(this) result(num_coordinates)
         import :: Abstract_Coordinates
             class(Abstract_Coordinates), intent(in) :: this
-            integer :: num_coordinates
         end function Abstract_get_num
 
         pure function Abstract_get(this, i_particle) result(vector)

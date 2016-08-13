@@ -115,9 +115,8 @@ contains
         end if
     end subroutine Abstract_allocate_coordinates
 
-    pure function Abstract_get_num(this) result(num_coordinates)
+    pure integer function Abstract_get_num(this) result(num_coordinates)
         class(Abstract_Component_Coordinates), intent(in) :: this
-        integer :: num_coordinates
 
         num_coordinates = this%number%get()
     end function Abstract_get_num
@@ -203,8 +202,6 @@ contains
         class(Concrete_Component_Orientations), intent(out) :: this
         class(Abstract_Component_Number), target, intent(in) :: number
 
-        integer :: i_particle
-
         this%number => number
         call this%allocate_coordinates()
     end subroutine Orientations_construct
@@ -263,9 +260,8 @@ contains
         real(DP), intent(in) :: vector(:)
     end subroutine Null_set
 
-    pure function Null_get_num(this) result(num_coordinates)
+    pure integer function Null_get_num(this) result(num_coordinates)
         class(Null_Component_Coordinates), intent(in) :: this
-        integer :: num_coordinates
         num_coordinates = 0
     end function Null_get_num
 

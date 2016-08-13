@@ -12,7 +12,7 @@ trap "wait" TERM EXIT
 for tex in $(find figures/ -name "*.tex")
 do
     echo $tex
-    (time pdflatex -output-directory=$(dirname $tex) $tex) > \
+    (time lualatex -output-directory=$(dirname $tex) $tex) > \
         $(dirname $tex)/$(basename $tex .tex).tmp 2>&1&
     while (($(jobs | wc -l) >= $@))
     do

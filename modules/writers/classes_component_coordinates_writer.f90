@@ -9,13 +9,13 @@ implicit none
 
 private
 
-    type, public :: Concrete_Coordinates_Writer_Selector
+    type, public :: Concrete_Component_Coordinates_Writer_Selector
         integer :: period = 0
         logical :: write_positions = .false.
         logical :: write_orientations = .false.
-    end type Concrete_Coordinates_Writer_Selector
+    end type Concrete_Component_Coordinates_Writer_Selector
 
-    type, abstract, public :: Abstract_Coordinates_Writer
+    type, abstract, public :: Abstract_Component_Coordinates_Writer
     private
         character(len=:), allocatable :: i_component
         class(Abstract_Component_Coordinates), pointer :: positions => null()
@@ -32,33 +32,36 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: write_new => Abstract_write_new
         procedure :: write => Abstract_write
-    end type Abstract_Coordinates_Writer
+    end type Abstract_Component_Coordinates_Writer
 
-    type, extends(Abstract_Coordinates_Writer), public :: Concrete_Coordinates_Writer
+    type, extends(Abstract_Component_Coordinates_Writer), public :: &
+        Concrete_Component_Coordinates_Writer
 
-    end type Concrete_Coordinates_Writer
+    end type Concrete_Component_Coordinates_Writer
 
-    type, extends(Abstract_Coordinates_Writer), public :: Null_Coordinates_Writer
+    type, extends(Abstract_Component_Coordinates_Writer), public :: &
+        Null_Component_Coordinates_Writer
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: write => Null_write
-    end type Null_Coordinates_Writer
+    end type Null_Component_Coordinates_Writer
 
 contains
 
-!implementation Abstract_Coordinates_Writer
+!implementation Abstract_Component_Coordinates_Writer
 
     subroutine Abstract_construct_new(this, i_component, positions, orientations, &
         coordinates_selector)
-        class(Abstract_Coordinates_Writer), intent(out) :: this
+        class(Abstract_Component_Coordinates_Writer), intent(out) :: this
         integer, intent(in) :: i_component
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        type(Concrete_Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
 
         type(Concrete_Number_to_String) :: string
 
-        call check_positive("Abstract_Coordinates_Writer: construct", "i_component", i_component)
+        call check_positive("Abstract_Component_Coordinates_Writer: construct", "i_component", &
+            i_component)
         this%i_component = string%get(i_component)
         this%positions => positions
         this%orientations => orientations
@@ -75,21 +78,21 @@ contains
     end subroutine Abstract_construct_new
 
     subroutine Abstract_construct(this, positions, orientations, coordinates_selector, basename)
-        class(Abstract_Coordinates_Writer), intent(out) :: this
+        class(Abstract_Component_Coordinates_Writer), intent(out) :: this
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        type(Concrete_Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
         character(len=*), intent(in) :: basename
 
-        call check_positive("Abstract_Coordinates_Writer: construct", &
+        call check_positive("Abstract_Component_Coordinates_Writer: construct", &
             "coordinates_selector%period", coordinates_selector%period)
         this%period = coordinates_selector%period
-        call check_string_not_empty("Abstract_Coordinates_Writer: construct: basename", basename)
+        call check_string_not_empty("Abstract_Component_Coordinates_Writer: construct: basename", basename)
         this%basename = basename
         this%legend = "#"
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
-        class(Abstract_Coordinates_Writer), intent(inout) :: this
+        class(Abstract_Component_Coordinates_Writer), intent(inout) :: this
 
         if (allocated(this%string_orientations)) deallocate(this%string_orientations)
         if (allocated(this%string_positions)) deallocate(this%string_positions)
@@ -100,8 +103,14 @@ contains
         if (allocated(this%i_component)) deallocate(this%i_component)
     end subroutine Abstract_destroy
 
+    pure integer function Abstract_get_num(this) result(num_coordinates)
+        class(Abstract_Component_Coordinates_Writer), intent(in) :: this
+
+        num_coordinates = this%positions%get_num()
+    end function Abstract_get_num
+
     subroutine Abstract_write_new(this, coordinates_unit)
-        class(Abstract_Coordinates_Writer), intent(in) :: this
+        class(Abstract_Component_Coordinates_Writer), intent(in) :: this
         integer, intent(in) :: coordinates_unit
 
         integer :: i_particle
@@ -114,7 +123,7 @@ contains
     end subroutine Abstract_write_new
 
     subroutine Abstract_write(this, i_step)
-        class(Abstract_Coordinates_Writer), intent(in) :: this
+        class(Abstract_Component_Coordinates_Writer), intent(in) :: this
         integer, intent(in) :: i_step
 
         integer :: unit_i
@@ -128,33 +137,33 @@ contains
         end if
     end subroutine Abstract_write
 
-!end implementation Abstract_Coordinates_Writer
+!end implementation Abstract_Component_Coordinates_Writer
 
-!implementation Null_Coordinates_Writer
+!implementation Null_Component_Coordinates_Writer
 
     subroutine Null_construct_new(this, i_component, positions, orientations, coordinates_selector)
-        class(Null_Coordinates_Writer), intent(out) :: this
+        class(Null_Component_Coordinates_Writer), intent(out) :: this
         integer, intent(in) :: i_component
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        type(Concrete_Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
     end subroutine Null_construct_new
 
     subroutine Null_construct(this, positions, orientations, coordinates_selector, basename)
-        class(Null_Coordinates_Writer), intent(out) :: this
+        class(Null_Component_Coordinates_Writer), intent(out) :: this
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        type(Concrete_Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
         character(len=*), intent(in) :: basename
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
-        class(Null_Coordinates_Writer), intent(inout) :: this
+        class(Null_Component_Coordinates_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
     subroutine Null_write(this, i_step)
-        class(Null_Coordinates_Writer), intent(in) :: this
+        class(Null_Component_Coordinates_Writer), intent(in) :: this
         integer, intent(in) :: i_step
     end subroutine Null_write
 
-!end implementation Null_Coordinates_Writer
+!end implementation Null_Component_Coordinates_Writer
 
 end module classes_component_coordinates_writer
