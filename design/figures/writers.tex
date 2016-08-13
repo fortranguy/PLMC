@@ -28,6 +28,17 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(ComponentCoordinatesWriter.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{CompleteCoordinatesWriter}{0, 0}
+                \operation{\procedure{construct}{boxSize: \type{BoxSizeWriter},
+                    componentsCoordinates: \type{ComponentCoordinatesWriter[:]},
+                    componentsCoordinatesSelectors: \type{ComponentCoordinatesWriterSelector[:]},
+                    basename: \type{char[:]}, period: \type{int}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{write}{iStep: \type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(BoxSizeWriter.north) + (7.5 cm, 0 cm)$)}]
             \umlnote[text width=\mediumTextWidth]{\import{}: \\
                 \namespace{Environment} :: Environment \\

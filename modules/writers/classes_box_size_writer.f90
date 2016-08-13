@@ -1,9 +1,6 @@
 module classes_box_size_writer
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_strings, only: max_line_length
-use procedures_checks, only: check_string_not_empty, check_positive
-use classes_number_to_string, only: Concrete_Number_to_String
 use classes_periodic_box, only: Abstract_Periodic_Box
 
 implicit none
@@ -13,10 +10,6 @@ private
     type, abstract, public :: Abstract_Box_Size_Writer
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        character(len=:), allocatable :: basename
-        character(len=:), allocatable :: legend
-        integer :: period = 0
-        type(Concrete_Number_to_String) :: string_step
     contains
         procedure :: construct_new => Abstract_construct_new
         procedure :: construct => Abstract_construct
@@ -45,7 +38,6 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
 
         this%periodic_box => periodic_box
-        this%legend = "# box_size:"
     end subroutine Abstract_construct_new
 
     subroutine Abstract_construct(this, periodic_box, period, basename)
@@ -53,19 +45,11 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         integer, intent(in) :: period
         character(len=*), intent(in) :: basename
-
-        call check_string_not_empty("Abstract_Box_Size_Writer: construct: basename", basename)
-        this%basename = basename
-
-        call check_positive("Abstract_Box_Size_Writer: construct", "period", period)
-        this%period = period
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Box_Size_Writer), intent(inout) :: this
 
-        if (allocated(this%legend)) deallocate(this%legend)
-        if (allocated(this%basename)) deallocate(this%basename)
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
@@ -73,22 +57,12 @@ contains
         class(Abstract_Box_Size_Writer), intent(in) :: this
         integer, intent(in) :: coordinates_unit
 
-        write(coordinates_unit, *) this%legend, this%periodic_box%get_size()
+        write(coordinates_unit, *) "# box_size:", this%periodic_box%get_size()
     end subroutine Abstract_write_new
 
     subroutine Abstract_write(this, i_step)
         class(Abstract_Box_Size_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-
-        integer :: unit_i
-
-        if (mod(i_step, this%period) == 0) then
-            open(newunit=unit_i, recl=max_line_length, file=this%basename//"_"//this%string_step%&
-                get(i_step)//".out", action="write")
-            write(unit_i, *) this%legend
-            write(unit_i, *) this%periodic_box%get_size()
-            close(unit_i)
-        end if
     end subroutine Abstract_write
 
 !end implementation Abstract_Box_Size_Writer
