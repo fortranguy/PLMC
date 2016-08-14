@@ -28,13 +28,12 @@ implicit none
     call plmc_create(io%generating_data, io%exploring_data)
     call plmc_create(physical_model, io%generating_data, io%exploring_data)
     call plmc_set(io%generating_data)
-    call plmc_set(num_snaps, physical_model%mixture%components, io%generating_data)
+    call plmc_set(num_snaps, io%generating_data)
     call plmc_visit_set(visit, io%exploring_data, "Check.")
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, io%exploring_data)
         !ifort bug?
     call plmc_create(observables, physical_model%mixture%components)
-    call plmc_create(io%readers, io%writers, physical_model, num_snaps, markov_chain_explorer, io%&
-        generating_data)
+    call plmc_create(io%readers, io%writers, physical_model, markov_chain_explorer)
     call plmc_destroy(io%generating_data, io%exploring_data)
     call plmc_create(io%json, io%report_data)
     call plmc_write(io%json, io%report_data)

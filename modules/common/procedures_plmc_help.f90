@@ -19,7 +19,7 @@ contains
 
     subroutine plmc_catch_exploring_help()
         call plmc_catch_help_core("plmc_catch_exploring_help", &
-            "Please provide generating.json, exploring.json and snap shots for all components.")
+            "Please provide generating.json, exploring.json and snap shots.")
     end subroutine plmc_catch_exploring_help
 
     subroutine plmc_catch_density_help()

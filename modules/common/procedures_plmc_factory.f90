@@ -27,12 +27,9 @@ use procedures_plmc_iterations, only: plmc_set_num_steps, plmc_set_num_snaps
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
-use types_generating_readers_wrapper, only: Generating_Readers_Wrapper
-use procedures_generating_readers_factory, only: generating_readers_create => create, &
-    generating_readers_destroy => destroy, generating_readers_set => set
-use types_exploring_readers_wrapper, only: Exploring_Readers_Wrapper
-use procedures_exploring_readers_factory, only: exploring_readers_create => create, &
-    exploring_readers_detroy => destroy, exploring_readers_set => set
+use types_readers_wrapper, only: Readers_Wrapper
+use procedures_readers_factory, only: readers_create => create, readers_destroy => destroy, &
+    readers_set => set
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use procedures_generating_writers_factory, only: generating_writers_create => create, &
     generating_writers_destroy => destroy
@@ -67,9 +64,9 @@ end interface plmc_destroy
 
 interface plmc_set
     module procedure :: set_random_seed
-    module procedure :: plmc_set_num_steps, set_num_snaps
+    module procedure :: plmc_set_num_steps, plmc_set_num_snaps
     module procedure :: set_num_particles
-    module procedure :: set_mixture_coordinates, exploring_readers_set
+    module procedure :: set_coordinates_from_json, set_coordinates_from_snap
     module procedure :: markov_chain_generator_set
     module procedure :: tune_components_moves
     module procedure :: set_success_and_reset_counter_generating, &
@@ -80,13 +77,13 @@ contains
 
     subroutine create_generating_readers_writers(readers, writers, physical_model, changes, &
         generating_data)
-        type(Generating_Readers_Wrapper), intent(out) :: readers
+        type(Readers_Wrapper), intent(out) :: readers
         type(Generating_Writers_Wrapper), intent(out) :: writers
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: generating_data
 
-        call generating_readers_create(readers, physical_model%environment, physical_model%mixture%&
+        call readers_create(readers, physical_model%environment, physical_model%mixture%&
             components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
@@ -95,28 +92,22 @@ contains
     end subroutine create_generating_readers_writers
 
     subroutine destroy_generating_readers_writers(readers, writers)
-        type(Generating_Readers_Wrapper), intent(inout) :: readers
+        type(Readers_Wrapper), intent(inout) :: readers
         type(Generating_Writers_Wrapper), intent(inout) :: writers
 
         call generating_writers_destroy(writers)
-        call generating_readers_destroy(readers)
+        call readers_destroy(readers)
     end subroutine destroy_generating_readers_writers
 
-    subroutine create_exploring_readers_writers(readers, writers, physical_model, num_snaps, &
-        markov_chain_explorer, generating_data)
-        type(Exploring_Readers_Wrapper), intent(out) :: readers
+    subroutine create_exploring_readers_writers(readers, writers, physical_model, &
+        markov_chain_explorer)
+        type(Readers_Wrapper), intent(out) :: readers
         type(Exploring_Writers_Wrapper), intent(out) :: writers
         type(Physical_Model_Wrapper), intent(in) :: physical_model
-        integer, intent(in) :: num_snaps
         type(Markov_Chain_Explorer_Wrapper), intent(in) :: markov_chain_explorer
-        type(json_file), intent(inout) :: generating_data
 
-        integer :: num_offset
-
-        num_offset = 2 ! generating.json + exploring.json, cf. [[create_exploring_data]]
-        call exploring_readers_create(readers, physical_model%environment%periodic_box, &
-            physical_model%mixture%components, num_snaps, num_offset, generating_data, &
-            environment_prefix)
+        call readers_create(readers, physical_model%environment, physical_model%mixture%&
+            components)
         call exploring_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
             short_interactions%components_pairs, markov_chain_explorer%particle_insertion_method, &
@@ -124,10 +115,10 @@ contains
     end subroutine create_exploring_readers_writers
 
     subroutine destroy_exploring_readers_writers(readers, writers)
-        type(Exploring_Readers_Wrapper), intent(inout) :: readers
+        type(Readers_Wrapper), intent(inout) :: readers
         type(Exploring_Writers_Wrapper), intent(inout) :: writers
 
-        call exploring_readers_detroy(readers)
+        call readers_destroy(readers)
         call exploring_writers_destroy(writers)
     end subroutine destroy_exploring_readers_writers
 
@@ -196,19 +187,20 @@ contains
         call reset_counters(observables%insertion_counters)
     end subroutine set_success_and_reset_counter_exploring
 
-    subroutine set_mixture_coordinates(readers, generating_data)
-        type(Generating_Readers_Wrapper), intent(in) :: readers
+    subroutine set_coordinates_from_json(readers, generating_data)
+        type(Readers_Wrapper), intent(in) :: readers
         type(json_file), intent(inout) :: generating_data
 
-        call generating_readers_set(readers%complete_coordinates, generating_data, readers_prefix)
-    end subroutine set_mixture_coordinates
+        call readers_set(readers, generating_data, readers_prefix)
+    end subroutine set_coordinates_from_json
 
-    subroutine set_num_snaps(num_snaps, components, generating_data)
-        integer, intent(out) :: num_snaps
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(json_file), intent(inout) :: generating_data
+    subroutine set_coordinates_from_snap(readers, i_snap)
+        type(Readers_Wrapper), intent(in) :: readers
+        integer, intent(in) :: i_snap
 
-        call plmc_set_num_snaps(num_snaps, size(components), generating_data)
-    end subroutine set_num_snaps
+        integer, parameter :: num_offset = 2 ! cf. [[create_exploring_data]]
+
+        call readers_set(readers, num_offset + i_snap)
+    end subroutine set_coordinates_from_snap
 
 end module procedures_plmc_factory

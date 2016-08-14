@@ -197,7 +197,7 @@
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/common/types_exploring_io.f90">
-			<Option weight="7" />
+			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/common/types_generating_io.f90">
 			<Option weight="16" />
@@ -358,7 +358,9 @@
 		<Unit filename="modules/environment/box/procedures_reciprocal_lattice_factory.f90">
 			<Option weight="13" />
 		</Unit>
-		<Unit filename="modules/environment/classes_beta_pressure.f90" />
+		<Unit filename="modules/environment/classes_beta_pressure.f90">
+			<Option weight="2" />
+		</Unit>
 		<Unit filename="modules/environment/classes_permittivity.f90">
 			<Option weight="2" />
 		</Unit>
@@ -596,23 +598,14 @@
 		<Unit filename="modules/random/procedures_random_seed_factory.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/readers/classes_box_size_reader.f90">
-			<Option weight="3" />
-		</Unit>
 		<Unit filename="modules/readers/classes_complete_coordinates_reader.f90">
 			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/readers/classes_component_coordinates_reader.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/readers/classes_snap_number.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="modules/readers/coordinates/procedures_coordinates_reader.f90">
 			<Option weight="2" />
-		</Unit>
-		<Unit filename="modules/readers/procedures_box_size_reader_factory.f90">
-			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/readers/procedures_complete_coordinates_reader_factory.f90">
 			<Option weight="15" />
@@ -620,22 +613,13 @@
 		<Unit filename="modules/readers/procedures_component_coordinates_reader_factory.f90">
 			<Option weight="13" />
 		</Unit>
-		<Unit filename="modules/readers/procedures_exploring_readers_factory.f90">
-			<Option weight="8" />
-		</Unit>
-		<Unit filename="modules/readers/procedures_generating_readers_factory.f90">
+		<Unit filename="modules/readers/procedures_readers_factory.f90">
 			<Option weight="16" />
-		</Unit>
-		<Unit filename="modules/readers/procedures_snap_number_factory.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/readers/types_component_coordinates_reader_wrapper.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/readers/types_exploring_readers_wrapper.f90">
-			<Option weight="6" />
-		</Unit>
-		<Unit filename="modules/readers/types_generating_readers_wrapper.f90">
+		<Unit filename="modules/readers/types_readers_wrapper.f90">
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/classes_neighbour_cells.f90">
