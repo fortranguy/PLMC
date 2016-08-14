@@ -1,0 +1,34 @@
+\documentclass{standalone}
+
+\usepackage{luatex85}
+\renewcommand{\familydefault}{\sfdefault}
+\input figures/figures.sty
+
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\mediumTextWidth]{CompleteCoordinatesReader}{0, 0}
+                \operation{\procedure{construct}{}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{read}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(CompleteCoordinatesReader.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinatesReader}{0, 0}
+                \operation[0]{\procedure{construct}{...}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{read}{coordinatesUnit: \type{int}, numParticles: \type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[on background layer]
+            \composition{CompleteCoordinatesReader}{\refName{componentsCoordinates}}{\numRef{1..,}}
+                {ComponentCoordinatesReader}
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}

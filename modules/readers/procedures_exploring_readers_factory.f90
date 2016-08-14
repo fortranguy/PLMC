@@ -61,7 +61,7 @@ contains
         do i_component = 1, size(readers%components)
             call create_filename_from_argument(snap_filename, readers%snap_number%&
                 get(i_component, i_snap))
-            call readers%components(i_component)%coordinates%read(snap_filename)
+            !call readers%components(i_component)%coordinates%read(snap_filename)
         end do
     end subroutine set
 

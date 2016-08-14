@@ -191,7 +191,7 @@
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_write.f90">
-			<Option weight="7" />
+			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="12" />
@@ -200,7 +200,7 @@
 			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/common/types_generating_io.f90">
-			<Option weight="7" />
+			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_explorer_wrapper.f90">
 			<Option weight="12" />
@@ -598,11 +598,11 @@
 		<Unit filename="modules/readers/classes_box_size_reader.f90">
 			<Option weight="3" />
 		</Unit>
+		<Unit filename="modules/readers/classes_component_coordinates_reader.f90">
+			<Option weight="4" />
+		</Unit>
 		<Unit filename="modules/readers/classes_snap_number.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/readers/coordinates/classes_component_coordinates_reader.f90">
-			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/readers/coordinates/procedures_component_coordinates_reader_factory.f90">
 			<Option weight="5" />
@@ -716,7 +716,7 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/writers/classes_complete_coordinates_writer.f90">
-			<Option weight="6" />
+			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/writers/classes_component_coordinates_writer.f90">
 			<Option weight="4" />
@@ -734,13 +734,13 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_changes_success_writer_factory.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="modules/writers/procedures_complete_coordinates_writer_factory.f90">
 			<Option weight="13" />
 		</Unit>
+		<Unit filename="modules/writers/procedures_complete_coordinates_writer_factory.f90">
+			<Option weight="15" />
+		</Unit>
 		<Unit filename="modules/writers/procedures_component_coordinates_writer_factory.f90">
-			<Option weight="5" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_exploring_writers_factory.f90">
 			<Option weight="14" />
@@ -760,7 +760,9 @@
 		<Unit filename="modules/writers/procedures_triangle_writer_factory.f90">
 			<Option weight="13" />
 		</Unit>
-		<Unit filename="modules/writers/types_changes_success_writer_wrapper.f90" />
+		<Unit filename="modules/writers/types_changes_success_writer_wrapper.f90">
+			<Option weight="3" />
+		</Unit>
 		<Unit filename="modules/writers/types_component_coordinates_writer_wrapper.f90">
 			<Option weight="5" />
 		</Unit>
@@ -768,7 +770,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/writers/types_generating_writers_wrapper.f90">
-			<Option weight="6" />
+			<Option weight="15" />
 		</Unit>
 		<Unit filename="programs/density.f90">
 			<Option weight="15" />

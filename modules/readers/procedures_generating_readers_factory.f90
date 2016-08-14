@@ -43,7 +43,7 @@ contains
             data_field = prefix//"Component "//string%get(i_component)//"."//"initial coordinates"
             call generating_data%get(data_field, filename, data_found)
             call check_data_found(data_field, data_found)
-            call components(i_component)%coordinates%read(filename)
+            !call components(i_component)%coordinates%read(filename)
         end do
     end subroutine set
 

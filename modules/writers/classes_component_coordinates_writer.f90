@@ -10,7 +10,6 @@ implicit none
 private
 
     type, public :: Component_Coordinates_Writer_Selector
-        integer :: period = 0
         logical :: write_positions = .false.
         logical :: write_orientations = .false.
     end type Component_Coordinates_Writer_Selector
