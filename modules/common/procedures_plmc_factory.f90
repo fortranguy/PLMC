@@ -1,6 +1,6 @@
 module procedures_plmc_factory
 
-use data_input_prefixes, only: environment_prefix, mixture_prefix, random_number_generator_prefix, &
+use data_input_prefixes, only: environment_prefix, readers_prefix, random_number_generator_prefix, &
     writers_prefix
 use json_module, only: json_file
 use procedures_json_data_factory, only: json_data_create_input => create_input, &
@@ -27,7 +27,6 @@ use procedures_plmc_iterations, only: plmc_set_num_steps, plmc_set_num_snaps
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
-use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
 use types_generating_readers_wrapper, only: Generating_Readers_Wrapper
 use procedures_generating_readers_factory, only: generating_readers_create => create, &
     generating_readers_destroy => destroy, generating_readers_set => set
@@ -87,7 +86,8 @@ contains
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: generating_data
 
-        call generating_readers_create(readers, physical_model%mixture%components)
+        call generating_readers_create(readers, physical_model%environment, physical_model%mixture%&
+            components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
             short_interactions%components_pairs, changes%components, generating_data, &
@@ -196,11 +196,11 @@ contains
         call reset_counters(observables%insertion_counters)
     end subroutine set_success_and_reset_counter_exploring
 
-    subroutine set_mixture_coordinates(components_readers, generating_data)
-        type(Component_Coordinates_Reader_wrapper), intent(in) :: components_readers(:)
+    subroutine set_mixture_coordinates(readers, generating_data)
+        type(Generating_Readers_Wrapper), intent(in) :: readers
         type(json_file), intent(inout) :: generating_data
 
-        call generating_readers_set(components_readers, generating_data, mixture_prefix)
+        call generating_readers_set(readers%complete_coordinates, generating_data, readers_prefix)
     end subroutine set_mixture_coordinates
 
     subroutine set_num_snaps(num_snaps, components, generating_data)

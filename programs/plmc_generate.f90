@@ -31,7 +31,7 @@ implicit none
     call plmc_create(observables, physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_generator%changes, &
         io%generating_data)
-    call plmc_set(io%readers%components, io%generating_data)
+    call plmc_set(io%readers, io%generating_data)
     call plmc_set(markov_chain_generator)
     call plmc_destroy(io%generating_data)
     call plmc_create(io%json, io%report_data)

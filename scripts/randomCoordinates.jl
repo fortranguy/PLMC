@@ -1,5 +1,5 @@
 if size(ARGS, 1) != 1
-    error("Please provide coordinates.jl and a generating.json file.")
+    error("Please provide a generating.json file.")
 end
 import PLMC
 import JSON
@@ -12,7 +12,7 @@ boxSize, components, interMinDistances = PLMC.set(inputData)
 firstPositions = trues(size(components))
 testPosition = Array{Float64}
 for iComponent = 1:size(components, 1)
-    prog = PM.Progress(components[iComponent].num)
+    prog = PM.Progress(components[iComponent].num, "Component $(iComponent): ")
     while size(components[iComponent].positions, 2) < components[iComponent].num
         overlap = true
         while overlap
@@ -40,5 +40,5 @@ for iComponent = 1:size(components, 1)
         end
         PM.next!(prog)
     end
-    PLMC.write(components, iComponent, inputData)
 end
+PLMC.write(components, boxSize, inputData)

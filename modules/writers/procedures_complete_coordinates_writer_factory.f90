@@ -33,6 +33,7 @@ contains
 
         type(Component_Coordinates_Writer_Wrapper), allocatable :: components_coordinates(:)
         type(Component_Coordinates_Writer_Selector), allocatable :: components_selectors(:)
+        type(Component_Coordinates_Writer_Selector) :: components_selector
 
         data_field = prefix//"Coordinates.write"
         call generating_data%get(data_field, write_coordinates, data_found)
@@ -50,7 +51,9 @@ contains
 
         call component_coordinates_writer_create(components_coordinates, components_selectors, &
             components, write_coordinates)
-        call coordinates%construct(periodic_box, components_coordinates, components_selectors, &
+        components_selector%write_positions = any(components_selectors%write_positions)
+        components_selector%write_orientations = any(components_selectors%write_orientations)
+        call coordinates%construct(periodic_box, components_coordinates, components_selector, &
             basename, period)
         call component_coordinates_writer_destroy(components_coordinates)
     end subroutine create

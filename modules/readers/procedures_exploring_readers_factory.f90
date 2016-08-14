@@ -9,8 +9,8 @@ use procedures_box_size_reader_factory, only: box_size_reader_create => create, 
 use types_component_wrapper, only: Component_Wrapper
 use procedures_snap_number_factory, only: snap_number_create => create, &
     snap_number_destroy => destroy
-use procedures_coordinates_reader_factory, only: coordinates_reader_create => create, &
-    coordinates_reader_destroy => destroy
+!use procedures_coordinates_reader_factory, only: coordinates_reader_create => create, &
+!    coordinates_reader_destroy => destroy
 use types_exploring_readers_wrapper, only: Exploring_Readers_Wrapper
 
 implicit none
@@ -39,13 +39,13 @@ contains
 
         call box_size_reader_create(readers%box, periodic_box, box_size_changes)
         call snap_number_create(readers%snap_number, num_snaps, num_offset)
-        call coordinates_reader_create(readers%components, components)
+        !call coordinates_reader_create(readers%components, components)
     end subroutine create
 
     subroutine destroy(readers)
         type(Exploring_Readers_Wrapper), intent(inout) :: readers
 
-        call coordinates_reader_destroy(readers%components)
+        !call coordinates_reader_destroy(readers%components)
         call snap_number_destroy(readers%snap_number)
         call box_size_reader_destroy(readers%box)
     end subroutine destroy

@@ -3,29 +3,77 @@ module procedures_component_coordinates_reader_factory
 use procedures_errors, only: error_exit
 use classes_component_number, only: Abstract_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates
+use types_component_wrapper, only: Component_Wrapper
 use classes_component_coordinates_reader, only: Concrete_Component_Coordinates_Reader_Selector, &
     Abstract_Component_Coordinates_Reader, Concrete_Component_Coordinates_Reader, &
     Concrete_Component_Positions_Reader, Concrete_Component_Orientations_Reader, &
     Null_Component_Coordinates_Reader
+use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
+use procedures_property_inquirers, only: component_has_positions, component_has_orientations
 
 implicit none
 
 private
 public :: create, destroy
 
+interface create
+    module procedure :: create_line
+    module procedure :: create_element
+end interface create
+
+interface destroy
+    module procedure :: destroy_element
+    module procedure :: destroy_line
+end interface destroy
+
 contains
 
-    subroutine create(coordinates, number, positions, orientations, selector)
+    subroutine create_line(components_coordinates, components)
+        type(Component_Coordinates_Reader_wrapper), allocatable, intent(out) :: &
+            components_coordinates(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        type(Concrete_Component_Coordinates_Reader_Selector) :: selector_i
+        integer :: i_component
+
+        allocate(components_coordinates(size(components)))
+        do i_component = 1, size(components_coordinates)
+            associate(number_i => components(i_component)%number, &
+                positions_i => components(i_component)%positions, &
+                orientations_i => components(i_component)%orientations)
+                selector_i%read_positions = component_has_positions(positions_i)
+                selector_i%read_orientations = component_has_orientations(orientations_i)
+                call create(components_coordinates(i_component)%reader, number_i, positions_i, &
+                    orientations_i, selector_i)
+            end associate
+        end do
+    end subroutine create_line
+
+    subroutine destroy_line(components_coordinates)
+        type(Component_Coordinates_Reader_wrapper), allocatable, intent(inout) :: &
+            components_coordinates(:)
+
+        integer :: i_component
+
+        if (allocated(components_coordinates)) then
+            do i_component = size(components_coordinates), 1, -1
+                call destroy(components_coordinates(i_component)%reader)
+            end do
+            deallocate(components_coordinates)
+        end if
+    end subroutine destroy_line
+
+    subroutine create_element(coordinates, number, positions, orientations, selector)
         class(Abstract_Component_Coordinates_Reader), allocatable, intent(out) :: coordinates
         class(Abstract_Component_Number), intent(in) :: number
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
         type(Concrete_Component_Coordinates_Reader_Selector), intent(in) :: selector
 
-        call allocate(coordinates, selector)
-        call construct(coordinates, number, positions, orientations)
-    end subroutine create
+        call allocate_element(coordinates, selector)
+        call construct_element(coordinates, number, positions, orientations)
+    end subroutine create_element
 
-    subroutine allocate(coordinates, selector)
+    subroutine allocate_element(coordinates, selector)
         class(Abstract_Component_Coordinates_Reader), allocatable, intent(out) :: coordinates
         type(Concrete_Component_Coordinates_Reader_Selector), intent(in) :: selector
 
@@ -38,9 +86,9 @@ contains
         else
             allocate(Null_Component_Coordinates_Reader :: coordinates)
         end if
-    end subroutine allocate
+    end subroutine allocate_element
 
-    subroutine construct(coordinates, number, positions, orientations)
+    subroutine construct_element(coordinates, number, positions, orientations)
         class(Abstract_Component_Coordinates_Reader), intent(inout) :: coordinates
         class(Abstract_Component_Number), intent(in) :: number
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
@@ -58,15 +106,15 @@ contains
                 call error_exit("procedures_component_coordinates_reader_factory: construct: "//&
                     "coordinates type unknown.")
         end select
-    end subroutine construct
+    end subroutine construct_element
 
-    subroutine destroy(coordinates)
+    subroutine destroy_element(coordinates)
         class(Abstract_Component_Coordinates_Reader), allocatable, intent(inout) :: coordinates
 
         if (allocated(coordinates)) then
             call coordinates%destroy()
             deallocate(coordinates)
         end if
-    end subroutine destroy
+    end subroutine destroy_element
 
 end module procedures_component_coordinates_reader_factory

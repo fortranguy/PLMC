@@ -64,6 +64,5 @@ for iComponent = 1:size(components, 1)
     iParticleMax = iParticleMin - 1 + components[iComponent].num
     components[iComponent].positions = positions[:, iParticleMin:iParticleMax]
     iParticleMin = iParticleMax + 1
-
-    PLMC.write(components, iComponent, inputData)
 end
+PLMC.write(components, boxSize, inputData)

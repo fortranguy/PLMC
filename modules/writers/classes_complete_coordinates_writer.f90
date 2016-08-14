@@ -42,23 +42,23 @@ contains
 
 !implementation Abstract_Complete_Coordinates_Writer
 
-    subroutine Abstract_construct(this, periodic_box, components_coordinates, components_selectors,&
+    subroutine Abstract_construct(this, periodic_box, components_coordinates, components_selector,&
         basename, period)
         class(Abstract_Complete_Coordinates_Writer), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         type(Component_Coordinates_Writer_Wrapper), intent(in) :: components_coordinates(:)
-        type(Component_Coordinates_Writer_Selector), intent(in) :: components_selectors(:)
+        type(Component_Coordinates_Writer_Selector), intent(in) :: components_selector
         character(len=*), intent(in) :: basename
         integer, intent(in) :: period
 
         this%periodic_box => periodic_box
         allocate(this%components_coordinates, source=components_coordinates)
         this%components_legend = "# i_component"
-        if (any(components_selectors%write_positions)) then
+        if (components_selector%write_positions) then
             this%components_legend = this%components_legend//&
                 "    position_x    position_y    position_z"
         end if
-        if (any(components_selectors%write_orientations)) then
+        if (components_selector%write_orientations) then
             this%components_legend = this%components_legend//&
                 "    orientation_x    orientation_y    orientation_z"
         end if
@@ -106,12 +106,12 @@ contains
 
 !implementation Null_Complete_Coordinates_Writer
 
-    subroutine Null_construct(this, periodic_box, components_coordinates, components_selectors, &
+    subroutine Null_construct(this, periodic_box, components_coordinates, components_selector, &
         basename, period)
         class(Null_Complete_Coordinates_Writer), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         type(Component_Coordinates_Writer_Wrapper), intent(in) :: components_coordinates(:)
-        type(Component_Coordinates_Writer_Selector), intent(in) :: components_selectors(:)
+        type(Component_Coordinates_Writer_Selector), intent(in) :: components_selector
         character(len=*), intent(in) :: basename
         integer, intent(in) :: period
     end subroutine Null_construct

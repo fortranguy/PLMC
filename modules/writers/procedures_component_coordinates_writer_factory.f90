@@ -46,9 +46,8 @@ contains
                     component_has_positions(positions_i)
                 components_selectors(i_component)%write_orientations = &
                     component_has_orientations(orientations_i)
-                call create(components_coordinates(i_component)%&
-                    writer, i_component, positions_i, orientations_i, &
-                    components_selectors(i_component), write_coordinates)
+                call create(components_coordinates(i_component)%writer, i_component, positions_i, &
+                    orientations_i, components_selectors(i_component), write_coordinates)
             end associate
         end do
     end subroutine create_line

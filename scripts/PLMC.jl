@@ -54,23 +54,29 @@ module PLMC
 
     end
 
-    function write(components, iComponent, inputData)
-        outputFile = open(inputData["Mixture"]["Component $(iComponent)"]["initial coordinates"], "w")
-        println(outputFile, "# number    ", components[iComponent].num)
-        if components[iComponent].num != 0
-            if inputData["Mixture"]["Component $(iComponent)"]["is dipolar"]
-                components[iComponent].orientations = randomOrientations(components[iComponent].num)
-                println(outputFile, "# position_x    position_y    position_z    orientation_x    orientation_y    orientation_z")
-                writedlm(outputFile, vcat(components[iComponent].positions,
-                    components[iComponent].orientations)')
-            else
-                println(outputFile, "# position_x  position_y  position_z")
-                writedlm(outputFile, components[iComponent].positions')
-            end
+    function write(components, boxSize, inputData)
+        outputFile = open(inputData["Input"]["initial coordinates"], "w")
+        println(outputFile, "# box_size    ", join(boxSize, "    "))
+        println(outputFile, "# nums_particles    ",
+            join(map(component -> component.num, components), "    "))
+        areDipolar = map(iComponent ->
+            inputData["Mixture"]["Component $(iComponent)"]["is dipolar"], 1:size(components, 1))
+        if any(areDipolar)
+            println(outputFile, string("# i_component    position_x    position_y    position_z",
+                "    orientation_x    orientation_y    orientation_z"))
         else
-            println(outputFile, "#")
+            println(outputFile, "# i_component    position_x    position_y    position_z")
         end
-        close(outputFile)
+        for iComponent = 1:size(components, 1)
+            if areDipolar[iComponent]
+                components[iComponent].orientations = randomOrientations(components[iComponent].num)
+                writedlm(outputFile, hcat(fill(iComponent, components[iComponent].num),
+                    components[iComponent].positions', components[iComponent].orientations'))
+            else
+                writedlm(outputFile, hcat(fill(iComponent, components[iComponent].num),
+                    components[iComponent].positions'))
+            end
+        end
         println("Coordinates written in ", outputFile.name)
     end
 

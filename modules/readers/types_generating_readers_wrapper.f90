@@ -1,13 +1,13 @@
 module types_generating_readers_wrapper
 
-use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
+use classes_complete_coordinates_reader, only: Abstract_Complete_Coordinates_Reader
 
 implicit none
 
 private
 
     type, public :: Generating_Readers_Wrapper
-        type(Component_Coordinates_Reader_wrapper), allocatable :: components(:)
+        class(Abstract_Complete_Coordinates_Reader), allocatable :: complete_coordinates
     end type Generating_Readers_Wrapper
 
 end module types_generating_readers_wrapper

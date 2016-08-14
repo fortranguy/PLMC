@@ -30,24 +30,21 @@
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,
-            "can exchange": false,
-            "initial coordinates": "coordinates_1.in"
+            "can exchange": false
         },
         "Component 2": {
             "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 0.5,
-            "can exchange": false,
-            "initial coordinates": "coordinates_2.in"
+            "can exchange": false
         },
         "Component 3": {
             "initial number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 0.25,
-            "can exchange": false,
-            "initial coordinates": "coordinates_3.in"
+            "can exchange": false
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -153,6 +150,9 @@
     },
     "Monte Carlo": {
         "number of steps": 100
+    },
+    "Input": {
+        "initial coordinates": "initial_coordinates.xyz"
     },
     "Output": {
         "Coordinates": {

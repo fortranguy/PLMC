@@ -4,7 +4,6 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_component_number, only: Abstract_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates
-use procedures_component_coordinates_reader_micro, only: create_from_file
 use procedures_coordinates_reader, only: create_coordinates_from_file
 
 implicit none
@@ -16,7 +15,6 @@ private
         logical :: read_orientations = .false.
     end type Concrete_Component_Coordinates_Reader_Selector
 
-    !> @todo integrity check?
     type, abstract, public :: Abstract_Component_Coordinates_Reader
     contains
         procedure(Abstract_destroy), deferred :: destroy
@@ -30,6 +28,7 @@ private
             class(Abstract_Component_Coordinates_Reader), intent(inout) :: this
         end subroutine Abstract_destroy
 
+        !> @todo integrity check?
         subroutine Abstract_read(this, coordinates_unit, num_particles)
         import :: Abstract_Component_Coordinates_Reader
             class(Abstract_Component_Coordinates_Reader), intent(in) :: this

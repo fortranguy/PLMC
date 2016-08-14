@@ -32,8 +32,7 @@
             "moment norm": 1.0,
             "can exchange": true,
             "density": 0.14467592592592593,
-            "inverse powered activity": 0.9608364858810531,
-            "initial coordinates": "coordinates_1.in"
+            "inverse powered activity": 0.9608364858810531
         },
         "Component 2": {
             "initial number": 0,
@@ -42,8 +41,7 @@
             "moment norm": 0.5,
             "can exchange": true,
             "density": 0.14467592592592593,
-            "inverse powered activity": 0.6699286761545606,
-            "initial coordinates": "coordinates_2.in"
+            "inverse powered activity": 0.6699286761545606
         },
         "Component 3": {
             "initial number": 0,
@@ -52,8 +50,7 @@
             "moment norm": 0.25,
             "can exchange": true,
             "density": 0.14467592592592593,
-            "inverse powered activity": 0.6054863834073454,
-            "initial coordinates": "coordinates_3.in"
+            "inverse powered activity": 0.6054863834073454
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -159,6 +156,9 @@
     },
     "Monte Carlo": {
         "number of steps": 100
+    },
+    "Input": {
+        "initial coordinates": "initial_coordinates.xyz"
     },
     "Output": {
         "Coordinates": {
