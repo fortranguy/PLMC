@@ -7,13 +7,13 @@ use procedures_checks, only: check_array_size, check_positive, check_increase_fa
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters, set_increase_factor
-use classes_moved_coordinates, only: Abstract_Moved_Coordinates
+use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
 
 implicit none
 
 private
 
-    type, extends(Abstract_Moved_Coordinates), public :: Concrete_Translated_Positions
+    type, extends(Abstract_Moved_Component_Coordinates), public :: Concrete_Translated_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
@@ -31,19 +31,20 @@ private
 
 contains
 
-    subroutine Concrete_construct(this, periodic_box, positions, delta, tuning_parameters)
+    subroutine Concrete_construct(this, periodic_box, positions, initial_delta, tuning_parameters)
         class(Concrete_Translated_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
-        real(DP), intent(in) :: delta(:)
+        real(DP), intent(in) :: initial_delta(:)
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
 
         this%periodic_box => periodic_box
         this%positions => positions
-        call check_array_size("Concrete_Translated_Positions: construct", "delta", delta, &
-            num_dimensions)
-        call check_positive("Concrete_Translated_Positions: construct", "delta", delta)
-        this%delta = delta
+        call check_array_size("Concrete_Translated_Positions: construct", "initial_delta", &
+            initial_delta, num_dimensions)
+        call check_positive("Concrete_Translated_Positions: construct", "initial_delta", &
+            initial_delta)
+        this%delta = initial_delta
         call check_increase_factor("Concrete_Translated_Positions: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor

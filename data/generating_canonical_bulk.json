@@ -3,7 +3,7 @@
         "Box": {
             "periodicity": "XYZ",
             "initial size": [12.0, 12.0, 12.0],
-            "size changes": false
+            "size can change": false
         },
         "Thermostat": {
             "temperature": 2.0

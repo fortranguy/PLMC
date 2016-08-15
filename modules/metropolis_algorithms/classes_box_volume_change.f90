@@ -14,6 +14,7 @@ use procedures_visit_condition, only: visit_condition_in_range => in_range, &
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use types_reals_line, only: Reals_Line
+use procedures_triangle_observables, only: operator(-)
 use types_temporary_observables, only: Concrete_Single_Energies, Concrete_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_triangle_observables, only: triangle_observables_sum
@@ -88,13 +89,14 @@ contains
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
         call generating_observables_create(deltas%walls_energies, size(observables%walls_energies))
         call generating_observables_create(deltas%field_energies, size(observables%field_energies))
-        call this%test_metropolis(success, deltas)
+        call this%test_metropolis(success, deltas, observables)
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, deltas)
+    subroutine Abstract_test_metropolis(this, success, deltas, observables)
         class(Abstract_Box_Volume_Change), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Energies), intent(inout) :: deltas
+        type(Generating_Observables_Wrapper), intent(in) :: observables
 
         real(DP) :: delta_energy
         type(Concrete_Energies) :: new_energies
@@ -116,11 +118,14 @@ contains
         call generating_observables_create(new_energies%walls_energies, size(deltas%walls_energies))
         call this%visit_walls(overlap, new_energies%walls_energies)
         if (overlap) return
+        deltas%walls_energies = new_energies%walls_energies - observables%walls_energies
         call generating_observables_create(new_energies%field_energies, size(deltas%field_energies))
         call this%visit_fields(new_energies%field_energies)
+        deltas%field_energies = new_energies%field_energies - observables%field_energies
         call generating_observables_create(new_energies%short_energies, size(deltas%short_energies))
         call this%visit_short(overlap, new_energies%short_energies)
         if (overlap) return
+        deltas%short_energies = new_energies%short_energies - observables%short_energies
         !dipolar interactions
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &

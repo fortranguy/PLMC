@@ -1,6 +1,7 @@
 module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_input_prefixes, only: environment_prefix
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
@@ -9,7 +10,11 @@ use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
+use procedures_changed_box_size_factory, only: changed_box_size_create => create, &
+    changed_box_size_destroy => destroy
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
+use procedures_move_tuner_factory, only: move_tuner_create_box_size_change => &
+    create_box_size_change, move_tuner_destroy => destroy
 use procedures_random_coordinates_factory, only: random_coordinates_create => create, &
     random_coordinates_destroy => destroy
 use procedures_coordinates_copier_factory, only: coordinates_copier_create_position => &
@@ -18,8 +23,8 @@ use procedures_coordinates_copier_factory, only: coordinates_copier_create_posit
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_component_factory, only: changes_component_create, changes_component_destroy
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_property_inquirers, only: component_can_translate, component_can_rotate, &
-    component_can_exchange
+use procedures_property_inquirers, only: box_size_can_change, component_can_translate, &
+    component_can_rotate, component_can_exchange
 
 implicit none
 
@@ -38,29 +43,44 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        type(Concrete_Move_Tuning_Parameters) :: tuning_parameters
-        type(Concrete_Move_Tuner_Parameters) :: tuner_parameters
+        type(Concrete_Move_Tuning_Parameters) :: box_size_tuning_parameters, &
+            components_tuning_parameters
+        type(Concrete_Move_Tuner_Parameters) :: box_size_tuner_parameters, &
+            components_tuner_parameters
         logical :: can_exchange(size(components))
         logical :: have_positions(size(components)), have_orientations(size(can_exchange))
+        logical :: volume_can_change, some_components_have_coordinates
         type(Concrete_Number_to_String) :: string
         integer :: i_component
 
-        call set_tuning_parameters(tuning_parameters, num_tuning_steps, generating_data, &
-            prefix//"Components.")
-        call set_tuner_parameters(tuner_parameters, num_tuning_steps, generating_data, &
-            prefix//"Components.")
+        volume_can_change = box_size_can_change(generating_data, environment_prefix)
+        call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, volume_can_change,&
+            generating_data, prefix//"Box Size.")
+        call changed_box_size_create(changes%changed_box_size, periodic_box, &
+            box_size_tuning_parameters, volume_can_change, generating_data, prefix//"Box Size.")
+        call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, volume_can_change, &
+            generating_data, prefix//"Box Size.")
+        call move_tuner_create_box_size_change(changes%box_size_change_tuner, changes%&
+            changed_box_size, box_size_tuner_parameters, num_tuning_steps)
+
+        call set_have_positions(have_positions, components)
+        call set_have_orientations(have_orientations, components)
+        some_components_have_coordinates = any(have_positions) .or. any(have_orientations)
+        call set_tuning_parameters(components_tuning_parameters, num_tuning_steps, &
+            some_components_have_coordinates, generating_data, prefix//"Components.")
+        call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
+            some_components_have_coordinates, generating_data, prefix//"Components.")
         allocate(changes%components(size(components)))
         do i_component = 1, size(changes%components)
             call changes_component_create(changes%components(i_component), periodic_box, &
-                components(i_component), tuning_parameters, tuner_parameters, num_tuning_steps, &
-                generating_data, prefix//"Component "//string%get(i_component)//".")
+                components(i_component), components_tuning_parameters, components_tuner_parameters,&
+                num_tuning_steps, generating_data, prefix//"Component "//string%&
+                get(i_component)//".")
         end do
 
         call set_can_exchange(can_exchange, components)
-        call set_have_positions(have_positions, components)
         call random_coordinates_create(changes%random_position, accessible_domain, can_exchange, &
         have_positions)
-        call set_have_orientations(have_orientations, components)
         call random_coordinates_create(changes%random_orientation, can_exchange, have_orientations)
         call coordinates_copier_create_position(changes%position_copier, changes%random_position, &
             have_positions)
@@ -68,16 +88,17 @@ contains
             random_orientation, have_orientations)
     end subroutine changes_create
 
-    subroutine set_tuning_parameters(parameters, num_tuning_steps, generating_data, prefix)
+    subroutine set_tuning_parameters(parameters, num_tuning_steps, needed, generating_data, prefix)
         type(Concrete_Move_Tuning_Parameters), intent(out) :: parameters
         integer, intent(in) :: num_tuning_steps
+        logical, intent(in) :: needed
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        if (num_tuning_steps > 0) then
+        if (needed .and. num_tuning_steps > 0) then
             data_field = prefix//"increase factor"
             call generating_data%get(data_field, parameters%increase_factor, data_found)
             call check_data_found(data_field, data_found)
@@ -90,16 +111,17 @@ contains
         end if
     end subroutine set_tuning_parameters
 
-    subroutine set_tuner_parameters(parameters, num_tuning_steps, generating_data, prefix)
+    subroutine set_tuner_parameters(parameters, num_tuning_steps, needed, generating_data, prefix)
         type(Concrete_Move_Tuner_Parameters), intent(out) :: parameters
         integer, intent(in) :: num_tuning_steps
+        logical, intent(in) :: needed
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        if (num_tuning_steps > 0) then
+        if (needed .and. num_tuning_steps > 0) then
             data_field = prefix//"accumulation period"
             call generating_data%get(data_field, parameters%accumulation_period, data_found)
             call check_data_found(data_field, data_found)
@@ -167,6 +189,8 @@ contains
             end do
             deallocate(changes%components)
         end if
+        call move_tuner_destroy(changes%box_size_change_tuner)
+        call changed_box_size_destroy(changes%changed_box_size)
     end subroutine changes_destroy
 
 end module procedures_changes_factory

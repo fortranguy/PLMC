@@ -16,7 +16,8 @@ use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments,
     Concrete_Component_Dipolar_Moments
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential
-use classes_moved_coordinates, only: Abstract_Moved_Coordinates
+use classes_changed_box_size, only: Abstract_Changed_Box_Size, Null_Changed_Box_Size
+use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
@@ -28,7 +29,7 @@ implicit none
 
 private
 public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permittivity, &
-    use_reciprocal_lattice, use_walls, &
+    use_reciprocal_lattice, use_walls, box_size_can_change, &
     component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
     component_interacts_with_wall, measure_chemical_potentials, measure_pressure
@@ -53,6 +54,11 @@ interface use_walls
     module procedure :: use_walls_from_floor_penetration
     module procedure :: use_walls_from_walls
 end interface use_walls
+
+interface box_size_can_change
+    module procedure :: box_size_can_change_from_json
+    module procedure :: box_size_can_change_from_changed_box_size
+end interface box_size_can_change
 
 interface component_exists
     module procedure :: component_exists_from_number
@@ -194,6 +200,26 @@ contains
         end select
     end function use_walls_from_walls
 
+    logical function box_size_can_change_from_json(generating_data, prefix) &
+        result(box_size_can_change)
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        box_size_can_change = logical_from_json(generating_data, prefix//"Box.size can change")
+    end function box_size_can_change_from_json
+
+    pure logical function box_size_can_change_from_changed_box_size(changed_box_size) &
+        result(box_size_can_change)
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_box_size
+
+        select type (changed_box_size)
+            type is (Null_Changed_Box_Size)
+                box_size_can_change = .false.
+            class default
+                box_size_can_change = .true.
+        end select
+    end function box_size_can_change_from_changed_box_size
+
     pure logical function component_exists_from_number(component_number) result(component_exists)
         class(Abstract_Component_Number), intent(in) :: component_number
 
@@ -252,7 +278,7 @@ contains
     end function component_has_positions
 
     pure logical function component_can_translate(translated_positions)
-        class(Abstract_Moved_Coordinates), intent(in) :: translated_positions
+        class(Abstract_Moved_Component_Coordinates), intent(in) :: translated_positions
 
         select type (translated_positions)
             type is (Concrete_Translated_Positions)
@@ -263,7 +289,7 @@ contains
     end function component_can_translate
 
     pure logical function component_can_rotate(rotated_orientations)
-        class(Abstract_Moved_Coordinates), intent(in) :: rotated_orientations
+        class(Abstract_Moved_Component_Coordinates), intent(in) :: rotated_orientations
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)

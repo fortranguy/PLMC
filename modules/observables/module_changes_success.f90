@@ -45,7 +45,7 @@ end interface set_successes
 
 contains
 
-    pure elemental subroutine changes_counter_reset(counter)
+    elemental subroutine changes_counter_reset(counter)
         type(Concrete_Changes_Counter), intent(inout) :: counter
 
         call reset_counters(counter%translation)
@@ -54,20 +54,20 @@ contains
         call reset_counters(counter%remove)
     end subroutine changes_counter_reset
 
-    pure elemental subroutine change_counters_reset(counters)
+    elemental subroutine change_counters_reset(counters)
         type(Concrete_Change_Counters_Line), intent(inout) :: counters
 
         call reset_counters(counters%line)
     end subroutine change_counters_reset
 
-    pure elemental subroutine change_counter_reset(counter)
+    elemental subroutine change_counter_reset(counter)
         type(Concrete_Change_Counter), intent(inout) :: counter
 
         counter%num_hits = 0
         counter%num_successes = 0
     end subroutine change_counter_reset
 
-    pure elemental subroutine changes_success_set(success, counter)
+    elemental subroutine changes_success_set(success, counter)
         type(Concrete_Changes_Success), intent(inout) :: success
         type(Concrete_Changes_Counter), intent(in) :: counter
 
@@ -77,21 +77,21 @@ contains
         success%remove = calculate_ratio(counter%remove)
     end subroutine changes_success_set
 
-    pure elemental subroutine change_successes_set(successes, counters)
+    elemental subroutine change_successes_set(successes, counters)
         type(Reals_Line), intent(inout) :: successes
         type(Concrete_Change_Counters_Line), intent(in) :: counters
 
         successes%line = calculate_ratio(counters%line)
     end subroutine change_successes_set
 
-    pure elemental subroutine change_success_set(success, counter)
+    elemental subroutine change_success_set(success, counter)
         real(DP), intent(inout) :: success
         type(Concrete_Change_Counter), intent(in) :: counter
 
         success = calculate_ratio(counter)
     end subroutine change_success_set
 
-    pure elemental real(DP) function calculate_ratio(counter) result(ratio)
+    elemental real(DP) function calculate_ratio(counter) result(ratio)
         type(Concrete_Change_Counter), intent(in) :: counter
 
         if (counter%num_hits > 0) then
