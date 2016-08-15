@@ -3,7 +3,7 @@
         "Box": {
             "periodicity": "XYZ",
             "initial size": [12.0, 12.0, 12.0],
-            "size can change": false
+            "size can change": true
         },
         "Thermostat": {
             "temperature": 2.0
@@ -26,21 +26,20 @@
     "Mixture": {
         "number of components": 3,
         "Component 1": {
-            "initial number": 250,
+            "initial number": 200,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": false
         },
         "Component 2": {
-            "initial number": 250,
+            "initial number": 1000,
             "minimum distance": 0.8,
-            "is dipolar": true,
-            "moment norm": 0.5,
+            "is dipolar": false,
             "can exchange": false
         },
         "Component 3": {
-            "initial number": 250,
+            "initial number": 300,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 0.25,
@@ -115,7 +114,17 @@
         "name": "urandom"
     },
     "Changes": {
-        "number of tuning steps": 50,
+        "number of tuning steps": 100,
+        "Box Size": {
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 10,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01,
+            "Small Change": {
+                "initial delta": 0.1
+            }
+        },
         "Components": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
@@ -134,9 +143,6 @@
         "Component 2": {
             "Small Move": {
                 "initial delta": [0.3, 0.3, 0.3]
-            },
-            "Small Rotation": {
-                "initial delta": 1.0
             }
         },
         "Component 3": {
@@ -149,7 +155,7 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 100
+        "number of steps": 250
     },
     "Input": {
         "initial coordinates": "initial_coordinates.xyz"
