@@ -285,7 +285,7 @@ contains
         particle%i = this%mixture%components(i_actor)%number%get() + 1
         particle%position = this%changes%random_position%get(i_actor)
         particle%orientation = this%changes%random_orientation%get(i_actor)
-        particle%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get_norm() * &
+        particle%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get_norm() * &
             particle%orientation
     end subroutine Add_define_exchange
 
@@ -359,10 +359,10 @@ contains
                 visit(deltas(i_component), particle, i_exclude)
         end do
         deltas(i_actor) = deltas(i_actor) - this%dipolar_interactions%self_components(i_actor)%&
-            component%meet(particle%dipolar_moment)
+            component%meet(particle%dipole_moment)
         mixture_delta = &
             this%dipolar_interactions%reci_visitor%visit_add(i_actor, particle) + &
-            this%dipolar_interactions%surf_mixture%visit_add(i_actor, particle%dipolar_moment) - &
+            this%dipolar_interactions%surf_mixture%visit_add(i_actor, particle%dipole_moment) - &
             this%dipolar_interactions%dlc_visitor%visit_add(i_actor, particle)
     end subroutine Add_visit_dipolar
 
@@ -377,7 +377,7 @@ contains
             get() + 1)
         call this%mixture%components(i_actor)%positions%add(particle%position)
         call this%mixture%components(i_actor)%orientations%add(particle%orientation)
-        call this%mixture%total_moment%add(i_actor, particle%dipolar_moment)
+        call this%mixture%total_moment%add(i_actor, particle%dipole_moment)
         do i_component = 1, size(this%short_interactions%visitable_cells, 2)
             call this%short_interactions%visitable_cells(i_actor, i_component)%add(particle)
         end do
@@ -416,7 +416,7 @@ contains
         particle%i = random_integer(this%mixture%components(i_actor)%number%get())
         particle%position = this%mixture%components(i_actor)%positions%get(particle%i)
         particle%orientation = this%mixture%components(i_actor)%orientations%get(particle%i)
-        particle%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(particle%i)
+        particle%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get(particle%i)
     end subroutine Remove_define_exchange
 
     !> \[
@@ -490,11 +490,11 @@ contains
                 visit(deltas(i_component), particle, i_exclude)
         end do
         deltas(i_actor) = deltas(i_actor) - this%dipolar_interactions%&
-            self_components(i_actor)%component%meet(particle%dipolar_moment)
+            self_components(i_actor)%component%meet(particle%dipole_moment)
         deltas = -deltas
         mixture_delta = &
             this%dipolar_interactions%reci_visitor%visit_remove(i_actor, particle) + &
-            this%dipolar_interactions%surf_mixture%visit_remove(i_actor, particle%dipolar_moment) -&
+            this%dipolar_interactions%surf_mixture%visit_remove(i_actor, particle%dipole_moment) -&
             this%dipolar_interactions%dlc_visitor%visit_remove(i_actor, particle)
     end subroutine Remove_visit_dipolar
 
@@ -510,7 +510,7 @@ contains
         do i_component = size(this%short_interactions%visitable_cells, 2), 1, -1
             call this%short_interactions%visitable_cells(i_actor, i_component)%remove(particle)
         end do
-        call this%mixture%total_moment%remove(i_actor, particle%dipolar_moment)
+        call this%mixture%total_moment%remove(i_actor, particle%dipole_moment)
         call this%mixture%components(i_actor)%orientations%remove(particle%i)
         call this%mixture%components(i_actor)%positions%remove(particle%i)
         call this%mixture%components(i_actor)%number%set(this%mixture%components(i_actor)%number%&
@@ -539,7 +539,7 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: particle
         integer, intent(in) :: i_actor
         abort = .true.; particle%i = 0; particle%position = 0._DP; particle%orientation = 0._DP
-        particle%dipolar_moment = 0._DP
+        particle%dipole_moment = 0._DP
     end subroutine Null_define_exchange
 
     pure real(DP) function Null_acceptation_probability(this, i_actor, delta_energy) &

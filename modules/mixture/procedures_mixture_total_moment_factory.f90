@@ -43,7 +43,7 @@ contains
         integer :: i_component
 
         do i_component = 1, size(are_dipolar)
-            are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
+            are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipole_moments)
         end do
     end subroutine set_are_dipolar
 

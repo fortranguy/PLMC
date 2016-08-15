@@ -31,7 +31,7 @@ contains
         call coordinates_create(component%positions, exists, periodic_box, component%number)
         is_dipolar = exists .and. component_is_dipolar(generating_data, prefix)
         call coordinates_create(component%orientations, component%number, is_dipolar)
-        call coordinates_create(component%dipolar_moments, component%orientations, is_dipolar, &
+        call coordinates_create(component%dipole_moments, component%orientations, is_dipolar, &
             generating_data, prefix)
         can_exchange = exists .and. component_can_exchange(generating_data, prefix)
         call composition_create(component%chemical_potential, can_exchange, generating_data, prefix)
@@ -44,7 +44,7 @@ contains
 
         call composition_destroy(component%average_number)
         call composition_destroy(component%chemical_potential)
-        call coordinates_destroy(component%dipolar_moments)
+        call coordinates_destroy(component%dipole_moments)
         call coordinates_destroy(component%orientations)
         call coordinates_destroy(component%positions)
         call composition_destroy(component%number)

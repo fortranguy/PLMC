@@ -97,9 +97,9 @@ contains
         this%structure_p = cmplx(0._DP, 0._DP, DP)
         this%structure_m = cmplx(0._DP, 0._DP, DP)
         do i_component = 1, size(this%components)
-            do i_particle = 1, this%components(i_component)%dipolar_moments%get_num()
+            do i_particle = 1, this%components(i_component)%dipole_moments%get_num()
                 particle%position = this%components(i_component)%positions%get(i_particle)
-                particle%dipolar_moment = this%components(i_component)%dipolar_moments%&
+                particle%dipole_moment = this%components(i_component)%dipole_moments%&
                     get(i_particle)
                 call this%update_add(i_component, particle)
             end do
@@ -191,8 +191,8 @@ contains
                 fourier_position_new = fourier_position_new_1(n_1) * fourier_position_new_2(n_2)
                 exp_kz_new = exp_kz_new_tab(abs(n_1), abs(n_2))
 
-                wave_dot_moment_12 = dot_product(wave_vector, old%dipolar_moment(1:2))
-                wave_x_moment_3 = norm2(wave_vector) * old%dipolar_moment(3)
+                wave_dot_moment_12 = dot_product(wave_vector, old%dipole_moment(1:2))
+                wave_x_moment_3 = norm2(wave_vector) * old%dipole_moment(3)
 
                 this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
                     cmplx(+wave_x_moment_3, wave_dot_moment_12, DP) * &
@@ -215,10 +215,10 @@ contains
     !>          e^{\pm k_{1:2} x_3} e^{i \vec{k}_{1:2} \cdot \vec{x}_{1:2}}
     !>  \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_transmutation(this, ij_components, new_dipolar_moment, old)
+    pure subroutine Abstract_update_transmutation(this, ij_components, new_dipole_moment, old)
         class(Abstract_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: surface_size(2)
@@ -251,10 +251,10 @@ contains
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
                 exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
 
-                wave_dot_delta_moment_12 = dot_product(wave_vector, new_dipolar_moment(1:2) - old%&
-                    dipolar_moment(1:2))
-                wave_delta_moment_3 = norm2(wave_vector) * (new_dipolar_moment(3) - old%&
-                    dipolar_moment(3))
+                wave_dot_delta_moment_12 = dot_product(wave_vector, new_dipole_moment(1:2) - old%&
+                    dipole_moment(1:2))
+                wave_delta_moment_3 = norm2(wave_vector) * (new_dipole_moment(3) - old%&
+                    dipole_moment(3))
 
                 this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
                     cmplx(+wave_delta_moment_3, wave_dot_delta_moment_12, DP) * &
@@ -266,13 +266,13 @@ contains
         end do
     end subroutine Abstract_update_transmutation
 
-    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+    pure subroutine Abstract_update_rotation(this, i_component, new_dipole_moment, old)
         class(Abstract_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        call this%update_transmutation([i_component, i_component], new_dipolar_moment, old)
+        call this%update_transmutation([i_component, i_component], new_dipole_moment, old)
     end subroutine Abstract_update_rotation
 
     !> cf. [[classes_dlc_structures:Abstract_update_exchange]]
@@ -334,8 +334,8 @@ contains
 
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
                 exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
-                wave_dot_moment_12 = dot_product(wave_vector, particle%dipolar_moment(1:2))
-                wave_x_moment_3 = norm2(wave_vector) * particle%dipolar_moment(3)
+                wave_dot_moment_12 = dot_product(wave_vector, particle%dipole_moment(1:2))
+                wave_x_moment_3 = norm2(wave_vector) * particle%dipole_moment(3)
 
                 this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
                     signed * cmplx(+wave_x_moment_3, wave_dot_moment_12, DP) * &
@@ -407,9 +407,9 @@ contains
                 exp_kz_2 = exp_kz_2_tab(abs(n_1), abs(n_2))
 
                 wave_dot_delta_moment_12 = dot_product(wave_vector, &
-                    particles(1)%dipolar_moment(1:2) - particles(2)%dipolar_moment(1:2))
+                    particles(1)%dipole_moment(1:2) - particles(2)%dipole_moment(1:2))
                 wave_delta_moment_3 = norm2(wave_vector) * &
-                    (particles(1)%dipolar_moment(3) - particles(2)%dipolar_moment(3))
+                    (particles(1)%dipole_moment(3) - particles(2)%dipole_moment(3))
 
                 this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
                     cmplx(+wave_delta_moment_3, wave_dot_delta_moment_12, DP) * &
@@ -460,10 +460,10 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_translation
 
-    pure subroutine Null_update_transmutation(this, ij_components, new_dipolar_moment, old)
+    pure subroutine Null_update_transmutation(this, ij_components, new_dipole_moment, old)
         class(Null_DLC_Structures), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_transmutation
 

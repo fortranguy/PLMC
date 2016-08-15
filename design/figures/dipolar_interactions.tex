@@ -33,7 +33,7 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{DESrealComponent}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox,
                     positions: \type{ComponentCoordinates},
-                    dipolarMoments: \type{ComponentDipolarMoments}, realPair: \type{DESrealPair}}}}
+                    dipoleMoments: \type{ComponentDipoleMoments}, realPair: \type{DESrealPair}}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{visit}{energy: \type{real}, particle:
                     \type{TemporaryParticle}, iExclude: \type{int}}}
@@ -43,12 +43,12 @@
         \begin{scope}[shift={($(DESconvergenceParameter.south) - (0 cm, 4.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESselfComponent}{0, 0}
                 \operation{\procedure{construct}{permittivity: \type{Permittivity},
-                    dipolarMoments: \type{ComponentDipolarMoments},
+                    dipoleMoments: \type{ComponentDipoleMoments},
                     alpha: \type{DESconvergenceParameter}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{visit}{}: \type{real}}
-                \operation{\procedure{meet}{dipolarMoment: \type{rea[3]}}: \type{real}}
+                \operation{\procedure{meet}{dipoleMoment: \type{rea[3]}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -59,13 +59,13 @@
                 \operation{\procedure{destroy}{}}
                 \operation[0]{\procedure{visit}{}: \type{real}}
                 \operation{\procedure{visitTransmutation}{ijComponents \type{int[2]},
-                    dipolarMoment2: \type{real[3]}, dipolarMoment1: \type{real[3]}}: \type{real}}
+                    dipoleMoment2: \type{real[3]}, dipoleMoment1: \type{real[3]}}: \type{real}}
                 \operation{\procedure{visitRotation}{iComponent: \type{int},
-                    dipolarMoment2: \type{real[3]}, dipolarMoment1: \type{real[3]}}: \type{real}}
+                    dipoleMoment2: \type{real[3]}, dipoleMoment1: \type{real[3]}}: \type{real}}
                 \operation{\procedure{visitAdd}{iComponent: \type{int},
-                    dipolarMoment: \type{real[3]}}: \type{real}}
+                    dipoleMoment: \type{real[3]}}: \type{real}}
                 \operation{\procedure{visitRemove}{iComponent: \type{int},
-                    dipolarMoment: \type{real[3]}}: \type{real}}
+                    dipoleMoment: \type{real[3]}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -76,9 +76,9 @@
                     newPosition: \type{real[3]},
                     old: \type{TemporaryParticle}}: \type{real}}
                 \operation[0]{\procedure{visitTransmutation}{ijComponents: \type{int[2]},
-                    newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
                 \operation[0]{\procedure{visitRotation}{iComponent: \type{int},
-                    newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
                 \operation[0]{\procedure{visitAdd}{iComponent: \type{int},
                     particle: \type{TemporaryParticle}}: \type{real}}
                 \operation[0]{\procedure{visitRemove}{iComponent: \type{int},
@@ -126,12 +126,12 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{visitIntra}{energy: \type{real},
                     positions: \type{ComponentCoordinates},
-                    dipolarMoments: \type{ComponentDipolarMoments}, realPair: \type{DESrealPair}}}
+                    dipoleMoments: \type{ComponentDipoleMoments}, realPair: \type{DESrealPair}}}
                 \operation{\procedure{visitInter}{energy: \type{real},
                     positions1: \type{ComponentCoordinates},
-                    dipolarMoments1: \type{ComponentDipolarMoments},
+                    dipoleMoments1: \type{ComponentDipoleMoments},
                     positions2: \type{ComponentCoordinates},
-                    dipolarMoments2: \type{ComponentDipolarMoments}, realPair: \type{DESrealPair}}}
+                    dipoleMoments2: \type{ComponentDipoleMoments}, realPair: \type{DESrealPair}}}
             \end{abstractclass}
         \end{scope}
 
@@ -151,9 +151,9 @@
                 \operation[0]{\procedure{updateTranslation}{iComponent: \type{int},
                     newPosition: \type{real[3]}, old: \type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateTransmutation}{ijComponents: \type{int[2]},
-                    newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateRotation}{iComponent: \type{int},
-                    newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateAdd}{iComponent: \type{int},
                     particle: \type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateRemove}{iComponent: \type{int},
@@ -210,7 +210,7 @@
             \umlnote[text width=\mediumTextWidth]{\import{}::\\
                 \namespace{Environment} :: PeriodicBox, ReciprocalLattice, Permittivity\\
                 \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
-                    ComponentDipolarMoments, TemporaryParticle};
+                    ComponentDipoleMoments, TemporaryParticle};
         \end{scope}
 
         \begin{scope}[on background layer]

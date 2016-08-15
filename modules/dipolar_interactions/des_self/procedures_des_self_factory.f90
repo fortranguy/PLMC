@@ -36,7 +36,7 @@ contains
         allocate(components(size(mixture_components)))
         do i_component = 1, size(components)
             call create(components(i_component)%component, permittivity, &
-                mixture_components(i_component)%dipolar_moments, are_dipolar(i_component), alpha)
+                mixture_components(i_component)%dipole_moments, are_dipolar(i_component), alpha)
         end do
     end subroutine create_components
 

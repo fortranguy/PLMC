@@ -256,7 +256,7 @@ contains
         do i_component = 1, size(new_energies)
             new_energies(i_component) = dipoles_field_visit_component(this%environment%&
                 external_field, this%mixture%components(i_component)%positions, this%mixture%&
-                components(i_component)%dipolar_moments)
+                components(i_component)%dipole_moments)
         end do
     end subroutine Abstract_visit_fields
 

@@ -50,7 +50,7 @@ contains
                 interact_ij = are_dipolar(i_component) .and. are_dipolar(j_component)
                 call create(components(i_component, j_component)%component, periodic_box, &
                     mixture_components(i_component)%positions, mixture_components(i_component)%&
-                    dipolar_moments, interact_ij, pair)
+                    dipole_moments, interact_ij, pair)
             end do
         end do
     end subroutine create_components

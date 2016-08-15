@@ -33,19 +33,19 @@ private
             class(Abstract_DES_Surf_Mixture), intent(in) :: this
         end function Abstract_visit
 
-        pure real(DP) function Abstract_visit_transmutation(this, ij_components, dipolar_moment_2, &
-            dipolar_moment_1)
+        pure real(DP) function Abstract_visit_transmutation(this, ij_components, dipole_moment_2, &
+            dipole_moment_1)
         import :: DP, Abstract_DES_Surf_Mixture
             class(Abstract_DES_Surf_Mixture), intent(in) :: this
             integer, intent(in) :: ij_components(:)
-            real(DP), intent(in) :: dipolar_moment_2(:), dipolar_moment_1(:)
+            real(DP), intent(in) :: dipole_moment_2(:), dipole_moment_1(:)
         end function Abstract_visit_transmutation
 
-        pure real(DP) function Abstract_visit_exchange(this, i_component, dipolar_moment, signed)
+        pure real(DP) function Abstract_visit_exchange(this, i_component, dipole_moment, signed)
         import :: DP, Abstract_DES_Surf_Mixture
             class(Abstract_DES_Surf_Mixture), intent(in) :: this
             integer, intent(in) :: i_component
-            real(DP), intent(in) :: dipolar_moment(:), signed
+            real(DP), intent(in) :: dipole_moment(:), signed
         end function Abstract_visit_exchange
 
     end interface
@@ -93,30 +93,30 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
-    pure real(DP) function Abstract_visit_rotation(this, i_component, dipolar_moment_2, &
-        dipolar_moment_1) result(delta_energy)
+    pure real(DP) function Abstract_visit_rotation(this, i_component, dipole_moment_2, &
+        dipole_moment_1) result(delta_energy)
         class(Abstract_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment_2(:), dipolar_moment_1(:)
+        real(DP), intent(in) :: dipole_moment_2(:), dipole_moment_1(:)
 
-        delta_energy = this%visit_transmutation([i_component, i_component], dipolar_moment_2, &
-            dipolar_moment_1)
+        delta_energy = this%visit_transmutation([i_component, i_component], dipole_moment_2, &
+            dipole_moment_1)
     end function Abstract_visit_rotation
 
-    pure real(DP) function Abstract_visit_add(this, i_component, dipolar_moment) result(energy)
+    pure real(DP) function Abstract_visit_add(this, i_component, dipole_moment) result(energy)
         class(Abstract_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:)
+        real(DP), intent(in) :: dipole_moment(:)
 
-        energy = this%visit_exchange(i_component, dipolar_moment, +1.0_DP)
+        energy = this%visit_exchange(i_component, dipole_moment, +1.0_DP)
     end function Abstract_visit_add
 
-    pure real(DP) function Abstract_visit_remove(this, i_component, dipolar_moment) result(energy)
+    pure real(DP) function Abstract_visit_remove(this, i_component, dipole_moment) result(energy)
         class(Abstract_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:)
+        real(DP), intent(in) :: dipole_moment(:)
 
-        energy = this%visit_exchange(i_component, dipolar_moment, -1.0_DP)
+        energy = this%visit_exchange(i_component, dipole_moment, -1.0_DP)
     end function Abstract_visit_remove
 
 !end implementation Abstract_DES_Surf_Mixture
@@ -139,21 +139,21 @@ contains
     !>                          (\vec{M} - \vec{\mu}_\mathsf{i})
     !>                 ]
     !> \]
-    pure real(DP) function Spherical_visit_transmutation(this, ij_components, dipolar_moment_2, &
-        dipolar_moment_1) result(delta_energy)
+    pure real(DP) function Spherical_visit_transmutation(this, ij_components, dipole_moment_2, &
+        dipole_moment_1) result(delta_energy)
         class(Spherical_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: dipolar_moment_2(:), dipolar_moment_1(:)
+        real(DP), intent(in) :: dipole_moment_2(:), dipole_moment_1(:)
 
         delta_energy = 0._DP
         if (.not.(this%total_moment%is_dipolar(ij_components(1)) .or. &
             this%total_moment%is_dipolar(ij_components(2)))) return !shortcut?
 
         delta_energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
-            (dot_product(dipolar_moment_2, dipolar_moment_2) - &
-             dot_product(dipolar_moment_1, dipolar_moment_1) + &
-             2._DP*dot_product(dipolar_moment_2 - dipolar_moment_1, &
-                this%total_moment%get() - dipolar_moment_1))
+            (dot_product(dipole_moment_2, dipole_moment_2) - &
+             dot_product(dipole_moment_1, dipole_moment_1) + &
+             2._DP*dot_product(dipole_moment_2 - dipole_moment_1, &
+                this%total_moment%get() - dipole_moment_1))
     end function Spherical_visit_transmutation
 
     !> \[
@@ -161,18 +161,18 @@ contains
     !>          (\vec{\mu} \cdot \vec{\mu}) \pm 2(\vec{\mu} \cdot \vec{M})
     !>      ]
     !> \]
-    pure real(DP) function Spherical_visit_exchange(this, i_component, dipolar_moment, signed) &
+    pure real(DP) function Spherical_visit_exchange(this, i_component, dipole_moment, signed) &
         result(delta_energy)
         class(Spherical_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:), signed
+        real(DP), intent(in) :: dipole_moment(:), signed
 
         delta_energy = 0._DP
         if (.not.this%total_moment%is_dipolar(i_component)) return
 
         delta_energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
-            (dot_product(dipolar_moment, dipolar_moment) + &
-             signed*2._DP*dot_product(dipolar_moment, this%total_moment%get()))
+            (dot_product(dipole_moment, dipole_moment) + &
+             signed*2._DP*dot_product(dipole_moment, this%total_moment%get()))
     end function Spherical_visit_exchange
 
 !end implementation Spherical_DES_Surf_Mixture
@@ -196,11 +196,11 @@ contains
     !>              \mu^{\prime 2}_z - \mu_z^2 + 2(\mu^\prime_z - \mu_z)(M_z - \mu_z)
     !>          ]
     !> \]
-    pure real(DP) function Rectangular_visit_transmutation(this, ij_components, dipolar_moment_2, &
-        dipolar_moment_1) result(delta_energy)
+    pure real(DP) function Rectangular_visit_transmutation(this, ij_components, dipole_moment_2, &
+        dipole_moment_1) result(delta_energy)
         class(Rectangular_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: dipolar_moment_2(:), dipolar_moment_1(:)
+        real(DP), intent(in) :: dipole_moment_2(:), dipole_moment_1(:)
 
         real(DP) :: total_moment(num_dimensions)
 
@@ -210,19 +210,19 @@ contains
 
         total_moment = this%total_moment%get()
         delta_energy = 1._DP/2._DP/this%permittivity / product(this%periodic_box%get_size()) * &
-            (dipolar_moment_2(3)**2 - dipolar_moment_1(3)**2 + &
-             2._DP*(dipolar_moment_2(3) - dipolar_moment_1(3)) * &
-             (total_moment(3) - dipolar_moment_1(3)))
+            (dipole_moment_2(3)**2 - dipole_moment_1(3)**2 + &
+             2._DP*(dipole_moment_2(3) - dipole_moment_1(3)) * &
+             (total_moment(3) - dipole_moment_1(3)))
     end function Rectangular_visit_transmutation
 
     !> \[
     !>      \Delta U = \frac{1}{2\epsilon V}[\mu_z^2 \pm 2 \mu_z M_z]
     !> \]
-    pure real(DP) function Rectangular_visit_exchange(this, i_component, dipolar_moment, signed) &
+    pure real(DP) function Rectangular_visit_exchange(this, i_component, dipole_moment, signed) &
         result(delta_energy)
         class(Rectangular_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:), signed
+        real(DP), intent(in) :: dipole_moment(:), signed
 
         real(DP) :: total_moment(num_dimensions)
 
@@ -231,8 +231,8 @@ contains
 
         total_moment = this%total_moment%get()
         delta_energy = 1._DP/2._DP/this%permittivity / product(this%periodic_box%get_size()) * &
-            (dipolar_moment(3)**2 + &
-             signed*2._DP*dipolar_moment(3) * total_moment(3))
+            (dipole_moment(3)**2 + &
+             signed*2._DP*dipole_moment(3) * total_moment(3))
     end function Rectangular_visit_exchange
 
 !end implementation Rectangular_DES_Surf_Mixture
@@ -244,19 +244,19 @@ contains
         energy = 0._DP
     end function Null_visit
 
-    pure real(DP) function Null_visit_transmutation(this, ij_components, dipolar_moment_2, &
-        dipolar_moment_1) result(delta_energy)
+    pure real(DP) function Null_visit_transmutation(this, ij_components, dipole_moment_2, &
+        dipole_moment_1) result(delta_energy)
         class(Null_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: dipolar_moment_2(:), dipolar_moment_1(:)
+        real(DP), intent(in) :: dipole_moment_2(:), dipole_moment_1(:)
         delta_energy = 0._DP
     end function Null_visit_transmutation
 
-    pure real(DP) function Null_visit_exchange(this, i_component, dipolar_moment, signed) &
+    pure real(DP) function Null_visit_exchange(this, i_component, dipole_moment, signed) &
         result(delta_energy)
         class(Null_DES_Surf_Mixture), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:), signed
+        real(DP), intent(in) :: dipole_moment(:), signed
         delta_energy = 0._DP
     end function Null_visit_exchange
 

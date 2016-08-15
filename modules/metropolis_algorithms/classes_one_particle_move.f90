@@ -284,11 +284,11 @@ contains
         old%i = random_integer(this%mixture%components(i_actor)%number%get())
         old%position = this%mixture%components(i_actor)%positions%get(old%i)
         old%orientation = this%mixture%components(i_actor)%orientations%get(old%i)
-        old%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(old%i)
+        old%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get(old%i)
         new%i = old%i
         new%position = this%changes_components(i_actor)%translated_positions%get(new%i)
         new%orientation = old%orientation
-        new%dipolar_moment = old%dipolar_moment
+        new%dipole_moment = old%dipole_moment
     end subroutine Translation_define_change
 
     subroutine Translation_visit_field(this, delta, new, old)
@@ -412,11 +412,11 @@ contains
         old%i = random_integer(this%mixture%components(i_actor)%orientations%get_num())
         old%position = this%mixture%components(i_actor)%positions%get(old%i)
         old%orientation = this%mixture%components(i_actor)%orientations%get(old%i)
-        old%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get(old%i)
+        old%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get(old%i)
         new%i = old%i
         new%position = old%position
         new%orientation = this%changes_components(i_actor)%rotated_orientations%get(new%i)
-        new%dipolar_moment = this%mixture%components(i_actor)%dipolar_moments%get_norm() * new%&
+        new%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get_norm() * new%&
             orientation
     end subroutine Rotation_define_change
 
@@ -425,7 +425,7 @@ contains
         real(DP), intent(out) :: delta
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        delta = dipoles_field_visit_rotation(this%environment%external_field, new%dipolar_moment, &
+        delta = dipoles_field_visit_rotation(this%environment%external_field, new%dipole_moment, &
             old)
     end subroutine Rotation_visit_field
 
@@ -468,11 +468,11 @@ contains
         end do
         deltas = real_energies_new - real_energies_old
         mixture_delta = &
-            this%dipolar_interactions%reci_visitor%visit_rotation(i_actor, new%dipolar_moment, &
+            this%dipolar_interactions%reci_visitor%visit_rotation(i_actor, new%dipole_moment, &
                 old) + &
-            this%dipolar_interactions%surf_mixture%visit_rotation(i_actor, new%dipolar_moment, &
-                old%dipolar_moment) - &
-            this%dipolar_interactions%dlc_visitor%visit_rotation(i_actor, new%dipolar_moment, old)
+            this%dipolar_interactions%surf_mixture%visit_rotation(i_actor, new%dipole_moment, &
+                old%dipole_moment) - &
+            this%dipolar_interactions%dlc_visitor%visit_rotation(i_actor, new%dipole_moment, old)
     end subroutine Rotation_visit_dipolar
 
     subroutine Rotation_update_actor(this, i_actor, new, old)
@@ -481,11 +481,11 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
         call this%mixture%components(i_actor)%orientations%set(new%i, new%orientation)
-        call this%mixture%total_moment%remove(i_actor, old%dipolar_moment)
-        call this%mixture%total_moment%add(i_actor, new%dipolar_moment)
-        call this%dipolar_interactions%reci_structure%update_rotation(i_actor, new%dipolar_moment, &
+        call this%mixture%total_moment%remove(i_actor, old%dipole_moment)
+        call this%mixture%total_moment%add(i_actor, new%dipole_moment)
+        call this%dipolar_interactions%reci_structure%update_rotation(i_actor, new%dipole_moment, &
             old)
-        call this%dipolar_interactions%dlc_structures%update_rotation(i_actor, new%dipolar_moment, &
+        call this%dipolar_interactions%dlc_structures%update_rotation(i_actor, new%dipole_moment, &
             old)
     end subroutine Rotation_update_actor
 
@@ -551,8 +551,8 @@ contains
          type(Concrete_Temporary_Particle), intent(out) :: new, old
          integer, intent(in) :: i_actor
          abort = .true.
-         new%i = 0; new%position = 0._DP; new%orientation = 0._DP; new%dipolar_moment = 0._DP
-         old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipolar_moment = 0._DP
+         new%i = 0; new%position = 0._DP; new%orientation = 0._DP; new%dipole_moment = 0._DP
+         old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipole_moment = 0._DP
      end subroutine Null_define_change
 
      subroutine Null_visit_field(this, delta, new, old)

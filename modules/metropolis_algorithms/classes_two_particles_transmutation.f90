@@ -204,14 +204,14 @@ contains
         particles(1)%position = this%mixture%components(ij_actors(1))%positions%get(particles(1)%i)
         particles(1)%orientation = this%mixture%components(ij_actors(1))%orientations%&
             get(particles(1)%i)
-        particles(1)%dipolar_moment = this%mixture%components(ij_actors(1))%dipolar_moments%&
+        particles(1)%dipole_moment = this%mixture%components(ij_actors(1))%dipole_moments%&
             get(particles(1)%i)
         particles(2)%i = this%mixture%components(ij_actors(2))%number%get() + 1
         call this%changes%position_copier%copy(particles(2)%position, particles(1)%position, &
             ij_actors)
         call this%changes%orientation_copier%copy(particles(2)%orientation, particles(1)%&
             orientation, ij_actors)
-        particles(2)%dipolar_moment = this%mixture%components(ij_actors(2))%dipolar_moments%&
+        particles(2)%dipole_moment = this%mixture%components(ij_actors(2))%dipole_moments%&
             get_norm() * particles(2)%orientation
     end subroutine Abstract_define_transmutation
 
@@ -300,16 +300,16 @@ contains
                     component%visit(deltas(i_component, i), particles(i), i_exclude)
             end do
             deltas(ij_actors(i), i) = deltas(ij_actors(i), i) - this%dipolar_interactions%&
-                self_components(ij_actors(i))%component%meet(particles(i)%dipolar_moment)
+                self_components(ij_actors(i))%component%meet(particles(i)%dipole_moment)
         end do
         deltas(:, 1) = -deltas(:, 1)
         mixture_delta = &
             this%dipolar_interactions%reci_visitor%visit_transmutation(ij_actors, particles(2)%&
-                dipolar_moment, particles(1)) + &
+                dipole_moment, particles(1)) + &
             this%dipolar_interactions%surf_mixture%visit_transmutation(ij_actors, particles(2)%&
-                dipolar_moment, particles(1)%dipolar_moment) - &
+                dipole_moment, particles(1)%dipole_moment) - &
             this%dipolar_interactions%dlc_visitor%visit_transmutation(ij_actors, particles(2)%&
-                dipolar_moment, particles(1))
+                dipole_moment, particles(1))
     end subroutine Abstract_visit_dipolar
 
     pure integer function i_exclude_particle(i_component, ij_actors, particles, i) result(i_exclude)
@@ -341,7 +341,7 @@ contains
             call this%short_interactions%visitable_cells(ij_actors(1), i_component)%&
                 remove(particles(1))
         end do
-        call this%mixture%total_moment%remove(ij_actors(1), particles(1)%dipolar_moment)
+        call this%mixture%total_moment%remove(ij_actors(1), particles(1)%dipole_moment)
         call this%mixture%components(ij_actors(1))%orientations%remove(particles(1)%i)
         call this%mixture%components(ij_actors(1))%positions%remove(particles(1)%i)
         call this%mixture%components(ij_actors(1))%number%set(this%mixture%&
@@ -350,16 +350,16 @@ contains
             components(ij_actors(2))%number%get() + 1)
         call this%mixture%components(ij_actors(2))%positions%add(particles(2)%position)
         call this%mixture%components(ij_actors(2))%orientations%add(particles(2)%orientation)
-        call this%mixture%total_moment%add(ij_actors(2), particles(2)%dipolar_moment)
+        call this%mixture%total_moment%add(ij_actors(2), particles(2)%dipole_moment)
         do i_component = 1, size(this%short_interactions%visitable_cells, 2)
             call this%short_interactions%visitable_cells(ij_actors(2), i_component)%&
                 add(particles(2))
         end do
 
         call this%dipolar_interactions%reci_structure%update_transmutation(ij_actors, particles(2)%&
-            dipolar_moment, particles(1))
+            dipole_moment, particles(1))
         call this%dipolar_interactions%dlc_structures%update_transmutation(ij_actors, particles(2)%&
-            dipolar_moment, particles(1))
+            dipole_moment, particles(1))
     end subroutine Abstract_update_actors
 
 !end implementation Abstract_Two_Particles_Transmutation

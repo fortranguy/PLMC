@@ -92,7 +92,7 @@ contains
 
         do i_component = 1, size(components)
             field_energies(i_component) = dipoles_field_visit_component(external_field, &
-                components(i_component)%positions, components(i_component)%dipolar_moments)
+                components(i_component)%positions, components(i_component)%dipole_moments)
         end do
     end subroutine visit_field
 
@@ -260,10 +260,10 @@ contains
         do i_component = 1, size(components)
             associate(energy_i => energies(i_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
-                    dipolar_moments_i => components(i_component)%dipolar_moments, &
+                    dipole_moments_i => components(i_component)%dipole_moments, &
                     pair => dipolar_interactions%real_pair)
                 call dipolar_interactions%real_visitor%visit(energy_i, positions_i, &
-                    dipolar_moments_i, pair)
+                    dipole_moments_i, pair)
             end associate
         end do
     end subroutine visit_des_real_intra
@@ -279,12 +279,12 @@ contains
             do i_component = 1, j_component - 1
                 associate(energy_ij => energies(j_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
-                    dipolar_moments_i => components(i_component)%dipolar_moments, &
+                    dipole_moments_i => components(i_component)%dipole_moments, &
                     positions_j => components(j_component)%positions, &
-                    dipolar_moments_j => components(j_component)%dipolar_moments, &
+                    dipole_moments_j => components(j_component)%dipole_moments, &
                     pair => dipolar_interactions%real_pair)
                     call dipolar_interactions%real_visitor%visit(energy_ij, positions_i, &
-                        dipolar_moments_i, positions_j, dipolar_moments_j, pair)
+                        dipole_moments_i, positions_j, dipole_moments_j, pair)
                 end associate
             end do
         end do

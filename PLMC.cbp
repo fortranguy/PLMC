@@ -505,7 +505,7 @@
 		<Unit filename="modules/mixture/coordinates/classes_component_coordinates.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/mixture/coordinates/classes_component_dipolar_moments.f90">
+		<Unit filename="modules/mixture/coordinates/classes_component_dipole_moments.f90">
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/mixture/coordinates/classes_coordinates.f90">
@@ -514,7 +514,7 @@
 		<Unit filename="modules/mixture/coordinates/procedures_component_coordinates_factory.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/mixture/coordinates/procedures_component_dipolar_moments_factory.f90">
+		<Unit filename="modules/mixture/coordinates/procedures_component_dipole_moments_factory.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/mixture/coordinates/procedures_coordinates_factory.f90">

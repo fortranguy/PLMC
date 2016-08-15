@@ -99,9 +99,9 @@ contains
 
         this%structure  = cmplx(0._DP, 0._DP, DP)
         do i_component = 1, size(this%components)
-            do i_particle = 1, this%components(i_component)%dipolar_moments%get_num()
+            do i_particle = 1, this%components(i_component)%dipole_moments%get_num()
                 particle%position = this%components(i_component)%positions%get(i_particle)
-                particle%dipolar_moment = this%components(i_component)%dipolar_moments%&
+                particle%dipole_moment = this%components(i_component)%dipole_moments%&
                     get(i_particle)
                 call this%update_add(i_component, particle)
             end do
@@ -173,7 +173,7 @@ contains
                         fourier_position_new_2(n_2) * fourier_position_new_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, old%dipolar_moment) * &
+                        dot_product(wave_vector, old%dipole_moment) * &
                         (fourier_position_new - fourier_position_old)
                 end do
             end do
@@ -186,10 +186,10 @@ contains
     !>      \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
     !>  \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_transmulation(this, ij_components, new_dipolar_moment, old)
+    pure subroutine Abstract_update_transmulation(this, ij_components, new_dipole_moment, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: box_size(num_dimensions)
@@ -223,20 +223,20 @@ contains
                         fourier_position_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, new_dipolar_moment - old%dipolar_moment) * &
+                        dot_product(wave_vector, new_dipole_moment - old%dipole_moment) * &
                         fourier_position
                 end do
             end do
         end do
     end subroutine Abstract_update_transmulation
 
-    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+    pure subroutine Abstract_update_rotation(this, i_component, new_dipole_moment, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        call this%update_transmutation([i_component, i_component], new_dipolar_moment, old)
+        call this%update_transmutation([i_component, i_component], new_dipole_moment, old)
     end subroutine Abstract_update_rotation
 
     !> cf. [[Abstract_update_exchange]]
@@ -298,7 +298,7 @@ contains
                         fourier_position_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        signed * dot_product(wave_vector, particle%dipolar_moment) * &
+                        signed * dot_product(wave_vector, particle%dipole_moment) * &
                         fourier_position
                 end do
             end do
@@ -358,8 +358,8 @@ contains
                         fourier_position_2_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, particles(1)%dipolar_moment - particles(2)%&
-                            dipolar_moment) * (fourier_position_2 - fourier_position_1)
+                        dot_product(wave_vector, particles(1)%dipole_moment - particles(2)%&
+                            dipole_moment) * (fourier_position_2 - fourier_position_1)
                 end do
             end do
         end do
@@ -404,17 +404,17 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_translation
 
-    pure subroutine Null_update_transmulation(this, ij_components, new_dipolar_moment, old)
+    pure subroutine Null_update_transmulation(this, ij_components, new_dipole_moment, old)
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_transmulation
 
-    pure subroutine Null_update_rotation(this, i_component, new_dipolar_moment, old)
+    pure subroutine Null_update_rotation(this, i_component, new_dipole_moment, old)
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_rotation
 

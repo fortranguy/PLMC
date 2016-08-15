@@ -190,10 +190,10 @@ contains
             old(i)%i = random_integer(this%components(ij_actors(i))%number%get())
             old(i)%position = this%components(ij_actors(i))%positions%get(old(i)%i)
             old(i)%orientation = this%components(ij_actors(i))%orientations%get(old(i)%i)
-            old(i)%dipolar_moment = this%components(ij_actors(i))%dipolar_moments%get(old(i)%i)
+            old(i)%dipole_moment = this%components(ij_actors(i))%dipole_moments%get(old(i)%i)
             new(i)%i = old(i)%i
             new(i)%orientation = old(i)%orientation
-            new(i)%dipolar_moment = old(i)%dipolar_moment
+            new(i)%dipole_moment = old(i)%dipole_moment
         end do
 
         new(1)%position = old(2)%position

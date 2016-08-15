@@ -68,9 +68,9 @@ contains
 
         this%total_moment = 0._DP
         do i_component = 1, size(this%components)
-            do i_particle = 1, this%components(i_component)%dipolar_moments%get_num()
+            do i_particle = 1, this%components(i_component)%dipole_moments%get_num()
                 this%total_moment = this%total_moment + this%components(i_component)%&
-                    dipolar_moments%get(i_particle)
+                    dipole_moments%get(i_particle)
             end do
         end do
     end subroutine Abstract_reset
@@ -89,28 +89,28 @@ contains
         total_moment = this%total_moment
     end function Abstract_get
 
-    subroutine Abstract_add(this, i_component, dipolar_moment)
+    subroutine Abstract_add(this, i_component, dipole_moment)
         class(Abstract_Mixture_Total_Moment), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:)
+        real(DP), intent(in) :: dipole_moment(:)
 
         if (.not.this%are_dipolar(i_component)) return
 
-        call check_array_size("Abstract_Mixture_Total_Moment: add", "dipolar_moment", &
-            dipolar_moment, num_dimensions)
-        this%total_moment = this%total_moment + dipolar_moment
+        call check_array_size("Abstract_Mixture_Total_Moment: add", "dipole_moment", &
+            dipole_moment, num_dimensions)
+        this%total_moment = this%total_moment + dipole_moment
     end subroutine Abstract_add
 
-    subroutine Abstract_remove(this, i_component, dipolar_moment)
+    subroutine Abstract_remove(this, i_component, dipole_moment)
         class(Abstract_Mixture_Total_Moment), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:)
+        real(DP), intent(in) :: dipole_moment(:)
 
         if (.not.this%are_dipolar(i_component)) return
 
-        call check_array_size("Abstract_Mixture_Total_Moment: remove", "dipolar_moment", &
-            dipolar_moment, num_dimensions)
-        this%total_moment = this%total_moment - dipolar_moment
+        call check_array_size("Abstract_Mixture_Total_Moment: remove", "dipole_moment", &
+            dipole_moment, num_dimensions)
+        this%total_moment = this%total_moment - dipole_moment
     end subroutine Abstract_remove
 
 !end implementation Abstract_Mixture_Total_Moment
@@ -143,16 +143,16 @@ contains
         is_dipolar = .false.
     end function Null_is_dipolar
 
-    subroutine Null_add(this, i_component, dipolar_moment)
+    subroutine Null_add(this, i_component, dipole_moment)
         class(Null_Mixture_Total_Moment), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:)
+        real(DP), intent(in) :: dipole_moment(:)
     end subroutine Null_add
 
-    subroutine Null_remove(this, i_component, dipolar_moment)
+    subroutine Null_remove(this, i_component, dipole_moment)
         class(Null_Mixture_Total_Moment), intent(inout) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: dipolar_moment(:)
+        real(DP), intent(in) :: dipole_moment(:)
     end subroutine Null_remove
 
 !end implementation Null_Mixture_Total_Moment

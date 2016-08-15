@@ -1,7 +1,7 @@
 module procedures_des_self_component_factory
 
 use classes_permittivity, only: Abstract_Permittivity
-use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 use classes_des_self_component, only: Abstract_DES_Self_Component, &
     Concrete_DES_Self_Component, Null_DES_Self_Component
@@ -13,10 +13,10 @@ public :: create, destroy
 
 contains
 
-    subroutine create(component, permittivity, dipolar_moments, is_dipolar, alpha)
+    subroutine create(component, permittivity, dipole_moments, is_dipolar, alpha)
         class(Abstract_DES_Self_Component), allocatable, intent(out) :: component
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
+        class(Abstract_Component_Dipole_Moments), intent(in) :: dipole_moments
         logical, intent(in) :: is_dipolar
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
 
@@ -25,7 +25,7 @@ contains
         else
             allocate(Null_DES_Self_Component :: component)
         end if
-        call component%construct(permittivity, dipolar_moments, alpha)
+        call component%construct(permittivity, dipole_moments, alpha)
     end subroutine create
 
     subroutine destroy(component)

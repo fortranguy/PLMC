@@ -33,20 +33,20 @@ private
             type(Concrete_Temporary_Particle), intent(in) :: old
         end function Abstract_visit_translation
 
-        pure real(DP) function Abstract_visit_transmutation(this, ij_components,new_dipolar_moment,&
+        pure real(DP) function Abstract_visit_transmutation(this, ij_components,new_dipole_moment,&
             old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
             class(Abstract_Structure_Visitor), intent(in) :: this
             integer, intent(in) :: ij_components(:)
-            real(DP), intent(in) :: new_dipolar_moment(:)
+            real(DP), intent(in) :: new_dipole_moment(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end function Abstract_visit_transmutation
 
-        pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipolar_moment, old)
+        pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
             class(Abstract_Structure_Visitor), intent(in) :: this
             integer, intent(in) :: i_component
-            real(DP), intent(in) :: new_dipolar_moment(:)
+            real(DP), intent(in) :: new_dipole_moment(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end function Abstract_visit_rotation
 

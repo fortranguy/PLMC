@@ -30,7 +30,7 @@ contains
         integer :: i_component
 
         do i_component = 1, size(selector)
-            selector(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
+            selector(i_component) = component_is_dipolar(components(i_component)%dipole_moments)
         end do
 
         if (any(selector) .and. apply_external_field(external_field)) then

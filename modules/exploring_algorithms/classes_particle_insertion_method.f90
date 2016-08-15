@@ -105,7 +105,7 @@ contains
                     insertion_counters(i_component)%num_hits + 1
                 test%position = this%random_position%get(i_component)
                 test%orientation = this%random_orientation%get(i_component)
-                test%dipolar_moment = this%components(i_component)%dipolar_moments%get_norm() * &
+                test%dipole_moment = this%components(i_component)%dipole_moments%get_norm() * &
                     test%orientation
 
                 call this%visit_field(deltas%field, test)
@@ -179,9 +179,9 @@ contains
                 visit(deltas(j_component), test, i_exclude)
         end do
         deltas(i_component) = deltas(i_component) - this%dipolar_interactions%&
-            self_components(i_component)%component%meet(test%dipolar_moment)
+            self_components(i_component)%component%meet(test%dipole_moment)
         mixture_delta = this%dipolar_interactions%reci_visitor%visit_add(i_component, test) + &
-            this%dipolar_interactions%surf_mixture%visit_add(i_component, test%dipolar_moment) - &
+            this%dipolar_interactions%surf_mixture%visit_add(i_component, test%dipole_moment) - &
             this%dipolar_interactions%dlc_visitor%visit_add(i_component, test)
     end subroutine Abstract_visit_dipolar
 

@@ -12,8 +12,8 @@ use classes_component_number, only: Abstract_Component_Number, Concrete_Componen
 use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
 use classes_min_distance, only: Abstract_Min_Distance, Concrete_Min_Distance
-use classes_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
-    Concrete_Component_Dipolar_Moments
+use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments, &
+    Concrete_Component_Dipole_Moments
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential
 use classes_changed_box_size, only: Abstract_Changed_Box_Size, Null_Changed_Box_Size
@@ -66,7 +66,7 @@ end interface component_exists
 
 interface component_is_dipolar
     module procedure :: component_is_dipolar_from_json
-    module procedure :: component_is_dipolar_from_dipolar_moments
+    module procedure :: component_is_dipolar_from_dipole_moments
 end interface component_is_dipolar
 
 interface component_can_exchange
@@ -318,17 +318,17 @@ contains
         end select
     end function component_has_orientations
 
-    pure logical function component_is_dipolar_from_dipolar_moments(dipolar_moments) &
+    pure logical function component_is_dipolar_from_dipole_moments(dipole_moments) &
         result(component_is_dipolar)
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
+        class(Abstract_Component_Dipole_Moments), intent(in) :: dipole_moments
 
-        select type (dipolar_moments)
-            type is (Concrete_Component_Dipolar_Moments)
+        select type (dipole_moments)
+            type is (Concrete_Component_Dipole_Moments)
                 component_is_dipolar = .true.
             class default
                 component_is_dipolar = .false.
         end select
-    end function component_is_dipolar_from_dipolar_moments
+    end function component_is_dipolar_from_dipole_moments
 
     logical function component_can_exchange_from_json(generating_data, prefix) &
         result(component_can_exchange)

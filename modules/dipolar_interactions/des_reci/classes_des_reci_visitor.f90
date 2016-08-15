@@ -159,7 +159,7 @@ contains
                         fourier_position_old_2(n_2) * fourier_position_old_3(n_3)
                     fourier_position_new = fourier_position_new_1(n_1) * &
                         fourier_position_new_2(n_2) * fourier_position_new_3(n_3)
-                    wave_dot_moment = dot_product(wave_vector, old%dipolar_moment)
+                    wave_dot_moment = dot_product(wave_vector, old%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &
                         real((fourier_position_new - fourier_position_old) * &
@@ -184,11 +184,11 @@ contains
     !>              \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu})
     !>          \right]
     !> \]
-    pure real(DP) function Abstract_visit_transmutation(this, ij_components, new_dipolar_moment, &
+    pure real(DP) function Abstract_visit_transmutation(this, ij_components, new_dipole_moment, &
         old) result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: box_size(num_dimensions)
@@ -224,7 +224,7 @@ contains
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)
                     wave_dot_delta_moment = dot_product(wave_vector, &
-                        new_dipolar_moment - old%dipolar_moment)
+                        new_dipole_moment - old%dipole_moment)
 
                     real_fourier_x_conjg_structure = real(fourier_position * &
                         conjg(this%structure%get(n_1, n_2, n_3)), DP)
@@ -238,14 +238,14 @@ contains
         delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_transmutation
 
-    pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipolar_moment, old) &
+    pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old) &
         result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        delta_energy = this%visit_transmutation([i_component, i_component], new_dipolar_moment, old)
+        delta_energy = this%visit_transmutation([i_component, i_component], new_dipole_moment, old)
     end function Abstract_visit_rotation
 
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
@@ -310,7 +310,7 @@ contains
 
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)
-                    wave_dot_moment = dot_product(wave_vector, particle%dipolar_moment)
+                    wave_dot_moment = dot_product(wave_vector, particle%dipole_moment)
 
                     real_fourier_x_conjg_structure = signed * real(fourier_position * &
                         conjg(this%structure%get(n_1, n_2, n_3)), DP)
@@ -387,8 +387,8 @@ contains
                         fourier_position_1_3(n_3)
                     fourier_position_2 = fourier_position_2_1(n_1) * fourier_position_2_2(n_2) * &
                         fourier_position_2_3(n_3)
-                    wave_dot_delta_moment = dot_product(wave_vector, particles(1)%dipolar_moment - &
-                        particles(2)%dipolar_moment)
+                    wave_dot_delta_moment = dot_product(wave_vector, particles(1)%dipole_moment - &
+                        particles(2)%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &
                         real((fourier_position_2 - fourier_position_1) * &
@@ -433,11 +433,11 @@ contains
         delta_energy = 0._DP
     end function Null_visit_translation
 
-    pure real(DP) function Null_visit_transmutation(this, ij_components, new_dipolar_moment, &
+    pure real(DP) function Null_visit_transmutation(this, ij_components, new_dipole_moment, &
         old) result(delta_energy)
         class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_transmutation

@@ -177,8 +177,8 @@ contains
                 fourier_position_new = fourier_position_new_1(n_1) * fourier_position_new_2(n_2)
                 exp_kz_new = exp_kz_new_tab(abs(n_1), abs(n_2))
 
-                wave_dot_moment_12 = dot_product(wave_vector, old%dipolar_moment(1:2))
-                wave_x_moment_3 = norm2(wave_vector) * old%dipolar_moment(3)
+                wave_dot_moment_12 = dot_product(wave_vector, old%dipole_moment(1:2))
+                wave_x_moment_3 = norm2(wave_vector) * old%dipole_moment(3)
 
                 real_part_1 = real(this%structures%get_plus(n_1, n_2) * &
                     cmplx(-wave_x_moment_3, -wave_dot_moment_12, DP) * &
@@ -221,11 +221,11 @@ contains
     !>          -[k_{1:2} (\mu^\prime_3 - \mu_3)]^2 +
     !>          [\vec{k}_{1:2} \cdot (\vec{\mu}^\prime_{1:2} - \vec{\mu}_{1:2})]^2
     !> \]
-    pure real(DP) function Abstract_visit_transmutation(this, ij_components, new_dipolar_moment, &
+    pure real(DP) function Abstract_visit_transmutation(this, ij_components, new_dipole_moment, &
         old) result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: real_part_1, real_part_2, real_part_3
@@ -261,10 +261,10 @@ contains
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
                 exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
 
-                wave_dot_delta_moment_12 = dot_product(wave_vector, new_dipolar_moment(1:2) - old%&
-                    dipolar_moment(1:2))
-                wave_delta_moment_3 = norm2(wave_vector) * (new_dipolar_moment(3) - old%&
-                    dipolar_moment(3))
+                wave_dot_delta_moment_12 = dot_product(wave_vector, new_dipole_moment(1:2) - old%&
+                    dipole_moment(1:2))
+                wave_delta_moment_3 = norm2(wave_vector) * (new_dipole_moment(3) - old%&
+                    dipole_moment(3))
 
                 real_part_1 = real(this%structures%get_plus(n_1, n_2) * &
                     cmplx(-wave_delta_moment_3, -wave_dot_delta_moment_12, DP) * &
@@ -281,14 +281,14 @@ contains
         delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_transmutation
 
-    pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipolar_moment, old) &
+    pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old) &
         result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        delta_energy = this%visit_transmutation([i_component, i_component], new_dipolar_moment, old)
+        delta_energy = this%visit_transmutation([i_component, i_component], new_dipole_moment, old)
     end function Abstract_visit_rotation
 
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
@@ -361,8 +361,8 @@ contains
 
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
                 exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
-                wave_dot_moment_12 = dot_product(wave_vector, particle%dipolar_moment(1:2))
-                wave_x_moment_3 = norm2(wave_vector) * particle%dipolar_moment(3)
+                wave_dot_moment_12 = dot_product(wave_vector, particle%dipole_moment(1:2))
+                wave_x_moment_3 = norm2(wave_vector) * particle%dipole_moment(3)
 
                 real_part_1 = signed * real(this%structures%get_plus(n_1, n_2) * &
                     cmplx(-wave_x_moment_3, -wave_dot_moment_12, DP) * &
@@ -470,9 +470,9 @@ contains
                 exp_kz_2 = exp_kz_2_tab(abs(n_1), abs(n_2))
 
                 wave_dot_delta_moment_12 = dot_product(wave_vector, &
-                    particles(1)%dipolar_moment(1:2) - particles(2)%dipolar_moment(1:2))
+                    particles(1)%dipole_moment(1:2) - particles(2)%dipole_moment(1:2))
                 wave_delta_moment_3 = norm2(wave_vector) * &
-                    (particles(1)%dipolar_moment(3) - particles(2)%dipolar_moment(3))
+                    (particles(1)%dipole_moment(3) - particles(2)%dipole_moment(3))
 
                 real_part_1 = real(this%structures%get_plus(n_1, n_2) * &
                     cmplx(-wave_delta_moment_3, -wave_dot_delta_moment_12, DP) * &
@@ -522,11 +522,11 @@ contains
         delta_energy = 0._DP
     end function Null_visit_translation
 
-    pure real(DP) function Null_visit_transmutation(this, ij_components, new_dipolar_moment, old) &
+    pure real(DP) function Null_visit_transmutation(this, ij_components, new_dipole_moment, old) &
         result(delta_energy)
         class(Null_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        real(DP), intent(in) :: new_dipolar_moment(:)
+        real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_transmutation

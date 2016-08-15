@@ -11,7 +11,7 @@ private
         integer :: i = 0
         real(DP) :: position(num_dimensions) = 0._DP
         real(DP) :: orientation(num_dimensions) = 0._DP
-        real(DP) :: dipolar_moment(num_dimensions) = 0._DP
+        real(DP) :: dipole_moment(num_dimensions) = 0._DP
     end type Concrete_Temporary_Particle
 
 end module types_temporary_particle

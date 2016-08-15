@@ -34,19 +34,19 @@ private
             type(Concrete_Temporary_Particle), intent(in) :: old
         end subroutine Abstract_update_translation
 
-        pure subroutine Abstract_update_transmutation(this, ij_components, new_dipolar_moment, old)
+        pure subroutine Abstract_update_transmutation(this, ij_components, new_dipole_moment, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Factor
             class(Abstract_Structure_Factor), intent(inout) :: this
             integer, intent(in) :: ij_components(:)
-            real(DP), intent(in) :: new_dipolar_moment(:)
+            real(DP), intent(in) :: new_dipole_moment(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end subroutine Abstract_update_transmutation
 
-        pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
+        pure subroutine Abstract_update_rotation(this, i_component, new_dipole_moment, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Factor
             class(Abstract_Structure_Factor), intent(inout) :: this
             integer, intent(in) :: i_component
-            real(DP), intent(in) :: new_dipolar_moment(:)
+            real(DP), intent(in) :: new_dipole_moment(:)
             type(Concrete_Temporary_Particle), intent(in) :: old
         end subroutine Abstract_update_rotation
 
