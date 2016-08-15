@@ -17,6 +17,7 @@ use types_observables_energies, only: Concrete_Double_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
+use procedures_metropolis_test, only: metropolis_test
 
 implicit none
 
@@ -163,7 +164,6 @@ contains
         type(Concrete_Temporary_Particle) :: particles(2)
         real(DP) :: delta_energy
         logical :: abort, overlap
-        real(DP) :: acceptation_probability, rand
 
         success = .false.
         call this%define_transmutation(abort, particles, ij_actors)
@@ -178,13 +178,7 @@ contains
 
         delta_energy = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        acceptation_probability = this%acceptation_probability(ij_actors, delta_energy)
-        if (acceptation_probability >= 1._DP) then
-            success = .true.
-        else
-            call random_number(rand)
-            if (rand < acceptation_probability) success = .true.
-        end if
+        success = metropolis_test(this%acceptation_probability(ij_actors, delta_energy))
         if (success) call this%update_actors(ij_actors, particles)
     end subroutine Abstract_test_metropolis
 
@@ -216,8 +210,8 @@ contains
     end subroutine Abstract_define_transmutation
 
     !> \[
-    !>      P[i \in I \to j \in J] = \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
-    !>          e^{-\beta \Delta U_{i \to j}} \frac{a_I^{-N_I}}{a_J^{-N_J}}
+    !>      P[i \in I \to j \in J] = min \left( 1, \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
+    !>          e^{-\beta \Delta U_{i \to j}} \frac{a_I^{-N_I}}{a_J^{-N_J}} \right)
     !> \]
     pure real(DP) function Abstract_acceptation_probability(this, ij_actors, delta_energy) &
         result(probability)
@@ -235,6 +229,7 @@ contains
                 exp(-delta_energy/temperature) * component_i%chemical_potential%&
                 get_inv_pow_activity() / component_j%chemical_potential%get_inv_pow_activity()
         end associate
+        probability = min(1._DP, probability)
     end function Abstract_acceptation_probability
 
     subroutine Abstract_visit_field(this, deltas, particles)

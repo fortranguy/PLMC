@@ -18,6 +18,7 @@ use types_observables_energies, only: Concrete_Single_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
+use procedures_metropolis_test, only: metropolis_test
 
 implicit none
 
@@ -241,7 +242,6 @@ contains
         real(DP) :: delta_energy
         type(Concrete_Temporary_Particle) :: new, old
         logical :: abort, overlap
-        real(DP) :: rand
 
         success = .false.
         call this%define_change(abort, new, old, i_actor)
@@ -256,12 +256,7 @@ contains
 
         delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        if (delta_energy <= 0._DP) then
-            success = .true.
-        else
-            call random_number(rand)
-            if (rand < exp(-delta_energy/this%environment%temperature%get())) success = .true.
-        end if
+        success = metropolis_test(min(1._DP, exp(-delta_energy/this%environment%temperature%get())))
         if (success) call this%update_actor(i_actor, new, old)
     end subroutine Abstract_test_metropolis
 

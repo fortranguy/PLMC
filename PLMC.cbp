@@ -463,6 +463,7 @@
 		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_algorithms_factory.f90">
 			<Option weight="19" />
 		</Unit>
+		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_test.f90" />
 		<Unit filename="modules/metropolis_algorithms/procedures_one_particle_exchange_factory.f90">
 			<Option weight="18" />
 		</Unit>

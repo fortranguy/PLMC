@@ -22,6 +22,7 @@ use procedures_observables_energies_factory, only: observables_energies_create =
 use procedures_generating_observables_factory, only:generating_observables_create => create
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 use procedures_plmc_reset, only: plmc_reset_cells, plmc_reset_cells
+use procedures_metropolis_test, only: metropolis_test
 
 implicit none
 
@@ -116,7 +117,6 @@ contains
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
         logical :: overlap
-        real(DP) :: acceptation_probability, rand
 
         success = .false.
         box_size_ratio = this%changed_box_size%get_ratio()
@@ -142,14 +142,7 @@ contains
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             triangle_observables_sum(deltas%short_energies)
-        acceptation_probability = this%acceptation_probability(box_size_ratio, delta_energy)
-        if (acceptation_probability < 1._DP) then
-            call random_number(rand)
-            if (rand < acceptation_probability) success = .true.
-        else
-            success = .true.
-        end if
-
+        success = metropolis_test(this%acceptation_probability(box_size_ratio, delta_energy))
         if (.not.success) then
             call this%environment%periodic_box%set(box_size)
             call this%rescale_positions(1._DP / box_size_ratio)
@@ -158,9 +151,9 @@ contains
     end subroutine Abstract_test_metropolis
 
     !> \[
-    !>      P[V \to V^\prime] = e^{-\beta p V \left( \frac{V^\prime}{V} - 1 \right)}
+    !>      P[V \to V^\prime] = min \left( 1, e^{-\beta p V \left( \frac{V^\prime}{V} - 1 \right)}
     !>          \left( \frac{V^\prime}{V} \right)^{N+1}
-    !>          e^{-\beta [U(\vec{s}^N, V^\prime) - U(\vec{s}^N, V)]}
+    !>          e^{-\beta [U(\vec{s}^N, V^\prime) - U(\vec{s}^N, V)]} \right)
     !> \]
     pure real(DP) function Abstract_acceptation_probability(this, box_size_ratio, delta_energy) &
         result(probability)
@@ -181,7 +174,7 @@ contains
             product(this%environment%accessible_domain%get_size()) * (volume_ratio - 1._DP)) * &
             volume_ratio**(num_particles + 1) * &
             exp(-delta_energy/this%environment%temperature%get())
-        if (probability > 1._DP) probability = 1._DP
+        probability = min(1._DP, probability)
     end function Abstract_acceptation_probability
 
         subroutine Abstract_rescale_positions(this, box_size_ratio)

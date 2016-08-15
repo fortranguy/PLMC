@@ -17,6 +17,7 @@ use types_observables_energies, only: Concrete_Single_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
+use procedures_metropolis_test, only: metropolis_test
 
 implicit none
 
@@ -246,7 +247,6 @@ contains
         type(Concrete_Temporary_Particle) :: particle
         real(DP) :: delta_energy
         logical :: abort, overlap
-        real(DP) :: acceptation_probability, rand
 
         success = .false.
         call this%define_exchange(abort, particle, i_actor)
@@ -261,13 +261,7 @@ contains
 
         delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        acceptation_probability = this%acceptation_probability(i_actor, delta_energy)
-        if (acceptation_probability >= 1._DP) then
-            success = .true.
-        else
-            call random_number(rand)
-            if (rand < acceptation_probability) success = .true.
-        end if
+        success = metropolis_test(this%acceptation_probability(i_actor, delta_energy))
         if (success) call this%update_actor(i_actor, particle)
     end subroutine Abstract_test_metropolis
 
@@ -290,7 +284,8 @@ contains
     end subroutine Add_define_exchange
 
     !> \[
-    !>      P[N \to N+1] = \frac{V \rho}{N+1} e^{-\beta \Delta U_{N \to N+1}} a^{N}
+    !>      P[N \to N+1] = min \left( 1,
+    !>          \frac{V \rho}{N+1} e^{-\beta \Delta U_{N \to N+1}} a^{N} \right)
     !> \]
     pure real(DP) function Add_acceptation_probability(this, i_actor, delta_energy) &
         result(probability)
@@ -305,6 +300,7 @@ contains
                     chemical_potential%get_density() / (real(component%number%get() + 1, DP)) * &
                 exp(-delta_energy/temperature) / component%chemical_potential%get_inv_pow_activity()
         end associate
+        probability = min(1._DP, probability)
     end function Add_acceptation_probability
 
     subroutine Add_visit_field(this, delta, particle)
@@ -420,7 +416,8 @@ contains
     end subroutine Remove_define_exchange
 
     !> \[
-    !>      P[N \to N-1] = \frac{N}{V \rho} e^{-\beta \Delta U_{N \to N-1}} a^{-N}
+    !>      P[N \to N-1] = min \left( 1,
+    !>          \frac{N}{V \rho} e^{-\beta \Delta U_{N \to N-1}} a^{-N} \right)
     !> \]
     pure real(DP) function Remove_acceptation_probability(this, i_actor, delta_energy) &
         result(probability)
@@ -435,6 +432,7 @@ contains
                 get_size()) / component%chemical_potential%get_density() * &
                 exp(-delta_energy/temperature) * component%chemical_potential%get_inv_pow_activity()
         end associate
+        probability = min(1._DP, probability)
     end function Remove_acceptation_probability
 
     subroutine Remove_visit_field(this, delta, particle)
