@@ -5,6 +5,8 @@ use module_changes_success, only: Concrete_Change_Counter, reset_counters
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use procedures_observables_factory_micro, only: create_reals, create_triangle_reals, destroy_reals,&
     destroy_triangle_reals
+use procedures_observables_energies_factory, only: observables_energies_create => create, &
+    observables_energies_destroy => destroy
 
 implicit none
 
@@ -32,10 +34,7 @@ contains
         integer, intent(in) :: num_components
 
         call create(observables%inv_pow_activities, num_components)
-        call create(observables%walls_energies, num_components)
-        call create(observables%field_energies, num_components)
-        call create(observables%short_energies, num_components)
-        call create(observables%dipolar_energies, num_components)
+        call observables_energies_create(observables%energies, num_components)
         call create(observables%insertion_successes, num_components)
         call create(observables%insertion_counters, num_components)
     end subroutine create_all
@@ -45,10 +44,7 @@ contains
 
         call destroy(observables%insertion_counters)
         call destroy(observables%insertion_successes)
-        call destroy(observables%dipolar_energies)
-        call destroy(observables%short_energies)
-        call destroy(observables%field_energies)
-        call destroy(observables%walls_energies)
+        call observables_energies_destroy(observables%energies)
         call destroy(observables%inv_pow_activities)
     end subroutine destroy_all
 

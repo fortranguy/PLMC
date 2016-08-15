@@ -13,9 +13,9 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use types_changes_wrapper, only: Changes_Wrapper
-use types_temporary_observables, only: Concrete_Double_Energies
+use types_observables_energies, only: Concrete_Double_Energies
+use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
 implicit none
@@ -61,14 +61,6 @@ private
         procedure :: set_selector => Null_set_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
-        procedure, private :: test_metropolis => Null_test_metropolis
-        procedure, private :: define_transmutation => Null_define_transmutation
-        procedure, private :: acceptation_probability => Null_acceptation_probability
-        procedure, private :: visit_field => Null_visit_field
-        procedure, private :: visit_walls => Null_visit_walls
-        procedure, private :: visit_short => Null_visit_short
-        procedure, private :: visit_dipolar => Null_visit_dipolar
-        procedure, private :: update_actors => Null_update_actors
     end type Null_Two_Particles_Transmutation
 
 contains
@@ -147,26 +139,16 @@ contains
 
         logical :: success
         type(Concrete_Double_Energies) :: deltas
-        integer :: ij_actors(2), i
+        integer :: ij_actors(2)
 
         ij_actors = this%couples%get(this%selector%get())
         observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits = &
             observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits + 1
-        allocate(deltas%short(size(observables%short_energies), 2))
-        allocate(deltas%dipolar(size(observables%dipolar_energies), 2))
+        allocate(deltas%short(size(observables%energies%short_energies), 2))
+        allocate(deltas%dipolar(size(observables%energies%dipolar_energies), 2))
         call this%test_metropolis(success, deltas, ij_actors)
         if (success) then
-            do i = 1, size(ij_actors)
-                observables%field_energies(ij_actors(i)) = &
-                    observables%field_energies(ij_actors(i)) + deltas%field(i)
-                observables%walls_energies(ij_actors(i)) = &
-                    observables%walls_energies(ij_actors(i)) + deltas%walls(i)
-                call update_energies(observables%short_energies, deltas%short(:, i), ij_actors(i))
-                call update_energies(observables%dipolar_energies, deltas%dipolar(:, i), &
-                    ij_actors(i))
-            end do
-            observables%dipolar_mixture_energy = observables%dipolar_mixture_energy + &
-                deltas%dipolar_mixture
+            call observables_energies_set(observables%energies, deltas, ij_actors)
             observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_successes = &
                 observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_successes + 1
         end if
@@ -414,81 +396,6 @@ contains
         class(Null_Two_Particles_Transmutation), intent(in) :: this
         type(Generating_Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
-
-    subroutine Null_test_metropolis(this, success, deltas, ij_actors)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        logical, intent(out) :: success
-        type(Concrete_Double_Energies), intent(inout) :: deltas
-        integer, intent(in) :: ij_actors(:)
-        success = .false.
-        deltas%field = 0._DP; deltas%walls = 0._DP; deltas%short = 0._DP; deltas%dipolar = 0._DP
-        deltas%dipolar_mixture = 0._DP
-    end subroutine Null_test_metropolis
-
-    subroutine Null_define_transmutation(this, abort, particles, ij_actors)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: particles(:)
-        integer, intent(in) :: ij_actors(:)
-        integer :: i
-        abort = .true.
-        do i = 1, size(particles)
-            particles(i)%i = 0;
-            particles(i)%position = 0._DP;
-            particles(i)%orientation = 0._DP;
-            particles(i)%dipolar_moment = 0._DP;
-        end do
-    end subroutine Null_define_transmutation
-
-    pure real(DP) function Null_acceptation_probability(this, ij_actors, delta_energy) &
-        result(probability)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        integer, intent(in) :: ij_actors(:)
-        real(DP), intent(in) :: delta_energy
-        probability = 0._DP
-    end function Null_acceptation_probability
-
-    subroutine Null_visit_field(this, deltas, particles)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
-        deltas = 0._DP
-    end subroutine Null_visit_field
-
-    subroutine Null_visit_walls(this, overlap, deltas, ij_actors, particles)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: deltas(:)
-        integer, intent(in) :: ij_actors(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
-        overlap = .false.
-        deltas = 0._DP
-    end subroutine Null_visit_walls
-
-    subroutine Null_visit_short(this, overlap, deltas, ij_actors, particles)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: deltas(:, :)
-        integer, intent(in) :: ij_actors(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
-        overlap = .false.
-        deltas = 0._DP
-    end subroutine Null_visit_short
-
-    subroutine Null_visit_dipolar(this, deltas, mixture_delta, ij_actors, particles)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:, :)
-        real(DP), intent(out) :: mixture_delta
-        integer, intent(in) :: ij_actors(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
-        deltas = 0._DP; mixture_delta = 0._DP
-    end subroutine Null_visit_dipolar
-
-    subroutine Null_update_actors(this, ij_actors, particles)
-        class(Null_Two_Particles_Transmutation), intent(in) :: this
-        integer, intent(in) :: ij_actors(:)
-        type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
-    end subroutine Null_update_actors
 
 !end implementation Null_Two_Particles_Transmutation
 

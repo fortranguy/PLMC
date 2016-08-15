@@ -37,8 +37,8 @@ contains
         integer :: i_component
 
         call writers%num_particles%write(i_step, observables%num_particles)
-        call writers%field%write(i_step, observables%field_energies)
-        call writers%walls%write(i_step, observables%walls_energies)
+        call writers%field%write(i_step, observables%energies%field_energies)
+        call writers%walls%write(i_step, observables%energies%walls_energies)
         if (0 <= i_step) then
             call writers%complete_coordinates%write(i_step)
         end if
@@ -48,9 +48,10 @@ contains
                     changes_sucesses(i_component))
             end do
         end if
-        call writers%short_energies%write(i_step, observables%short_energies)
-        call writers%dipolar_energies%write(i_step, observables%dipolar_energies)
-        call writers%dipolar_mixture_energy%write(i_step, observables%dipolar_mixture_energy)
+        call writers%short_energies%write(i_step, observables%energies%short_energies)
+        call writers%dipolar_energies%write(i_step, observables%energies%dipolar_energies)
+        call writers%dipolar_mixture_energy%write(i_step, observables%energies%&
+            dipolar_mixture_energy)
         call writers%switches%write(i_step, observables%switches_successes)
         call writers%transmutations%write(i_step, observables%transmutations_successes)
     end subroutine write_generating_observables
@@ -61,12 +62,13 @@ contains
         integer, intent(in) :: i_snap
 
         call writers%beta_pressure_excess%write(i_snap, observables%beta_pressure_excess)
-        call writers%field%write(i_snap, observables%field_energies)
-        call writers%walls%write(i_snap, observables%walls_energies)
+        call writers%field%write(i_snap, observables%energies%field_energies)
+        call writers%walls%write(i_snap, observables%energies%walls_energies)
         call writers%inv_pow_activities%write(i_snap, observables%inv_pow_activities)
-        call writers%short_energies%write(i_snap, observables%short_energies)
-        call writers%dipolar_energies%write(i_snap, observables%dipolar_energies)
-        call writers%dipolar_mixture_energy%write(i_snap, observables%dipolar_mixture_energy)
+        call writers%short_energies%write(i_snap, observables%energies%short_energies)
+        call writers%dipolar_energies%write(i_snap, observables%energies%dipolar_energies)
+        call writers%dipolar_mixture_energy%write(i_snap, observables%energies%&
+            dipolar_mixture_energy)
         call writers%insertion_successes%write(i_snap, observables%insertion_successes)
     end subroutine write_exploring_observables
 

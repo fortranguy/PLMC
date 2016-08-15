@@ -15,7 +15,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MetropolisAlgorithm.south) + (0 cm, -2.5 cm)$)}]
+        \begin{scope}[shift={($(MetropolisAlgorithm.north) + (0 cm, 6 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{OneParticleMove}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
@@ -29,6 +29,17 @@
         \end{scope}
 
         \begin{scope}[shift={($(OneParticleMove.north) + (9 cm, 0 cm)$)}]
+            \coordinate (Import) at (0, 0);
+            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+                \namespace{Environment} :: Environment \\
+                \namespace{Mixture} :: Mixture, Component \\
+                \namespace{ShortInteractions} :: ShortInteractions \\
+                \namespace{DipolarInteractions} :: DipolarInteractions \\
+                \namespace{Changes} :: ChangesComponent, Changes, ChangedBoxSize \\
+                \namespace{Observables} :: Observables};
+        \end{scope}
+
+        \begin{scope}[shift={($(MetropolisAlgorithm.north -| Import)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{TwoParticlesSwitch}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
@@ -52,7 +63,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(OneParticleMove.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(OneParticleExchange |- MetropolisAlgorithm.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{TwoParticlesTransmutation}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
@@ -65,7 +76,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(OneParticleExchange.south |- TwoParticlesTransmutation.north)$)}]
+        \begin{scope}[shift={($(TwoParticlesSwitch.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BoxVolumeChange}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
@@ -75,22 +86,16 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(OneParticleExchange.north |- MetropolisAlgorithm.north)$)}]
+        \begin{scope}[shift={($(TwoParticlesTransmutation |- BoxVolumeChange.north)$)}]
             \begin{class}[text width=\mediumTextWidth]{MetropolisAlgorithms}{0, 0}
+                \UMLattribute{boxVolumeChange: \type{BoxVolumeChange}}
                 \UMLattribute{oneParticleTranslation: \type{OneParticleMove}}
                 \UMLattribute{oneParticleRotation: \type{OneParticleMove}}
                 \UMLattribute{twoParticlesSwitch: \type{TwoParticlesSwitch}}
+                \UMLattribute{oneParticleAdd: \type{OneParticleExchange}}
+                \UMLattribute{oneParticleRemove: \type{OneParticleExchange}}
+                \UMLattribute{twoParticlesTransmutation: \type{TwoParticlesTransmutation}}
             \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(MetropolisAlgorithm.north -| TwoParticlesSwitch)$)}]
-            \umlnote[text width=\mediumTextWidth]{\import{}:\\
-                \namespace{Environment} :: Environment \\
-                \namespace{Mixture} :: Mixture, Component \\
-                \namespace{ShortInteractions} :: ShortInteractions \\
-                \namespace{DipolarInteractions} :: DipolarInteractions \\
-                \namespace{Changes} :: ChangesComponent, Changes, ChangedBoxSize \\
-                \namespace{Observables} :: Observables};
         \end{scope}
 
     \end{tikzpicture}

@@ -1,4 +1,4 @@
-module types_temporary_observables
+module types_observables_energies
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_reals_line, only: Reals_Line
@@ -19,10 +19,10 @@ private
         real(DP) :: dipolar_mixture = 0._DP
     end type Concrete_Double_Energies
 
-    type, public :: Concrete_Energies !in Observables?
+    type, public :: Concrete_Energies
         real(DP), allocatable :: field_energies(:), walls_energies(:)
         type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_mixture_energy = 0._DP
     end type Concrete_Energies
 
-end module types_temporary_observables
+end module types_observables_energies

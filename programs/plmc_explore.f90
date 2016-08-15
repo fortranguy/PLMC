@@ -43,7 +43,7 @@ implicit none
     do i_snap = 1, num_snaps
         call plmc_set(io%readers, i_snap)
         call plmc_reset(physical_model)
-        call plmc_visit(observables, physical_model, visit)
+        call plmc_visit(observables%energies, physical_model, visit)
         call markov_chain_explorer%volume_change_method%try(observables)
         call markov_chain_explorer%particle_insertion_method%try(observables)
         call plmc_set(observables)

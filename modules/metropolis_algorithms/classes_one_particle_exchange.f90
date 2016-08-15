@@ -13,9 +13,9 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_changes_wrapper, only: Changes_Wrapper
-use types_temporary_observables, only: Concrete_Single_Energies
+use types_observables_energies, only: Concrete_Single_Energies
+use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use procedures_metropolis_micro, only: update_energies
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
 implicit none
@@ -227,16 +227,11 @@ contains
 
         i_actor = this%selector%get()
         call this%increment_hit(observables%changes_counters(i_actor))
-        allocate(deltas%short(size(observables%short_energies)))
-        allocate(deltas%dipolar(size(observables%dipolar_energies)))
+        allocate(deltas%short(size(observables%energies%short_energies)))
+        allocate(deltas%dipolar(size(observables%energies%dipolar_energies)))
         call this%test_metropolis(success, deltas, i_actor)
         if (success) then
-            observables%field_energies(i_actor) = observables%field_energies(i_actor) + deltas%field
-            observables%walls_energies(i_actor) = observables%walls_energies(i_actor) + deltas%walls
-            call update_energies(observables%short_energies, deltas%short, i_actor)
-            call update_energies(observables%dipolar_energies, deltas%dipolar, i_actor)
-            observables%dipolar_mixture_energy = observables%dipolar_mixture_energy + &
-                deltas%dipolar_mixture
+            call observables_energies_set(observables%energies, deltas, i_actor)
             observables%num_particles(i_actor) = this%mixture%components(i_actor)%number%get()
             call this%increment_success(observables%changes_counters(i_actor))
         end if

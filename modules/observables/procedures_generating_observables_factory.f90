@@ -6,6 +6,8 @@ use module_changes_success, only: Concrete_Change_Counter, Concrete_Changes_Coun
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_observables_factory_micro, only: create_reals, create_triangle_reals, &
     create_square_reals, destroy_reals, destroy_triangle_reals, destroy_square_reals
+use procedures_observables_energies_factory, only: observables_energies_create => create, &
+    observables_energies_destroy => destroy
 
 implicit none
 
@@ -43,10 +45,7 @@ contains
         integer, intent(in) :: num_components
 
         call create(observables%num_particles, num_components)
-        call create(observables%walls_energies, num_components)
-        call create(observables%field_energies, num_components)
-        call create(observables%short_energies, num_components)
-        call create(observables%dipolar_energies, num_components)
+        call observables_energies_create(observables%energies, num_components)
         call create(observables%changes_counters, num_components)
         call create(observables%switches_counters, num_components)
         call create(observables%transmutations_counters, num_components)
@@ -64,10 +63,7 @@ contains
         call destroy(observables%transmutations_counters)
         call destroy(observables%switches_counters)
         call destroy(observables%changes_counters)
-        call destroy(observables%dipolar_energies)
-        call destroy(observables%short_energies)
-        call destroy(observables%field_energies)
-        call destroy(observables%walls_energies)
+        call observables_energies_destroy(observables%energies)
         call destroy(observables%num_particles)
     end subroutine destroy_all
 

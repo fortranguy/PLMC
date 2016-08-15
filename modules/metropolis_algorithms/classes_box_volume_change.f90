@@ -15,9 +15,10 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_component =>
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use types_reals_line, only: Reals_Line
 use procedures_triangle_observables, only: operator(-)
-use types_temporary_observables, only: Concrete_Single_Energies, Concrete_Energies
+use types_observables_energies, only: Concrete_Single_Energies, Concrete_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_triangle_observables, only: triangle_observables_sum
+use procedures_observables_energies_factory, only: observables_energies_create => create
 use procedures_generating_observables_factory, only:generating_observables_create => create
 use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 use procedures_plmc_reset, only: plmc_reset_cells, plmc_reset_cells
@@ -47,9 +48,21 @@ private
         procedure, private :: visit_short => Abstract_visit_short
     end type Abstract_Box_Volume_Change
 
+    type, extends(Abstract_Box_Volume_Change), public :: Concrete_Box_Volume_Change
+
+    end type Concrete_Box_Volume_Change
+
+    type, extends(Abstract_Box_Volume_Change), public :: Null_Box_Volume_Change
+    contains
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get_num_choices => Null_get_num_choices
+        procedure :: try => Null_try
+    end type Null_Box_Volume_Change
+
 contains
 
-!implementation Abstract_Metropolis_Algorithm
+!implementation Abstract_Box_Volume_Change
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, changed_box_size)
         class(Abstract_Box_Volume_Change), intent(out) :: this
@@ -87,16 +100,15 @@ contains
         type(Concrete_Energies) :: deltas
 
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
-        call generating_observables_create(deltas%walls_energies, size(observables%walls_energies))
-        call generating_observables_create(deltas%field_energies, size(observables%field_energies))
-        call this%test_metropolis(success, deltas, observables)
+        call observables_energies_create(deltas, size(this%mixture%components))
+        call this%test_metropolis(success, deltas, observables%energies)
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, deltas, observables)
+    subroutine Abstract_test_metropolis(this, success, deltas, energies)
         class(Abstract_Box_Volume_Change), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Energies), intent(inout) :: deltas
-        type(Generating_Observables_Wrapper), intent(in) :: observables
+        type(Concrete_Energies), intent(in) :: energies
 
         real(DP) :: delta_energy
         type(Concrete_Energies) :: new_energies
@@ -118,14 +130,14 @@ contains
         call generating_observables_create(new_energies%walls_energies, size(deltas%walls_energies))
         call this%visit_walls(overlap, new_energies%walls_energies)
         if (overlap) return
-        deltas%walls_energies = new_energies%walls_energies - observables%walls_energies
+        deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
         call generating_observables_create(new_energies%field_energies, size(deltas%field_energies))
         call this%visit_fields(new_energies%field_energies)
-        deltas%field_energies = new_energies%field_energies - observables%field_energies
+        deltas%field_energies = new_energies%field_energies - energies%field_energies
         call generating_observables_create(new_energies%short_energies, size(deltas%short_energies))
         call this%visit_short(overlap, new_energies%short_energies)
         if (overlap) return
-        deltas%short_energies = new_energies%short_energies - observables%short_energies
+        deltas%short_energies = new_energies%short_energies - energies%short_energies
         !dipolar interactions
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
@@ -283,6 +295,32 @@ contains
         end do
     end subroutine Abstract_visit_short
 
-!end implementation Abstract_Metropolis_Algorithm
+!end implementation Abstract_Box_Volume_Change
+
+!implementation Null_Box_Volume_Change
+
+    subroutine Null_construct(this, environment, mixture, short_interactions, changed_box_size)
+        class(Null_Box_Volume_Change), intent(out) :: this
+        type(Environment_Wrapper), target, intent(in) :: environment
+        type(Mixture_Wrapper), target, intent(in) :: mixture
+        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
+    end subroutine Null_construct
+
+    subroutine Null_destroy(this)
+        class(Null_Box_Volume_Change), intent(inout) :: this
+    end subroutine Null_destroy
+
+    pure integer function Null_get_num_choices(this) result(num_choices)
+        class(Null_Box_Volume_Change), intent(in) :: this
+        num_choices = 0
+    end function Null_get_num_choices
+
+    subroutine Null_try(this, observables)
+        class(Null_Box_Volume_Change), intent(in) :: this
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
+    end subroutine Null_try
+
+!end implementation Null_Box_Volume_Change
 
 end module classes_box_volume_change

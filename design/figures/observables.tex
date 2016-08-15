@@ -11,11 +11,7 @@
         \begin{scope}
             \begin{class}[text width=\mediumTextWidth]{GeneratingObservables}{0, 0}
                 \UMLattribute{numParticles: \type{int[:]}}
-                \UMLattribute{fieldEnergies: \type{real[:]}}
-                \UMLattribute{wallsEnergies: \type{real[:]}}
-                \UMLattribute{shortEnergies: \type{real[:.]}}
-                \UMLattribute{dipolarEnergies: \type{real[:.]}}
-                \UMLattribute{dipolarMixtureEnergy: \type{real}}
+                \UMLattribute{energies: \type{Energies}}
                 \UMLattribute{volumeChangeCounter: \type{ChangeCounter}}
                 \UMLattribute{volumeChangeSuccess: \type{real}}
                 \UMLattribute{changesCounters: \type{ChangesCounter[:]}}
@@ -54,13 +50,19 @@
             \begin{class}[text width=\mediumTextWidth]{ExploringObservables}{0, 0}
                 \UMLattribute{betaPressureExcess: \type{real}}
                 \UMLattribute{invPowActivities: \type{real[:]}}
+                \UMLattribute{energies: \type{Energies}}
+                \UMLattribute{insertionCounters: \type{ChangeCounter[:]}}
+                \UMLattribute{insertionSuccesses: \type{real[:]}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(ExploringObservables.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\smallTextWidth]{Energies}{0, 0}
                 \UMLattribute{fieldEnergies: \type{real[:]}}
                 \UMLattribute{wallsEnergies: \type{real[:]}}
                 \UMLattribute{shortEnergies: \type{real[:.]}}
                 \UMLattribute{dipolarEnergies: \type{real[:.]}}
                 \UMLattribute{dipolarMixtureEnergy: \type{real}}
-                \UMLattribute{insertionCounters: \type{ChangeCounter[:]}}
-                \UMLattribute{insertionSuccesses: \type{real[:]}}
             \end{class}
         \end{scope}
 

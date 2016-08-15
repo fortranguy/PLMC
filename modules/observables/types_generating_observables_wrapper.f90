@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_changes_success, only: Concrete_Change_Counter, Concrete_Changes_Counter, &
     Concrete_Changes_Success, Concrete_Change_Counters_Line
 use types_reals_line, only: Reals_Line
+use types_observables_energies, only: Concrete_Energies
 
 implicit none
 
@@ -11,9 +12,7 @@ private
 
     type, public :: Generating_Observables_Wrapper
         integer, allocatable :: num_particles(:)
-        real(DP), allocatable :: field_energies(:), walls_energies(:)
-        type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
-        real(DP) :: dipolar_mixture_energy = 0._DP
+        type(Concrete_Energies) :: energies
         type(Concrete_Change_Counter) :: volume_change_counter
         real(DP) :: volume_change_success
         type(Concrete_Changes_Counter), allocatable :: changes_counters(:)

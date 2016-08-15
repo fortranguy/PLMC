@@ -16,7 +16,7 @@ use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_reals_line, only: Reals_Line
-use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
+use types_observables_energies, only: Concrete_Energies
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use procedures_observables_factory_micro, only: create_triangle_nodes, destroy_triangle_nodes
 use procedures_triangle_observables, only: triangle_observables_init, &
@@ -53,33 +53,33 @@ contains
         call check_data_found(data_field, data_found)
     end subroutine set_visit
 
-    subroutine visit_generating(observables, physical_model)
-        type(Generating_Observables_Wrapper), intent(inout) :: observables
+    subroutine visit_generating(energies, physical_model)
+        type(Concrete_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
 
-        call plmc_visit(observables%field_energies, physical_model%environment%external_field, &
+        call plmc_visit(energies%field_energies, physical_model%environment%external_field, &
             physical_model%mixture%components)
-        call plmc_visit(observables%walls_energies, physical_model%mixture%components, &
+        call plmc_visit(energies%walls_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
-        call visit_short_full(observables%short_energies, physical_model%mixture%components, &
+        call visit_short_full(energies%short_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
-        call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
+        call plmc_visit(energies%dipolar_energies, energies%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
     end subroutine visit_generating
 
-    subroutine visit_exploring(observables, physical_model, visit)
-        type(Exploring_Observables_Wrapper), intent(inout) :: observables
+    subroutine visit_exploring(energies, physical_model, visit)
+        type(Concrete_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         logical, intent(in) :: visit
 
         if (.not.visit) return
-        call plmc_visit(observables%field_energies, physical_model%environment%external_field, &
+        call plmc_visit(energies%field_energies, physical_model%environment%external_field, &
             physical_model%mixture%components)
-        call plmc_visit(observables%walls_energies, physical_model%mixture%components, &
+        call plmc_visit(energies%walls_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
-        call visit_short_cells(observables%short_energies, physical_model%mixture%components, &
+        call visit_short_cells(energies%short_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
-        call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, &
+        call plmc_visit(energies%dipolar_energies, energies%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
     end subroutine visit_exploring
 
