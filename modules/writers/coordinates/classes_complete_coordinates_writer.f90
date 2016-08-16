@@ -4,7 +4,7 @@ use data_strings, only: max_line_length
 use procedures_checks, only: check_positive, check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_component_coordinates_writer, only: Component_Coordinates_Writer_Selector
+use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
 use types_component_coordinates_writer_wrapper, only: Component_Coordinates_Writer_Wrapper
 use procedures_component_coordinates_writer_factory, only: component_coordinates_writer_destroy => &
     destroy

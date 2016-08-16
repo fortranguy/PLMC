@@ -30,6 +30,7 @@
             "origin": [0.0, 0.0, 0.0],
             "size": [6.0, 6.0, 6.0]
         },
+        "component number": 1,
         "delta": 0.1,
         "file name": "z_density.out"
     },

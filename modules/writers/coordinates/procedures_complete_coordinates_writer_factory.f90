@@ -4,7 +4,7 @@ use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
-use classes_component_coordinates_writer, only: Component_Coordinates_Writer_Selector
+use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
 use types_component_coordinates_writer_wrapper, only: Component_Coordinates_Writer_Wrapper
 use procedures_component_coordinates_writer_factory, only: component_coordinates_writer_create => &
     create, component_coordinates_writer_destroy => destroy

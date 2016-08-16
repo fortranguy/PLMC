@@ -220,9 +220,6 @@
 		<Unit filename="modules/common/types_potential_domain.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="modules/common/types_radial_distribution_component.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_des_convergence_parameter.f90">
 			<Option weight="3" />
 		</Unit>
@@ -463,7 +460,9 @@
 		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_algorithms_factory.f90">
 			<Option weight="19" />
 		</Unit>
-		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_test.f90" />
+		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_test.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/metropolis_algorithms/procedures_one_particle_exchange_factory.f90">
 			<Option weight="18" />
 		</Unit>
@@ -524,6 +523,9 @@
 		<Unit filename="modules/mixture/coordinates/procedures_coordinates_micro.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/mixture/coordinates/types_raw_coordinates.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/mixture/hard_core/classes_min_distance.f90">
 			<Option weight="2" />
 		</Unit>
@@ -550,6 +552,9 @@
 		</Unit>
 		<Unit filename="modules/mixture/types_mixture_wrapper.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/mixture/types_radial_distribution_component.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/mixture/types_temporary_particle.f90">
 			<Option weight="1" />
@@ -614,6 +619,9 @@
 		<Unit filename="modules/readers/classes_component_coordinates_reader.f90">
 			<Option weight="4" />
 		</Unit>
+		<Unit filename="modules/readers/procedures_complete_coordinates_reader.f90">
+			<Option weight="2" />
+		</Unit>
 		<Unit filename="modules/readers/procedures_complete_coordinates_reader_factory.f90">
 			<Option weight="15" />
 		</Unit>
@@ -625,6 +633,9 @@
 		</Unit>
 		<Unit filename="modules/readers/procedures_readers_factory.f90">
 			<Option weight="16" />
+		</Unit>
+		<Unit filename="modules/readers/types_component_coordinates_reader_selector.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/readers/types_component_coordinates_reader_wrapper.f90">
 			<Option weight="5" />
@@ -736,6 +747,9 @@
 		</Unit>
 		<Unit filename="modules/writers/coordinates/procedures_component_coordinates_writer_factory.f90">
 			<Option weight="13" />
+		</Unit>
+		<Unit filename="modules/writers/coordinates/types_component_coordinates_writer_selector.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/writers/coordinates/types_component_coordinates_writer_wrapper.f90">
 			<Option weight="5" />

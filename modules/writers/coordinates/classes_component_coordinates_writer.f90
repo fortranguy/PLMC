@@ -5,14 +5,11 @@ use procedures_checks, only: check_string_not_empty, check_positive
 use classes_number_to_string, only: Abstract_Number_to_String, &
     Concrete_Number_to_String, Null_Number_to_String
 use classes_component_coordinates, only: Abstract_Component_Coordinates
+use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
+
 implicit none
 
 private
-
-    type, public :: Component_Coordinates_Writer_Selector
-        logical :: write_positions = .false.
-        logical :: write_orientations = .false.
-    end type Component_Coordinates_Writer_Selector
 
     type, abstract, public :: Abstract_Component_Coordinates_Writer
     private

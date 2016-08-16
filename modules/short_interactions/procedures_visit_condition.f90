@@ -3,9 +3,11 @@ module procedures_visit_condition
 implicit none
 
     abstract interface
+
         pure logical function in_range(i_inside, i_outside)
             integer, intent(in) :: i_inside, i_outside
         end function
+
     end interface
 
 private

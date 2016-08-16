@@ -4,16 +4,10 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_component_number, only: Abstract_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates
-use procedures_coordinates_reader, only: create_coordinates_from_file
 
 implicit none
 
 private
-
-    type, public :: Concrete_Component_Coordinates_Reader_Selector
-        logical :: read_positions = .false.
-        logical :: read_orientations = .false.
-    end type Concrete_Component_Coordinates_Reader_Selector
 
     type, abstract, public :: Abstract_Component_Coordinates_Reader
     contains
