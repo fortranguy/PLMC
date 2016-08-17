@@ -10,7 +10,7 @@ use types_component_coordinates_reader_selector, only: Component_Coordinates_Rea
 implicit none
 
 private
-public :: complete_coordinates_read
+public :: complete_coordinates_read, complete_coordinates_deallocate
 
 contains
 
@@ -99,5 +99,12 @@ contains
             read(coordinates_unit, *) i_component_dummy, raw_coordinates%orientations(:, i_particle)
         end if
     end subroutine read_coordinates
+
+    subroutine complete_coordinates_deallocate(raw_coordinates)
+        type(Concrete_Raw_Coordinates), intent(inout) :: raw_coordinates
+
+        if (allocated(raw_coordinates%orientations)) deallocate(raw_coordinates%orientations)
+        if (allocated(raw_coordinates%positions)) deallocate(raw_coordinates%positions)
+    end subroutine complete_coordinates_deallocate
 
 end module procedures_complete_coordinates_reader

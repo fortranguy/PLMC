@@ -10,6 +10,7 @@ use procedures_component_coordinates_writer_factory, only: component_coordinates
     create, component_coordinates_writer_destroy => destroy
 use classes_complete_coordinates_writer, only: Abstract_Complete_Coordinates_Writer, &
     Concrete_Complete_Coordinates_Writer, Null_Complete_Coordinates_Writer
+use procedures_property_inquirers, only: property_write_coordinates => write_coordinates
 
 implicit none
 
@@ -35,9 +36,7 @@ contains
         type(Component_Coordinates_Writer_Selector), allocatable :: components_selectors(:)
         type(Component_Coordinates_Writer_Selector) :: components_selector
 
-        data_field = prefix//"Coordinates.write"
-        call generating_data%get(data_field, write_coordinates, data_found)
-        call check_data_found(data_field, data_found)
+        write_coordinates = property_write_coordinates(generating_data, prefix)
         if (write_coordinates) then
             allocate(Concrete_Complete_Coordinates_Writer :: coordinates)
         else
@@ -47,6 +46,8 @@ contains
             data_field = prefix//"Coordinates.period"
             call generating_data%get(data_field, period, data_found)
             call check_data_found(data_field, data_found)
+        else
+            period = 0
         end if
 
         call component_coordinates_writer_create(components_coordinates, components_selectors, &

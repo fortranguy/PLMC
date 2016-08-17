@@ -1,6 +1,6 @@
 program z_density
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use data_strings, only: max_line_length
 use data_input_prefixes, only: environment_prefix

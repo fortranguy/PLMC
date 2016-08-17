@@ -1,7 +1,7 @@
 module procedures_property_inquirers
 
 use json_module, only: json_file
-use procedures_checks, only: check_data_found
+use procedures_checks, only: check_data_found, check_array_size
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
@@ -32,7 +32,8 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
     use_reciprocal_lattice, use_walls, box_size_can_change, &
     component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
-    component_interacts_with_wall, measure_chemical_potentials, measure_pressure
+    component_interacts_with_wall, num_components, i_component, ij_components, write_coordinates, &
+    measure_chemical_potentials, measure_pressure
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -73,6 +74,22 @@ interface component_can_exchange
     module procedure :: component_can_exchange_from_json
     module procedure :: component_can_exchange_from_chemical_potential
 end interface component_can_exchange
+
+interface num_components
+    module procedure :: num_components_from_json
+end interface num_components
+
+interface i_component
+    module procedure :: i_component_from_json
+end interface i_component
+
+interface ij_components
+    module procedure :: ij_components_from_json
+end interface ij_components
+
+interface write_coordinates
+    module procedure :: write_coordinates_from_json
+end interface write_coordinates
 
 interface components_interact
     module procedure :: components_interact_from_min_distance
@@ -349,6 +366,54 @@ contains
                 component_can_exchange = .false.
         end select
     end function component_can_exchange_from_chemical_potential
+
+    integer function num_components_from_json(generating_data, prefix) result(num_components)
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"number of components"
+        call generating_data%get(data_field, num_components, data_found)
+        call check_data_found(data_field, data_found)
+    end function num_components_from_json
+
+    integer function i_component_from_json(exploring_data, prefix) result(i_component)
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"component number"
+        call exploring_data%get(data_field, i_component, data_found)
+        call check_data_found(data_field, data_found)
+    end function i_component_from_json
+
+    function ij_components_from_json(exploring_data, prefix) result(ij_components)
+        integer :: ij_components(2)
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        integer, allocatable :: json_ij_components(:)
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"components couple"
+        call exploring_data%get(data_field, json_ij_components, data_found)
+        call check_data_found(data_field, data_found)
+        call check_array_size("procedures_property_inquirers: ij_components_from_json", &
+            "json_ij_components", json_ij_components, size(ij_components))
+        ij_components = json_ij_components
+    end function ij_components_from_json
+
+    logical function write_coordinates_from_json(generating_data, prefix) result(write_coordinates)
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        write_coordinates = logical_from_json(generating_data, prefix//"Coordinates.write")
+    end function write_coordinates_from_json
 
     logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
         result(measure_chemical_potentials)

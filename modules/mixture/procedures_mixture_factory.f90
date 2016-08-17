@@ -12,7 +12,8 @@ use procedures_hard_core_factory, only: hard_core_create => create, hard_core_de
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_property_inquirers, only: component_has_positions, component_has_orientations
+use procedures_property_inquirers, only: component_has_positions, component_has_orientations, &
+    property_num_components => num_components
 
 implicit none
 
@@ -64,14 +65,11 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: exists, data_found
+        logical :: exists
         integer :: num_components, i_component
         type(Concrete_Number_to_String) :: string
 
-        data_field = prefix//"number of components"
-        call generating_data%get(data_field, num_components, data_found)
-        call check_data_found(data_field, data_found)
+        num_components = property_num_components(generating_data, prefix)
         call check_positive("create_components", "num_components", num_components)
         if (num_components == 0) then
             exists = .false.
