@@ -1,7 +1,7 @@
 program density
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_input_prefixes, only: environment_prefix, mixture_prefix, writers_prefix, density_prefix
+use data_input_prefixes, only: environment_prefix, mixture_prefix, density_prefix
 use data_constants, only: num_dimensions
 use json_module, only: json_file
 use procedures_json_data_factory, only: json_data_create_input => create_input, &

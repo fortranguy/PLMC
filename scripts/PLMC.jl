@@ -39,9 +39,8 @@ module PLMC
 
         interMinDistances = zeros(size(components, 1), size(components, 1)) # triangle?
         for iComponent = 1:size(components, 1)
-            components[iComponent] = Component(
-                inputData["Mixture"]["Component $(iComponent)"]["initial number"], zeros(3, 1),
-                zeros(3, 1))
+            initialNumber = inputData["Mixture"]["Component $(iComponent)"]["initial number"]
+            components[iComponent] = Component(initialNumber, zeros(3, 0), zeros(3, 0))
             for jComponent = 1:iComponent-1
                 interMinDistances[iComponent, jComponent] =
                     inputData["Mixture"]["Inter $(jComponent)$(iComponent)"]["minimum distance"]

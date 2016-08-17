@@ -9,8 +9,7 @@ PM = ProgressMeter
 
 boxSize, components, interMinDistances = PLMC.set(inputData)
 
-firstPositions = trues(size(components))
-testPosition = Array{Float64}
+testPosition = zeros(3, 0)
 for iComponent = 1:size(components, 1)
     prog = PM.Progress(components[iComponent].num, "Component $(iComponent): ")
     while size(components[iComponent].positions, 2) < components[iComponent].num
@@ -31,13 +30,8 @@ for iComponent = 1:size(components, 1)
                 end
             end
         end
-        if (firstPositions[iComponent])
-            components[iComponent].positions[:, 1] = PLMC.folded(boxSize, testPosition)
-            firstPositions[iComponent] = false
-        else
-            components[iComponent].positions = hcat(components[iComponent].positions,
-                                                     PLMC.folded(boxSize, testPosition))
-        end
+        components[iComponent].positions = hcat(components[iComponent].positions, PLMC.
+            folded(boxSize, testPosition))
         PM.next!(prog)
     end
 end
