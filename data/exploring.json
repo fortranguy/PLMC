@@ -31,8 +31,7 @@
             "size": [6.0, 6.0, 6.0]
         },
         "component number": 1,
-        "delta": 0.1,
-        "file name": "z_density.out"
+        "name": "plain"
     },
     "Radial": {
         "delta": 0.1,

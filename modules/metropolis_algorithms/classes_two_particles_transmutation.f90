@@ -6,7 +6,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_visit_condition, only: visit_condition_different => different
+use procedures_visit_condition, only: visit_different
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add, &
     dipoles_field_visit_remove => visit_remove
@@ -271,8 +271,8 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, particles, i)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit_energy(overlap, deltas(i_component, i), particles(i), &
-                    visit_condition_different, i_exclude)
+                    visit_energy(overlap, deltas(i_component, i), particles(i), visit_different, &
+                    i_exclude)
                 if (overlap) return
             end do
         end do

@@ -8,7 +8,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use classes_hard_contact, only: Abstract_Hard_Contact
-use procedures_visit_condition, only: visit_condition_in_range => in_range
+use procedures_visit_condition, only: abstract_visit_condition
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_pair_potential, only: Abstract_Pair_Potential
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells
@@ -160,12 +160,12 @@ contains
         end do
     end subroutine Abstract_destroy_visitable_lists
 
-    subroutine Abstract_visit_energy(this, overlap, energy, particle, in_range, i_exclude)
+    subroutine Abstract_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        procedure(visit_condition_in_range) :: in_range
+        procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
         real(DP) :: energy_i
@@ -187,7 +187,8 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit_energy(overlap, energy_i, particle, this%pair_potential, in_range, i_exclude)
+                visit_energy(overlap, energy_i, particle, this%pair_potential, visit_condition, &
+                i_exclude)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -195,12 +196,13 @@ contains
         end do
     end subroutine Abstract_visit_energy
 
-    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, in_range, i_exclude)
+    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, visit_condition, &
+        i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        procedure(visit_condition_in_range) :: in_range
+        procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
         real(DP) :: contacts_i
@@ -222,7 +224,7 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit_contacts(overlap, contacts_i, particle, this%pair_potential, in_range, &
+                visit_contacts(overlap, contacts_i, particle, this%pair_potential, visit_condition,&
                 i_exclude)
             if (overlap) return
             contacts = contacts + contacts_i
@@ -301,23 +303,23 @@ contains
         class(Null_Visitable_Cells), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_visit_energy(this, overlap, energy, particle, in_range, i_exclude)
+    subroutine Null_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        procedure(visit_condition_in_range) :: in_range
+        procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.
         energy = 0._DP
     end subroutine Null_visit_energy
 
-    subroutine Null_visit_contacts(this, overlap, contacts, particle, in_range, i_exclude)
+    subroutine Null_visit_contacts(this, overlap, contacts, particle, visit_condition, i_exclude)
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        procedure(visit_condition_in_range) :: in_range
+        procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.
         contacts = 0._DP
