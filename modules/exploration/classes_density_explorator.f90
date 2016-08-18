@@ -25,11 +25,11 @@ private
             class(Abstract_Density_Explorator), intent(inout) :: this
         end subroutine Abstract_destroy
 
-        subroutine Abstract_fill(this, i_snap, position)
+        subroutine Abstract_fill(this, i_snap, positions)
         import :: DP, Abstract_Density_Explorator
             class(Abstract_Density_Explorator), intent(inout) :: this
             integer, intent(in) :: i_snap
-            real(DP), intent(in) :: position(:)
+            real(DP), intent(in) :: positions(:, :)
         end subroutine Abstract_fill
 
         subroutine Abstract_write(this)
@@ -70,14 +70,18 @@ contains
         call box_destroy(this%parallelepiped_domain)
     end subroutine Plain_destroy
 
-    subroutine Plain_fill(this, i_snap, position)
+    subroutine Plain_fill(this, i_snap, positions)
         class(Plain_Density_Explorator), intent(inout) :: this
         integer, intent(in) :: i_snap
-        real(DP), intent(in) :: position(:)
+        real(DP), intent(in) :: positions(:, :)
 
-        if (this%parallelepiped_domain%is_inside(position)) then
-            this%nums_inside(i_snap) = this%nums_inside(i_snap) + 1._DP
-        end if
+        integer :: i_particle
+
+        do i_particle = 1, size(positions, 2)
+            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
+                this%nums_inside(i_snap) = this%nums_inside(i_snap) + 1._DP
+            end if
+        end do
     end subroutine Plain_fill
 
     subroutine Plain_write(this)

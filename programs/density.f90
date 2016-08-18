@@ -35,7 +35,7 @@ implicit none
     class(Abstract_Min_Distance), allocatable :: wall_min_distance
     class(Abstract_Density_Explorator), allocatable :: density_explorator
     real(DP) :: box_size(num_dimensions)
-    integer :: num_components, i_component, i_particle
+    integer :: num_components, i_component
     type(Component_Coordinates_Reader_Selector) :: selector
     integer :: num_snaps, i_snap
     character(len=:), allocatable :: snap_filename
@@ -68,9 +68,7 @@ implicit none
         call complete_coordinates_read(box_size, raw_coordinates, num_components, i_component, &
             snap_filename, selector)
         call periodic_box%set(box_size)
-        do i_particle = 1, size(raw_coordinates%positions, 2)
-            call density_explorator%fill(i_snap, raw_coordinates%positions(:, i_particle))
-        end do
+        call density_explorator%fill(i_snap, raw_coordinates%positions)
         call complete_coordinates_deallocate(raw_coordinates)
         if (allocated(snap_filename)) deallocate(snap_filename)
     end do
