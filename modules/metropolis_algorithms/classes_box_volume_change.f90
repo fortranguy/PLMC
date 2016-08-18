@@ -9,8 +9,7 @@ use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_cells_factory, only: cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_visit_condition, only: visit_condition_in_range => in_range, &
-    visit_condition_lower => lower, visit_condition_unconditional => unconditional
+use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use types_reals_line, only: Reals_Line
@@ -262,15 +261,15 @@ contains
         integer :: j_component, i_component, i_particle, i_exclude
         logical :: same_component
         type(Concrete_Temporary_Particle) :: particle
-        procedure(visit_condition_in_range), pointer :: in_range => null()
+        procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
         do j_component = 1, size(this%short_interactions%visitable_cells, 2)
             do i_component = 1, j_component
                 same_component = i_component == j_component
                 if (same_component) then
-                    in_range => visit_condition_lower
+                    visit_condition => visit_lower
                 else
-                    in_range => visit_condition_unconditional
+                    visit_condition => visit_all
                 end if
                 energy_ij = 0._DP
                 do i_particle = 1, this%mixture%components(j_component)%positions%get_num()
@@ -279,7 +278,7 @@ contains
                         get(particle%i)
                     i_exclude = merge(particle%i, 0, same_component)
                     call this%short_interactions%visitable_cells(i_component, j_component)%&
-                        visit_energy(overlap, energy_j, particle, in_range, i_exclude)
+                        visit_energy(overlap, energy_j, particle, visit_condition, i_exclude)
                     if (overlap) return
                     energy_ij = energy_ij + energy_j
                 end do

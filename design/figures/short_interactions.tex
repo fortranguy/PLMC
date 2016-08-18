@@ -18,11 +18,13 @@
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{TemporaryParticle},
-                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle},
-                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{translate}{toPosition: \type{real[3]},
                     from: \type{TemporaryParticle}}}
@@ -40,12 +42,14 @@
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{TemporaryParticle},
                     pairPotential: \type{PairPotential},
-                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle},
                     pairPotential: \type{PairPotential},
-                    inRange: \procedure{inRange}{iInside: \type{int}, iOutside: \type{int}},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{add}{iParticle: \type{int}}}
                 \operation{\procedure{remove}{iParticle: \type{int}}}
@@ -104,6 +108,7 @@
 
         \begin{scope}[shift={($(VisitableCells.north) + (9 cm, 0 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{ShortInteractions}{0, 0}
+                \UMLattribute{hardContact: \type{HardContact}}
                 \UMLattribute{wallsVisitor: \type{WallsVisitor}}
                 \UMLattribute{wallPairs: \type{PairPotential[:]}}
                 \UMLattribute{componentsVisitor: \type{ShortPairsVisitor}}

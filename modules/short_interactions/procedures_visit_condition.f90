@@ -4,33 +4,33 @@ implicit none
 
     abstract interface
 
-        pure logical function in_range(i_inside, i_outside)
+        pure logical function abstract_visit_condition(i_inside, i_outside)
             integer, intent(in) :: i_inside, i_outside
-        end function
+        end function abstract_visit_condition
 
     end interface
 
 private
-public :: in_range, different, lower, unconditional
+public :: abstract_visit_condition, visit_different, visit_lower, visit_all
 
 contains
 
-    pure logical function different(i_inside, i_outside)
+    pure logical function visit_different(i_inside, i_outside)
         integer, intent(in) :: i_inside, i_outside
 
-        different = i_inside /= i_outside
-    end function different
+        visit_different = i_inside /= i_outside
+    end function visit_different
 
-    pure logical function lower(i_inside, i_outside)
-    integer, intent(in) :: i_inside, i_outside
-
-        lower = i_inside < i_outside
-    end function lower
-
-    pure logical function unconditional(i_inside, i_outside)
+    pure logical function visit_lower(i_inside, i_outside)
         integer, intent(in) :: i_inside, i_outside
 
-        unconditional = .true.
-    end function unconditional
+        visit_lower = i_inside < i_outside
+    end function visit_lower
+
+    pure logical function visit_all(i_inside, i_outside)
+        integer, intent(in) :: i_inside, i_outside
+
+        visit_all = .true.
+    end function visit_all
 
 end module procedures_visit_condition

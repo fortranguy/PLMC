@@ -72,13 +72,13 @@ contains
             allocate(raw_coordinates%orientations(num_dimensions, num_particles))
         else if (selector%read_positions .and. .not.selector%read_orientations) then
             allocate(raw_coordinates%positions(num_dimensions, num_particles))
-            allocate(raw_coordinates%orientations(0, 0))
+            allocate(raw_coordinates%orientations(num_dimensions, 0))
         else if (.not.selector%read_positions .and. selector%read_orientations) then
-            allocate(raw_coordinates%positions(0, 0))
+            allocate(raw_coordinates%positions(num_dimensions, 0))
             allocate(raw_coordinates%orientations(num_dimensions, num_particles))
         else
-            allocate(raw_coordinates%positions(0, 0))
-            allocate(raw_coordinates%orientations(0, 0))
+            allocate(raw_coordinates%positions(num_dimensions, 0))
+            allocate(raw_coordinates%orientations(num_dimensions, 0))
         end if
     end subroutine allocate_coordinates
 
