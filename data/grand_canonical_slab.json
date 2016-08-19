@@ -39,16 +39,16 @@
             "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": true,
-            "density": 0.0,
-            "inverse powered activity": 0.0
+            "density": 0.11397052022052022,
+            "inverse powered activity": 0.03757636600979546
         },
         "Component 2": {
             "initial number": 0,
             "minimum distance": 0.8,
             "is dipolar": false,
             "can exchange": true,
-            "density": 0.0,
-            "inverse powered activity": 0.0
+            "density": 0.56666019166019166,
+            "inverse powered activity": 0.012133022671524659
         },
         "Component 3": {
             "initial number": 0,
@@ -56,8 +56,8 @@
             "is dipolar": true,
             "moment norm": 0.25,
             "can exchange": true,
-            "density": 0.0,
-            "inverse powered activity": 0.0
+            "density": 0.17054242054242053,
+            "inverse powered activity": 0.02474289886810979
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -149,11 +149,11 @@
         "name": "urandom"
     },
     "Changes": {
-        "number of tuning steps": 100,
+        "number of tuning steps": 1000,
         "Components": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
-            "accumulation period": 10,
+            "accumulation period": 100,
             "wanted success ratio": 0.75,
             "tolerance": 0.01
         },
@@ -180,7 +180,7 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 250
+        "number of steps": 10000
     },
     "Input": {
         "initial coordinates": "initial_coordinates.xyz"

@@ -143,7 +143,7 @@
         "name": "urandom"
     },
     "Changes": {
-        "number of tuning steps": 100,
+        "number of tuning steps": 1000,
         "Components": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
@@ -174,7 +174,7 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 250
+        "number of steps": 10000
     },
     "Input": {
         "initial coordinates": "initial_coordinates.xyz"
