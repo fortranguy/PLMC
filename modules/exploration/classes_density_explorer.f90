@@ -55,8 +55,8 @@ private
     type, extends(Abstract_Density_Explorer), public :: Z_Density_Explorer
     private
         real(DP), allocatable :: density(:, :)
+        real(DP) :: delta_z
         integer :: i_z_min, i_z_max
-        real(DP) :: delta
         character(len=:), allocatable :: filename
     contains
         procedure :: construct => Z_construct
@@ -65,82 +65,20 @@ private
         procedure :: write => Z_write
     end type Z_Density_Explorer
 
+    type, extends(Abstract_Density_Explorer), public :: XZ_Density_Explorer
+    private
+        real(DP), allocatable :: density(:, :, :)
+        real(DP) :: delta_x, delta_z
+        integer :: i_x_min, i_x_max, i_z_min, i_z_max
+        character(len=:), allocatable :: filename
+    contains
+        procedure :: construct => XZ_construct
+        procedure :: destroy => XZ_destroy
+        procedure :: fill => XZ_fill
+        procedure :: write => XZ_write
+    end type XZ_Density_Explorer
+
 contains
-
-!implementation Z_Density_Explorer
-
-    subroutine Z_construct(this, parallelepiped_domain, delta, num_snaps, filename)
-        class(Z_Density_Explorer), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
-        real(DP), intent(in) :: delta !! \( \mathrm{d} z \)
-        integer, intent(in) :: num_snaps
-        character(len=*), intent(in) :: filename
-
-        real(DP), dimension(num_dimensions) :: domain_origin, domain_size
-
-        allocate(this%parallelepiped_domain, source=parallelepiped_domain)
-        call check_positive("Z_Density_Explorer: construct", "delta", delta)
-        this%delta = delta
-        domain_origin = this%parallelepiped_domain%get_origin()
-        domain_size = this%parallelepiped_domain%get_size()
-        this%i_z_min = nint((domain_origin(3) - domain_size(3)/2) / this%delta)
-        this%i_z_max = nint((domain_origin(3) + domain_size(3)/2) / this%delta)
-        allocate(this%density(this%i_z_min:this%i_z_max, num_snaps))
-            !! @note swap dimensions? cf. [[Z_write]]
-        this%density = 0._DP
-        this%filename = filename
-    end subroutine Z_construct
-
-    subroutine Z_destroy(this)
-        class(Z_Density_Explorer), intent(inout) :: this
-
-        if (allocated(this%filename)) deallocate(this%filename)
-        if (allocated(this%density)) deallocate(this%density)
-        call box_destroy(this%parallelepiped_domain)
-    end subroutine Z_destroy
-
-    subroutine Z_fill(this, i_snap, positions)
-        class(Z_Density_Explorer), intent(inout) :: this
-        integer, intent(in) :: i_snap
-        real(DP), intent(in) :: positions(:, :)
-
-        real(DP) :: domain_size(num_dimensions)
-        integer :: i_particle, i_z
-
-        do i_particle = 1, size(positions, 2)
-            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
-                i_z = nint(positions(3, i_particle) / this%delta)
-                this%density(i_z, i_snap) = this%density(i_z, i_snap) + 1._DP
-            end if
-        end do
-        domain_size = this%parallelepiped_domain%get_size()
-        this%density(:, i_snap) = this%density(:, i_snap) / product(domain_size(1:2)) / this%delta
-    end subroutine Z_fill
-
-    !> \[
-    !>      \rho(z) = \left\langle
-    !>          \frac{1}{L_x L_y}\frac{\mathrm{d} N}{\mathrm{d} z}(z)
-    !>      \right\rangle
-    !> \]
-    subroutine Z_write(this)
-        class(Z_Density_Explorer), intent(in) :: this
-
-        real(DP), dimension(this%i_z_min:this%i_z_max) :: density_average, density_std_dev
-        integer :: i_z
-        integer :: density_unit
-
-        open(newunit=density_unit, recl=max_line_length, file=this%filename, action="write")
-        write(density_unit, *) "# z    average    standard_deviation"
-        do i_z = lbound(density_average, 1), ubound(density_average, 1)
-            density_average(i_z) = average(this%density(i_z, :))
-            density_std_dev(i_z) = standard_deviation(this%density(i_z, :))
-            write(density_unit, *) real(i_z, DP) * this%delta, density_average(i_z), &
-                density_std_dev(i_z)
-        end do
-        close(density_unit)
-    end subroutine Z_write
-
-!end implementation Z_Density_Explorer
 
 !implementation Plain_Density_Explorer
 
@@ -189,5 +127,159 @@ contains
     end subroutine Plain_write
 
 !end implementation Plain_Density_Explorer
+
+!implementation Z_Density_Explorer
+
+    subroutine Z_construct(this, parallelepiped_domain, delta_z, num_snaps, filename)
+        class(Z_Density_Explorer), intent(out) :: this
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        real(DP), intent(in) :: delta_z
+        integer, intent(in) :: num_snaps
+        character(len=*), intent(in) :: filename
+
+        real(DP), dimension(num_dimensions) :: domain_origin, domain_size
+
+        allocate(this%parallelepiped_domain, source=parallelepiped_domain)
+        call check_positive("Z_Density_Explorer: construct", "delta_z", delta_z)
+        this%delta_z = delta_z
+        domain_origin = this%parallelepiped_domain%get_origin()
+        domain_size = this%parallelepiped_domain%get_size()
+        this%i_z_min = nint((domain_origin(3) - domain_size(3)/2) / this%delta_z)
+        this%i_z_max = nint((domain_origin(3) + domain_size(3)/2) / this%delta_z)
+        allocate(this%density(this%i_z_min:this%i_z_max, num_snaps))
+            !! @note swap dimensions? cf. [[Z_write]]
+        this%density = 0._DP
+        this%filename = filename
+    end subroutine Z_construct
+
+    subroutine Z_destroy(this)
+        class(Z_Density_Explorer), intent(inout) :: this
+
+        if (allocated(this%filename)) deallocate(this%filename)
+        if (allocated(this%density)) deallocate(this%density)
+        call box_destroy(this%parallelepiped_domain)
+    end subroutine Z_destroy
+
+    subroutine Z_fill(this, i_snap, positions)
+        class(Z_Density_Explorer), intent(inout) :: this
+        integer, intent(in) :: i_snap
+        real(DP), intent(in) :: positions(:, :)
+
+        real(DP) :: domain_size(num_dimensions)
+        integer :: i_particle, i_z
+
+        do i_particle = 1, size(positions, 2)
+            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
+                i_z = nint(positions(3, i_particle) / this%delta_z)
+                this%density(i_z, i_snap) = this%density(i_z, i_snap) + 1._DP
+            end if
+        end do
+        domain_size = this%parallelepiped_domain%get_size()
+        this%density(:, i_snap) = this%density(:, i_snap) / product(domain_size(1:2)) / this%delta_z
+    end subroutine Z_fill
+
+    !> \[
+    !>      \rho(z) = \left\langle
+    !>          \frac{1}{L_x L_y}\frac{\mathrm{d} N}{\mathrm{d} z}(z)
+    !>      \right\rangle
+    !> \]
+    subroutine Z_write(this)
+        class(Z_Density_Explorer), intent(in) :: this
+
+        real(DP), dimension(this%i_z_min:this%i_z_max) :: density_average, density_std_dev
+        integer :: i_z
+        integer :: density_unit
+
+        open(newunit=density_unit, recl=max_line_length, file=this%filename, action="write")
+        write(density_unit, *) "# z    average    standard_deviation"
+        do i_z = lbound(density_average, 1), ubound(density_average, 1)
+            density_average(i_z) = average(this%density(i_z, :))
+            density_std_dev(i_z) = standard_deviation(this%density(i_z, :))
+            write(density_unit, *) real(i_z, DP) * this%delta_z, density_average(i_z), &
+                density_std_dev(i_z)
+        end do
+        close(density_unit)
+    end subroutine Z_write
+
+!end implementation Z_Density_Explorer
+
+!implementation XZ_Density_Explorer
+
+    subroutine XZ_construct(this, parallelepiped_domain, delta_xz, num_snaps, filename)
+        class(XZ_Density_Explorer), intent(out) :: this
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        real(DP), intent(in) :: delta_xz
+        integer, intent(in) :: num_snaps
+        character(len=*), intent(in) :: filename
+
+        real(DP), dimension(num_dimensions) :: domain_origin, domain_size
+
+        allocate(this%parallelepiped_domain, source=parallelepiped_domain)
+        call check_positive("XZ_Density_Explorer: construct", "delta_xz", delta_xz)
+        this%delta_x = delta_xz
+        this%delta_z = delta_xz
+
+        domain_origin = this%parallelepiped_domain%get_origin()
+        domain_size = this%parallelepiped_domain%get_size()
+        this%i_x_min = nint((domain_origin(1) - domain_size(1)/2) / this%delta_x)
+        this%i_x_max = nint((domain_origin(1) + domain_size(1)/2) / this%delta_x)
+        this%i_z_min = nint((domain_origin(3) - domain_size(3)/2) / this%delta_z)
+        this%i_z_max = nint((domain_origin(3) + domain_size(3)/2) / this%delta_z)
+        allocate(this%density(this%i_x_min:this%i_x_max, this%i_z_min:this%i_z_max, num_snaps))
+        this%density = 0
+        this%filename = filename
+    end subroutine XZ_construct
+
+    subroutine XZ_destroy(this)
+        class(XZ_Density_Explorer), intent(inout) :: this
+
+        if (allocated(this%filename)) deallocate(this%filename)
+        if (allocated(this%density)) deallocate(this%density)
+        call box_destroy(this%parallelepiped_domain)
+    end subroutine XZ_destroy
+
+    subroutine XZ_fill(this, i_snap, positions)
+        class(XZ_Density_Explorer), intent(inout) :: this
+        integer, intent(in) :: i_snap
+        real(DP), intent(in) :: positions(:, :)
+
+        real(DP) :: domain_size(num_dimensions)
+        integer :: i_particle, i_x, i_z
+
+        do i_particle = 1, size(positions, 2)
+            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
+                i_x = nint(positions(1, i_particle) / this%delta_x)
+                i_z = nint(positions(3, i_particle) / this%delta_z)
+                this%density(i_x, i_z, i_snap) = this%density(i_x, i_z, i_snap) + 1._DP
+            end if
+        end do
+        domain_size = this%parallelepiped_domain%get_size()
+        this%density(:, :, i_snap) = this%density(:, :, i_snap) / domain_size(2) / &
+            (this%delta_x * this%delta_z)
+    end subroutine XZ_fill
+
+    subroutine XZ_write(this)
+        class(XZ_Density_Explorer), intent(in) :: this
+
+        real(DP), dimension(this%i_x_min:this%i_x_max, this%i_z_min:this%i_z_max) :: &
+            density_average, density_std_dev
+        integer :: i_x, i_z
+        integer :: density_unit
+
+        open(newunit=density_unit, recl=max_line_length, file=this%filename, action="write")
+        write(density_unit, *) "# x    z    average    standard_deviation"
+        do i_z = lbound(density_average, 2), ubound(density_average, 2)
+            do i_x = lbound(density_average, 1), ubound(density_average, 1)
+                density_average(i_x, i_z) = average(this%density(i_x, i_z, :))
+                density_std_dev(i_x, i_z) = standard_deviation(this%density(i_x, i_z, :))
+                write(density_unit, *) real(i_x, DP) * this%delta_x, real(i_z, DP) * this%delta_z, &
+                    density_average(i_x, i_z), density_std_dev(i_x, i_z)
+            end do
+            write(density_unit, *)
+        end do
+        close(density_unit)
+    end subroutine XZ_write
+
+!end implementation XZ_Density_Explorer
 
 end module classes_density_explorer

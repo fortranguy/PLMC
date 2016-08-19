@@ -10,7 +10,7 @@ use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use classes_density_explorer, only: Abstract_Density_Explorer, Plain_Density_Explorer, &
-    Z_Density_Explorer
+    Z_Density_Explorer, XZ_Density_Explorer
 use procedures_property_inquirers, only: periodicity_is_xy
 
 implicit none
@@ -60,6 +60,7 @@ contains
             case ("z")
                 allocate(Z_Density_Explorer :: density_explorer)
             case ("xz")
+                allocate(XZ_Density_Explorer :: density_explorer)
             case default
                 call error_exit("procedures_density_explorer_factory: allocate: "//&
                     "density_type unknown. Please choose between 'plain', 'z' or 'xz'.")
@@ -91,12 +92,23 @@ contains
             type is (Z_Density_Explorer)
                 call check_periodicity_xy(periodic_box)
                 block
-                    real(DP) :: delta
+                    real(DP) :: delta_z
                     data_field = prefix//"delta"
-                    call exploring_data%get(data_field, delta, data_found)
+                    call exploring_data%get(data_field, delta_z, data_found)
                     call check_data_found(data_field, data_found)
                     filename = "z_density_"//string%get(i_component)//".out"
-                    call density_explorer%construct(parallelepiped_domain, delta, num_snaps, &
+                    call density_explorer%construct(parallelepiped_domain, delta_z, num_snaps, &
+                        filename)
+                end block
+            type is (XZ_Density_Explorer)
+                call check_periodicity_xy(periodic_box)
+                block
+                    real(DP) :: delta_xz
+                    data_field = prefix//"delta"
+                    call exploring_data%get(data_field, delta_xz, data_found)
+                    call check_data_found(data_field, data_found)
+                    filename = "xz_density_"//string%get(i_component)//".out"
+                    call density_explorer%construct(parallelepiped_domain, delta_xz, num_snaps, &
                         filename)
                 end block
             class default
