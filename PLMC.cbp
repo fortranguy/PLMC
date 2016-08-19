@@ -136,6 +136,9 @@
 		<Unit filename="modules/common/classes_plmc_propagator.f90">
 			<Option weight="17" />
 		</Unit>
+		<Unit filename="modules/common/data_arguments.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/common/data_constants.f90">
 			<Option weight="0" />
 		</Unit>
@@ -185,7 +188,7 @@
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_iterations.f90">
-			<Option weight="2" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_propagator_factory.f90">
 			<Option weight="18" />
@@ -424,8 +427,13 @@
 		<Unit filename="modules/environment/walls/procedures_walls_visitor_factory.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/exploration/classes_density_explorator.f90" />
-		<Unit filename="modules/exploration/procedures_density_explorator_factory.f90" />
+		<Unit filename="modules/exploration/classes_density_explorer.f90">
+			<Option weight="15" />
+		</Unit>
+		<Unit filename="modules/exploration/procedures_density_explorer_factory.f90">
+			<Option weight="16" />
+		</Unit>
+		<Unit filename="modules/exploration/procedures_elementary_statistics.f90" />
 		<Unit filename="modules/exploring_algorithms/classes_particle_insertion_method.f90">
 			<Option weight="11" />
 		</Unit>
@@ -787,7 +795,7 @@
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="programs/density.f90">
-			<Option weight="15" />
+			<Option weight="17" />
 			<Option target="density" />
 		</Unit>
 		<Unit filename="programs/plmc_explore.f90">

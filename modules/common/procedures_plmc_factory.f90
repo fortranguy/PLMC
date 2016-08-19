@@ -2,6 +2,7 @@ module procedures_plmc_factory
 
 use data_input_prefixes, only: environment_prefix, readers_prefix, random_number_generator_prefix, &
     writers_prefix
+use data_arguments, only: i_generating, i_exploring, num_json_arguments
 use json_module, only: json_file
 use procedures_json_data_factory, only: json_data_create_input => create_input, &
     json_data_create_output => create_output, json_data_destroy_input => destroy_input, &
@@ -125,14 +126,14 @@ contains
     subroutine create_generating_data(generating_data)
         type(json_file), intent(out) :: generating_data
 
-        call json_data_create_input(generating_data, 1)
+        call json_data_create_input(generating_data, i_generating)
     end subroutine create_generating_data
 
     subroutine create_exploring_data(generating_data, exploring_data)
         type(json_file), intent(out) :: generating_data, exploring_data
 
-        call json_data_create_input(generating_data, 1)
-        call json_data_create_input(exploring_data, 2)
+        call json_data_create_input(generating_data, i_generating)
+        call json_data_create_input(exploring_data, i_exploring)
     end subroutine create_exploring_data
 
     subroutine destroy_exploring_data(generating_data, exploring_data)
@@ -198,9 +199,7 @@ contains
         type(Readers_Wrapper), intent(in) :: readers
         integer, intent(in) :: i_snap
 
-        integer, parameter :: num_offset = 2 ! cf. [[create_exploring_data]]
-
-        call readers_set(readers, num_offset + i_snap)
+        call readers_set(readers, num_json_arguments + i_snap)
     end subroutine set_coordinates_from_snap
 
 end module procedures_plmc_factory

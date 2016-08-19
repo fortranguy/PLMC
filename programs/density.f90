@@ -3,6 +3,7 @@ program density
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_input_prefixes, only: environment_prefix, mixture_prefix, density_prefix
 use data_constants, only: num_dimensions
+use data_arguments, only: i_generating, i_exploring, num_json_arguments
 use json_module, only: json_file
 use procedures_json_data_factory, only: json_data_create_input => create_input, &
     json_data_destroy_input => destroy_input
@@ -22,9 +23,9 @@ use procedures_complete_coordinates_reader, only: complete_coordinates_read, &
 use procedures_property_inquirers, only: use_walls, property_num_components => num_components, &
     property_i_component => i_component
 use procedures_plmc_iterations, only: plmc_set_num_snaps
-use classes_density_explorator, only: Abstract_Density_Explorator
-use procedures_density_explorator_factory, only: density_explorator_create => create, &
-    density_explorator_destroy => destroy
+use classes_density_explorer, only: Abstract_Density_Explorer
+use procedures_density_explorer_factory, only: density_explorer_create => create, &
+    density_explorer_destroy => destroy
 use procedures_plmc_help, only: plmc_catch_density_help
 
 implicit none
@@ -33,7 +34,7 @@ implicit none
     class(Abstract_Visitable_Walls), allocatable :: visitable_walls
     class(Abstract_Floor_Penetration), allocatable :: floor_penetration
     class(Abstract_Min_Distance), allocatable :: wall_min_distance
-    class(Abstract_Density_Explorator), allocatable :: density_explorator
+    class(Abstract_Density_Explorer), allocatable :: density_explorer
     real(DP) :: box_size(num_dimensions)
     integer :: num_components, i_component
     type(Component_Coordinates_Reader_Selector) :: selector
@@ -43,7 +44,7 @@ implicit none
     type(json_file) :: generating_data, exploring_data
 
     call plmc_catch_density_help()
-    call json_data_create_input(generating_data, 1)
+    call json_data_create_input(generating_data, i_generating)
     call plmc_set_num_snaps(num_snaps, generating_data)
     call box_create(periodic_box, generating_data, environment_prefix)
     call walls_create(floor_penetration, generating_data, environment_prefix)
@@ -54,27 +55,27 @@ implicit none
     num_components = property_num_components(generating_data, mixture_prefix)
     call json_data_destroy_input(generating_data)
 
-    call json_data_create_input(exploring_data, 2)
-    call density_explorator_create(density_explorator, periodic_box, visitable_walls, num_snaps, &
-        exploring_data, density_prefix)
+    call json_data_create_input(exploring_data, i_exploring)
     i_component = property_i_component(exploring_data, density_prefix)
     call check_in_range("density", num_components, "i_component", i_component)
+    call density_explorer_create(density_explorer, periodic_box, visitable_walls, i_component, &
+        num_snaps, exploring_data, density_prefix)
     call json_data_destroy_input(exploring_data)
 
     selector%read_positions = .true.
     selector%read_orientations = .false.
     do i_snap = 1, num_snaps
-        call create_filename_from_argument(snap_filename, i_snap + 2)
+        call create_filename_from_argument(snap_filename, num_json_arguments + i_snap)
         call complete_coordinates_read(box_size, raw_coordinates, num_components, i_component, &
             snap_filename, selector)
         call periodic_box%set(box_size)
-        call density_explorator%fill(i_snap, raw_coordinates%positions)
+        call density_explorer%fill(i_snap, raw_coordinates%positions)
         call complete_coordinates_deallocate(raw_coordinates)
         if (allocated(snap_filename)) deallocate(snap_filename)
     end do
-    call density_explorator%write()
+    call density_explorer%write()
 
-    call density_explorator_destroy(density_explorator)
+    call density_explorer_destroy(density_explorer)
     call walls_destroy(visitable_walls)
     call hard_core_destroy(wall_min_distance)
     call walls_destroy(floor_penetration)

@@ -1,2 +1,4 @@
+- MetropolisAlgorithms -> GeneratingAlgorithms
 - Hide DLC in EwaldReci?
 - Exploration: more decoupling?
+- Radial: to factorise

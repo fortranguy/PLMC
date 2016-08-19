@@ -28,10 +28,11 @@
         "Parallelepiped Domain": {
             "name": "domain",
             "origin": [0.0, 0.0, 0.0],
-            "size": [6.0, 6.0, 6.0]
+            "size": [12.0, 12.0, 12.0]
         },
         "component number": 1,
-        "name": "plain"
+        "name": "z",
+        "delta": 0.1
     },
     "Radial": {
         "delta": 0.1,
