@@ -16,14 +16,14 @@ use types_changes_wrapper, only: Changes_Wrapper
 use types_observables_energies, only: Concrete_Double_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
-use procedures_metropolis_test, only: metropolis_test
+use classes_generating_algorithm, only: Abstract_Generating_Algorithm
+use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
 
 private
 
-    type, extends(Abstract_Metropolis_Algorithm), abstract, public :: &
+    type, extends(Abstract_Generating_Algorithm), abstract, public :: &
         Abstract_Two_Particles_Transmutation
     private
         type(Environment_Wrapper), pointer :: environment => null()
@@ -40,7 +40,7 @@ private
         procedure :: set_selector => Abstract_set_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
-        procedure, private :: test_metropolis => Abstract_test_metropolis
+        procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure, private :: define_transmutation => Abstract_define_transmutation
         procedure, private :: acceptation_probability => Abstract_acceptation_probability
         procedure, private :: visit_field => Abstract_visit_field
@@ -147,7 +147,7 @@ contains
             observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits + 1
         allocate(deltas%short(size(observables%energies%short_energies), 2))
         allocate(deltas%dipolar(size(observables%energies%dipolar_energies), 2))
-        call this%test_metropolis(success, deltas, ij_actors)
+        call this%metropolis_algorithm(success, deltas, ij_actors)
         if (success) then
             call observables_energies_set(observables%energies, deltas, ij_actors)
             observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_successes = &
@@ -155,7 +155,7 @@ contains
         end if
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, deltas, ij_actors)
+    subroutine Abstract_metropolis_algorithm(this, success, deltas, ij_actors)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Double_Energies), intent(inout) :: deltas
@@ -178,9 +178,9 @@ contains
 
         delta_energy = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        success = metropolis_test(this%acceptation_probability(ij_actors, delta_energy))
+        success = metropolis_algorithm(this%acceptation_probability(ij_actors, delta_energy))
         if (success) call this%update_actors(ij_actors, particles)
-    end subroutine Abstract_test_metropolis
+    end subroutine Abstract_metropolis_algorithm
 
     subroutine Abstract_define_transmutation(this, abort, particles, ij_actors)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this

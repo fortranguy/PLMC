@@ -1,6 +1,6 @@
 program density
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_input_prefixes, only: environment_prefix, mixture_prefix, density_prefix
 use data_constants, only: num_dimensions
 use data_arguments, only: i_generating, i_exploring, num_json_arguments

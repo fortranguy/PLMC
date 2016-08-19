@@ -12,12 +12,14 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit
 use classes_random_coordinates, only: Abstract_Random_Coordinates
 use types_observables_energies, only: Concrete_Single_Energies
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
+use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Particle_Insertion_Method
+    type, extends(Abstract_Exploring_Algorithm), abstract, public :: &
+        Abstract_Particle_Insertion_Method
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()

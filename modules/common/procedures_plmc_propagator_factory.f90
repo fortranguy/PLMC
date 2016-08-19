@@ -1,7 +1,7 @@
 module procedures_plmc_propagator_factory
 
-use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer, &
-    Metropolis_Algorithms_Wrapper
+use types_generating_algorithms_wrapper, only: Generating_Algorithm_Pointer, &
+    Generating_Algorithms_Wrapper
 use classes_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator, &
     Null_PLMC_Propagator
 
@@ -12,18 +12,18 @@ public :: create, destroy
 
 contains
 
-    subroutine create(propagator, metropolis_algorithms)
+    subroutine create(propagator, generating_algorithms)
         class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
-        type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis_algorithms
+        type(Generating_Algorithms_Wrapper), target, intent(in) :: generating_algorithms
 
-        type(Metropolis_Algorithm_Pointer) :: algorithms(6)
+        type(Generating_Algorithm_Pointer) :: algorithms(6)
 
-        algorithms(1)%algorithm => metropolis_algorithms%one_particle_translation
-        algorithms(2)%algorithm => metropolis_algorithms%one_particle_rotation
-        algorithms(3)%algorithm => metropolis_algorithms%two_particles_switch
-        algorithms(4)%algorithm => metropolis_algorithms%one_particle_add
-        algorithms(5)%algorithm => metropolis_algorithms%one_particle_remove
-        algorithms(6)%algorithm => metropolis_algorithms%two_particles_transmutation
+        algorithms(1)%algorithm => generating_algorithms%one_particle_translation
+        algorithms(2)%algorithm => generating_algorithms%one_particle_rotation
+        algorithms(3)%algorithm => generating_algorithms%two_particles_switch
+        algorithms(4)%algorithm => generating_algorithms%one_particle_add
+        algorithms(5)%algorithm => generating_algorithms%one_particle_remove
+        algorithms(6)%algorithm => generating_algorithms%two_particles_transmutation
 
         allocate(Concrete_PLMC_Propagator :: propagator) !What about Null_?
         call propagator%construct(algorithms)

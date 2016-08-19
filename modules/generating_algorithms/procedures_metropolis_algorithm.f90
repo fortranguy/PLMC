@@ -1,15 +1,15 @@
-module procedures_metropolis_test
+module procedures_metropolis_algorithm
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
 implicit none
 
 private
-public :: metropolis_test
+public :: metropolis_algorithm
 
 contains
 
-    logical function metropolis_test(acceptation_probability) result(success)
+    logical function metropolis_algorithm(acceptation_probability) result(success)
         real(DP), intent(in) :: acceptation_probability
 
         real(DP) :: rand
@@ -24,6 +24,6 @@ contains
         else
             success = .true.
         end if
-    end function metropolis_test
+    end function metropolis_algorithm
 
-end module procedures_metropolis_test
+end module procedures_metropolis_algorithm

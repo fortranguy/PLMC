@@ -9,7 +9,25 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
+            \begin{abstractclass}[text width=\smallTextWidth]{ExploringAlgorithm}{0, 0}
+                \operation[0]{\procedure{try}{observables: \type{Observables}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ExploringAlgorithm.north) + (9 cm, 0 cm)$)}]
+            \coordinate (Import) at (0, 0);
+            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+                \namespace{Environment} :: Environment \\
+                \namespace{Mixture} :: Component, ComponentNumber \\
+                \namespace{ShortInteractions} :: ShortInteractions \\
+                \namespace{DipolarInteractions} :: DipolarInteractions \\
+                \namespace{Random} :: RandomCoordinates \\
+                \namespace{Observables} :: ExploringObservables};
+        \end{scope}
+
+        \begin{scope}[shift={($(ExploringAlgorithm.south) - (0 cm, 3 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ParticleInsertionMethod}{0, 0}
+                \inherit{ExploringAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
                     components: \type{Component[:]}, shortInteractions: \type{ShortInteractions},
                     dipolarInteractions: \type{DipolarInteractions},
@@ -21,23 +39,14 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ParticleInsertionMethod.south) - (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(ParticleInsertionMethod.north -| Import)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{VolumeChangeMethod}{0, 0}
+                \inherit{ExploringAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
                     components: \type{Component[:]}, shortInteractions: \type{ShortInteractions}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{try}{observables: \type{ExploringObservables}}}
             \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ParticleInsertionMethod.north) + (9 cm, 0 cm)$)}]
-            \umlnote[text width=\mediumTextWidth]{\import{}:\\
-                \namespace{Environment} :: Environment \\
-                \namespace{Mixture} :: Component, ComponentNumber \\
-                \namespace{ShortInteractions} :: ShortInteractions \\
-                \namespace{DipolarInteractions} :: DipolarInteractions \\
-                \namespace{Random} :: RandomCoordinates \\
-                \namespace{Observables} :: ExploringObservables};
         \end{scope}
 
     \end{tikzpicture}

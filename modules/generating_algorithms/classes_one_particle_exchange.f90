@@ -16,14 +16,14 @@ use types_changes_wrapper, only: Changes_Wrapper
 use types_observables_energies, only: Concrete_Single_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
-use procedures_metropolis_test, only: metropolis_test
+use classes_generating_algorithm, only: Abstract_Generating_Algorithm
+use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
 
 private
 
-    type, extends(Abstract_Metropolis_Algorithm), abstract, public :: Abstract_One_Particle_Exchange
+    type, extends(Abstract_Generating_Algorithm), abstract, public :: Abstract_One_Particle_Exchange
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
@@ -38,7 +38,7 @@ private
         procedure :: try => Abstract_try
         procedure :: set_selector => Abstract_set_selector
         procedure :: get_num_choices => Abstract_get_num_choices
-        procedure, private :: test_metropolis => Abstract_test_metropolis
+        procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_exchange), private, deferred :: define_exchange
         procedure(Abstract_acceptation_probability), private, deferred :: acceptation_probability
         procedure(Abstract_visit_field), private, deferred :: visit_field
@@ -230,7 +230,7 @@ contains
         call this%increment_hit(observables%changes_counters(i_actor))
         allocate(deltas%short(size(observables%energies%short_energies)))
         allocate(deltas%dipolar(size(observables%energies%dipolar_energies)))
-        call this%test_metropolis(success, deltas, i_actor)
+        call this%metropolis_algorithm(success, deltas, i_actor)
         if (success) then
             call observables_energies_set(observables%energies, deltas, i_actor)
             observables%num_particles(i_actor) = this%mixture%components(i_actor)%number%get()
@@ -238,7 +238,7 @@ contains
         end if
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, deltas, i_actor)
+    subroutine Abstract_metropolis_algorithm(this, success, deltas, i_actor)
         class(Abstract_One_Particle_Exchange), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Single_Energies), intent(inout) :: deltas
@@ -261,9 +261,9 @@ contains
 
         delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        success = metropolis_test(this%acceptation_probability(i_actor, delta_energy))
+        success = metropolis_algorithm(this%acceptation_probability(i_actor, delta_energy))
         if (success) call this%update_actor(i_actor, particle)
-    end subroutine Abstract_test_metropolis
+    end subroutine Abstract_metropolis_algorithm
 
 !end implementation Abstract_One_Particle_Exchange
 

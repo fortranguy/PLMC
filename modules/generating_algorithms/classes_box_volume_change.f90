@@ -19,15 +19,15 @@ use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
 use procedures_generating_observables_factory, only:generating_observables_create => create
-use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
+use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_plmc_reset, only: plmc_reset_cells, plmc_reset_cells
-use procedures_metropolis_test, only: metropolis_test
+use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
 
 private
 
-    type, extends(Abstract_Metropolis_Algorithm), abstract, public :: Abstract_Box_Volume_Change
+    type, extends(Abstract_Generating_Algorithm), abstract, public :: Abstract_Box_Volume_Change
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
@@ -38,7 +38,7 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
-        procedure, private :: test_metropolis => Abstract_test_metropolis
+        procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure, private :: acceptation_probability => Abstract_acceptation_probability
         procedure, private :: rescale_positions => Abstract_rescale_positions
         procedure, private :: save_cells => Abstract_save_cells
@@ -101,10 +101,10 @@ contains
 
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
         call observables_energies_create(deltas, size(this%mixture%components))
-        call this%test_metropolis(success, deltas, observables%energies)
+        call this%metropolis_algorithm(success, deltas, observables%energies)
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, deltas, energies)
+    subroutine Abstract_metropolis_algorithm(this, success, deltas, energies)
         class(Abstract_Box_Volume_Change), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Energies), intent(inout) :: deltas
@@ -141,13 +141,13 @@ contains
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             triangle_observables_sum(deltas%short_energies)
-        success = metropolis_test(this%acceptation_probability(box_size_ratio, delta_energy))
+        success = metropolis_algorithm(this%acceptation_probability(box_size_ratio, delta_energy))
         if (.not.success) then
             call this%environment%periodic_box%set(box_size)
             call this%rescale_positions(1._DP / box_size_ratio)
             call this%restore_cells(neighbour_cells, visitable_cells)
         end if
-    end subroutine Abstract_test_metropolis
+    end subroutine Abstract_metropolis_algorithm
 
     !> \[
     !>      P[V \to V^\prime] = min \left( 1, e^{-\beta p V \left( \frac{V^\prime}{V} - 1 \right)}

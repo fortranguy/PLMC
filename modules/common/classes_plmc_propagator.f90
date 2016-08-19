@@ -1,8 +1,8 @@
 module classes_plmc_propagator
 
 use classes_tower_sampler, only: Concrete_Tower_Sampler
-use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer, &
-    Metropolis_Algorithms_Wrapper
+use types_generating_algorithms_wrapper, only: Generating_Algorithm_Pointer, &
+    Generating_Algorithms_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
@@ -11,7 +11,7 @@ private
 
     type, abstract, public :: Abstract_PLMC_Propagator
     private
-        type(Metropolis_Algorithm_Pointer), allocatable :: metropolis_algorithms(:)
+        type(Generating_Algorithm_Pointer), allocatable :: generating_algorithms(:)
         type(Concrete_Tower_Sampler) :: selector
     contains
         procedure :: construct => Abstract_construct
@@ -36,29 +36,29 @@ contains
 
 !implementation Abstract_PLMC_Propagator
 
-    subroutine Abstract_construct(this, metropolis_algorithms)
+    subroutine Abstract_construct(this, generating_algorithms)
         class(Abstract_PLMC_Propagator), intent(out) :: this
-        type(Metropolis_Algorithm_Pointer), target, intent(in) :: metropolis_algorithms(:)
+        type(Generating_Algorithm_Pointer), target, intent(in) :: generating_algorithms(:)
 
-        allocate(this%metropolis_algorithms, source=metropolis_algorithms)
+        allocate(this%generating_algorithms, source=generating_algorithms)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
 
         call this%selector%destroy()
-        if (allocated(this%metropolis_algorithms)) then
-            deallocate(this%metropolis_algorithms)
+        if (allocated(this%generating_algorithms)) then
+            deallocate(this%generating_algorithms)
         end if
     end subroutine Abstract_destroy
 
     subroutine Abstract_set_selector(this)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
 
-        integer :: nums_choices(size(this%metropolis_algorithms)), i_choice
+        integer :: nums_choices(size(this%generating_algorithms)), i_choice
 
         do i_choice = 1, size(nums_choices)
-            nums_choices(i_choice) = this%metropolis_algorithms(i_choice)%algorithm%&
+            nums_choices(i_choice) = this%generating_algorithms(i_choice)%algorithm%&
                 get_num_choices()
         end do
         call this%selector%construct(nums_choices)
@@ -72,7 +72,7 @@ contains
 
         do i_choice = 1, this%selector%get_num_choices()
             i_random = this%selector%get() !no direct feed in array: gfortran bug?
-            call this%metropolis_algorithms(i_random)%algorithm%try(observables)
+            call this%generating_algorithms(i_random)%algorithm%try(observables)
         end do
     end subroutine Abstract_try
 
@@ -80,9 +80,9 @@ contains
 
 !implementation Null_PLMC_Propagator
 
-    subroutine Null_construct(this, metropolis_algorithms)
+    subroutine Null_construct(this, generating_algorithms)
         class(Null_PLMC_Propagator), intent(out) :: this
-        type(Metropolis_Algorithm_Pointer), target, intent(in) :: metropolis_algorithms(:)
+        type(Generating_Algorithm_Pointer), target, intent(in) :: generating_algorithms(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

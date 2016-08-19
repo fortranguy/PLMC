@@ -1,7 +1,6 @@
 module procedures_plmc_factory
 
-use data_input_prefixes, only: environment_prefix, readers_prefix, random_number_generator_prefix, &
-    writers_prefix
+use data_input_prefixes, only: readers_prefix, random_number_generator_prefix, writers_prefix
 use data_arguments, only: i_generating, i_exploring, num_json_arguments
 use json_module, only: json_file
 use procedures_json_data_factory, only: json_data_create_input => create_input, &
@@ -13,15 +12,13 @@ use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_physical_model_factory, only: physical_model_create_generating => create_generating,&
     physical_model_create_exploring => create_exploring, physical_model_destroy => destroy
 use procedures_random_seed_factory, only: random_seed_set => set
-use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_set
 use procedures_markov_chain_generator_factory, only: markov_chain_generator_create => create, &
     markov_chain_generator_destroy => destroy, markov_chain_generator_set => set
 use procedures_markov_chain_explorer_factory, only: markov_chain_explorer_create => create, &
     markov_chain_explorer_destroy => destroy
 use procedures_observables_factory, only: observables_create_generating, &
     observables_create_exploring, observables_destroy_generating, observables_destroy_exploring
-use module_changes_success, only: Concrete_Changes_Success, &
-    reset_counters, set_successes
+use module_changes_success, only: Concrete_Changes_Success, reset_counters, set_successes
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_plmc_iterations, only: plmc_set_num_steps, plmc_set_num_snaps

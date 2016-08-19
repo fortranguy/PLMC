@@ -9,12 +9,13 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
+use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Volume_Change_Method
+    type, extends(Abstract_Exploring_Algorithm), abstract, public :: Abstract_Volume_Change_Method
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()

@@ -17,14 +17,14 @@ use module_changes_success, only: Concrete_Changes_Counter
 use types_observables_energies, only: Concrete_Single_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
-use classes_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
-use procedures_metropolis_test, only: metropolis_test
+use classes_generating_algorithm, only: Abstract_Generating_Algorithm
+use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
 
 private
 
-    type, extends(Abstract_Metropolis_Algorithm), abstract, public :: Abstract_One_Particle_Move
+    type, extends(Abstract_Generating_Algorithm), abstract, public :: Abstract_One_Particle_Move
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
@@ -39,7 +39,7 @@ private
         procedure :: try => Abstract_try
         procedure :: set_selector => Abstract_set_selector
         procedure :: get_num_choices => Abstract_get_num_choices
-        procedure, private :: test_metropolis => Abstract_test_metropolis
+        procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_change), private, deferred :: define_change
         procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_walls), private, deferred :: visit_walls
@@ -144,7 +144,7 @@ private
         procedure :: set_selector => Null_set_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
-        procedure, private :: test_metropolis => Null_test_metropolis
+        procedure, private :: metropolis_algorithm => Null_metropolis_algorithm
         procedure, private :: define_change => Null_define_change
         procedure, private :: visit_field => Null_visit_field
         procedure, private :: visit_walls => Null_visit_walls
@@ -226,14 +226,14 @@ contains
         call this%increment_hit(observables%changes_counters(i_actor))
         allocate(deltas%short(size(observables%energies%short_energies)))
         allocate(deltas%dipolar(size(observables%energies%dipolar_energies)))
-        call this%test_metropolis(success, deltas, i_actor)
+        call this%metropolis_algorithm(success, deltas, i_actor)
         if (success) then
             call observables_energies_set(observables%energies, deltas, i_actor)
             call this%increment_success(observables%changes_counters(i_actor))
         end if
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, deltas, i_actor)
+    subroutine Abstract_metropolis_algorithm(this, success, deltas, i_actor)
         class(Abstract_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Single_Energies), intent(inout) :: deltas
@@ -256,9 +256,10 @@ contains
 
         delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
-        success = metropolis_test(min(1._DP, exp(-delta_energy/this%environment%temperature%get())))
+        success = metropolis_algorithm(min(1._DP, &
+            exp(-delta_energy/this%environment%temperature%get())))
         if (success) call this%update_actor(i_actor, new, old)
-    end subroutine Abstract_test_metropolis
+    end subroutine Abstract_metropolis_algorithm
 
 !end implementation Abstract_One_Particle_Move
 
@@ -528,7 +529,7 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
 
-    subroutine Null_test_metropolis(this, success, deltas, i_actor)
+    subroutine Null_metropolis_algorithm(this, success, deltas, i_actor)
         class(Null_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Single_Energies), intent(inout) :: deltas
@@ -536,7 +537,7 @@ contains
         success = .false.
         deltas%field = 0._DP; deltas%walls = 0._DP; deltas%short = 0._DP; deltas%dipolar = 0._DP
         deltas%dipolar_mixture = 0._DP
-    end subroutine Null_test_metropolis
+    end subroutine Null_metropolis_algorithm
 
     subroutine Null_define_change(this, abort, new, old, i_actor)
          class(Null_One_Particle_Move), intent(in) :: this
