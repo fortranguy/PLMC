@@ -32,9 +32,9 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: try => Abstract_try
-        procedure, private :: visit_field => Abstract_visit_field
         procedure, private :: visit_walls => Abstract_visit_walls
         procedure, private :: visit_short => Abstract_visit_short
+        procedure, private :: visit_field => Abstract_visit_field
         procedure, private :: visit_dipolar => Abstract_visit_dipolar
     end type Abstract_Particle_Insertion_Method
 
@@ -129,14 +129,6 @@ contains
         end do
     end subroutine Abstract_try
 
-    subroutine Abstract_visit_field(this, delta, test)
-        class(Abstract_Particle_Insertion_Method), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: test
-
-        delta = dipoles_field_visit_add(this%environment%external_field, test)
-    end subroutine Abstract_visit_field
-
     subroutine Abstract_visit_walls(this, overlap, delta, i_component, test)
         class(Abstract_Particle_Insertion_Method), intent(in) :: this
         logical, intent(out) :: overlap
@@ -165,6 +157,14 @@ contains
         end do
     end subroutine Abstract_visit_short
 
+    subroutine Abstract_visit_field(this, delta, test)
+        class(Abstract_Particle_Insertion_Method), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: test
+
+        delta = dipoles_field_visit_add(this%environment%external_field, test)
+    end subroutine Abstract_visit_field
+
     subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, i_component, test)
         class(Abstract_Particle_Insertion_Method), intent(in) :: this
         real(DP), intent(out) :: deltas(:)
@@ -177,7 +177,7 @@ contains
         do j_component = 1, size(this%dipolar_interactions%real_components, 1)
             i_exclude = merge(test%i, 0, j_component == i_component)
             call this%dipolar_interactions%real_components(j_component, i_component)%component%&
-                visit(deltas(j_component), test, i_exclude)
+                visit(deltas(j_component), test, visit_different, i_exclude)
         end do
         deltas(i_component) = deltas(i_component) - this%dipolar_interactions%&
             self_components(i_component)%component%meet(test%dipole_moment)

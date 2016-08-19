@@ -20,7 +20,8 @@ use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
 use procedures_generating_observables_factory, only:generating_observables_create => create
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
-use procedures_plmc_reset, only: plmc_reset_cells, plmc_reset_cells
+use procedures_plmc_reset, only: plmc_reset_cells
+use procedures_plmc_visit, only: visit_walls, visit_short, visit_field
 use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
@@ -43,9 +44,6 @@ private
         procedure, private :: rescale_positions => Abstract_rescale_positions
         procedure, private :: save_cells => Abstract_save_cells
         procedure, private :: restore_cells => Abstract_restore_cells
-        procedure, private :: visit_walls => Abstrac_visit_walls
-        procedure, private :: visit_fields => Abstract_visit_fields
-        procedure, private :: visit_short => Abstract_visit_short
     end type Abstract_Box_Volume_Change
 
     type, extends(Abstract_Box_Volume_Change), public :: Concrete_Box_Volume_Change
@@ -127,16 +125,19 @@ contains
         call plmc_reset_cells(this%short_interactions%visitable_cells)
 
         call generating_observables_create(new_energies%walls_energies, size(deltas%walls_energies))
-        call this%visit_walls(overlap, new_energies%walls_energies)
+        call visit_walls(overlap, new_energies%walls_energies, this%mixture%components, this%&
+            short_interactions)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
-        call generating_observables_create(new_energies%field_energies, size(deltas%field_energies))
-        call this%visit_fields(new_energies%field_energies)
-        deltas%field_energies = new_energies%field_energies - energies%field_energies
         call generating_observables_create(new_energies%short_energies, size(deltas%short_energies))
-        call this%visit_short(overlap, new_energies%short_energies)
-        if (overlap) return
+        call visit_short(overlap, new_energies%short_energies, this%mixture%components, this%&
+            short_interactions)
         deltas%short_energies = new_energies%short_energies - energies%short_energies
+        if (overlap) return
+        call generating_observables_create(new_energies%field_energies, size(deltas%field_energies))
+        call visit_field(new_energies%field_energies, this%environment%external_field, this%&
+            mixture%components)
+        deltas%field_energies = new_energies%field_energies - energies%field_energies
         !dipolar interactions
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
@@ -176,7 +177,7 @@ contains
         probability = min(1._DP, probability)
     end function Abstract_acceptation_probability
 
-        subroutine Abstract_rescale_positions(this, box_size_ratio)
+    subroutine Abstract_rescale_positions(this, box_size_ratio)
         class(Abstract_Box_Volume_Change), intent(in) :: this
         real(DP), intent(in) :: box_size_ratio(:)
 
@@ -223,69 +224,6 @@ contains
         end do
         allocate(this%short_interactions%visitable_cells, source=visitable_cells)
     end subroutine Abstract_restore_cells
-
-    subroutine Abstrac_visit_walls(this, overlap, new_energies)
-        class(Abstract_Box_Volume_Change), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: new_energies(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(new_energies)
-            call this%short_interactions%walls_visitor%visit(overlap, new_energies(i_component), &
-                this%mixture%components(i_component)%positions, this%short_interactions%&
-                wall_pairs(i_component)%potential)
-            if (overlap) return
-        end do
-    end subroutine Abstrac_visit_walls
-
-    subroutine Abstract_visit_fields(this, new_energies)
-        class(Abstract_Box_Volume_Change), intent(in) :: this
-        real(DP), intent(out) :: new_energies(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(new_energies)
-            new_energies(i_component) = dipoles_field_visit_component(this%environment%&
-                external_field, this%mixture%components(i_component)%positions, this%mixture%&
-                components(i_component)%dipole_moments)
-        end do
-    end subroutine Abstract_visit_fields
-
-    subroutine Abstract_visit_short(this, overlap, new_energies)
-        class(Abstract_Box_Volume_Change), intent(in) :: this
-        logical, intent(out) :: overlap
-        type(Reals_Line), intent(inout) :: new_energies(:)
-
-        real(DP) :: energy_ij, energy_j
-        integer :: j_component, i_component, i_particle, i_exclude
-        logical :: same_component
-        type(Concrete_Temporary_Particle) :: particle
-        procedure(abstract_visit_condition), pointer :: visit_condition => null()
-
-        do j_component = 1, size(this%short_interactions%visitable_cells, 2)
-            do i_component = 1, j_component
-                same_component = i_component == j_component
-                if (same_component) then
-                    visit_condition => visit_lower
-                else
-                    visit_condition => visit_all
-                end if
-                energy_ij = 0._DP
-                do i_particle = 1, this%mixture%components(j_component)%positions%get_num()
-                    particle%i = i_particle
-                    particle%position = this%mixture%components(j_component)%positions%&
-                        get(particle%i)
-                    i_exclude = merge(particle%i, 0, same_component)
-                    call this%short_interactions%visitable_cells(i_component, j_component)%&
-                        visit_energy(overlap, energy_j, particle, visit_condition, i_exclude)
-                    if (overlap) return
-                    energy_ij = energy_ij + energy_j
-                end do
-                new_energies(j_component)%line(i_component) = energy_ij
-            end do
-        end do
-    end subroutine Abstract_visit_short
 
 !end implementation Abstract_Box_Volume_Change
 

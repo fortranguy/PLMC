@@ -43,9 +43,9 @@ private
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure, private :: define_transmutation => Abstract_define_transmutation
         procedure, private :: acceptation_probability => Abstract_acceptation_probability
-        procedure, private :: visit_field => Abstract_visit_field
         procedure, private :: visit_walls => Abstract_visit_walls
         procedure, private :: visit_short => Abstract_visit_short
+        procedure, private :: visit_field => Abstract_visit_field
         procedure, private :: visit_dipolar => Abstract_visit_dipolar
         procedure, private :: update_actors => Abstract_update_actors
     end type Abstract_Two_Particles_Transmutation
@@ -169,14 +169,14 @@ contains
         call this%define_transmutation(abort, particles, ij_actors)
         if (abort) return
 
-        call this%visit_field(deltas%field, particles)
         call this%visit_walls(overlap, deltas%walls, ij_actors, particles)
         if (overlap) return
         call this%visit_short(overlap, deltas%short, ij_actors, particles)
         if (overlap) return
+        call this%visit_field(deltas%field, particles)
         call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, ij_actors, particles)
 
-        delta_energy = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
+        delta_energy = sum(deltas%walls + deltas%field) + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
         success = metropolis_algorithm(this%acceptation_probability(ij_actors, delta_energy))
         if (success) call this%update_actors(ij_actors, particles)
@@ -232,15 +232,6 @@ contains
         probability = min(1._DP, probability)
     end function Abstract_acceptation_probability
 
-    subroutine Abstract_visit_field(this, deltas, particles)
-        class(Abstract_Two_Particles_Transmutation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
-
-        deltas = [dipoles_field_visit_remove(this%environment%external_field, particles(1)), &
-            dipoles_field_visit_add(this%environment%external_field, particles(2))] !to check
-    end subroutine Abstract_visit_field
-
     subroutine Abstract_visit_walls(this, overlap, deltas, ij_actors, particles)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
@@ -279,6 +270,15 @@ contains
         deltas(:, 1) = -deltas(:, 1)
     end subroutine Abstract_visit_short
 
+    subroutine Abstract_visit_field(this, deltas, particles)
+        class(Abstract_Two_Particles_Transmutation), intent(in) :: this
+        real(DP), intent(out) :: deltas(:)
+        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+
+        deltas = [dipoles_field_visit_remove(this%environment%external_field, particles(1)), &
+            dipoles_field_visit_add(this%environment%external_field, particles(2))]
+    end subroutine Abstract_visit_field
+
     subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, ij_actors, particles)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
         real(DP), intent(out) :: deltas(:, :)
@@ -292,7 +292,8 @@ contains
             do i_component = 1, size(this%dipolar_interactions%real_components, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, particles, i)
                 call this%dipolar_interactions%real_components(i_component, ij_actors(i))%&
-                    component%visit(deltas(i_component, i), particles(i), i_exclude)
+                    component%visit(deltas(i_component, i), particles(i), visit_different, &
+                    i_exclude)
             end do
             deltas(ij_actors(i), i) = deltas(ij_actors(i), i) - this%dipolar_interactions%&
                 self_components(ij_actors(i))%component%meet(particles(i)%dipole_moment)

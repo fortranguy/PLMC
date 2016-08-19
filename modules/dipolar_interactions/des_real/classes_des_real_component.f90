@@ -7,6 +7,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments
 use types_temporary_particle, only: Concrete_Temporary_Particle
+use procedures_visit_condition, only: abstract_visit_condition
 
 implicit none
 
@@ -64,10 +65,11 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
-    pure subroutine Abstract_visit_energy(this, energy, particle, i_exclude)
+    pure subroutine Abstract_visit_energy(this, energy, particle, visit_condition, i_exclude)
         class(Abstract_DES_Real_Component), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
         real(DP) :: vector_ij(num_dimensions)
@@ -75,7 +77,7 @@ contains
 
         energy = 0._DP
         do j_particle = 1, this%positions%get_num()
-            if (j_particle == i_exclude) cycle
+            if (.not.visit_condition(j_particle, i_exclude)) cycle
             vector_ij = this%periodic_box%vector(particle%position, this%positions%&
                 get(j_particle))
             energy = energy + this%des_real_pair%meet(vector_ij, particle%dipole_moment, &
@@ -116,10 +118,11 @@ contains
         class(Null_DES_Real_Component), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure subroutine Null_visit_energy(this, energy, particle, i_exclude)
+    pure subroutine Null_visit_energy(this, energy, particle, visit_condition, i_exclude)
         class(Null_DES_Real_Component), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         energy = 0._DP
     end subroutine Null_visit_energy

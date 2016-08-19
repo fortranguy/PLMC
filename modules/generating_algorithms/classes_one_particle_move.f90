@@ -41,9 +41,9 @@ private
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_change), private, deferred :: define_change
-        procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_walls), private, deferred :: visit_walls
         procedure(Abstract_visit_short), private, deferred :: visit_short
+        procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_dipolar), private, deferred :: visit_dipolar
         procedure(Abstract_update_actor), private, deferred :: update_actor
         procedure(Abstract_increment_hit), private, nopass, deferred :: increment_hit
@@ -59,13 +59,6 @@ private
             type(Concrete_Temporary_Particle), intent(out) :: new, old
             integer, intent(in) :: i_actor
         end subroutine Abstract_define_change
-
-        subroutine Abstract_visit_field(this, delta, new, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
-            real(DP), intent(out) :: delta
-            type(Concrete_Temporary_Particle), intent(in) :: new, old
-        end subroutine Abstract_visit_field
 
         subroutine Abstract_visit_walls(this, overlap, delta, i_actor, new, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
@@ -84,6 +77,13 @@ private
             integer, intent(in) :: i_actor
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_visit_short
+
+        subroutine Abstract_visit_field(this, delta, new, old)
+        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
+            class(Abstract_One_Particle_Move), intent(in) :: this
+            real(DP), intent(out) :: delta
+            type(Concrete_Temporary_Particle), intent(in) :: new, old
+        end subroutine Abstract_visit_field
 
         subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
@@ -116,9 +116,9 @@ private
     type, extends(Abstract_One_Particle_Move), public :: Concrete_One_Particle_Translation
     contains
         procedure, private :: define_change => Translation_define_change
-        procedure, private :: visit_field => Translation_visit_field
         procedure, private :: visit_walls => Translation_visit_walls
         procedure, private :: visit_short => Translation_visit_short
+        procedure, private :: visit_field => Translation_visit_field
         procedure, private :: visit_dipolar => Translation_visit_dipolar
         procedure, private :: update_actor => Translation_update_actor
         procedure, private, nopass :: increment_hit => Translation_increment_hit
@@ -128,9 +128,9 @@ private
     type, extends(Abstract_One_Particle_Move), public :: Concrete_One_Particle_Rotation
     contains
         procedure, private :: define_change => Rotation_define_change
-        procedure, private :: visit_field => Rotation_visit_field
         procedure, private :: visit_walls => Rotation_visit_walls
         procedure, private :: visit_short => Rotation_visit_short
+        procedure, private :: visit_field => Rotation_visit_field
         procedure, private :: visit_dipolar => Rotation_visit_dipolar
         procedure, private :: update_actor => Rotation_update_actor
         procedure, private, nopass :: increment_hit => Rotation_increment_hit
@@ -146,9 +146,9 @@ private
         procedure :: try => Null_try
         procedure, private :: metropolis_algorithm => Null_metropolis_algorithm
         procedure, private :: define_change => Null_define_change
-        procedure, private :: visit_field => Null_visit_field
         procedure, private :: visit_walls => Null_visit_walls
         procedure, private :: visit_short => Null_visit_short
+        procedure, private :: visit_field => Null_visit_field
         procedure, private :: visit_dipolar => Null_visit_dipolar
         procedure, private :: update_actor => Null_update_actor
         procedure, private, nopass :: increment_hit => Null_increment_hit
@@ -247,14 +247,14 @@ contains
         call this%define_change(abort, new, old, i_actor)
         if (abort) return
 
-        call this%visit_field(deltas%field, new, old)
         call this%visit_walls(overlap, deltas%walls, i_actor, new, old)
         if (overlap) return
         call this%visit_short(overlap, deltas%short, i_actor, new, old)
         if (overlap) return
+        call this%visit_field(deltas%field, new, old)
         call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, i_actor, new, old)
 
-        delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
+        delta_energy = deltas%walls + deltas%field + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
         success = metropolis_algorithm(min(1._DP, &
             exp(-delta_energy/this%environment%temperature%get())))
@@ -286,14 +286,6 @@ contains
         new%orientation = old%orientation
         new%dipole_moment = old%dipole_moment
     end subroutine Translation_define_change
-
-    subroutine Translation_visit_field(this, delta, new, old)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-
-        delta = dipoles_field_visit_translation(this%environment%external_field, new%position, old)
-    end subroutine Translation_visit_field
 
     subroutine Translation_visit_walls(this, overlap, delta, i_actor, new, old)
         class(Concrete_One_Particle_Translation), intent(in) :: this
@@ -336,6 +328,14 @@ contains
         deltas = energies_new - energies_old
     end subroutine Translation_visit_short
 
+    subroutine Translation_visit_field(this, delta, new, old)
+        class(Concrete_One_Particle_Translation), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+
+        delta = dipoles_field_visit_translation(this%environment%external_field, new%position, old)
+    end subroutine Translation_visit_field
+
     subroutine Translation_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
         class(Concrete_One_Particle_Translation), intent(in) :: this
         real(DP), intent(out) :: deltas(:)
@@ -349,9 +349,9 @@ contains
         do i_component = 1, size(this%dipolar_interactions%real_components, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
-                visit(real_energies_new(i_component), new, i_exclude)
+                visit(real_energies_new(i_component), new, visit_different, i_exclude)
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
-                visit(real_energies_old(i_component), old, i_exclude)
+                visit(real_energies_old(i_component), old, visit_different, i_exclude)
         end do
         mixture_delta = &
             this%dipolar_interactions%reci_visitor%visit_translation(i_actor, new%position, old) - &
@@ -414,15 +414,6 @@ contains
             orientation
     end subroutine Rotation_define_change
 
-    subroutine Rotation_visit_field(this, delta, new, old)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-
-        delta = dipoles_field_visit_rotation(this%environment%external_field, new%dipole_moment, &
-            old)
-    end subroutine Rotation_visit_field
-
     subroutine Rotation_visit_walls(this, overlap, delta, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
@@ -443,6 +434,15 @@ contains
         deltas = 0._DP
     end subroutine Rotation_visit_short
 
+    subroutine Rotation_visit_field(this, delta, new, old)
+        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+
+        delta = dipoles_field_visit_rotation(this%environment%external_field, new%dipole_moment, &
+            old)
+    end subroutine Rotation_visit_field
+
     subroutine Rotation_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: deltas(:)
@@ -456,9 +456,9 @@ contains
         do i_component = 1, size(this%dipolar_interactions%real_components, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
-                visit(real_energies_new(i_component), new, i_exclude)
+                visit(real_energies_new(i_component), new, visit_different, i_exclude)
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
-                visit(real_energies_old(i_component), old, i_exclude)
+                visit(real_energies_old(i_component), old, visit_different, i_exclude)
         end do
         deltas = real_energies_new - real_energies_old
         mixture_delta = &
@@ -549,13 +549,6 @@ contains
          old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipole_moment = 0._DP
      end subroutine Null_define_change
 
-     subroutine Null_visit_field(this, delta, new, old)
-        class(Null_One_Particle_Move), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-        delta = 0._DP
-    end subroutine Null_visit_field
-
      subroutine Null_visit_walls(this, overlap, delta, i_actor, new, old)
          class(Null_One_Particle_Move), intent(in) :: this
          logical, intent(out) :: overlap
@@ -575,6 +568,13 @@ contains
          overlap = .false.
          deltas = 0._DP
      end subroutine Null_visit_short
+
+    subroutine Null_visit_field(this, delta, new, old)
+        class(Null_One_Particle_Move), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        delta = 0._DP
+    end subroutine Null_visit_field
 
      subroutine Null_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
          class(Null_One_Particle_Move), intent(in) :: this

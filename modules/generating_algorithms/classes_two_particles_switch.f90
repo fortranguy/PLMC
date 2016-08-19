@@ -37,9 +37,9 @@ private
         procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure, private :: define_switch => Abstract_define_switch
-        procedure, private :: visit_field => Abstract_visit_field
         procedure, private :: visit_walls => Abstract_visit_walls
         procedure, private :: visit_short => Abstract_visit_short
+        procedure, private :: visit_field => Abstract_visit_field
         procedure, private :: visit_dipolar => Abstract_visit_dipolar
         procedure, private :: update_actors => Abstract_update_actors
     end type Abstract_Two_Particles_Switch
@@ -152,14 +152,14 @@ contains
         call this%define_switch(abort, new, old, ij_actors)
         if (abort) return
 
-        call this%visit_field(deltas%field, new, old)
         call this%visit_walls(overlap, deltas%walls, ij_actors, new, old)
         if (overlap) return
         call this%visit_short(overlap, deltas%short, ij_actors, new, old)
         if (overlap) return
+        call this%visit_field(deltas%field, new, old)
         call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, ij_actors, new, old)
 
-        delta_energy = sum(deltas%field + deltas%walls) + sum(deltas%short + deltas%dipolar) + &
+        delta_energy = sum(deltas%walls + deltas%field) + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
         success = metropolis_algorithm(min(1._DP, &
             exp(-delta_energy/this%environment%temperature%get())))
@@ -195,19 +195,6 @@ contains
         new(1)%position = old(2)%position
         new(2)%position = old(1)%position
     end subroutine Abstract_define_switch
-
-    subroutine Abstract_visit_field(this, deltas, new, old)
-        class(Abstract_Two_Particles_Switch), intent(in) :: this
-        real(DP), intent(out) :: deltas(:)
-        type(Concrete_Temporary_Particle), intent(in) :: new(:), old(:)
-
-        integer :: i
-
-        do i = 1, size(deltas)
-            deltas(i) = dipoles_field_visit_translation(this%environment%external_field, new(i)%&
-                position, old(i))
-        end do
-    end subroutine Abstract_visit_field
 
     subroutine Abstract_visit_walls(this, overlap, deltas, ij_actors, new, old)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
@@ -261,6 +248,19 @@ contains
         deltas = energies_new - energies_old
     end subroutine Abstract_visit_short
 
+    subroutine Abstract_visit_field(this, deltas, new, old)
+        class(Abstract_Two_Particles_Switch), intent(in) :: this
+        real(DP), intent(out) :: deltas(:)
+        type(Concrete_Temporary_Particle), intent(in) :: new(:), old(:)
+
+        integer :: i
+
+        do i = 1, size(deltas)
+            deltas(i) = dipoles_field_visit_translation(this%environment%external_field, new(i)%&
+                position, old(i))
+        end do
+    end subroutine Abstract_visit_field
+
     subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, ij_actors, new, old)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
         real(DP), intent(out) :: deltas(:, :)
@@ -277,10 +277,12 @@ contains
                 !i_actor <-> j_actor: missing
                 i_exclude = i_exclude_particle(i_component, ij_actors, new)
                 call this%dipolar_interactions%real_components(i_component, ij_actors(i))%&
-                    component%visit(real_energies_new(i_component, i), new(i), i_exclude)
+                    component%visit(real_energies_new(i_component, i), new(i), visit_different, &
+                    i_exclude)
                 i_exclude = i_exclude_particle(i_component, ij_actors, old)
                 call this%dipolar_interactions%real_components(i_component, ij_actors(i))%&
-                    component%visit(real_energies_old(i_component, i), old(i), i_exclude)
+                    component%visit(real_energies_old(i_component, i), old(i), visit_different, &
+                    i_exclude)
             end do
         end do
         deltas = real_energies_new - real_energies_old

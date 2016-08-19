@@ -10,6 +10,7 @@ use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
+use procedures_plmc_visit, only: visit_short
 
 implicit none
 
@@ -64,36 +65,11 @@ contains
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
-        real(DP) :: contacts, conctacts_j
-        integer :: i_component, j_component, i_particle, i_exclude
-        logical :: same_component, overlap
-        type(Concrete_Temporary_Particle) :: particle
-        type(Concrete_Number_to_String) :: string
-        procedure(abstract_visit_condition), pointer :: visit_condition => null()
+        logical :: overlap
+        real(DP) :: contacts
 
-        contacts = 0._DP
-        do j_component = 1, size(this%components)
-            do i_component = 1, j_component
-                same_component = i_component == j_component
-                if (same_component) then
-                    visit_condition => visit_lower
-                else
-                    visit_condition => visit_all
-                end if
-                do i_particle = 1, this%components(j_component)%positions%get_num()
-                    particle%i = i_particle
-                    particle%position = this%components(j_component)%positions%get(particle%i)
-                    i_exclude = merge(particle%i, 0, same_component)
-                    call this%short_interactions%visitable_cells(i_component, j_component)%&
-                        visit_contacts(overlap, conctacts_j, particle, visit_condition, i_exclude)
-                    if (overlap) then
-                        call error_exit("Abstract_Volume_Change_Method: try: components "//string%&
-                            get(i_component)//" and "//string%get(j_component)//" overlap.")
-                    end if
-                    contacts = contacts + conctacts_j
-                end do
-            end do
-        end do
+        call visit_short(overlap, contacts, this%components, this%short_interactions)
+        if (overlap) call error_exit("Abstract_Volume_Change_Method: try: visit_short: overlap")
         observables%beta_pressure_excess = this%short_interactions%hard_contact%&
             get_beta_pressure_excess(contacts)
     end subroutine Abstract_try

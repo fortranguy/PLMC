@@ -9,8 +9,6 @@ use procedures_des_real_pair_factory, only: des_real_pair_create => create, &
 use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
 use procedures_des_real_component_factory, only: des_real_component_create => create, &
     des_real_component_destroy => destroy
-use procedures_des_real_visitor_factory, only: des_real_visitor_create => create, &
-    des_real_visitor_destroy => destroy
 
 implicit none
 
@@ -18,7 +16,6 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: des_real_visitor_create
     module procedure :: create_components
     module procedure :: des_real_component_create
     module procedure :: des_real_pair_create
@@ -28,7 +25,6 @@ interface destroy
     module procedure :: des_real_pair_destroy
     module procedure :: des_real_component_destroy
     module procedure :: destroy_components
-    module procedure :: des_real_visitor_destroy
 end interface destroy
 
 contains

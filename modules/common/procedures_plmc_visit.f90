@@ -4,7 +4,6 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
-use classes_number_to_string, only: Concrete_Number_to_String
 use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -24,7 +23,7 @@ use procedures_triangle_observables, only: triangle_observables_init, &
 implicit none
 
 private
-public :: plmc_visit_set, plmc_visit, visit_short_full, visit_short_cells
+public :: plmc_visit_set, plmc_visit, visit_walls, visit_short, visit_field, visit_dipolar
 
 interface plmc_visit_set
     module procedure :: set_visit
@@ -32,10 +31,12 @@ end interface plmc_visit_set
 
 interface plmc_visit
     module procedure :: visit_generating, visit_exploring
-    module procedure :: visit_field
-    module procedure :: visit_walls
-    module procedure :: visit_dipolar
 end interface plmc_visit
+
+interface visit_short
+    module procedure :: visit_short_energies
+    module procedure :: visit_short_contacts
+end interface visit_short
 
 contains
 
@@ -56,13 +57,19 @@ contains
         type(Concrete_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
 
-        call plmc_visit(energies%field_energies, physical_model%environment%external_field, &
+        logical :: overlap
+
+        call visit_walls(overlap, energies%walls_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        if (overlap) call error_exit("procedures_plmc_visit: visit_generating: visit_walls: "&
+            //"overlap.")
+        call visit_short_full(overlap, energies%short_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        if (overlap) call error_exit("procedures_plmc_visit: visit_generating: visit_short_full: "&
+            //"overlap.")
+        call visit_field(energies%field_energies, physical_model%environment%external_field, &
             physical_model%mixture%components)
-        call plmc_visit(energies%walls_energies, physical_model%mixture%components, &
-            physical_model%short_interactions)
-        call visit_short_full(energies%short_energies, physical_model%mixture%components, &
-            physical_model%short_interactions)
-        call plmc_visit(energies%dipolar_energies, energies%dipolar_mixture_energy, &
+        call visit_dipolar(energies%dipolar_energies, energies%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
     end subroutine visit_generating
 
@@ -71,71 +78,60 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         logical, intent(in) :: visit
 
+        logical :: overlap
+
         if (.not.visit) return
-        call plmc_visit(energies%field_energies, physical_model%environment%external_field, &
+        call visit_walls(overlap, energies%walls_energies, physical_model%mixture%components, &
+            physical_model%short_interactions)
+        if (overlap) call error_exit("procedures_plmc_visit: visit_exploring: visit_walls: "&
+            //"overlap.")
+        call visit_short(overlap, energies%short_energies, physical_model%mixture%&
+            components,physical_model%short_interactions)
+        if (overlap) call error_exit("procedures_plmc_visit: visit_exploring: "//&
+            "visit_short: overlap.")
+        call visit_field(energies%field_energies, physical_model%environment%external_field, &
             physical_model%mixture%components)
-        call plmc_visit(energies%walls_energies, physical_model%mixture%components, &
-            physical_model%short_interactions)
-        call visit_short_cells(energies%short_energies, physical_model%mixture%components, &
-            physical_model%short_interactions)
-        call plmc_visit(energies%dipolar_energies, energies%dipolar_mixture_energy, &
+        call visit_dipolar(energies%dipolar_energies, energies%dipolar_mixture_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions)
     end subroutine visit_exploring
 
-    pure subroutine visit_field(field_energies, external_field, components)
-        real(DP), intent(out) :: field_energies(:)
-        class(Abstract_External_Field), intent(in) :: external_field
-        type(Component_Wrapper), intent(in) :: components(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(components)
-            field_energies(i_component) = dipoles_field_visit_component(external_field, &
-                components(i_component)%positions, components(i_component)%dipole_moments)
-        end do
-    end subroutine visit_field
-
-    subroutine visit_walls(walls_energies, components, short_interactions)
-        real(DP), intent(out) :: walls_energies(:)
+    pure subroutine visit_walls(overlap, walls_energies, components, short_interactions)
+        logical, intent(out) :: overlap
+        real(DP), intent(inout) :: walls_energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
-        logical :: overlap
         integer :: i_component
-        type(Concrete_Number_to_String) :: string
 
-        do i_component = 1, size(components)
-            associate(energy_i => walls_energies(i_component), &
-                positions_i => components(i_component)%positions, &
-                potential_i => short_interactions%wall_pairs(i_component)%potential)
-                call short_interactions%walls_visitor%visit(overlap, energy_i, positions_i, &
-                    potential_i)
-            end associate
-            if (overlap) then
-                call error_exit("procedures_plmc_visit: visit_walls: component "//string%&
-                    get(i_component)//" overlaps.")
-            end if
+        overlap = .false.
+        do i_component = 1, size(walls_energies)
+            call short_interactions%walls_visitor%visit(overlap, walls_energies(i_component), &
+                components(i_component)%positions, &
+                short_interactions%wall_pairs(i_component)%potential)
+            if (overlap) return
         end do
     end subroutine visit_walls
 
-    subroutine visit_short_full(energies, components, short_interactions)
+    pure subroutine visit_short_full(overlap, energies, components, short_interactions)
+        logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
-        call visit_short_intra(energies, components, short_interactions)
-        call visit_short_inter(energies, components, short_interactions)
+        call visit_short_intra(overlap, energies, components, short_interactions)
+        if (overlap) return
+        call visit_short_inter(overlap, energies, components, short_interactions)
     end subroutine visit_short_full
 
-    subroutine visit_short_intra(energies, components, short_interactions)
+    pure subroutine visit_short_intra(overlap, energies, components, short_interactions)
+        logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         integer :: i_component
-        logical :: overlap
-        type(Concrete_Number_to_String) :: string
 
+        overlap = .false.
         do i_component = 1, size(components)
             associate(energy_i => energies(i_component)%line(i_component), &
                 positions_i => components(i_component)%positions, &
@@ -144,22 +140,19 @@ contains
             call short_interactions%components_visitor%visit(overlap, energy_i, positions_i, &
                 potential_i)
             end associate
-            if (overlap) then
-                call error_exit("procedures_plmc_visit: visit_short_intra: component "//string%&
-                    get(i_component)//" overlaps with itself.")
-            end if
+            if (overlap) return
         end do
     end subroutine visit_short_intra
 
-    subroutine visit_short_inter(energies, components, short_interactions)
+    pure subroutine visit_short_inter(overlap, energies, components, short_interactions)
+        logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         integer :: i_component, j_component
-        logical :: overlap
-        type(Concrete_Number_to_String) :: string
 
+        overlap = .false.
         do j_component = 1, size(components)
             do i_component = 1, j_component - 1
                 associate(energy_ij => energies(j_component)%line(i_component), &
@@ -170,27 +163,25 @@ contains
                     call short_interactions%components_visitor%visit(overlap, energy_ij, &
                         positions_i, positions_j, potential_ij)
                 end associate
-                if (overlap) then
-                    call error_exit("procedures_plmc_visit: visit_short_inter: components "//&
-                        string%get(i_component)//" and "//string%get(j_component)//" overlap.")
-                end if
+                if (overlap) return
             end do
         end do
     end subroutine visit_short_inter
 
-    subroutine visit_short_cells(energies, components, short_interactions)
+    subroutine visit_short_energies(overlap, energies, components, short_interactions)
+        logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         real(DP) :: energy_ij, energy_j
-        integer :: j_component, i_component, i_particle, i_exclude
-        logical :: same_component, overlap
+        integer :: i_component, j_component, i_particle, i_exclude
+        logical :: same_component
         type(Concrete_Temporary_Particle) :: particle
-        type(Concrete_Number_to_String) :: string
         procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
-        do j_component = 1, size(short_interactions%visitable_cells, 2)
+        overlap = .false.
+        do j_component = 1, size(energies)
             do i_component = 1, j_component
                 same_component = i_component == j_component
                 if (same_component) then
@@ -205,18 +196,63 @@ contains
                     i_exclude = merge(particle%i, 0, same_component)
                     call short_interactions%visitable_cells(i_component, j_component)%&
                         visit_energy(overlap, energy_j, particle, visit_condition, i_exclude)
-                    if (overlap) then
-                        call error_exit("procedures_plmc_visit: visit_short_cells: components "//&
-                            string%get(i_component)//" and "//string%get(j_component)//" overlap.")
-                    end if
+                    if (overlap) return
                     energy_ij = energy_ij + energy_j
                 end do
                 energies(j_component)%line(i_component) = energy_ij
             end do
         end do
-    end subroutine visit_short_cells
+    end subroutine visit_short_energies
 
-    pure subroutine visit_dipolar(energies, mixture_energy, components, &
+    subroutine visit_short_contacts(overlap, contacts, components, short_interactions)
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: contacts
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+
+        real(DP) :: conctacts_j
+        integer :: i_component, j_component, i_particle, i_exclude
+        logical :: same_component
+        type(Concrete_Temporary_Particle) :: particle
+        procedure(abstract_visit_condition), pointer :: visit_condition => null()
+
+        overlap = .false.
+        contacts = 0._DP
+        do j_component = 1, size(components)
+            do i_component = 1, j_component
+                same_component = i_component == j_component
+                if (same_component) then
+                    visit_condition => visit_lower
+                else
+                    visit_condition => visit_all
+                end if
+                do i_particle = 1, components(j_component)%positions%get_num()
+                    particle%i = i_particle
+                    particle%position = components(j_component)%positions%get(particle%i)
+                    i_exclude = merge(particle%i, 0, same_component)
+                    call short_interactions%visitable_cells(i_component, j_component)%&
+                        visit_contacts(overlap, conctacts_j, particle, visit_condition, i_exclude)
+                    if (overlap) return
+                    contacts = contacts + conctacts_j
+                end do
+            end do
+        end do
+    end subroutine visit_short_contacts
+
+    pure subroutine visit_field(field_energies, external_field, components)
+        real(DP), intent(inout) :: field_energies(:)
+        class(Abstract_External_Field), intent(in) :: external_field
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(field_energies)
+            field_energies(i_component) = dipoles_field_visit_component(external_field, &
+                components(i_component)%positions, components(i_component)%dipole_moments)
+        end do
+    end subroutine visit_field
+
+    subroutine visit_dipolar(energies, mixture_energy, components, &
         dipolar_interactions)
         type(Reals_Line), intent(inout) :: energies(:)
         real(DP), intent(out) :: mixture_energy
@@ -240,57 +276,42 @@ contains
         call triangle_observables_add(energies, -self_energies)
     end subroutine visit_dipolar
 
-    pure subroutine visit_des_real(energies, components, dipolar_interactions)
+    subroutine visit_des_real(energies, components, dipolar_interactions)
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
-        call visit_des_real_intra(energies, components, dipolar_interactions)
-        call visit_des_real_inter(energies, components, dipolar_interactions)
-    end subroutine visit_des_real
+        real(DP) :: energy_ij, energy_j
+        integer :: i_component, j_component, i_particle, i_exclude
+        logical :: same_component
+        type(Concrete_Temporary_Particle) :: particle
+        procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
-    pure subroutine visit_des_real_intra(energies, components, dipolar_interactions)
-        type(Reals_Line), intent(inout) :: energies(:)
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
-
-        integer :: i_component
-
-        do i_component = 1, size(components)
-            associate(energy_i => energies(i_component)%line(i_component), &
-                    positions_i => components(i_component)%positions, &
-                    dipole_moments_i => components(i_component)%dipole_moments, &
-                    pair => dipolar_interactions%real_pair)
-                call dipolar_interactions%real_visitor%visit(energy_i, positions_i, &
-                    dipole_moments_i, pair)
-            end associate
-        end do
-    end subroutine visit_des_real_intra
-
-    pure subroutine visit_des_real_inter(energies, components, dipolar_interactions)
-        type(Reals_Line), intent(inout) :: energies(:)
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
-
-        integer :: i_component, j_component
-
-        do j_component = 1, size(components)
-            do i_component = 1, j_component - 1
-                associate(energy_ij => energies(j_component)%line(i_component), &
-                    positions_i => components(i_component)%positions, &
-                    dipole_moments_i => components(i_component)%dipole_moments, &
-                    positions_j => components(j_component)%positions, &
-                    dipole_moments_j => components(j_component)%dipole_moments, &
-                    pair => dipolar_interactions%real_pair)
-                    call dipolar_interactions%real_visitor%visit(energy_ij, positions_i, &
-                        dipole_moments_i, positions_j, dipole_moments_j, pair)
-                end associate
+        do j_component = 1, size(energies)
+            do i_component = 1, j_component
+                same_component = i_component == j_component
+                if (same_component) then
+                    visit_condition => visit_lower
+                else
+                    visit_condition => visit_all
+                end if
+                energy_ij = 0._DP
+                do i_particle = 1, components(j_component)%dipole_moments%get_num()
+                    particle%i = i_particle
+                    particle%position = components(j_component)%positions%get(particle%i)
+                    particle%dipole_moment = components(j_component)%dipole_moments%get(particle%i)
+                    i_exclude = merge(particle%i, 0, same_component)
+                    call dipolar_interactions%real_components(i_component, j_component)%component%&
+                        visit(energy_j, particle, visit_condition, i_exclude)
+                    energy_ij = energy_ij + energy_j
+                end do
+                energies(j_component)%line(i_component) = energy_ij
             end do
         end do
-    end subroutine visit_des_real_inter
+    end subroutine visit_des_real
 
     pure subroutine visit_des_self(energies, self_components)
-        real(DP), intent(out) :: energies(:)
+        real(DP), intent(inout) :: energies(:)
         type(DES_Self_Component_Wrapper), intent(in) :: self_components(:)
 
         integer :: i_component

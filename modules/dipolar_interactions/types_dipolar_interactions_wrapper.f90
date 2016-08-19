@@ -3,7 +3,6 @@ module types_dipolar_interactions_wrapper
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
-use classes_des_real_visitor, only: Abstract_DES_Real_Visitor
 use classes_des_reci_weight, only: Abstract_DES_Reci_Weight
 use classes_des_reci_structure, only: Abstract_DES_Reci_Structure
 use classes_des_reci_visitor, only: Abstract_DES_Reci_Visitor
@@ -21,7 +20,6 @@ private
         class(Abstract_DES_Convergence_Parameter), allocatable :: alpha
         class(Abstract_DES_Real_Pair), allocatable :: real_pair
         type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
-        class(Abstract_DES_Real_Visitor), allocatable :: real_visitor
         class(Abstract_DES_Reci_Weight), allocatable :: reci_weight
         class(Abstract_DES_Reci_Structure), allocatable :: reci_structure
         class(Abstract_DES_Reci_Visitor), allocatable :: reci_visitor

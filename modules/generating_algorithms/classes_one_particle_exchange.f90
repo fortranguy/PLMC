@@ -41,9 +41,9 @@ private
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_exchange), private, deferred :: define_exchange
         procedure(Abstract_acceptation_probability), private, deferred :: acceptation_probability
-        procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_walls), private, deferred :: visit_walls
         procedure(Abstract_visit_short), private, deferred :: visit_short
+        procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_dipolar), private, deferred :: visit_dipolar
         procedure(Abstract_update_actor), private, deferred :: update_actor
         procedure(Abstract_increment_hit), private, nopass, deferred :: increment_hit
@@ -67,13 +67,6 @@ private
             real(DP), intent(in) :: delta_energy
         end function Abstract_acceptation_probability
 
-        subroutine Abstract_visit_field(this, delta, particle)
-        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Exchange
-            class(Abstract_One_Particle_Exchange), intent(in) :: this
-            real(DP), intent(out) :: delta
-            type(Concrete_Temporary_Particle), intent(in) :: particle
-        end subroutine Abstract_visit_field
-
         subroutine Abstract_visit_walls(this, overlap, delta, i_actor, particle)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Exchange
             class(Abstract_One_Particle_Exchange), intent(in) :: this
@@ -91,6 +84,13 @@ private
             integer, intent(in) :: i_actor
             type(Concrete_Temporary_Particle), intent(in) :: particle
         end subroutine Abstract_visit_short
+
+        subroutine Abstract_visit_field(this, delta, particle)
+        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Exchange
+            class(Abstract_One_Particle_Exchange), intent(in) :: this
+            real(DP), intent(out) :: delta
+            type(Concrete_Temporary_Particle), intent(in) :: particle
+        end subroutine Abstract_visit_field
 
         subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, i_actor, particle)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Exchange
@@ -124,9 +124,9 @@ private
     contains
         procedure, private :: define_exchange => Add_define_exchange
         procedure, private :: acceptation_probability => Add_acceptation_probability
-        procedure, private :: visit_field => Add_visit_field
         procedure, private :: visit_walls => Add_visit_walls
         procedure, private :: visit_short => Add_visit_short
+        procedure, private :: visit_field => Add_visit_field
         procedure, private :: visit_dipolar => Add_visit_dipolar
         procedure, private :: update_actor => Add_update_actor
         procedure, nopass, private :: increment_hit => Add_increment_hit
@@ -137,9 +137,9 @@ private
     contains
         procedure, private :: define_exchange => Remove_define_exchange
         procedure, private :: acceptation_probability => Remove_acceptation_probability
-        procedure, private :: visit_field => Remove_visit_field
         procedure, private :: visit_walls => Remove_visit_walls
         procedure, private :: visit_short => Remove_visit_short
+        procedure, private :: visit_field => Remove_visit_field
         procedure, private :: visit_dipolar => Remove_visit_dipolar
         procedure, private :: update_actor => Remove_update_actor
         procedure, nopass, private :: increment_hit => Remove_increment_hit
@@ -150,9 +150,9 @@ private
     contains
         procedure, private :: define_exchange => Null_define_exchange
         procedure, private :: acceptation_probability => Null_acceptation_probability
-        procedure, private :: visit_field => Null_visit_field
         procedure, private :: visit_walls => Null_visit_walls
         procedure, private :: visit_short => Null_visit_short
+        procedure, private :: visit_field => Null_visit_field
         procedure, private :: visit_dipolar => Null_visit_dipolar
         procedure, private :: update_actor => Null_update_actor
         procedure, nopass, private :: increment_hit => Null_increment_hit
@@ -252,14 +252,14 @@ contains
         call this%define_exchange(abort, particle, i_actor)
         if (abort) return
 
-        call this%visit_field(deltas%field, particle)
         call this%visit_walls(overlap, deltas%walls, i_actor, particle)
         if (overlap) return
         call this%visit_short(overlap, deltas%short, i_actor, particle)
         if (overlap) return
+        call this%visit_field(deltas%field, particle)
         call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, i_actor, particle)
 
-        delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
+        delta_energy = deltas%walls + deltas%field + sum(deltas%short + deltas%dipolar) + &
             deltas%dipolar_mixture
         success = metropolis_algorithm(this%acceptation_probability(i_actor, delta_energy))
         if (success) call this%update_actor(i_actor, particle)
@@ -303,14 +303,6 @@ contains
         probability = min(1._DP, probability)
     end function Add_acceptation_probability
 
-    subroutine Add_visit_field(this, delta, particle)
-        class(Concrete_One_Particle_Add), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: particle
-
-        delta = dipoles_field_visit_add(this%environment%external_field, particle)
-    end subroutine Add_visit_field
-
     subroutine Add_visit_walls(this, overlap, delta, i_actor, particle)
         class(Concrete_One_Particle_Add), intent(in) :: this
         logical, intent(out) :: overlap
@@ -339,6 +331,14 @@ contains
         end do
     end subroutine Add_visit_short
 
+    subroutine Add_visit_field(this, delta, particle)
+        class(Concrete_One_Particle_Add), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        delta = dipoles_field_visit_add(this%environment%external_field, particle)
+    end subroutine Add_visit_field
+
     subroutine Add_visit_dipolar(this, deltas, mixture_delta, i_actor, particle)
         class(Concrete_One_Particle_Add), intent(in) :: this
         real(DP), intent(out) :: deltas(:)
@@ -351,7 +351,7 @@ contains
         do i_component = 1, size(this%dipolar_interactions%real_components, 1)
             i_exclude = merge(particle%i, 0, i_component == i_actor)
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
-                visit(deltas(i_component), particle, i_exclude)
+                visit(deltas(i_component), particle, visit_different, i_exclude)
         end do
         deltas(i_actor) = deltas(i_actor) - this%dipolar_interactions%self_components(i_actor)%&
             component%meet(particle%dipole_moment)
@@ -434,14 +434,6 @@ contains
         probability = min(1._DP, probability)
     end function Remove_acceptation_probability
 
-    subroutine Remove_visit_field(this, delta, particle)
-        class(Concrete_One_Particle_Remove), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: particle
-
-        delta = dipoles_field_visit_remove(this%environment%external_field, particle)
-    end subroutine Remove_visit_field
-
     subroutine Remove_visit_walls(this, overlap, delta, i_actor, particle)
         class(Concrete_One_Particle_Remove), intent(in) :: this
         logical, intent(out) :: overlap
@@ -471,6 +463,14 @@ contains
         deltas = -deltas
     end subroutine Remove_visit_short
 
+    subroutine Remove_visit_field(this, delta, particle)
+        class(Concrete_One_Particle_Remove), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+
+        delta = dipoles_field_visit_remove(this%environment%external_field, particle)
+    end subroutine Remove_visit_field
+
     subroutine Remove_visit_dipolar(this, deltas, mixture_delta, i_actor, particle) !sign?
         class(Concrete_One_Particle_Remove), intent(in) :: this
         real(DP), intent(out) :: deltas(:)
@@ -483,7 +483,7 @@ contains
         do i_component = 1, size(this%dipolar_interactions%real_components, 1)
             i_exclude = merge(particle%i, 0, i_component == i_actor)
             call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
-                visit(deltas(i_component), particle, i_exclude)
+                visit(deltas(i_component), particle, visit_different, i_exclude)
         end do
         deltas(i_actor) = deltas(i_actor) - this%dipolar_interactions%&
             self_components(i_actor)%component%meet(particle%dipole_moment)
@@ -546,13 +546,6 @@ contains
         probability = 0._DP
     end function Null_acceptation_probability
 
-    subroutine Null_visit_field(this, delta, particle)
-        class(Null_One_Particle_Exchange), intent(in) :: this
-        real(DP), intent(out) :: delta
-        type(Concrete_Temporary_Particle), intent(in) :: particle
-        delta = 0._DP
-    end subroutine Null_visit_field
-
     subroutine Null_visit_walls(this, overlap, delta, i_actor, particle)
         class(Null_One_Particle_Exchange), intent(in) :: this
         logical, intent(out) :: overlap
@@ -570,6 +563,13 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: particle
         overlap = .false.; deltas = 0._DP
     end subroutine Null_visit_short
+
+    subroutine Null_visit_field(this, delta, particle)
+        class(Null_One_Particle_Exchange), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        delta = 0._DP
+    end subroutine Null_visit_field
 
     subroutine Null_visit_dipolar(this, deltas, mixture_delta, i_actor, particle)
         class(Null_One_Particle_Exchange), intent(in) :: this
