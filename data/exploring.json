@@ -12,23 +12,25 @@
     "Particle Insertion": {
         "mesure chemical potentials": true,
         "Parallelepiped Domain": {
-            "name": "boxed"
+            "name": "domain",
+            "origin": [0.0, 0.0, 0.0],
+            "size": [12.0, 12.0, 12.0]
         },
         "Component 1": {
-            "number": 100000
+            "number": 10000
         },
         "Component 2": {
-            "number": 100000
+            "number": 10000
         },
         "Component 3": {
-            "number": 100000
+            "number": 10000
         }
     },
     "Density": {
         "Parallelepiped Domain": {
             "name": "domain",
             "origin": [0.0, 0.0, 0.0],
-            "size": [6.0, 6.0, 6.0]
+            "size": [12.0, 12.0, 12.0]
         },
         "component number": 1,
         "name": "plain"
