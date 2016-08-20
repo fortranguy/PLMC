@@ -233,7 +233,7 @@ contains
         call this%metropolis_algorithm(success, deltas, i_actor)
         if (success) then
             call observables_energies_set(observables%energies, deltas, i_actor)
-            observables%num_particles(i_actor) = this%mixture%components(i_actor)%number%get()
+            observables%nums_particles(i_actor) = this%mixture%components(i_actor)%number%get()
             call this%increment_success(observables%changes_counters(i_actor))
         end if
     end subroutine Abstract_try

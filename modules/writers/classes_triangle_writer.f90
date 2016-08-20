@@ -4,23 +4,16 @@ use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
 use types_reals_line, only: Reals_Line
-use module_string_wrapper, only: String_Wrapper, strings_wrapper_destroy
+use types_logical_line, only: Concrete_Logical_Line
+use module_string_wrapper, only: Strings_Line, strings_wrapper_destroy
 
 implicit none
 
 private
 
-    type, public :: Selectors_Line
-        logical, allocatable :: line(:)
-    end type Selectors_Line
-
-    type :: Strings_Wrapper
-        type(String_Wrapper), allocatable :: with_component(:)
-    end type Strings_Wrapper
-
     type, abstract, public :: Abstract_Triangle_Writer
     private
-        type(Strings_Wrapper), allocatable :: strings(:)
+        type(Strings_Line), allocatable :: strings(:)
         integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
@@ -46,7 +39,7 @@ contains
 
     subroutine Abstract_construct(this, selectors, filename)
         class(Abstract_Triangle_Writer), intent(out) :: this
-        type(Selectors_Line), intent(in) :: selectors(:)
+        type(Concrete_Logical_Line), intent(in) :: selectors(:)
         character(len=*), intent(in) :: filename
 
         character(len=:), allocatable :: legend
@@ -63,22 +56,22 @@ contains
     subroutine Abstract_allocate_strings(this, legend, selectors)
         class(Abstract_Triangle_Writer), intent(inout) :: this
         character(len=:), allocatable, intent(inout) :: legend
-        type(Selectors_Line), intent(in) :: selectors(:)
+        type(Concrete_Logical_Line), intent(in) :: selectors(:)
 
         type(Concrete_Number_to_String) :: string
         integer :: i_component, j_component
 
         allocate(this%strings(size(selectors)))
         do j_component = 1, size(this%strings)
-            allocate(this%strings(j_component)%with_component(j_component))
-            do i_component = 1, size(this%strings(j_component)%with_component)
+            allocate(this%strings(j_component)%line(j_component))
+            do i_component = 1, size(this%strings(j_component)%line)
                 if (selectors(j_component)%line(i_component)) then
                     allocate(Concrete_Number_to_String :: this%strings(j_component)%&
-                        with_component(i_component)%string)
+                        line(i_component)%string)
                     legend = legend//"    "//string%get(i_component)//"<->"//string%get(j_component)
                 else
-                    allocate(Null_Number_to_String :: this%strings(j_component)%&
-                        with_component(i_component)%string)
+                    allocate(Null_Number_to_String :: this%strings(j_component)%line(i_component)%&
+                        string)
                 end if
             end do
         end do
@@ -91,26 +84,26 @@ contains
 
         if (allocated(this%strings)) then
             do i_component = size(this%strings), 1, -1
-                call strings_wrapper_destroy(this%strings(i_component)%with_component)
+                call strings_wrapper_destroy(this%strings(i_component)%line)
             end do
             deallocate(this%strings)
         end if
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write(this, i_step, triangle)
+    subroutine Abstract_write(this, i_step, observables)
         class(Abstract_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Reals_Line), intent(in) :: triangle(:)
+        type(Reals_Line), intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
         integer :: i_component, j_component
 
         string = ""
         do j_component = 1, size(this%strings)
-            do i_component = 1, size(this%strings(j_component)%with_component)
-                associate(string_ij => this%strings(j_component)%with_component(i_component)%&
-                    string, real_ij => triangle(j_component)%line(i_component))
+            do i_component = 1, size(this%strings(j_component)%line)
+                associate(string_ij => this%strings(j_component)%line(i_component)%string, &
+                    real_ij => observables(j_component)%line(i_component))
                     string = string//string_ij%get(real_ij)
                 end associate
             end do
@@ -124,7 +117,7 @@ contains
 
     subroutine Null_construct(this, selectors, filename)
         class(Null_Triangle_Writer), intent(out) :: this
-        type(Selectors_Line), intent(in) :: selectors(:)
+        type(Concrete_Logical_Line), intent(in) :: selectors(:)
         character(len=*), intent(in) :: filename
     end subroutine Null_construct
 
@@ -132,10 +125,10 @@ contains
         class(Null_Triangle_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write(this, i_step, triangle)
+    subroutine Null_write(this, i_step, observables)
         class(Null_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Reals_Line), intent(in) :: triangle(:)
+        type(Reals_Line), intent(in) :: observables(:)
     end subroutine Null_write
 
 !end implementation Null_Triangle_Writer

@@ -81,32 +81,32 @@ contains
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write_reals(this, i_step, line)
+    subroutine Abstract_write_reals(this, i_step, observables)
         class(Abstract_Line_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP), intent(in) :: line(:)
+        real(DP), intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
         integer :: i_component
 
         string = ""
         do i_component = 1, size(this%strings)
-            string = string//this%strings(i_component)%string%get(line(i_component))
+            string = string//this%strings(i_component)%string%get(observables(i_component))
         end do
         write(this%file_unit, *) i_step, string
     end subroutine Abstract_write_reals
 
-    subroutine Abstract_write_integers(this, i_step, line)
+    subroutine Abstract_write_integers(this, i_step, observables)
         class(Abstract_Line_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        integer, intent(in) :: line(:)
+        integer, intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
         integer :: i_component
 
         string = ""
         do i_component = 1, size(this%strings)
-            string = string//"    "//this%strings(i_component)%string%get(line(i_component))
+            string = string//"    "//this%strings(i_component)%string%get(observables(i_component))
         end do
         write(this%file_unit, *) i_step, string
     end subroutine Abstract_write_integers
@@ -125,16 +125,16 @@ contains
         class(Null_Line_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write_reals(this, i_step, line)
+    subroutine Null_write_reals(this, i_step, observables)
         class(Null_Line_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP), intent(in) :: line(:)
+        real(DP), intent(in) :: observables(:)
     end subroutine Null_write_reals
 
-    subroutine Null_write_integers(this, i_step, line)
+    subroutine Null_write_integers(this, i_step, observables)
         class(Null_Line_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        integer, intent(in) :: line(:)
+        integer, intent(in) :: observables(:)
     end subroutine Null_write_integers
 
 !end implementation Null_Line_Writer

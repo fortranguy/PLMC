@@ -11,10 +11,10 @@ implicit none
 private
 
     type, public :: Generating_Observables_Wrapper
-        integer, allocatable :: num_particles(:)
-        type(Concrete_Energies) :: energies
         type(Concrete_Change_Counter) :: volume_change_counter
         real(DP) :: volume_change_success
+        integer, allocatable :: nums_particles(:)
+        type(Concrete_Energies) :: energies
         type(Concrete_Changes_Counter), allocatable :: changes_counters(:)
         type(Concrete_Changes_Success), allocatable :: changes_sucesses(:)
         type(Concrete_Change_Counters_Line), allocatable :: switches_counters(:)

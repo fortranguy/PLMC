@@ -11,6 +11,10 @@ public :: strings_wrapper_destroy
         class(Abstract_Number_to_String), allocatable :: string
     end type String_Wrapper
 
+    type, public :: Strings_Line
+        type(String_Wrapper), allocatable :: line(:)
+    end type Strings_Line
+
 contains
 
     subroutine strings_wrapper_destroy(strings)

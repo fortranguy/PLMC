@@ -43,8 +43,8 @@ contains
                 rotated_orientations)
             selector_i%write_exchanges = component_can_exchange(components(i_component)%&
                 chemical_potential)
-            call create(components_changes(i_component)%writer, selector_i, "changes_"//string%&
-                get(i_component)//".out")
+            call create(components_changes(i_component)%writer, selector_i, "changes_success_"//&
+                string%get(i_component)//".out")
         end do
     end subroutine create_line
 

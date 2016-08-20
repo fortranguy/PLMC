@@ -44,7 +44,7 @@ contains
         type(Generating_Observables_Wrapper), intent(out) :: observables
         integer, intent(in) :: num_components
 
-        call create(observables%num_particles, num_components)
+        call create(observables%nums_particles, num_components)
         call observables_energies_create(observables%energies, num_components)
         call create(observables%changes_counters, num_components)
         call create(observables%switches_counters, num_components)
@@ -64,7 +64,7 @@ contains
         call destroy(observables%switches_counters)
         call destroy(observables%changes_counters)
         call observables_energies_destroy(observables%energies)
-        call destroy(observables%num_particles)
+        call destroy(observables%nums_particles)
     end subroutine destroy_all
 
     pure subroutine create_num_particles(num_particles, num_components)

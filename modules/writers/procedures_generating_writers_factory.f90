@@ -3,14 +3,11 @@ module procedures_generating_writers_factory
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use procedures_complete_coordinates_writer_factory, only: complete_coordinates_writer_create => &
     create, complete_coordinates_writer_destroy => destroy
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_factory, only: set_can_exchange
-use procedures_real_writer_factory, only: real_writer_create => create, &
-    real_writer_destroy => destroy
 use procedures_line_writer_factory, only: line_writer_create => create, &
     line_writer_destroy => destroy
 use procedures_triangle_writer_factory, only: triangle_writer_create => create, &
@@ -19,6 +16,8 @@ use procedures_square_writer_factory, only: square_writer_create => create_trans
     square_writer_destroy => destroy
 use procedures_changes_success_writer_factory, only: changes_success_writer_create => create, &
     changes_success_writer_destroy => destroy
+use procedures_energies_writers_factory, only: energies_writers_create => create, &
+    energies_writers_destroy => destroy
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 
 implicit none
@@ -39,39 +38,31 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        logical, dimension(size(components)) :: can_exchange, are_dipolar
+        logical, dimension(size(components)) :: can_exchange
 
-        call line_writer_create(writers%field, environment%external_field, components, &
-            "field_energies.out")
-        call line_writer_create(writers%walls, wall_pairs, "walls_energies.out")
         call set_can_exchange(can_exchange, components)
-        call line_writer_create(writers%num_particles, can_exchange, "num_particles.out")
+        call line_writer_create(writers%nums_particles, can_exchange, "nums_particles.out")
         call complete_coordinates_writer_create(writers%complete_coordinates, environment%&
             periodic_box, components, "coordinates", generating_data, prefix)
+        call energies_writers_create(writers%energies, environment%external_field, wall_pairs, &
+            components, short_pairs)
         call changes_success_writer_create(writers%components_changes, changes_components, &
             components)
-        call triangle_writer_create(writers%short_energies, short_pairs, "short_energies.out")
-        call set_are_dipolar(are_dipolar, components)
-        call triangle_writer_create(writers%dipolar_energies, are_dipolar, "dipolar_energies.out")
-        call real_writer_create(writers%dipolar_mixture_energy, any(are_dipolar), &
-            "dipolar_mixture_energy.out")
-        call triangle_writer_create(writers%switches, components, "switches.out")
-        call square_writer_create(writers%transmutations, components, "transmutations.out")
+        call triangle_writer_create(writers%switches_successes, components, &
+            "switches_successes.out")
+        call square_writer_create(writers%transmutations_successes, components, &
+            "transmutations_successes.out")
     end subroutine create
 
     subroutine destroy(writers)
         type(Generating_Writers_Wrapper), intent(inout) :: writers
 
-        call square_writer_destroy(writers%transmutations)
-        call triangle_writer_destroy(writers%switches)
-        call real_writer_destroy(writers%dipolar_mixture_energy)
-        call triangle_writer_destroy(writers%dipolar_energies)
-        call triangle_writer_destroy(writers%short_energies)
+        call square_writer_destroy(writers%transmutations_successes)
+        call triangle_writer_destroy(writers%switches_successes)
         call changes_success_writer_destroy(writers%components_changes)
+        call energies_writers_destroy(writers%energies)
         call complete_coordinates_writer_destroy(writers%complete_coordinates)
-        call line_writer_destroy(writers%num_particles)
-        call line_writer_destroy(writers%walls)
-        call line_writer_destroy(writers%field)
+        call line_writer_destroy(writers%nums_particles)
     end subroutine destroy
 
 end module procedures_generating_writers_factory

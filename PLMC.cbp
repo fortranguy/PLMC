@@ -187,6 +187,7 @@
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="14" />
 		</Unit>
+		<Unit filename="modules/common/procedures_visit_condition.f90" />
 		<Unit filename="modules/common/types_exploring_io.f90">
 			<Option weight="18" />
 		</Unit>
@@ -703,9 +704,6 @@
 		<Unit filename="modules/short_interactions/procedures_short_interactions_factory.f90">
 			<Option weight="17" />
 		</Unit>
-		<Unit filename="modules/short_interactions/procedures_visit_condition.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="modules/short_interactions/procedures_visitable_list_factory.f90">
 			<Option weight="8" />
 		</Unit>
@@ -748,8 +746,11 @@
 		<Unit filename="modules/writers/procedures_changes_success_writer_factory.f90">
 			<Option weight="15" />
 		</Unit>
-		<Unit filename="modules/writers/procedures_exploring_writers_factory.f90">
+		<Unit filename="modules/writers/procedures_energies_writers_factory.f90">
 			<Option weight="16" />
+		</Unit>
+		<Unit filename="modules/writers/procedures_exploring_writers_factory.f90">
+			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_generating_writers_factory.f90">
 			<Option weight="20" />
@@ -769,12 +770,16 @@
 		<Unit filename="modules/writers/types_changes_success_writer_wrapper.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/writers/types_exploring_writers_wrapper.f90">
+		<Unit filename="modules/writers/types_energies_writers.f90">
 			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/writers/types_exploring_writers_wrapper.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/writers/types_generating_writers_wrapper.f90">
 			<Option weight="17" />
 		</Unit>
+		<Unit filename="modules/writers/types_logical_line.f90" />
 		<Unit filename="programs/density.f90">
 			<Option weight="19" />
 			<Option target="density" />

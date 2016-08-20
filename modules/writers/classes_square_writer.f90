@@ -81,10 +81,10 @@ contains
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write(this, i_step, square)
+    subroutine Abstract_write(this, i_step, observables)
         class(Abstract_Square_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP), intent(in) :: square(:, :)
+        real(DP), intent(in) :: observables(:, :)
 
         character(len=:), allocatable :: string
         integer :: i_component, j_component
@@ -93,7 +93,7 @@ contains
         do j_component = 1, size(this%strings, 2)
             do i_component = 1, size(this%strings, 1)
                 string = string//this%strings(i_component, j_component)%string%&
-                    get(square(i_component, j_component))
+                    get(observables(i_component, j_component))
             end do
         end do
         write(this%file_unit, *) i_step, string
@@ -113,10 +113,10 @@ contains
         class(Null_Square_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write(this, i_step, square)
+    subroutine Null_write(this, i_step, observables)
         class(Null_Square_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        real(DP), intent(in) :: square(:, :)
+        real(DP), intent(in) :: observables(:, :)
     end subroutine Null_write
 
 !end implementation Null_Square_Writer
