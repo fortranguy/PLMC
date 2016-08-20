@@ -9,7 +9,7 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{class}[text width=\mediumTextWidth]{GeneratingObservables}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{GeneratingObservables}{0, 0}
                 \UMLattribute{numParticles: \type{int[:]}}
                 \UMLattribute{energies: \type{Energies}}
                 \UMLattribute{volumeChangeCounter: \type{ChangeCounter}}
@@ -24,7 +24,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(GeneratingObservables.north) + (8 cm, 0 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{ChangesCounter}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{ChangesCounter}{0, 0}
                 \UMLattribute{translation: \type{ChangeCounter}}
                 \UMLattribute{rotation: \type{ChangeCounter}}
                 \UMLattribute{exchange: \type{ChangeCounter}}
@@ -32,7 +32,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ChangesCounter.south) - (0 cm , 1.5 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{ChangesSuccess}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{ChangesSuccess}{0, 0}
                 \UMLattribute{translation: \type{real}}
                 \UMLattribute{rotation: \type{real}}
                 \UMLattribute{exchange: \type{real}}
@@ -40,14 +40,14 @@
         \end{scope}
 
         \begin{scope}[shift={($(ChangesSuccess.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{ChangeCounter}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{ChangeCounter}{0, 0}
                 \UMLattribute{numHits: \type{int}}
                 \UMLattribute{numSuccesses: \type{int}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ChangesCounter.north) + (8 cm, 0 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{ExploringObservables}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{ExploringObservables}{0, 0}
                 \UMLattribute{betaPressureExcess: \type{real}}
                 \UMLattribute{invPowActivities: \type{real[:]}}
                 \UMLattribute{energies: \type{Energies}}
@@ -57,7 +57,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ExploringObservables.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{Energies}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{Energies}{0, 0}
                 \UMLattribute{fieldEnergies: \type{real[:]}}
                 \UMLattribute{wallsEnergies: \type{real[:]}}
                 \UMLattribute{shortEnergies: \type{real[:.]}}

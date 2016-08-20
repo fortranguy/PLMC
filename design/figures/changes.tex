@@ -9,7 +9,7 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{class}[text width=\mediumTextWidth]{ChangesComponent}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{ChangesComponent}{0, 0}
                 \UMLattribute{translatedPositions: \type{MovedCoordinates}}
                 \UMLattribute{rotatedOrientations: \type{MovedCoordinates}}
                 \UMLattribute{translationTuner: \type{MoveTuner}}
@@ -18,7 +18,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ChangesComponent.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{MoveTuner}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{MoveTuner}{0, 0}
                 \operation{\procedure{construct}{movedCoordinates: \type{MovedCoordinates},
                     parameters: \type{MoveTunerParameters}}}
                 \operation{\procedure{destroy}{}}
@@ -28,7 +28,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(MoveTuner.north) - (7.5 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{MovedCoordinates}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{MovedCoordinates}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation[0]{\procedure{destroy}{}}
                 \operation[0]{\procedure{increaseDelta}{}}
@@ -37,7 +37,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(MoveTuner.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{MoveTunerParameters}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{MoveTunerParameters}{0, 0}
                 \UMLattribute{accumulationPeriod: \type{int}}
                 \UMLattribute{wantedSuccessRatio: \type{real}}
                 \UMLattribute{tolerance: \type{real}}
@@ -45,21 +45,21 @@
         \end{scope}
 
         \begin{scope}[shift={($(MovedCoordinates |- MoveTunerParameters.north)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{MovedComponentCoordinates}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{MovedComponentCoordinates}{0, 0}
                 \inherit{MovedCoordinates}
                 \operation[0]{\procedure{get}{iParticle: \type{int}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(MovedCoordinates |- ChangesComponent.north)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ChangedBoxSize}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ChangedBoxSize}{0, 0}
                 \inherit{MovedCoordinates}
                 \operation{\procedure{getRatio}{}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(MoveTunerParameters.north) + (8.5 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{CoordinatesCopier}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{CoordinatesCopier}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{copy}{target: \type{real[3]}, source: \type{real[3]},
@@ -68,7 +68,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(MoveTuner.north -| CoordinatesCopier)$)}]
-            \begin{class}[text width=\mediumTextWidth]{Changes}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{Changes}{0, 0}
                 \UMLattribute{changedBoxSize: \type{ChangedBoxSize}}
                 \UMLattribute{boxSizeChangeTuner: \type{MoveTuner}}
                 \UMLattribute{randomPosition: \type{RandomCoordinates}}
@@ -80,7 +80,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ChangesComponent.north -| Changes.north)$)}]
-            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+            \umlnote[text width=\largeTextWidth]{\import{}:\\
                 \namespace{Random} :: RandomCoordinates};
         \end{scope}
 

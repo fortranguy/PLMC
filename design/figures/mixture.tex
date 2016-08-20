@@ -9,14 +9,14 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{Coordinates}{0, 0}
                 \operation[0]{\procedure{getNum}{}: \type{int}}
                 \operation[0]{\procedure{get}{iParticle: \type{int}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Coordinates.north) + (8 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipoleMoments}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{ComponentDipoleMoments}{0, 0}
                 \inherit{Coordinates}
                 \operation{\procedure{construct}{norm: \type{real},
                     orientations: \type{ComponentCoordinates}}}
@@ -26,7 +26,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ComponentDipoleMoments.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{ComponentCoordinates}{0, 0}
                 \inherit{Coordinates}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation[0]{\procedure{destroy}{}}
@@ -39,14 +39,14 @@
         \end{scope}
 
         \begin{scope}[shift={($(Coordinates |- ComponentCoordinates.north)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentNumber}{0, 0}
                 \operation{\procedure{set}{number: \type{int}}}
                 \operation{\procedure{get}{}: \type{int}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ComponentAverageNumber}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentAverageNumber}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{get}{}: \type{int}}
@@ -54,7 +54,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ComponentDipoleMoments.north) + (0 cm, 4.5 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{Component}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{Component}{0, 0}
                 \UMLattribute{number: \type{ComponentNumber}}
                 \UMLattribute{positions: \type{ComponentCoordinates}}
                 \UMLattribute{orientations: \type{ComponentCoordinates}}
@@ -64,7 +64,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ComponentDipoleMoments.north) + (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{MixtureTotalMoment}{0, 0}
                 \operation{\procedure{construct}{components: \type{Component[:]},
                     areDipolar: \type{bool[:]}}}
                 \operation{\procedure{destroy}{}}
@@ -78,14 +78,14 @@
         \end{scope}
 
         \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{MinDistance}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{MinDistance}{0, 0}
                 \operation{\procedure{set}{minDistance: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(MixtureTotalMoment.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ComponentChemicalPotential}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentChemicalPotential}{0, 0}
                 \operation{\procedure{set}{density: \type{real}, invPowActivity: \type{real}}}
                 \operation{\procedure{getDensity}{}: \type{real}}
                 \operation{\procedure{getInvPowActivity}{}: \type{real}}
@@ -93,7 +93,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(Coordinates.north |- Component.north)$)}]
-            \begin{class}[text width=\smallTextWidth]{TemporaryParticle}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{TemporaryParticle}{0, 0}
                 \UMLattribute{i: \type{int}}
                 \UMLattribute{position: \type{real[3]}}
                 \UMLattribute{orientation: \type{real[3]}}
@@ -102,7 +102,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
-            \begin{class}[text width=\mediumTextWidth]{Mixture}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{Mixture}{0, 0}
                 \UMLattribute{components: \type{Component[:]}}
                 \UMLattribute{componentsMinDistances: \type{MinDistance[:.]}}
                 \UMLattribute{wallMinDistances: \type{MinDistance[:]}}

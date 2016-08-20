@@ -9,7 +9,7 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableCells}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     positions: \type{ComponentCoordinates}, hardContact: \type{HardContact},
                     pairPotential: \type{PairPotential}, neighbourCells: \type{NeighbourCells},
@@ -34,7 +34,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableCells.north) + (-9 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     positions: \type{ComponentCoordinates}, hardContact: \type{HardContact}}}
                 \operation{\procedure{destroy}{}}
@@ -57,7 +57,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{PairPotential}{0, 0}
                 \operation[0]{\procedure{construct}{domain: \type{ShortPotentialDomain},
                     expression: \type{PotentialExpression}}}
                 \operation[0]{\procedure{destroy}{}}
@@ -69,7 +69,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 5.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{HardContact}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{HardContact}{0, 0}
                 \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
                     diracPlus: \type{DiracDistributionPlus}}}
                 \operation{\procedure{destroy}{}}
@@ -81,7 +81,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.north |- HardContact.north)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{DiracDistributionPlus}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{DiracDistributionPlus}{0, 0}
                 \operation[0]{\procedure{set}{\ldots}}
                 \operation[0]{\procedure{getWidth}{}: \type{real}}
                 \operation[0]{\procedure{get}{distance: \type{real}}: \type{real}}
@@ -89,7 +89,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{NeighbourCells}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{NeighbourCells}{0, 0}
                 \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
                     hardContact: \type{HardContact}, pairPotential: \type{PairPotential}}}
                 \operation{\procedure{destroy}{}}
@@ -107,7 +107,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableCells.north) + (9 cm, 0 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{ShortInteractions}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
                 \UMLattribute{hardContact: \type{HardContact}}
                 \UMLattribute{wallsVisitor: \type{WallsVisitor}}
                 \UMLattribute{wallPairs: \type{PairPotential[:]}}
@@ -119,7 +119,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ShortInteractions.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ShortPairsVisitor}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{visitInter}{overlap: \type{bool}, energy: \type{real},
@@ -132,13 +132,13 @@
         \end{scope}
 
         \begin{scope}[shift={($(PairPotential -| ShortPairsVisitor)$)}]
-        \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
+        \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
                 \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(HardContact.north -| ShortInteractions)$)}]
-            \umlnote[text width=\mediumTextWidth] {\import{}: \\
+            \umlnote[text width=\largeTextWidth] {\import{}: \\
                 \namespace{Environment} :: PeriodicBox, ParallelepipedDomain, WallsVisitor \\
                 \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
         \end{scope}

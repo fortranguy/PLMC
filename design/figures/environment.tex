@@ -9,7 +9,7 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\mediumTextWidth]{PeriodicBox}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{PeriodicBox}{0, 0}
                 \operation{\procedure{set}{size: \type{real[3]}}}
                 \operation{\procedure{getSize}{}: \type{real[3]}}
                 \operation{\procedure{distance}{position1: \type{real[3]},
@@ -21,7 +21,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 4.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{ParallelepipedDomain}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getOrigin}{}: \type{real[3]}}
@@ -31,7 +31,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox.north) + (8 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{Temperature}{0, 0}
                 \operation{\procedure{set}{temperature: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
@@ -39,7 +39,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(Temperature.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ReciprocalLattice}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
                 \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
                     numbers: \type{int[3]}}}
                 \operation{\procedure{destroy}{}}
@@ -49,20 +49,20 @@
         \end{scope}
 
         \begin{scope}[shift={($(Temperature.north) + (0 cm, 3 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{Permittivity}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{Permittivity}{0, 0}
                 \operation{\procedure{set}{permittivity: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{FieldExpression}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{FieldExpression}{0, 0}
                 \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{ExternalField}{0, 0}
                 \operation{\procedure{construct}{parallelepipedDomain: \type{ParallelepipedDomain},
                     fieldExpression: \type{FieldExpression}}}
                 \operation{\procedure{destroy}{}}
@@ -71,7 +71,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ExternalField.north) - (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{WallsVisitor}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{WallsVisitor}{0, 0}
                 \operation{\procedure{construct}{wallsPotential: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
@@ -80,7 +80,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(WallsVisitor.south |- ParallelepipedDomain.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{FloorPenetration}{0, 0}
                 \operation{\procedure{getHeight}{}: \type{real}}
                 \operation{\procedure{meet}{overlap: \type{bool},
                     shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
@@ -88,7 +88,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(FloorPenetration.south |- PeriodicBox.north) + (0 cm, 0.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableWalls}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{VisitableWalls}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}, gap: \type{real},
                     floorPenetration: \type{FloorPenetration}}}
                 \operation{\procedure{destroy}{}}
@@ -101,7 +101,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{Environment}{0, 0}
                 \UMLattribute{periodicBox: \type{PeriodicBox}}
                 \UMLattribute{temperature: \type{Temperature}}
                 \UMLattribute{permittivity: \type{Permittivity}}
@@ -115,7 +115,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox |- Environment.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{BoxSizeChecker}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
                 \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
                     wallsPotential: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
@@ -124,7 +124,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(ExternalField.north -| FieldExpression.north)$)}]
-            \umlnote[text width=\smallTextWidth]{\import{}:\\
+            \umlnote[text width=\mediumTextWidth]{\import{}:\\
                 \namespace{Mixutre} :: \type{MinDistance},
                 \namespace{ShortInteractions} :: PairPotential};
         \end{scope}

@@ -1,13 +1,10 @@
 \documentclass[a4paper, 12pt]{article}
-\usepackage[paper=A4, pagesize]{typearea}
-\usepackage{geometry}
+\usepackage[top=2cm, bottom=2cm, left=1.5cm, right=1.5cm]{geometry}
 
 \usepackage{standalone}
 \def\buildMode{buildmissing}
 \input{figures/figures.sty}
 
-\usepackage{fullpage}
-\usepackage{pdflscape}
 %\usepackage{showframe}
 
 \usepackage[backend=biber]{biblatex}
@@ -55,8 +52,8 @@
 
     \newpage
     \tableofcontents
+    \clearpage
 
-    \begin{landscape}
     \section{Core}
 
         \subsection{Common}
@@ -102,12 +99,7 @@
                 \includestandalone[mode=\buildMode]{figures/short_interactions}
                 \caption{\namespace{Short Interactions}}
             \end{figure}
-
-    \end{landscape}
-        \clearpage
-        \thispagestyle{empty}
-        \KOMAoptions{paper=A3, pagesize}
-        \recalctypearea
+            \clearpage
 
             \subsubsection{Dipolar interactions}
             \begin{figure}[htb]
@@ -115,13 +107,13 @@
                 \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
                 \caption{\namespace{Dipolar Interactions}}
             \end{figure}
+            \begin{figure}[htb]
+                \centering
+                \includestandalone[mode=\buildMode]{figures/dipolar_interactions_reci}
+                \caption{\namespace{Dipolar Interactions}: Reciprocal Space}
+            \end{figure}
+            \clearpage
 
-        \clearpage
-        \KOMAoptions{paper=A4, pagesize}
-        \restoregeometry
-        \recalctypearea
-
-    \begin{landscape}
     \section{Markov chain generator}
 
         \subsection{Changes}
@@ -158,21 +150,20 @@
         \end{figure}
         \clearpage
 
-    \section{Readers}
+    \section{Input / Output}
+
         \begin{figure}[htb]
             \centering
             \includestandalone[mode=\buildMode]{figures/readers}
             \caption{\namespace{Readers}}
         \end{figure}
-        \clearpage
 
-    \section{Writers}
         \begin{figure}[htb]
             \centering
             \includestandalone[mode=\buildMode]{figures/writers}
             \caption{\namespace{Writers}}
         \end{figure}
-    \end{landscape}
+        \clearpage
 
     \nocite{*}
     \printbibliography

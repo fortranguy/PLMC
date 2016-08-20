@@ -1,0 +1,126 @@
+\documentclass{standalone}
+
+\usepackage{luatex85}
+\renewcommand{\familydefault}{\sfdefault}
+\input figures/figures.sty
+
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\largeTextWidth]{StructureVisitor}{0, 0}
+                \operation[0]{\procedure{visit}{}: \type{real}}
+                \operation[0]{\procedure{visitTranslation}{iComponent: \type{int},
+                    newPosition: \type{real[3]},
+                    old: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitTransmutation}{ijComponents: \type{int[2]},
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitRotation}{iComponent: \type{int},
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitAdd}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitRemove}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitSwitch}{ijComponents: \type{int[2]},
+                    particles: \type{TemporaryParticle[2]}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureVisitor.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESreciWeight}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity},
+                    alpha: \type{DESconvergenceParameter}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{get}{n1: \type{int}, n2: \type{int}, n3: \type{int}}:
+                    \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureVisitor.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DLCweight}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{get}{n1: \type{int}, n2: \type{int}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureVisitor.south) - (0 cm, 2 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{StructureFactor}{0, 0}
+                \operation[0]{\procedure{isDipolar}{iComponent: \type{int}}: \type{bool}}
+                \operation[0]{\procedure{updateTranslation}{iComponent: \type{int},
+                    newPosition: \type{real[3]}, old: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateTransmutation}{ijComponents: \type{int[2]},
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateRotation}{iComponent: \type{int},
+                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateAdd}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateRemove}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateSwitch}{ijComponents: \type{int[2]},
+                    particles: \type{TemporaryParticle[2]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureFactor.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESreciStructure}{0, 0}
+                \inherit{StructureFactor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
+                    areDipolar: \type{bool[:]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{get}{n1: \type{int}, n2: \type{int}, n3: \type{int}}:
+                    \type{complex}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESreciWeight.south)!0.2!(DESreciStructure.north)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESreciVisitor}{0, 0}
+                \inherit{StructureVisitor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DESreciWeight},
+                    structure: \type{DESreciStructure}}}
+                \operation{\procedure{destroy}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureFactor.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DLCstructures}{0, 0}
+                \inherit{StructureFactor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
+                    areDipolar: \type{bool[:]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{getPlus}{n1: \type{int}, n2: \type{int}}: \type{complex}}
+                \operation{\procedure{getMinus}{n1: \type{int}, n2: \type{int}}: \type{complex}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DLCweight.south)!0.2!(DLCstructures.north)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DLCvisitor}{0, 0}
+                \inherit{StructureVisitor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DLCweight},
+                    structures: \type{DLCstructures}}}
+                \operation{\procedure{destroy}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[on background layer]
+            \aggregation{DESreciVisitor}{\refName{weight}}{\numRef{1}}{DESreciWeight}
+            \aggregation{DESreciVisitor}{\refName{structure}}{\numRef{1}}{DESreciStructure}
+
+            \aggregation{DLCvisitor}{\refName{weight}}{\numRef{1}}{DLCweight}
+            \aggregation{DLCvisitor}{\refName{structure}}{\numRef{1}}{DLCstructures}
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}

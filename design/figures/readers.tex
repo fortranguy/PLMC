@@ -9,7 +9,7 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\mediumTextWidth]{CompleteCoordinatesReader}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{CompleteCoordinatesReader}{0, 0}
                 \operation{\procedure{construct}{}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{read}{}}
@@ -17,7 +17,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(CompleteCoordinatesReader.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinatesReader}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{ComponentCoordinatesReader}{0, 0}
                 \operation[0]{\procedure{construct}{...}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{read}{coordinatesUnit: \type{int}, numParticles: \type{int}}}

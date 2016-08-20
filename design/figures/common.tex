@@ -9,7 +9,7 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\smallTextWidth]{HeteroCouples}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{HeteroCouples}{0, 0}
                 \operation[0]{\procedure{construct}{numComponents: \type{int}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getNumIndices}{}: \type{int}}
@@ -18,21 +18,21 @@
         \end{scope}
 
         \begin{scope}[shift={($(HeteroCouples.south) - (0 cm, 2 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{PotentialDomain}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{PotentialDomain}{0, 0}
                 \UMLattribute{min: \type{real}}
                 \UMLattribute{delta: \type{real}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(PotentialDomain.south) + (-4 cm, -2 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{ShortPotentialDomain}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{ShortPotentialDomain}{0, 0}
                 \inherit{PotentialDomain}
                 \UMLattribute{max: \type{real}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(PotentialDomain.south) + (4 cm, -2 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{DipolarPotentialDomain}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{DipolarPotentialDomain}{0, 0}
                 \inherit{PotentialDomain}
                 \UMLattribute{maxOverBox: \type{real}}
             \end{class}
