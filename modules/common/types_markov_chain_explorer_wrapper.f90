@@ -10,10 +10,10 @@ implicit none
 private
 
     type, public :: Markov_Chain_Explorer_Wrapper
+        class(Abstract_Volume_Change_Method), allocatable :: volume_change_method
         class(Abstract_Parallelepiped_Domain), allocatable :: particle_insertion_domain
         class(Abstract_Random_Coordinates), allocatable :: random_position, random_orientation
         class(Abstract_Particle_Insertion_Method), allocatable :: particle_insertion_method
-        class(Abstract_Volume_Change_Method), allocatable :: volume_change_method
     end type Markov_Chain_Explorer_Wrapper
 
 end module types_markov_chain_explorer_wrapper

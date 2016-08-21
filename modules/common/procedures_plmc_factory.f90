@@ -85,8 +85,8 @@ contains
             components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
-            short_interactions%components_pairs, changes%components, generating_data, &
-            writers_prefix)
+            short_interactions%components_pairs, changes%components, changes%changed_box_size, &
+            generating_data, writers_prefix)
     end subroutine create_generating_readers_writers
 
     subroutine destroy_generating_readers_writers(readers, writers)

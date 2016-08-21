@@ -187,7 +187,9 @@
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="14" />
 		</Unit>
-		<Unit filename="modules/common/procedures_visit_condition.f90" />
+		<Unit filename="modules/common/procedures_visit_condition.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/common/types_exploring_io.f90">
 			<Option weight="18" />
 		</Unit>
@@ -367,6 +369,9 @@
 		</Unit>
 		<Unit filename="modules/environment/field/procedures_field_factory.f90">
 			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_beta_pressure_factory.f90">
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_environment_factory.f90">
 			<Option weight="18" />
@@ -779,7 +784,9 @@
 		<Unit filename="modules/writers/types_generating_writers_wrapper.f90">
 			<Option weight="17" />
 		</Unit>
-		<Unit filename="modules/writers/types_logical_line.f90" />
+		<Unit filename="modules/writers/types_logical_line.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="programs/density.f90">
 			<Option weight="19" />
 			<Option target="density" />

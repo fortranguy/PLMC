@@ -17,13 +17,13 @@
             "size": [12.0, 12.0, 12.0]
         },
         "Component 1": {
-            "number": 10000
+            "number": 100000
         },
         "Component 2": {
-            "number": 10000
+            "number": 100000
         },
         "Component 3": {
-            "number": 10000
+            "number": 100000
         }
     },
     "Density": {

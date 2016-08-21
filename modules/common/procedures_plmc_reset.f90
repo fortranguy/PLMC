@@ -8,12 +8,7 @@ use types_physical_model_wrapper, only: Physical_Model_Wrapper
 implicit none
 
 private
-public :: plmc_reset, plmc_reset_cells
-
-interface plmc_reset_cells
-    module procedure :: reset_neighbour_cells
-    module procedure :: reset_visitable_cells
-end interface plmc_reset_cells
+public :: plmc_reset, box_size_change_reset_cells, reset_neighbour_cells, reset_visitable_cells
 
 contains
 
@@ -30,10 +25,11 @@ contains
         type(Neighbour_Cells_Line), intent(inout) :: cells(:)
 
         integer :: i_component, j_component
+        logical :: only_resized_dummy
 
         do j_component = 1, size(cells)
             do i_component = 1, size(cells(j_component)%line)
-                call cells(j_component)%line(i_component)%cells%reset()
+                call cells(j_component)%line(i_component)%cells%reset(only_resized_dummy)
             end do
         end do
     end subroutine reset_neighbour_cells
@@ -49,6 +45,25 @@ contains
             end do
         end do
     end subroutine reset_visitable_cells
+
+    subroutine box_size_change_reset_cells(neighbour_cells, visitable_cells)
+        type(Neighbour_Cells_Line), intent(inout) :: neighbour_cells(:)
+        class(Abstract_Visitable_Cells), intent(inout) :: visitable_cells(:, :)
+
+        integer :: i_component, j_component
+        logical :: only_resized
+
+        do j_component = 1, size(neighbour_cells)
+            do i_component = 1, size(neighbour_cells(j_component)%line)
+                call neighbour_cells(j_component)%line(i_component)%cells%reset(only_resized)
+                if (.not. only_resized) then
+                    call visitable_cells(i_component, j_component)%reset()
+                    if (i_component /= j_component) call visitable_cells(j_component, i_component)%&
+                        reset()
+                end if
+            end do
+        end do
+    end subroutine box_size_change_reset_cells
 
     !> Some dipolar accumulators may need to be reset to reflect the current configuration.
     subroutine reset_dipolar(dipolar_interactions)

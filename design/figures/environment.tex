@@ -30,7 +30,36 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox.north) + (8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{ExternalField}{0, 0}
+                \operation{\procedure{construct}{parallelepipedDomain: \type{ParallelepipedDomain},
+                    fieldExpression: \type{FieldExpression}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ExternalField.north) + (8 cm, 0 cm)$)}]
+            \coordinate (Import) at (0, 0);
+            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+                \namespace{Mixutre} :: \type{MinDistance},
+                \namespace{ShortInteractions} :: PairPotential};
+        \end{scope}
+
+        \begin{scope}[shift={($(Import.south) - (0 cm, 3 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{FieldExpression}{0, 0}
+                \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(FieldExpression.south) - (0 cm, 1 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{Permittivity}{0, 0}
+                \operation{\procedure{set}{permittivity: \type{real}}}
+                \operation{\procedure{get}{}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PeriodicBox.north -| Permittivity)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{Temperature}{0, 0}
                 \operation{\procedure{set}{temperature: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
@@ -38,7 +67,7 @@
             % Parallel Tempering?
         \end{scope}
 
-        \begin{scope}[shift={($(Temperature.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(Temperature.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
                 \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
                     numbers: \type{int[3]}}}
@@ -48,25 +77,10 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Temperature.north) + (0 cm, 3 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{Permittivity}{0, 0}
-                \operation{\procedure{set}{permittivity: \type{real}}}
+        \begin{scope}[shift={($(ReciprocalLattice.south) - (0 cm, 1 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{BetaPressure}{0, 0}
+                \operation{\procedure{set}{density \type{real}, excess: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{FieldExpression}{0, 0}
-                \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{ExternalField}{0, 0}
-                \operation{\procedure{construct}{parallelepipedDomain: \type{ParallelepipedDomain},
-                    fieldExpression: \type{FieldExpression}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -121,12 +135,6 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{check}{}}
             \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ExternalField.north -| FieldExpression.north)$)}]
-            \umlnote[text width=\mediumTextWidth]{\import{}:\\
-                \namespace{Mixutre} :: \type{MinDistance},
-                \namespace{ShortInteractions} :: PairPotential};
         \end{scope}
 
         \begin{scope}[on background layer]

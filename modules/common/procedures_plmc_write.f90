@@ -38,6 +38,7 @@ contains
 
         integer :: i_component
 
+        call writers%volume_change_success%write(i_step, observables%volume_change_success)
         call writers%nums_particles%write(i_step, observables%nums_particles)
         if (0 <= i_step) then
             call writers%complete_coordinates%write(i_step)

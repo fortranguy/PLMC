@@ -5,8 +5,7 @@ use data_input_prefixes, only: environment_prefix
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
-use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
+use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
@@ -33,11 +32,10 @@ public :: changes_create, changes_destroy, set_can_translate, set_can_rotate, se
 
 contains
 
-    subroutine changes_create(changes, periodic_box, accessible_domain, components, &
-        num_tuning_steps, generating_data, prefix)
+    subroutine changes_create(changes, environment, components, num_tuning_steps, generating_data, &
+        prefix)
         type(Changes_Wrapper), intent(out) :: changes
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
+        type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
@@ -53,10 +51,10 @@ contains
         type(Concrete_Number_to_String) :: string
         integer :: i_component
 
-        volume_can_change = box_size_can_change(generating_data, environment_prefix)
+        volume_can_change = box_size_can_change(environment%beta_pressure)
         call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, volume_can_change,&
             generating_data, prefix//"Box Size.")
-        call changed_box_size_create(changes%changed_box_size, periodic_box, &
+        call changed_box_size_create(changes%changed_box_size, environment%periodic_box, &
             box_size_tuning_parameters, volume_can_change, generating_data, prefix//"Box Size.")
         call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, volume_can_change, &
             generating_data, prefix//"Box Size.")
@@ -72,15 +70,15 @@ contains
             some_components_have_coordinates, generating_data, prefix//"Components.")
         allocate(changes%components(size(components)))
         do i_component = 1, size(changes%components)
-            call changes_component_create(changes%components(i_component), periodic_box, &
-                components(i_component), components_tuning_parameters, components_tuner_parameters,&
-                num_tuning_steps, generating_data, prefix//"Component "//string%&
-                get(i_component)//".")
+            call changes_component_create(changes%components(i_component), environment%&
+                periodic_box, components(i_component), components_tuning_parameters, &
+                components_tuner_parameters, num_tuning_steps, generating_data, prefix//&
+                "Component "//string%get(i_component)//".")
         end do
 
         call set_can_exchange(can_exchange, components)
-        call random_coordinates_create(changes%random_position, accessible_domain, can_exchange, &
-        have_positions)
+        call random_coordinates_create(changes%random_position, environment%accessible_domain, &
+            can_exchange, have_positions)
         call random_coordinates_create(changes%random_orientation, can_exchange, have_orientations)
         call coordinates_copier_create_position(changes%position_copier, changes%random_position, &
             have_positions)

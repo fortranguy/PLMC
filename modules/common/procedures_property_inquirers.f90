@@ -4,6 +4,7 @@ use json_module, only: json_file
 use procedures_checks, only: check_data_found, check_array_size
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
+use classes_beta_pressure, only: Abstract_Beta_Pressure, Concrete_Beta_Pressure
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
 use classes_external_field, only: Abstract_External_Field, Null_External_Field
 use classes_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
@@ -58,6 +59,7 @@ end interface use_walls
 
 interface box_size_can_change
     module procedure :: box_size_can_change_from_json
+    module procedure :: box_size_can_change_from_beta_pressure
     module procedure :: box_size_can_change_from_changed_box_size
 end interface box_size_can_change
 
@@ -224,6 +226,18 @@ contains
 
         box_size_can_change = logical_from_json(generating_data, prefix//"Box.size can change")
     end function box_size_can_change_from_json
+
+    pure logical function box_size_can_change_from_beta_pressure(beta_pressure) &
+        result(box_size_can_change)
+        class(Abstract_Beta_Pressure), intent(in) :: beta_pressure
+
+        select type (beta_pressure)
+            type is (Concrete_Beta_Pressure)
+                box_size_can_change = .true.
+            class default
+                box_size_can_change = .false.
+        end select
+    end function box_size_can_change_from_beta_pressure
 
     pure logical function box_size_can_change_from_changed_box_size(changed_box_size) &
         result(box_size_can_change)

@@ -5,6 +5,10 @@
             "initial size": [12.0, 12.0, 12.0],
             "size can change": true
         },
+        "Pressure": {
+            "density": 0.1,
+            "excess": 0.02
+        },
         "Thermostat": {
             "temperature": 2.0
         },
@@ -12,11 +16,11 @@
             "apply": false
         },
         "Permittivity": {
-            "use": true,
+            "use": false,
             "value": 1.0
         },
         "Reciprocal Lattice": {
-            "use": true,
+            "use": false,
             "numbers": [8, 8, 8]
         },
         "Walls": {
@@ -24,79 +28,61 @@
         }
     },
     "Mixture": {
-        "number of components": 3,
+        "number of components": 1,
         "Component 1": {
-            "initial number": 200,
-            "minimum distance": 0.8,
-            "is dipolar": true,
+            "initial number": 3,
+            "minimum distance": 1.0,
+            "is dipolar": false,
             "moment norm": 1.0,
             "can exchange": false
         },
         "Component 2": {
-            "initial number": 1000,
-            "minimum distance": 0.8,
+            "initial number": 100,
+            "minimum distance": 1.0,
             "is dipolar": false,
             "can exchange": false
         },
         "Component 3": {
-            "initial number": 300,
-            "minimum distance": 0.8,
-            "is dipolar": true,
+            "initial number": 30,
+            "minimum distance": 1.0,
+            "is dipolar": false,
             "moment norm": 0.25,
             "can exchange": false
         },
         "Inter 12": {
-            "minimum distance": 0.8
+            "minimum distance": 1.0
         },
         "Inter 13": {
-            "minimum distance": 0.8
+            "minimum distance": 1.0
         },
         "Inter 23": {
-            "minimum distance": 0.8
+            "minimum distance": 1.0
         }
     },
     "Short Interactions": {
         "Component 1": {
-            "name": "LJ",
-            "tabulated": false,
-            "epsilon": 1.0,
-            "sigma": 1.0,
-            "maximum distance": 2.5
+            "name": "null",
+            "tabulated": false
         },
         "Component 2": {
-            "name": "LJ",
-            "tabulated": false,
-            "epsilon": 0.5,
-            "sigma": 1.0,
-            "maximum distance": 2.5
+            "name": "null",
+            "tabulated": false
         },
         "Component 3": {
-            "name": "LJ",
-            "tabulated": false,
-            "epsilon": 0.25,
-            "sigma": 1.0,
-            "maximum distance": 2.5
+            "name": "null",
+            "tabulated": false
         },
         "Inter 12": {
-            "name": "LJ",
-            "tabulated": false,
-            "epsilon": 1.0,
-            "sigma": 1.0,
-            "maximum distance": 2.5
+            "name": "null",
+            "tabulated": false
         },
         "Inter 13": {
-            "name": "LJ",
-            "tabulated": false,
-            "epsilon": 1.0,
-            "sigma": 1.0,
-            "maximum distance": 2.5
+            "name": "null",
+            "tabulated": false
         },
         "Inter 23": {
-            "name": "LJ",
-            "tabulated": false,
-            "epsilon": 1.0,
-            "sigma": 1.0,
-            "maximum distance": 2.5
+            "name": "null",
+            "tabulated": false
         },
         "Cells": {
             "data structure": "list"
@@ -114,7 +100,7 @@
         "name": "urandom"
     },
     "Changes": {
-        "number of tuning steps": 100,
+        "number of tuning steps": 10,
         "Box Size": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
@@ -155,7 +141,7 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 250
+        "number of steps": 10
     },
     "Input": {
         "initial coordinates": "initial_coordinates.xyz"

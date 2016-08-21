@@ -107,17 +107,28 @@ contains
         this%accessible_domain => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset(this)
+    subroutine Abstract_reset(this, only_resized)
         class(Abstract_Neighbour_Cells), intent(inout) :: this
+        logical, intent(out) :: only_resized
 
         integer :: nums(num_dimensions)
 
+        write(*, * ) "accessible_domain", this%accessible_domain%get_size()
         nums = floor(this%accessible_domain%get_size() / this%max_distance)
-        if (all(this%nums == nums)) return
+        if (all(this%nums == nums)) then
+            this%size = this%accessible_domain%get_size() / real(this%nums, DP)
+            call this%check_size()
+            write(*, * ) "resize: cell size", this%size
+            only_resized = .true.
+            return
+        else
+            only_resized = .false.
+        end if
         this%nums = nums
         call this%check_nums()
         this%size = this%accessible_domain%get_size() / real(this%nums, DP)
         call this%check_size()
+        write(*, * ) "reset: cell size", this%size
 
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
@@ -216,10 +227,12 @@ contains
         is_inside = this%accessible_domain%is_inside(position)
     end function Abstract_is_inside
 
-    pure function Abstract_index(this, position) result(index)
+    function Abstract_index(this, position) result(index)
         class(Abstract_Neighbour_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
         integer :: index(num_dimensions)
+
+        write(*, *) "index: size", this%size, "neighbours", allocated(this%neighbours)
 
         where (mod(this%nums, 2) == 0)
             index = floor(position/this%size)
@@ -293,8 +306,9 @@ contains
         class(Null_Neighbour_Cells), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_reset(this)
+    subroutine Null_reset(this, only_resized)
         class(Null_Neighbour_Cells), intent(inout) :: this
+        logical, intent(out) :: only_resized
     end subroutine Null_reset
 
     pure function Null_get_global_bounds(this) result(bounds)
@@ -325,7 +339,7 @@ contains
         is_inside = .false.
     end function Null_is_inside
 
-    pure function Null_index(this, position) result(index)
+    function Null_index(this, position) result(index)
         class(Null_Neighbour_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
         integer :: index(num_dimensions)

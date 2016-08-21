@@ -5,6 +5,8 @@ use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_beta_pressure_factory, only: beta_pressure_create => create, &
+    beta_pressure_destroy => destroy
 use procedures_temperature_factory, only: temperature_create => create, &
     temperature_destroy => destroy
 use classes_field_expression, only: Abstract_Field_Expression
@@ -19,7 +21,7 @@ use procedures_component_factory, only: component_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
-    apply_external_field, use_walls
+    box_size_can_change, apply_external_field, use_walls
 
 implicit none
 
@@ -39,6 +41,8 @@ contains
         logical :: field_applied
 
         call box_create(environment%periodic_box, generating_data, prefix)
+        call beta_pressure_create(environment%beta_pressure, box_size_can_change(generating_data, &
+            prefix), generating_data, prefix)
         call temperature_create(environment%temperature, generating_data, prefix)
         field_applied = apply_external_field(generating_data, prefix)
         call permittivity_create(environment%permittivity, generating_data, prefix)
@@ -85,6 +89,7 @@ contains
         call hard_core_destroy(environment%wall_min_distance)
         call permittivity_destroy(environment%permittivity)
         call temperature_destroy(environment%temperature)
+        call beta_pressure_destroy(environment%beta_pressure)
         call box_destroy(environment%periodic_box)
     end subroutine environment_destroy
 

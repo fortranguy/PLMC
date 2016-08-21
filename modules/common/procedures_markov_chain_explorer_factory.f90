@@ -30,6 +30,9 @@ contains
         logical, dimension(size(physical_model%mixture%components)) :: can_exchange, &
             have_positions, have_orientations
 
+        measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
+        call volume_change_method_create(markov_chain_explorer%volume_change_method, &
+            physical_model, measure_pressure_excess)
         measure_inv_pow_activities = measure_chemical_potentials(exploring_data, &
             particle_insertion_prefix)
         can_exchange = measure_inv_pow_activities ! as if exchange
@@ -46,19 +49,16 @@ contains
             physical_model, markov_chain_explorer%random_position, markov_chain_explorer%&
             random_orientation, measure_inv_pow_activities, exploring_data, &
             particle_insertion_prefix)
-        measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
-        call volume_change_method_create(markov_chain_explorer%volume_change_method, &
-            physical_model, measure_pressure_excess)
     end subroutine create
 
     subroutine destroy(markov_chain_explorer)
         type(Markov_Chain_Explorer_Wrapper), intent(inout) :: markov_chain_explorer
 
-        call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
         call particle_insertion_method_destroy(markov_chain_explorer%particle_insertion_method)
         call random_coordinates_destroy(markov_chain_explorer%random_orientation)
         call random_coordinates_destroy(markov_chain_explorer%random_position)
         call box_destroy(markov_chain_explorer%particle_insertion_domain)
+        call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
     end subroutine destroy
 
 end module procedures_markov_chain_explorer_factory

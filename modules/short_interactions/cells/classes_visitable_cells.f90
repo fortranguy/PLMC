@@ -100,14 +100,11 @@ contains
     subroutine Abstract_construct_visitable_lists(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
         integer :: global_i1, global_i2, global_i3
 
-        global_lbounds = this%neighbour_cells%get_global_lbounds()
-        global_ubounds = this%neighbour_cells%get_global_ubounds()
-        do global_i3 = global_lbounds(3), global_ubounds(3)
-        do global_i2 = global_lbounds(2), global_ubounds(2)
-        do global_i1 = global_lbounds(1), global_ubounds(1)
+        do global_i3 = lbound(this%visitable_lists, 3), ubound(this%visitable_lists, 3)
+        do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
+        do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
             call this%visitable_lists(global_i1, global_i2, global_i3)%construct(this%periodic_box,&
                 this%positions, this%hard_contact)
         end do
@@ -146,14 +143,11 @@ contains
     subroutine Abstract_destroy_visitable_lists(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
         integer :: global_i1, global_i2, global_i3
 
-        global_lbounds = this%neighbour_cells%get_global_lbounds()
-        global_ubounds = this%neighbour_cells%get_global_ubounds()
-        do global_i3 = global_ubounds(3), global_lbounds(3), -1
-        do global_i2 = global_ubounds(2), global_lbounds(2), -1
-        do global_i1 = global_ubounds(1), global_lbounds(1), -1
+        do global_i3 = lbound(this%visitable_lists, 3), ubound(this%visitable_lists, 3)
+        do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
+        do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
             call this%visitable_lists(global_i1, global_i2, global_i3)%destroy()
         end do
         end do
@@ -169,16 +163,13 @@ contains
         integer, intent(in) :: i_exclude
 
         real(DP) :: energy_i
-        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
         integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
         logical :: at_bottom_layer, at_top_layer
         integer :: local_i1, local_i2, local_i3
 
-        global_lbounds = this%neighbour_cells%get_global_lbounds()
-        global_ubounds = this%neighbour_cells%get_global_ubounds()
         ijk_cell = this%neighbour_cells%index(particle%position)
-        at_bottom_layer = (ijk_cell(3) == global_lbounds(3))
-        at_top_layer = (ijk_cell(3) == global_ubounds(3))
+        at_bottom_layer = (ijk_cell(3) == lbound(this%visitable_lists, 3))
+        at_top_layer = (ijk_cell(3) == ubound(this%visitable_lists, 3))
         energy = 0._DP
         do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
             if (this%neighbour_cells%skip(at_bottom_layer, at_top_layer, local_i3)) cycle
@@ -206,16 +197,13 @@ contains
         integer, intent(in) :: i_exclude
 
         real(DP) :: contacts_i
-        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
         integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
         logical :: at_bottom_layer, at_top_layer
         integer :: local_i1, local_i2, local_i3
 
-        global_lbounds = this%neighbour_cells%get_global_lbounds()
-        global_ubounds = this%neighbour_cells%get_global_ubounds()
         ijk_cell = this%neighbour_cells%index(particle%position)
-        at_bottom_layer = (ijk_cell(3) == global_lbounds(3))
-        at_top_layer = (ijk_cell(3) == global_ubounds(3))
+        at_bottom_layer = (ijk_cell(3) == lbound(this%visitable_lists, 3))
+        at_top_layer = (ijk_cell(3) == ubound(this%visitable_lists, 3))
         contacts = 0._DP
         do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
             if (this%neighbour_cells%skip(at_bottom_layer, at_top_layer, local_i3)) cycle

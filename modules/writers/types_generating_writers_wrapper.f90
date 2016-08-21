@@ -1,5 +1,6 @@
 module types_generating_writers_wrapper
 
+use classes_real_writer, only: Abstract_Real_Writer
 use classes_line_writer, only: Abstract_Line_Writer
 use classes_triangle_writer, only: Abstract_Triangle_Writer
 use classes_square_writer, only: Abstract_Square_Writer
@@ -12,6 +13,7 @@ implicit none
 private
 
     type, public :: Generating_Writers_Wrapper
+        class(Abstract_Real_Writer), allocatable :: volume_change_success
         class(Abstract_Line_Writer), allocatable :: nums_particles
         class(Abstract_Complete_Coordinates_Writer), allocatable :: complete_coordinates
         type(Concrete_Energies_Writers) :: energies

@@ -14,13 +14,14 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_component =>
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use types_reals_line, only: Reals_Line
 use procedures_triangle_observables, only: operator(-)
-use types_observables_energies, only: Concrete_Single_Energies, Concrete_Energies
+use types_observables_energies, only: Concrete_Energies
+use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
-use procedures_generating_observables_factory, only:generating_observables_create => create
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
-use procedures_plmc_reset, only: plmc_reset_cells
+use procedures_plmc_reset, only: box_size_change_reset_cells, reset_neighbour_cells, &
+    reset_visitable_cells
 use procedures_plmc_visit, only: visit_walls, visit_short, visit_field
 use procedures_metropolis_algorithm, only: metropolis_algorithm
 
@@ -95,46 +96,60 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        type(Concrete_Energies) :: deltas
-
-        observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
-        call observables_energies_create(deltas, size(this%mixture%components))
-        call this%metropolis_algorithm(success, deltas, observables%energies)
-    end subroutine Abstract_try
-
-    subroutine Abstract_metropolis_algorithm(this, success, deltas, energies)
-        class(Abstract_Box_Volume_Change), intent(in) :: this
-        logical, intent(out) :: success
-        type(Concrete_Energies), intent(inout) :: deltas
-        type(Concrete_Energies), intent(in) :: energies
-
-        real(DP) :: delta_energy
         type(Concrete_Energies) :: new_energies
         real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
-        logical :: overlap
 
-        success = .false.
+        observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
         box_size_ratio = this%changed_box_size%get_ratio()
         box_size = this%environment%periodic_box%get_size()
         call this%environment%periodic_box%set(box_size * box_size_ratio)
         call this%rescale_positions(box_size_ratio)
-        call this%save_cells(neighbour_cells, visitable_cells)
-        call plmc_reset_cells(this%short_interactions%neighbour_cells)
-        call plmc_reset_cells(this%short_interactions%visitable_cells)
+        !call this%save_cells(neighbour_cells, visitable_cells)
+        !call box_size_change_reset_cells(this%short_interactions%neighbour_cells, this%&
+        !    short_interactions%visitable_cells)
+        call reset_neighbour_cells(this%short_interactions%neighbour_cells)
+        call reset_visitable_cells(this%short_interactions%visitable_cells)
 
-        call generating_observables_create(new_energies%walls_energies, size(deltas%walls_energies))
+        call observables_energies_create(new_energies, size(this%mixture%components))
+        call this%metropolis_algorithm(success, new_energies, box_size_ratio, observables%energies)
+        if (success) then
+            call observables_energies_set(observables%energies, new_energies)
+        else
+            call this%environment%periodic_box%set(box_size)
+            call this%rescale_positions(1._DP / box_size_ratio)
+            !call this%restore_cells(neighbour_cells, visitable_cells)
+            !call box_size_change_reset_cells(this%short_interactions%neighbour_cells, this%&
+            !    short_interactions%visitable_cells)
+            call reset_neighbour_cells(this%short_interactions%neighbour_cells)
+            call reset_visitable_cells(this%short_interactions%visitable_cells)
+        end if
+        write(*, *) "success", success
+    end subroutine Abstract_try
+
+    subroutine Abstract_metropolis_algorithm(this, success, new_energies, box_size_ratio, energies)
+        class(Abstract_Box_Volume_Change), intent(in) :: this
+        logical, intent(out) :: success
+        type(Concrete_Energies), intent(inout) :: new_energies
+        real(DP), intent(in) :: box_size_ratio(:)
+        type(Concrete_Energies), intent(in) :: energies
+
+        real(DP) :: delta_energy
+        type(Concrete_Energies) :: deltas
+
+        logical :: overlap
+
+        success = .false.
+        call observables_energies_create(deltas, size(this%mixture%components))
         call visit_walls(overlap, new_energies%walls_energies, this%mixture%components, this%&
             short_interactions)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
-        call generating_observables_create(new_energies%short_energies, size(deltas%short_energies))
         call visit_short(overlap, new_energies%short_energies, this%mixture%components, this%&
             short_interactions)
         deltas%short_energies = new_energies%short_energies - energies%short_energies
         if (overlap) return
-        call generating_observables_create(new_energies%field_energies, size(deltas%field_energies))
         call visit_field(new_energies%field_energies, this%environment%external_field, this%&
             mixture%components)
         deltas%field_energies = new_energies%field_energies - energies%field_energies
@@ -143,11 +158,6 @@ contains
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             triangle_observables_sum(deltas%short_energies)
         success = metropolis_algorithm(this%acceptation_probability(box_size_ratio, delta_energy))
-        if (.not.success) then
-            call this%environment%periodic_box%set(box_size)
-            call this%rescale_positions(1._DP / box_size_ratio)
-            call this%restore_cells(neighbour_cells, visitable_cells)
-        end if
     end subroutine Abstract_metropolis_algorithm
 
     !> \[
@@ -216,7 +226,9 @@ contains
         call cells_destroy(this%short_interactions%visitable_cells)
         call cells_destroy(this%short_interactions%neighbour_cells)
 
+        allocate(this%short_interactions%neighbour_cells(size(neighbour_cells)))
         do j_component = 1, size(neighbour_cells)
+            allocate(this%short_interactions%neighbour_cells(j_component)%line(j_component))
             do i_component = 1, size(neighbour_cells(j_component)%line)
                 allocate(this%short_interactions%neighbour_cells(j_component)%line(i_component)%&
                     cells, source=neighbour_cells(j_component)%line(i_component)%cells)
