@@ -66,7 +66,7 @@ interface plmc_set
     module procedure :: set_initial_observables
     module procedure :: set_coordinates_from_json, set_coordinates_from_snap
     module procedure :: markov_chain_generator_set
-    module procedure :: tune_components_moves
+    module procedure :: tune_moved_coordinates
     module procedure :: set_success_and_reset_counter_generating, &
         set_success_and_reset_counter_exploring
 end interface plmc_set
@@ -146,25 +146,28 @@ contains
         call random_seed_set(input_data, random_number_generator_prefix)
     end subroutine set_random_seed
 
-    subroutine tune_components_moves(tuned, i_step, changes_components, changes_sucesses)
+    subroutine tune_moved_coordinates(tuned, i_step, changes, observables)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
-        type(Changes_Component_Wrapper), intent(inout) :: changes_components(:)
-        type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
+        type(Changes_Wrapper), intent(inout) :: changes
+        type(Generating_Observables_Wrapper), intent(in) :: observables
 
-        logical :: translation_tuned(size(changes_components)), &
-            rotation_tuned(size(changes_components))
+        logical :: box_size_tuned, translation_tuned(size(changes%components)), &
+            rotation_tuned(size(changes%components))
         integer :: i_component
 
-        do i_component = 1, size(changes_components)
-            call changes_components(i_component)%translation_tuner%&
-                tune(translation_tuned(i_component), i_step, changes_sucesses(i_component)%&
-                translation)
-            call changes_components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
-                i_step, changes_sucesses(i_component)%rotation)
+        call changes%box_size_change_tuner%tune(box_size_tuned, i_step, observables%&
+            volume_change_success)
+        do i_component = 1, size(changes%components)
+            call changes%components(i_component)%translation_tuner%&
+                tune(translation_tuned(i_component), i_step, observables%&
+                changes_sucesses(i_component)%translation)
+            call changes%components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
+                i_step, observables%changes_sucesses(i_component)%rotation)
         end do
-        tuned = all(translation_tuned) .and. all(rotation_tuned) ! Beware of inertia.
-    end subroutine tune_components_moves
+        tuned = box_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
+            ! Beware of inertia.
+    end subroutine tune_moved_coordinates
 
     subroutine set_success_and_reset_counter_generating(observables)
         type(Generating_Observables_Wrapper), intent(inout) :: observables

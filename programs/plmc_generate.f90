@@ -46,8 +46,7 @@ implicit none
     do i_step = -num_tuning_steps + 1, 0
         call markov_chain_generator%plmc_propagator%try(observables)
         call plmc_set(observables)
-        call plmc_set(changes_tuned, i_step, markov_chain_generator%changes%components, &
-            observables%changes_sucesses)
+        call plmc_set(changes_tuned, i_step, markov_chain_generator%changes, observables)
         call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
         if (changes_tuned) exit
     end do
