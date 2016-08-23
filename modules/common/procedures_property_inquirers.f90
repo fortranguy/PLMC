@@ -22,6 +22,8 @@ use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordina
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use classes_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
+use classes_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
+    Concrete_Visitable_Array
 use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method, &
     Concrete_Particle_Insertion_Method
 use classes_volume_change_method, only: Abstract_Volume_Change_Method, Concrete_Volume_Change_Method
@@ -33,8 +35,9 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
     use_reciprocal_lattice, use_walls, box_size_can_change, &
     component_exists, component_is_dipolar, component_has_positions, component_can_translate, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
-    component_interacts_with_wall, num_components, i_component, ij_components, write_coordinates, &
-    measure_chemical_potentials, measure_pressure
+    component_interacts_with_wall, num_components, i_component, ij_components, &
+    list_is_linked_list, list_is_array, &
+    write_coordinates, measure_chemical_potentials, measure_pressure
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -421,6 +424,28 @@ contains
             "json_ij_components", json_ij_components, size(ij_components))
         ij_components = json_ij_components
     end function ij_components_from_json
+
+    pure logical function list_is_linked_list(list)
+        class(Abstract_Visitable_List), intent(in) :: list
+
+        select type (list)
+            type is (Concrete_Visitable_List)
+                list_is_linked_list = .true.
+            class default
+                list_is_linked_list = .false.
+        end select
+    end function list_is_linked_list
+
+    pure logical function list_is_array(list)
+        class(Abstract_Visitable_List), intent(in) :: list
+
+        select type (list)
+            type is (Concrete_Visitable_Array)
+                list_is_array = .true.
+            class default
+                list_is_array = .false.
+        end select
+    end function list_is_array
 
     logical function write_coordinates_from_json(generating_data, prefix) result(write_coordinates)
         type(json_file), intent(inout) :: generating_data

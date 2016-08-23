@@ -646,6 +646,9 @@
 		<Unit filename="modules/short_interactions/cells/classes_visitable_cells.f90">
 			<Option weight="8" />
 		</Unit>
+		<Unit filename="modules/short_interactions/cells/classes_visitable_cells_memento.f90">
+			<Option weight="17" />
+		</Unit>
 		<Unit filename="modules/short_interactions/cells/data_cells.f90">
 			<Option weight="1" />
 		</Unit>
@@ -660,6 +663,9 @@
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/procedures_visitable_cells_factory.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/short_interactions/cells/procedures_visitable_cells_memento_factory.f90">
+			<Option weight="18" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/types_neighbour_cells_wrapper.f90">
 			<Option weight="8" />

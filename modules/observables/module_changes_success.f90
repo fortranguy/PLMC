@@ -21,8 +21,8 @@ interface set_successes
 end interface set_successes
 
     type, public :: Concrete_Change_Counter
-        integer :: num_hits
-        integer :: num_successes
+        integer :: num_hits = 0
+        integer :: num_successes = 0
     end type Concrete_Change_Counter
 
     type, public :: Concrete_Changes_Counter

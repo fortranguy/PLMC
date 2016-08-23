@@ -32,8 +32,8 @@ contains
                 case ("array")
                     allocate(Concrete_Visitable_Array :: list)
                 case default
-                    call error_exit(cells_data_structure//" unknown."&
-                        //"Choose between 'list' and 'array'.")
+                    call error_exit("procedures_visitable_list_factory: allocate: "//&
+                        cells_data_structure//" unknown."//"Choose between 'list' and 'array'.")
             end select
         else
             allocate(Null_Visitable_List :: list)

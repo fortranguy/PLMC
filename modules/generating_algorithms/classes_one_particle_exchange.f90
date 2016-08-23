@@ -232,8 +232,8 @@ contains
         allocate(deltas%dipolar(size(observables%energies%dipolar_energies)))
         call this%metropolis_algorithm(success, deltas, i_actor)
         if (success) then
-            call observables_energies_set(observables%energies, deltas, i_actor)
             observables%nums_particles(i_actor) = this%mixture%components(i_actor)%number%get()
+            call observables_energies_set(observables%energies, deltas, i_actor)
             call this%increment_success(observables%changes_counters(i_actor))
         end if
     end subroutine Abstract_try

@@ -39,7 +39,7 @@ implicit none
     call plmc_destroy(io%json, io%report_data)
 
     call plmc_reset(physical_model)
-    call plmc_set(observables%nums_particles, physical_model%mixture%components) !in exploring too?
+    call plmc_set(observables, physical_model) !in exploring too?
     call plmc_visit(observables%energies, physical_model)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."

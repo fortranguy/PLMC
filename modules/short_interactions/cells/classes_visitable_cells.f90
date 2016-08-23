@@ -29,6 +29,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_reset
+        procedure :: set => Abstract_set
         procedure :: visit_energy => Abstract_visit_energy
         procedure :: visit_contacts => Abstract_visit_contacts
         procedure :: translate => Abstract_translate
@@ -48,6 +49,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_reset
+        procedure :: set => Null_set
         procedure :: visit_energy => Null_visit_energy
         procedure :: visit_contacts => Null_visit_contacts
         procedure :: translate => Null_translate
@@ -60,32 +62,41 @@ contains
 !implementation Abstract_Visitable_Cells
 
     subroutine Abstract_construct(this, periodic_box, positions, hard_contact, pair_potential, &
-        neighbour_cells, list_mold)
+        list_mold)
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-        class(Abstract_Neighbour_Cells), target, intent(in) :: neighbour_cells
         class(Abstract_Visitable_List), intent(in) :: list_mold
 
         this%periodic_box => periodic_box
         this%positions => positions
         this%hard_contact => hard_contact
         this%pair_potential => pair_potential
-        this%neighbour_cells => neighbour_cells
         allocate(this%list_mold, mold=list_mold)
     end subroutine Abstract_construct
 
     subroutine Abstract_reset(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
+        call this%destroy_visitable_lists()
+        call this%construct_visitable_lists()
+        call this%fill_with_particles()
+    end subroutine Abstract_reset
 
-        if (allocated(this%visitable_lists)) then
-            call this%destroy_visitable_lists()
-            deallocate(this%visitable_lists)
-        end if
+    subroutine Abstract_set(this, neighbour_cells)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+        class(Abstract_Neighbour_Cells), target, intent(in) :: neighbour_cells
+
+        this%neighbour_cells => neighbour_cells
+    end subroutine Abstract_set
+
+    subroutine Abstract_construct_visitable_lists(this)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+
+        integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
+        integer :: global_i1, global_i2, global_i3
 
         global_lbounds = this%neighbour_cells%get_global_lbounds()
         global_ubounds = this%neighbour_cells%get_global_ubounds()
@@ -93,15 +104,6 @@ contains
                                       global_lbounds(2):global_ubounds(2), &
                                       global_lbounds(3):global_ubounds(3)), &
                                       mold=this%list_mold)
-        call this%construct_visitable_lists()
-        call this%fill_with_particles()
-    end subroutine Abstract_reset
-
-    subroutine Abstract_construct_visitable_lists(this)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
-
-        integer :: global_i1, global_i2, global_i3
-
         do global_i3 = lbound(this%visitable_lists, 3), ubound(this%visitable_lists, 3)
         do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
         do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
@@ -128,10 +130,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        if (allocated(this%visitable_lists)) then
-            call this%destroy_visitable_lists()
-            deallocate(this%visitable_lists)
-        end if
+        call this%destroy_visitable_lists()
         if (allocated(this%list_mold)) deallocate(this%list_mold)
         this%neighbour_cells => null()
         this%pair_potential => null()
@@ -145,6 +144,7 @@ contains
 
         integer :: global_i1, global_i2, global_i3
 
+        if (.not. allocated(this%visitable_lists)) return
         do global_i3 = lbound(this%visitable_lists, 3), ubound(this%visitable_lists, 3)
         do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
         do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
@@ -152,6 +152,7 @@ contains
         end do
         end do
         end do
+        deallocate(this%visitable_lists)
     end subroutine Abstract_destroy_visitable_lists
 
     subroutine Abstract_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
@@ -273,19 +274,23 @@ contains
 !implementation Null_Visitable_Cells
 
     subroutine Null_construct(this, periodic_box, positions, hard_contact, pair_potential, &
-        neighbour_cells, list_mold)
+        list_mold)
         class(Null_Visitable_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-        class(Abstract_Neighbour_Cells), target, intent(in) :: neighbour_cells
         class(Abstract_Visitable_List), intent(in) :: list_mold
     end subroutine Null_construct
 
     subroutine Null_reset(this)
         class(Null_Visitable_Cells), intent(inout) :: this
     end subroutine Null_reset
+
+    subroutine Null_set(this, neighbour_cells)
+        class(Null_Visitable_Cells), intent(inout) :: this
+        class(Abstract_Neighbour_Cells), target, intent(in) :: neighbour_cells
+    end subroutine Null_set
 
     subroutine Null_destroy(this)
         class(Null_Visitable_Cells), intent(inout) :: this

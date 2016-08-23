@@ -22,7 +22,7 @@ use procedures_changes_success_writer_factory, only: changes_success_writer_crea
 use procedures_energies_writers_factory, only: energies_writers_create => create, &
     energies_writers_destroy => destroy
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
-use procedures_property_inquirers, only: box_size_can_change
+use procedures_property_inquirers, only: property_box_size_can_change => box_size_can_change
 
 implicit none
 
@@ -43,10 +43,13 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        logical, dimension(size(components)) :: can_exchange
+        logical :: box_size_can_change, can_exchange(size(components))
 
-        call real_writer_create(writers%volume_change_success, &
-            box_size_can_change(changed_box_size), "volume_change_success.out")
+        box_size_can_change = property_box_size_can_change(changed_box_size)
+        call real_writer_create(writers%accessible_domain_size, box_size_can_change, &
+            "accessible_domain_size.out")
+        call real_writer_create(writers%volume_change_success, box_size_can_change, &
+            "volume_change_success.out")
         call set_can_exchange(can_exchange, components)
         call line_writer_create(writers%nums_particles, can_exchange, "nums_particles.out")
         call complete_coordinates_writer_create(writers%complete_coordinates, environment%&
@@ -71,6 +74,7 @@ contains
         call complete_coordinates_writer_destroy(writers%complete_coordinates)
         call line_writer_destroy(writers%nums_particles)
         call real_writer_destroy(writers%volume_change_success)
+        call real_writer_destroy(writers%accessible_domain_size)
     end subroutine destroy
 
 end module procedures_generating_writers_factory

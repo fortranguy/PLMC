@@ -14,7 +14,9 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: write => Abstract_write
+        generic :: write => write_scalar, write_array
+        procedure, private :: write_scalar => Abstract_write_scalar
+        procedure, private :: write_array => Abstract_write_array
     end type Abstract_Real_Writer
 
     type, extends(Abstract_Real_Writer), public :: Concrete_Real_Writer
@@ -25,7 +27,8 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: write => Null_write
+        procedure :: write_scalar => Null_write_scalar
+        procedure :: write_array => Null_write_array
     end type Null_Real_Writer
 
 contains
@@ -52,13 +55,21 @@ contains
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write(this, i_step, observable)
+    subroutine Abstract_write_scalar(this, i_step, observable)
         class(Abstract_Real_Writer), intent(in) :: this
         integer, intent(in) :: i_step
         real(DP), intent(in) :: observable
 
         write(this%file_unit, *) i_step, observable
-    end subroutine Abstract_write
+    end subroutine Abstract_write_scalar
+
+    subroutine Abstract_write_array(this, i_step, observable)
+        class(Abstract_Real_Writer), intent(in) :: this
+        integer, intent(in) :: i_step
+        real(DP), intent(in) :: observable(:)
+
+        write(this%file_unit, *) i_step, observable
+    end subroutine Abstract_write_array
 
 !end implementation Abstract_Real_Writer
 
@@ -73,11 +84,17 @@ contains
         class(Null_Real_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write(this, i_step, observable)
+    subroutine Null_write_scalar(this, i_step, observable)
         class(Null_Real_Writer), intent(in) :: this
         integer, intent(in) :: i_step
         real(DP), intent(in) :: observable
-    end subroutine Null_write
+    end subroutine Null_write_scalar
+
+    subroutine Null_write_array(this, i_step, observable)
+        class(Null_Real_Writer), intent(in) :: this
+        integer, intent(in) :: i_step
+        real(DP), intent(in) :: observable(:)
+    end subroutine Null_write_array
 
 !end implementation Null_Real_Writer
 

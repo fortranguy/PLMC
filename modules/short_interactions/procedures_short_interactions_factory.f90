@@ -40,7 +40,7 @@ contains
 
         logical :: interact_with_walls, interact, pressure_needed
         class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
-        class(Abstract_Visitable_List), allocatable :: list
+        class(Abstract_Visitable_List), allocatable :: list_mold
 
         if (present(exploring_data) .and. present(volume_change_prefix)) then
             pressure_needed = measure_pressure(exploring_data, volume_change_prefix)
@@ -63,16 +63,18 @@ contains
         call cells_create(short_interactions%neighbour_cells, environment%periodic_box, &
             environment%accessible_domain, short_interactions%hard_contact, short_interactions%&
             components_pairs, interact)
-        call visitable_list_allocate(list, interact, generating_data, prefix)
+        call visitable_list_allocate(list_mold, interact, generating_data, prefix)
         call cells_create(short_interactions%visitable_cells, environment%periodic_box, mixture%&
             components, short_interactions%hard_contact, short_interactions%components_pairs, &
-            short_interactions%neighbour_cells, list, interact)
-        call visitable_list_deallocate(list)
+            short_interactions%neighbour_cells, list_mold, interact)
+        call cells_create(short_interactions%visitable_cells_memento, list_mold, interact)
+        call visitable_list_deallocate(list_mold)
     end subroutine short_interactions_create
 
     subroutine short_interactions_destroy(short_interactions)
         type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
 
+        call cells_destroy(short_interactions%visitable_cells_memento)
         call cells_destroy(short_interactions%visitable_cells)
         call cells_destroy(short_interactions%neighbour_cells)
         call pairs_destroy(short_interactions%components_visitor)

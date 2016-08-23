@@ -7,7 +7,7 @@ use procedures_json_data_factory, only: json_data_create_input => create_input, 
     json_data_create_output => create_output, json_data_destroy_input => destroy_input, &
     json_data_destroy_output => destroy_output
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_factory, only: set_num_particles
+use procedures_mixture_factory, only: set_nums_particles
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_physical_model_factory, only: physical_model_create_generating => create_generating,&
     physical_model_create_exploring => create_exploring, physical_model_destroy => destroy
@@ -63,7 +63,7 @@ end interface plmc_destroy
 interface plmc_set
     module procedure :: set_random_seed
     module procedure :: plmc_set_num_steps, plmc_set_num_snaps
-    module procedure :: set_num_particles
+    module procedure :: set_initial_observables
     module procedure :: set_coordinates_from_json, set_coordinates_from_snap
     module procedure :: markov_chain_generator_set
     module procedure :: tune_components_moves
@@ -169,6 +169,8 @@ contains
     subroutine set_success_and_reset_counter_generating(observables)
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
+        call set_successes(observables%volume_change_success, observables%volume_change_counter)
+        call reset_counters(observables%volume_change_counter)
         call set_successes(observables%changes_sucesses, observables%changes_counters)
         call reset_counters(observables%changes_counters)
         call set_successes(observables%switches_successes, observables%switches_counters)
@@ -184,6 +186,14 @@ contains
         call set_successes(observables%insertion_successes, observables%insertion_counters)
         call reset_counters(observables%insertion_counters)
     end subroutine set_success_and_reset_counter_exploring
+
+    subroutine set_initial_observables(observables, physical_model)
+        type(Generating_Observables_Wrapper), intent(inout) :: observables
+        type(Physical_Model_Wrapper), intent(in) :: physical_model
+
+        call set_nums_particles(observables%nums_particles, physical_model%mixture%components)
+        observables%accessible_domain_size = physical_model%environment%accessible_domain%get_size()
+    end subroutine set_initial_observables
 
     subroutine set_coordinates_from_json(readers, generating_data)
         type(Readers_Wrapper), intent(in) :: readers

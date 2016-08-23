@@ -16,7 +16,7 @@ public :: create, destroy
 
 interface create
     module procedure :: create_all
-    module procedure :: create_num_particles
+    module procedure :: create_nums_particles
     module procedure :: create_changes_counters
     module procedure :: create_triangle_counters
     module procedure :: create_square_counters
@@ -34,7 +34,7 @@ interface destroy
     module procedure :: destroy_square_counters
     module procedure :: destroy_triangle_counters
     module procedure :: destroy_changes_counters
-    module procedure :: destroy_num_particles
+    module procedure :: destroy_nums_particles
     module procedure :: destroy_all
 end interface destroy
 
@@ -67,18 +67,18 @@ contains
         call destroy(observables%nums_particles)
     end subroutine destroy_all
 
-    pure subroutine create_num_particles(num_particles, num_components)
-        integer, allocatable, intent(out) :: num_particles(:)
+    pure subroutine create_nums_particles(nums_particles, num_components)
+        integer, allocatable, intent(out) :: nums_particles(:)
         integer, intent(in) :: num_components
 
-        allocate(num_particles(num_components))
-    end subroutine create_num_particles
+        allocate(nums_particles(num_components))
+    end subroutine create_nums_particles
 
-    pure subroutine destroy_num_particles(num_particles)
-        integer, allocatable, intent(inout) :: num_particles(:)
+    pure subroutine destroy_nums_particles(nums_particles)
+        integer, allocatable, intent(inout) :: nums_particles(:)
 
-        if (allocated(num_particles)) deallocate(num_particles)
-    end subroutine destroy_num_particles
+        if (allocated(nums_particles)) deallocate(nums_particles)
+    end subroutine destroy_nums_particles
 
     pure subroutine create_changes_counters(counters, num_components)
         type(Concrete_Changes_Counter), allocatable, intent(out) :: counters(:)

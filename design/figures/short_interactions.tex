@@ -12,10 +12,10 @@
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     positions: \type{ComponentCoordinates}, hardContact: \type{HardContact},
-                    pairPotential: \type{PairPotential}, neighbourCells: \type{NeighbourCells},
-                    listMold: \type{VisitableList}}}
+                    pairPotential: \type{PairPotential}, listMold: \type{VisitableList}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
+                \operation{\procedure{set}{neighbourCells: \type{NeighbourCells}}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{TemporaryParticle},
                     visitCondition: \procedure{visitCondition}
@@ -68,7 +68,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 5.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 6 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{HardContact}{0, 0}
                 \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
                     diracPlus: \type{DiracDistributionPlus}}}

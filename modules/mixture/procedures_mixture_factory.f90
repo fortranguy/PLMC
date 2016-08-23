@@ -18,7 +18,7 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: mixture_create, mixture_destroy, set_num_particles, set_have_positions, &
+public :: mixture_create, mixture_destroy, set_nums_particles, set_have_positions, &
     set_have_orientations
 
 interface mixture_create
@@ -97,16 +97,16 @@ contains
         end if
     end subroutine destroy_components
 
-    subroutine set_num_particles(num_particles, components)
-        integer, intent(inout) :: num_particles(:)
+    subroutine set_nums_particles(nums_particles, components)
+        integer, intent(inout) :: nums_particles(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component
 
-        do i_component = 1, size(num_particles)
-            num_particles(i_component) = components(i_component)%number%get()
+        do i_component = 1, size(nums_particles)
+            nums_particles(i_component) = components(i_component)%number%get()
         end do
-    end subroutine set_num_particles
+    end subroutine set_nums_particles
 
     subroutine set_have_positions(have_positions, components)
         logical, intent(out) :: have_positions(:)

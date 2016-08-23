@@ -13,6 +13,7 @@ implicit none
 private
 
     type, public :: Generating_Writers_Wrapper
+        class(Abstract_Real_Writer), allocatable :: accessible_domain_size
         class(Abstract_Real_Writer), allocatable :: volume_change_success
         class(Abstract_Line_Writer), allocatable :: nums_particles
         class(Abstract_Complete_Coordinates_Writer), allocatable :: complete_coordinates

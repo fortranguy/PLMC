@@ -113,12 +113,10 @@ contains
 
         integer :: nums(num_dimensions)
 
-        write(*, * ) "accessible_domain", this%accessible_domain%get_size()
         nums = floor(this%accessible_domain%get_size() / this%max_distance)
         if (all(this%nums == nums)) then
             this%size = this%accessible_domain%get_size() / real(this%nums, DP)
             call this%check_size()
-            write(*, * ) "resize: cell size", this%size
             only_resized = .true.
             return
         else
@@ -128,7 +126,6 @@ contains
         call this%check_nums()
         this%size = this%accessible_domain%get_size() / real(this%nums, DP)
         call this%check_size()
-        write(*, * ) "reset: cell size", this%size
 
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
@@ -227,12 +224,10 @@ contains
         is_inside = this%accessible_domain%is_inside(position)
     end function Abstract_is_inside
 
-    function Abstract_index(this, position) result(index)
+    pure function Abstract_index(this, position) result(index)
         class(Abstract_Neighbour_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
         integer :: index(num_dimensions)
-
-        write(*, *) "index: size", this%size, "neighbours", allocated(this%neighbours)
 
         where (mod(this%nums, 2) == 0)
             index = floor(position/this%size)
@@ -339,7 +334,7 @@ contains
         is_inside = .false.
     end function Null_is_inside
 
-    function Null_index(this, position) result(index)
+    pure function Null_index(this, position) result(index)
         class(Null_Neighbour_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
         integer :: index(num_dimensions)

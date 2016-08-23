@@ -8,7 +8,7 @@ use types_physical_model_wrapper, only: Physical_Model_Wrapper
 implicit none
 
 private
-public :: plmc_reset, box_size_change_reset_cells, reset_neighbour_cells, reset_visitable_cells
+public :: plmc_reset, box_size_change_reset_cells
 
 contains
 

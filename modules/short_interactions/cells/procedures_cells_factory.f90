@@ -9,6 +9,8 @@ use procedures_neighbour_cells_factory, only: neighbour_cells_create => create, 
     neighbour_cells_destroy => destroy
 use procedures_visitable_cells_factory, only: visitable_cells_create => create, &
     visitable_cells_destroy => destroy
+use procedures_visitable_cells_memento_factory, only: visitable_cells_memento_create => create, &
+    visitable_cells_memento_destroy => destroy
 
 implicit none
 
@@ -17,6 +19,7 @@ public :: create, destroy
 
 interface create
     module procedure :: visitable_cells_create
+    module procedure :: visitable_cells_memento_create
     module procedure :: create_components
     module procedure :: neighbour_cells_create
 end interface create
@@ -24,6 +27,7 @@ end interface create
 interface destroy
     module procedure :: neighbour_cells_destroy
     module procedure :: destroy_components
+    module procedure :: visitable_cells_memento_destroy
     module procedure :: visitable_cells_destroy
 end interface destroy
 

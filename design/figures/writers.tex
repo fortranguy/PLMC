@@ -81,7 +81,8 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{RealWriter}{0, 0}
                 \operation{\procedure{construct}{filename: \type{char[:]}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real}}}
+                \operation{\procedure{writeScalar}{iStep: \type{int}, observable: \type{real}}}
+                \operation{\procedure{writeArray}{iStep: \type{int}, observable: \type{real[:]}}}
             \end{abstractclass}
         \end{scope}
 

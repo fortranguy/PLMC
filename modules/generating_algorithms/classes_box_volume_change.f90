@@ -20,8 +20,7 @@ use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
-use procedures_plmc_reset, only: box_size_change_reset_cells, reset_neighbour_cells, &
-    reset_visitable_cells
+use procedures_plmc_reset, only: box_size_change_reset_cells
 use procedures_plmc_visit, only: visit_walls, visit_short, visit_field
 use procedures_metropolis_algorithm, only: metropolis_algorithm
 
@@ -102,30 +101,25 @@ contains
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
 
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
+        call this%save_cells(neighbour_cells, visitable_cells)
         box_size_ratio = this%changed_box_size%get_ratio()
         box_size = this%environment%periodic_box%get_size()
         call this%environment%periodic_box%set(box_size * box_size_ratio)
         call this%rescale_positions(box_size_ratio)
-        !call this%save_cells(neighbour_cells, visitable_cells)
-        !call box_size_change_reset_cells(this%short_interactions%neighbour_cells, this%&
-        !    short_interactions%visitable_cells)
-        call reset_neighbour_cells(this%short_interactions%neighbour_cells)
-        call reset_visitable_cells(this%short_interactions%visitable_cells)
-
+        call box_size_change_reset_cells(this%short_interactions%neighbour_cells, this%&
+            short_interactions%visitable_cells)
         call observables_energies_create(new_energies, size(this%mixture%components))
         call this%metropolis_algorithm(success, new_energies, box_size_ratio, observables%energies)
         if (success) then
+            observables%accessible_domain_size = this%environment%accessible_domain%get_size()
             call observables_energies_set(observables%energies, new_energies)
+            observables%volume_change_counter%num_successes = observables%volume_change_counter%&
+                num_successes + 1
         else
             call this%environment%periodic_box%set(box_size)
             call this%rescale_positions(1._DP / box_size_ratio)
-            !call this%restore_cells(neighbour_cells, visitable_cells)
-            !call box_size_change_reset_cells(this%short_interactions%neighbour_cells, this%&
-            !    short_interactions%visitable_cells)
-            call reset_neighbour_cells(this%short_interactions%neighbour_cells)
-            call reset_visitable_cells(this%short_interactions%visitable_cells)
+            call this%restore_cells(neighbour_cells, visitable_cells)
         end if
-        write(*, *) "success", success
     end subroutine Abstract_try
 
     subroutine Abstract_metropolis_algorithm(this, success, new_energies, box_size_ratio, energies)
@@ -213,7 +207,8 @@ contains
                     short_interactions%neighbour_cells(j_component)%line(i_component)%cells)
             end do
         end do
-        allocate(visitable_cells, source=this%short_interactions%visitable_cells)
+        call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
+            short_interactions%visitable_cells)
     end subroutine Abstract_save_cells
 
     subroutine Abstract_restore_cells(this, neighbour_cells, visitable_cells)
@@ -223,9 +218,7 @@ contains
 
         integer :: i_component, j_component
 
-        call cells_destroy(this%short_interactions%visitable_cells)
         call cells_destroy(this%short_interactions%neighbour_cells)
-
         allocate(this%short_interactions%neighbour_cells(size(neighbour_cells)))
         do j_component = 1, size(neighbour_cells)
             allocate(this%short_interactions%neighbour_cells(j_component)%line(j_component))
@@ -234,7 +227,8 @@ contains
                     cells, source=neighbour_cells(j_component)%line(i_component)%cells)
             end do
         end do
-        allocate(this%short_interactions%visitable_cells, source=visitable_cells)
+        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
+            visitable_cells, visitable_cells, this%short_interactions%neighbour_cells)
     end subroutine Abstract_restore_cells
 
 !end implementation Abstract_Box_Volume_Change

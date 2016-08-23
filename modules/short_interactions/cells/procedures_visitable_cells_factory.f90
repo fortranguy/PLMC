@@ -16,15 +16,15 @@ public :: create, destroy
 
 contains
 
-    subroutine create(cells, periodic_box, components, hard_contact, pairs, neighbour_cells, list, &
-        interact)
+    subroutine create(cells, periodic_box, components, hard_contact, pairs, neighbour_cells, &
+        list_mold, interact)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
         type(Pair_Potentials_Line), intent(in) :: pairs(:)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
-        class(Abstract_Visitable_List), intent(in) :: list
+        class(Abstract_Visitable_List), intent(in) :: list_mold
         logical, intent(in) :: interact
 
         integer :: i_component, j_component
@@ -43,8 +43,8 @@ contains
                 associate (pair_ij => pairs(j_pair)%line(i_pair)%potential, &
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &
-                        components(i_component)%positions, hard_contact, pair_ij, neighbours_ij, &
-                        list)
+                        components(i_component)%positions, hard_contact, pair_ij, list_mold)
+                    call cells(i_component, j_component)%set(neighbours_ij)
                 end associate
             end do
         end do

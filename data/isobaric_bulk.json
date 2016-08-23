@@ -28,9 +28,9 @@
         }
     },
     "Mixture": {
-        "number of components": 1,
+        "number of components": 3,
         "Component 1": {
-            "initial number": 3,
+            "initial number": 20,
             "minimum distance": 1.0,
             "is dipolar": false,
             "moment norm": 1.0,
@@ -100,15 +100,15 @@
         "name": "urandom"
     },
     "Changes": {
-        "number of tuning steps": 10,
+        "number of tuning steps": 1000,
         "Box Size": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
-            "accumulation period": 10,
+            "accumulation period": 100,
             "wanted success ratio": 0.75,
             "tolerance": 0.01,
             "Small Change": {
-                "initial delta": 0.1
+                "initial delta": 0.01
             }
         },
         "Components": {
@@ -141,7 +141,7 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 10
+        "number of steps": 1000
     },
     "Input": {
         "initial coordinates": "initial_coordinates.xyz"
