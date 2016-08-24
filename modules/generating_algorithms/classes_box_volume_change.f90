@@ -228,7 +228,7 @@ contains
             end do
         end do
         call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
-            visitable_cells, visitable_cells, this%short_interactions%neighbour_cells)
+            visitable_cells, this%short_interactions%neighbour_cells, visitable_cells)
     end subroutine Abstract_restore_cells
 
 !end implementation Abstract_Box_Volume_Change

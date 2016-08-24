@@ -1,5 +1,6 @@
 module types_short_interactions_wrapper
 
+use classes_beta_pressure_excess, only: Abstract_Beta_Pressure_Excess
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_walls_visitor, only: Abstract_Walls_Visitor
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
@@ -13,6 +14,7 @@ implicit none
 private
 
     type, public :: Short_Interactions_Wrapper
+        class(Abstract_Beta_Pressure_Excess), allocatable :: beta_pressure_excess
         class(Abstract_Hard_Contact), allocatable :: hard_contact
         class(Abstract_Walls_Visitor), allocatable :: walls_visitor
         type(Pair_Potential_Wrapper), allocatable :: wall_pairs(:)

@@ -70,8 +70,8 @@ contains
 
         call visit_short(overlap, contacts, this%components, this%short_interactions)
         if (overlap) call error_exit("Abstract_Volume_Change_Method: try: visit_short: overlap")
-        observables%beta_pressure_excess = this%short_interactions%hard_contact%&
-            get_beta_pressure_excess(contacts)
+        observables%beta_pressure_excess = this%short_interactions%beta_pressure_excess%&
+            get(contacts)
     end subroutine Abstract_try
 
 !end implementation Abstract_Volume_Change_Method

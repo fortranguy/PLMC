@@ -146,6 +146,7 @@ contains
         call random_seed_set(input_data, random_number_generator_prefix)
     end subroutine set_random_seed
 
+    !> @note Beware of inertia
     subroutine tune_moved_coordinates(tuned, i_step, changes, observables)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
@@ -166,7 +167,6 @@ contains
                 i_step, observables%changes_sucesses(i_component)%rotation)
         end do
         tuned = box_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
-            ! Beware of inertia.
     end subroutine tune_moved_coordinates
 
     subroutine set_success_and_reset_counter_generating(observables)

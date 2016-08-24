@@ -84,6 +84,12 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(BetaPressure.south) - (0 cm, 1 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{BetaPressureExcess}{0, 0}
+                \operation[0]{\procedure{get}{contacts: \type{real}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(ExternalField.north) - (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{WallsVisitor}{0, 0}
                 \operation{\procedure{construct}{wallsPotential: \type{VisitableWalls}}}

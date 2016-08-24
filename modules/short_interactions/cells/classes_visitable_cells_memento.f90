@@ -23,12 +23,12 @@ private
             class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
         end subroutine Abstract_save
 
-        subroutine Abstract_restore(visitable_cells_target, visitable_cells_source, neighbour_cells)
+        subroutine Abstract_restore(visitable_cells_target, neighbour_cells, visitable_cells_source)
         import :: Neighbour_Cells_Line, Abstract_Visitable_Cells
             class(Abstract_Visitable_Cells), allocatable, intent(inout) :: &
                 visitable_cells_target(:, :)
-            class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
             type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
+            class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
         end subroutine Abstract_restore
 
     end interface
@@ -65,10 +65,10 @@ contains
 
     !> @note Instead of copying linked-lists (i.e. array of [[Abstract_Visitable_List]]),
     !> [[Lists_restore]] rebuilds them.
-    subroutine Lists_restore(visitable_cells_target, visitable_cells_source, neighbour_cells)
+    subroutine Lists_restore(visitable_cells_target, neighbour_cells, visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)
-        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
+        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
         integer :: i_component, j_component
         integer :: i_pair, j_pair
@@ -95,10 +95,10 @@ contains
         allocate(visitable_cells_target, source=visitable_cells_source)
     end subroutine Arrays_save
 
-    subroutine Arrays_restore(visitable_cells_target, visitable_cells_source, neighbour_cells)
+    subroutine Arrays_restore(visitable_cells_target, neighbour_cells, visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)
-        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
+        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
         integer :: i_component, j_component
         integer :: i_pair, j_pair
@@ -124,10 +124,10 @@ contains
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
     end subroutine Null_save
 
-    subroutine Null_restore(visitable_cells_target, visitable_cells_source, neighbour_cells)
+    subroutine Null_restore(visitable_cells_target, neighbour_cells, visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)
-        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
+        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
     end subroutine Null_restore
 
 !end implementation Null_Visitable_Cells_Memento

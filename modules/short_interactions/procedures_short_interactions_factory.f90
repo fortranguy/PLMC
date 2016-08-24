@@ -6,6 +6,8 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
+use procedures_beta_pressure_excess_factory, only: beta_pressure_excess_create => create, &
+    beta_pressure_excess_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only:  Mixture_Wrapper
 use classes_dirac_distribution_plus, only: Abstract_Dirac_Distribution_Plus
@@ -19,7 +21,7 @@ use procedures_visitable_list_factory, only: visitable_list_allocate => allocate
     visitable_list_deallocate => deallocate
 use procedures_cells_factory, only: cells_create => create, cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_property_inquirers, only: measure_pressure
+use procedures_property_inquirers, only: property_measure_pressure => measure_pressure
 
 implicit none
 
@@ -38,20 +40,22 @@ contains
         type(json_file), optional, intent(inout) :: exploring_data
         character(len=*), optional, intent(in) :: volume_change_prefix
 
-        logical :: interact_with_walls, interact, pressure_needed
+        logical :: interact_with_walls, interact, measure_pressure
         class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
         class(Abstract_Visitable_List), allocatable :: list_mold
 
         if (present(exploring_data) .and. present(volume_change_prefix)) then
-            pressure_needed = measure_pressure(exploring_data, volume_change_prefix)
+            measure_pressure = property_measure_pressure(exploring_data, volume_change_prefix)
         else
-            pressure_needed = .false.
+            measure_pressure = .false.
         end if
 
-        call dirac_distribution_plus_create(dirac_plus, pressure_needed, exploring_data, &
+        call beta_pressure_excess_create(short_interactions%beta_pressure_excess, environment%&
+            periodic_box, environment%accessible_domain, measure_pressure)
+        call dirac_distribution_plus_create(dirac_plus, measure_pressure, exploring_data, &
             volume_change_prefix)
         call hard_contact_create(short_interactions%hard_contact, environment%periodic_box, &
-            environment%accessible_domain, dirac_plus, pressure_needed)
+            dirac_plus, measure_pressure)
         call dirac_distribution_plus_destroy(dirac_plus)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
             wall_min_distances, generating_data, prefix)
@@ -82,6 +86,7 @@ contains
         call walls_destroy(short_interactions%walls_visitor)
         call pairs_destroy(short_interactions%wall_pairs)
         call hard_contact_destroy(short_interactions%hard_contact)
+        call beta_pressure_excess_destroy(short_interactions%beta_pressure_excess)
     end subroutine short_interactions_destroy
 
 end module procedures_short_interactions_factory
