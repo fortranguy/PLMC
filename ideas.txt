@@ -1,4 +1,0 @@
-- Hide DLC in EwaldReci?
-- Exploration: more decoupling?
-- Radial: to factorise
-- BoxVolumeChange -> BoxSizeChange?

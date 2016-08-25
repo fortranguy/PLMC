@@ -15,6 +15,7 @@ private
     contains
         procedure :: set => Abstract_set
         procedure :: get_size => Abstract_get_size
+        procedure(Abstract_get_max_distance), deferred :: get_max_distance
         procedure :: distance => Abstract_distance
         procedure :: vector => Abstract_vector
         procedure(Abstract_folded), deferred :: folded
@@ -30,6 +31,12 @@ private
             real(DP) :: folded_position(num_dimensions)
         end function Abstract_folded
 
+        !> Maximum distance with possible overlap
+        pure real(DP) function Abstract_get_max_distance(this) result(max_distance)
+        import :: DP, Abstract_Periodic_Box
+            class(Abstract_Periodic_Box), intent(in) :: this
+        end function Abstract_get_max_distance
+
         subroutine Abstract_check(size)
         import :: DP
             real(DP), intent(in) :: size(:)
@@ -39,12 +46,14 @@ private
 
     type, extends(Abstract_Periodic_Box), public :: XYZ_Periodic_Box
     contains
+        procedure :: get_max_distance => XYZ_get_max_distance
         procedure :: folded => XYZ_folded
         procedure, private, nopass :: check => XYZ_check
     end type XYZ_Periodic_Box
 
     type, extends(Abstract_Periodic_Box), public :: XY_Periodic_Box
     contains
+        procedure :: get_max_distance => XY_get_max_distance
         procedure :: folded => XY_folded
         procedure, private, nopass :: check => XY_check
     end type XY_Periodic_Box
@@ -104,6 +113,13 @@ contains
         end do
     end subroutine XYZ_check
 
+    !> \[ r_\text{max} = \frac{\sqrt{3}}{2} L \]
+    pure real(DP) function XYZ_get_max_distance(this) result(max_distance)
+        class(XYZ_Periodic_Box), intent(in) :: this
+
+        max_distance = sqrt(3._DP) / 2._DP * this%size(1)
+    end function XYZ_get_max_distance
+
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     pure function XYZ_folded(this, position) result(folded_position)
         class(XYZ_Periodic_Box), intent(in) :: this
@@ -127,6 +143,13 @@ contains
             call warning_continue("XY_Periodic_Box: size(1) and size(2) are not equal.")
         end if
     end subroutine XY_check
+
+    !> \[ r_{1:2, \text{max}} = \frac{L}{\sqrt{2}} \]
+    pure real(DP) function XY_get_max_distance(this) result(max_distance)
+        class(XY_Periodic_Box), intent(in) :: this
+
+        max_distance = this%size(1) / sqrt(2._DP)
+    end function XY_get_max_distance
 
     pure function XY_folded(this, position) result(folded_position)
         class(XY_Periodic_Box), intent(in) :: this

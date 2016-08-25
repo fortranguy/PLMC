@@ -44,6 +44,13 @@
             \end{class}
         \end{scope}
 
+        \begin{scope}[shift={($(MovedCoordinates |- ChangesComponent.north)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ChangedBoxSize}{0, 0}
+                \inherit{MovedCoordinates}
+                \operation{\procedure{getRatio}{}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(MovedCoordinates |- MoveTunerParameters.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MovedComponentCoordinates}{0, 0}
                 \inherit{MovedCoordinates}
@@ -51,10 +58,9 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MovedCoordinates |- ChangesComponent.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ChangedBoxSize}{0, 0}
-                \inherit{MovedCoordinates}
-                \operation{\procedure{getRatio}{}: \type{real[3]}}
+        \begin{scope}[shift={($(MovedComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{MaximumBoxCompression}{0, 0}
+                \operation[0]{\procedure{getDelta}{minDistanceRatio: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 

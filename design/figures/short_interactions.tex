@@ -26,6 +26,11 @@
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
+                \operation{\procedure{visitMinDistance}{canOverlap: \type{bool},
+                    overlap: \type{bool}, ratio: \type{real}, particle: \type{TemporaryParticle},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
                 \operation{\procedure{translate}{toPosition: \type{real[3]},
                     from: \type{TemporaryParticle}}}
                 \operation{\procedure{add}{particle: \type{TemporaryParticle}}}
@@ -47,7 +52,13 @@
                     iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
                     particle: \type{TemporaryParticle},
-                    pairPotential: \type{PairPotential},
+                    minDistance: \type{real},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
+                \operation{\procedure{visitMinDistance}{canOverlap: \type{bool},
+                    overlap: \type{bool}, ratio: \type{real}, particle: \type{TemporaryParticle},
+                    minDistance: \type{real}, maxDistance: \type{real},
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
@@ -68,14 +79,17 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 5.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 7 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{HardContact}{0, 0}
                 \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
                     diracPlus: \type{DiracDistributionPlus}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getWidth}{}: \type{real}}
-                \operation[0]{\procedure{meet}{overlap: \type{bool}, contact: \type{real},
+                \operation[0]{\procedure{meetContact}{overlap: \type{bool}, contact: \type{real},
                     minDistance: \type{real}, vector: \type{real[3]}}}
+                \operation[0]{\procedure{meetMinDistance}{canOverlap: \type{bool},
+                    overlap: \type{bool}, ratio: \type{real}, minDistance: \type{real},
+                    vector: \type{real[3]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -92,7 +106,8 @@
             \umlnote[text width=\largeTextWidth] {\import{}: \\
                 \namespace{Environment} :: PeriodicBox, ParallelepipedDomain, WallsVisitor,
                     BetaPressureExcess \\
-                \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
+                \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle \\
+                \namespace{Changes} :: MaximumBoxCompression};
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.south) - (0 cm, 1.5 cm)$)}]
@@ -115,6 +130,7 @@
 
         \begin{scope}[shift={($(VisitableCells.north -| Import) + (0 cm, 2 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
+                \UMLattribute{maximumBoxCompression: \type{MaximumBoxCompression}}
                 \UMLattribute{betaPressureExcess: \type{BetaPressureExcess}}
                 \UMLattribute{hardContact: \type{HardContact}}
                 \UMLattribute{wallsVisitor: \type{WallsVisitor}}

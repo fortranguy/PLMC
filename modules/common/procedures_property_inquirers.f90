@@ -18,6 +18,8 @@ use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments, &
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential
 use classes_changed_box_size, only: Abstract_Changed_Box_Size, Null_Changed_Box_Size
+use classes_maximum_box_compression_explorer, only: Abstract_Maximum_Box_Compression_Explorer, &
+    Concrete_Maximum_Box_Compression_Explorer
 use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
@@ -37,7 +39,7 @@ public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permi
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
     component_interacts_with_wall, num_components, i_component, ij_components, &
     list_is_linked_list, list_is_array, &
-    write_coordinates, measure_chemical_potentials, measure_pressure
+    write_coordinates, measure_maximum_compression, measure_pressure, measure_chemical_potentials
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -101,15 +103,20 @@ interface components_interact
     module procedure :: components_interact_from_pair_potential
 end interface components_interact
 
-interface measure_chemical_potentials
-    module procedure :: measure_chemical_potentials_from_json
-    module procedure :: measure_chemical_potentials_from_particle_insertion_method
-end interface measure_chemical_potentials
+interface measure_maximum_compression
+    module procedure :: measure_maximum_compression_from_json
+    module procedure :: measure_maximum_compression_from_explorer
+end interface measure_maximum_compression
 
 interface measure_pressure
     module procedure :: measure_pressure_from_json
     module procedure :: measure_pressure_from_volume_change_method
 end interface measure_pressure
+
+interface measure_chemical_potentials
+    module procedure :: measure_chemical_potentials_from_json
+    module procedure :: measure_chemical_potentials_from_particle_insertion_method
+end interface measure_chemical_potentials
 
 contains
 
@@ -454,26 +461,27 @@ contains
         write_coordinates = logical_from_json(generating_data, prefix//"Coordinates.write")
     end function write_coordinates_from_json
 
-    logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
-        result(measure_chemical_potentials)
+    logical function measure_maximum_compression_from_json(exploring_data, prefix) &
+        result(measure_maximum_compression)
         type(json_file), intent(inout) :: exploring_data
         character(len=*), intent(in) :: prefix
 
-        measure_chemical_potentials = logical_from_json(exploring_data, &
-            prefix//"mesure chemical potentials")
-    end function measure_chemical_potentials_from_json
+        measure_maximum_compression = logical_from_json(exploring_data, &
+            prefix//"measure maximum compression")
+    end function measure_maximum_compression_from_json
 
-    pure logical function measure_chemical_potentials_from_particle_insertion_method&
-        (particle_insertion_method) result(measure_chemical_potentials)
-        class(Abstract_Particle_Insertion_Method), intent(in) :: particle_insertion_method
+    pure logical function measure_maximum_compression_from_explorer(&
+        maximum_box_compression_explorer) result(measure_maximum_compression)
+        class(Abstract_Maximum_Box_Compression_Explorer), intent(in) :: &
+            maximum_box_compression_explorer
 
-        select type (particle_insertion_method)
-            type is (Concrete_Particle_Insertion_Method)
-                measure_chemical_potentials = .true.
+        select type (maximum_box_compression_explorer)
+            type is (Concrete_Maximum_Box_Compression_Explorer)
+                measure_maximum_compression = .true.
             class default
-                measure_chemical_potentials = .false.
+                measure_maximum_compression = .false.
         end select
-    end function measure_chemical_potentials_from_particle_insertion_method
+    end function measure_maximum_compression_from_explorer
 
     logical function measure_pressure_from_json(exploring_data, prefix) result(measure_pressure)
         type(json_file), intent(inout) :: exploring_data
@@ -493,6 +501,27 @@ contains
                 measure_pressure = .false.
         end select
     end function measure_pressure_from_volume_change_method
+
+    logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
+        result(measure_chemical_potentials)
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        measure_chemical_potentials = logical_from_json(exploring_data, &
+            prefix//"measure chemical potentials")
+    end function measure_chemical_potentials_from_json
+
+    pure logical function measure_chemical_potentials_from_particle_insertion_method&
+        (particle_insertion_method) result(measure_chemical_potentials)
+        class(Abstract_Particle_Insertion_Method), intent(in) :: particle_insertion_method
+
+        select type (particle_insertion_method)
+            type is (Concrete_Particle_Insertion_Method)
+                measure_chemical_potentials = .true.
+            class default
+                measure_chemical_potentials = .false.
+        end select
+    end function measure_chemical_potentials_from_particle_insertion_method
 
     logical function logical_from_json(input_data, statement)
         type(json_file), intent(inout) :: input_data

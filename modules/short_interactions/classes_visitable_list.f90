@@ -23,11 +23,13 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: visit_energy => Abstract_visit_energy
-        procedure :: visit_contacts => Abstract_visit_contacts
+        generic :: visit => visit_energy, visit_contacts, visit_min_distance
         procedure :: set => Abstract_set
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
+        procedure, private :: visit_energy => Abstract_visit_energy
+        procedure, private :: visit_contacts => Abstract_visit_contacts
+        procedure, private :: visit_min_distance => Abstract_visit_min_distance
     end type Abstract_Visitable_List
 
     type, extends(Abstract_Visitable_List), public :: Concrete_Visitable_List
@@ -41,22 +43,24 @@ private
     contains
         procedure :: construct =>  Array_construct
         procedure :: destroy => Array_destroy
-        procedure :: visit_energy => Array_visit_energy
-        procedure :: visit_contacts => Array_visit_contacts
         procedure :: set => Array_set
         procedure :: add => Array_add
         procedure :: remove => Array_remove
+        procedure, private :: visit_energy => Array_visit_energy
+        procedure, private :: visit_contacts => Array_visit_contacts
+        procedure, private :: visit_min_distance => Array_visit_min_distance
     end type Concrete_Visitable_Array
 
     type, extends(Abstract_Visitable_List), public :: Null_Visitable_List
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: visit_energy => Null_visit_energy
-        procedure :: visit_contacts => Null_visit_contacts
         procedure :: set => Null_set
         procedure :: add => Null_add
         procedure :: remove => Null_remove
+        procedure, private :: visit_energy => Null_visit_energy
+        procedure, private :: visit_contacts => Null_visit_contacts
+        procedure, private :: visit_min_distance => Null_visit_min_distance
     end type Null_Visitable_List
 
 contains
@@ -145,13 +149,13 @@ contains
         end do
     end subroutine Abstract_visit_energy
 
-    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, pair_potential, &
+    subroutine Abstract_visit_contacts(this, overlap, contacts, particle, min_distance, &
         visit_condition, i_exclude)
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        real(DP), intent(in) :: min_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
@@ -159,15 +163,14 @@ contains
         real(DP) :: contact_i, vector(num_dimensions)
 
         overlap = .false.
-        contacts = 0
+        contacts = 0._DP
         current => this%beginning%next
         if (.not.associated(current%next)) return
         do
             next => current%next
             if (visit_condition(current%i, i_exclude)) then
                 vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
-                call this%hard_contact%meet(overlap, contact_i, pair_potential%get_min_distance(), &
-                    vector)
+                call this%hard_contact%meet(overlap, contact_i, min_distance, vector)
                 if (overlap) return
                 contacts = contacts + contact_i
             end if
@@ -175,6 +178,39 @@ contains
             current => next
         end do
     end subroutine Abstract_visit_contacts
+
+    subroutine Abstract_visit_min_distance(this, can_overlap, overlap, ratio, particle, &
+        min_distance, max_distance, visit_condition, i_exclude)
+        class(Abstract_Visitable_List), intent(in) :: this
+        logical, intent(out) :: can_overlap, overlap
+        real(DP), intent(out) :: ratio
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: min_distance, max_distance
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        real(DP) :: ratio_i
+        real(DP) :: vector(num_dimensions)
+        type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
+
+        can_overlap = .false.
+        overlap = .false.
+        ratio = max_distance / min_distance
+        current => this%beginning%next
+        if (.not.associated(current%next)) return
+        do
+            next => current%next
+            if (visit_condition(current%i, i_exclude)) then
+                vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
+                call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, vector)
+                if (.not. can_overlap) cycle
+                if (overlap) return
+                if (ratio_i < ratio) ratio = ratio_i
+            end if
+            if (.not.associated(next%next)) return
+            current => next
+        end do
+    end subroutine Abstract_visit_min_distance
 
     subroutine Abstract_add(this, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this
@@ -281,13 +317,13 @@ contains
         end do
     end subroutine Array_visit_energy
 
-    subroutine Array_visit_contacts(this, overlap, contacts, particle, pair_potential, &
+    subroutine Array_visit_contacts(this, overlap, contacts, particle, min_distance, &
         visit_condition, i_exclude)
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        real(DP), intent(in) :: min_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
@@ -300,12 +336,39 @@ contains
             if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
             vector = this%periodic_box%vector(particle%position, this%positions%get(this%&
                 nodes(i_node)))
-            call this%hard_contact%meet(overlap, contact_i, pair_potential%get_min_distance(), &
-                vector)
+            call this%hard_contact%meet(overlap, contact_i, min_distance, vector)
             if (overlap) return
             contacts = contacts + contact_i
         end do
     end subroutine Array_visit_contacts
+
+    subroutine Array_visit_min_distance(this, can_overlap, overlap, ratio, particle, min_distance, &
+        max_distance, visit_condition, i_exclude)
+        class(Concrete_Visitable_Array), intent(in) :: this
+        logical, intent(out) :: can_overlap, overlap
+        real(DP), intent(out) :: ratio
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: min_distance, max_distance
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        real(DP) :: ratio_i
+        real(DP) :: vector(num_dimensions)
+        integer :: i_node
+
+        can_overlap = .false.
+        overlap = .false.
+        ratio = max_distance / min_distance
+        do i_node = 1, this%num_nodes
+            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
+            vector = this%periodic_box%vector(particle%position, this%positions%get(this%&
+                nodes(i_node)))
+            call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, vector)
+            if (.not. can_overlap) cycle
+            if (overlap) return
+            if (ratio_i < ratio) ratio = ratio_i
+        end do
+    end subroutine Array_visit_min_distance
 
     subroutine Array_add(this, i_particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
@@ -364,18 +427,31 @@ contains
         energy = 0._DP
     end subroutine Null_visit_energy
 
-    subroutine Null_visit_contacts(this, overlap, contacts, particle, pair_potential, &
+    subroutine Null_visit_contacts(this, overlap, contacts, particle, min_distance, &
         visit_condition, i_exclude)
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        real(DP), intent(in) :: min_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.
         contacts = 0._DP
     end subroutine Null_visit_contacts
+
+    subroutine Null_visit_min_distance(this, can_overlap, overlap, ratio, particle, min_distance, &
+        max_distance, visit_condition, i_exclude)
+        class(Null_Visitable_List), intent(in) :: this
+        logical, intent(out) :: can_overlap, overlap
+        real(DP), intent(out) :: ratio
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: min_distance, max_distance
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+        can_overlap = .false.; overlap = .false.
+        ratio = 0._DP
+    end subroutine Null_visit_min_distance
 
     subroutine Null_add(this, i_particle)
         class(Null_Visitable_List), intent(inout) :: this

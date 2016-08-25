@@ -32,6 +32,7 @@ private
         procedure :: set => Abstract_set
         procedure :: visit_energy => Abstract_visit_energy
         procedure :: visit_contacts => Abstract_visit_contacts
+        procedure :: visit_min_distance => Abstract_visit_min_distance
         procedure :: translate => Abstract_translate
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
@@ -52,6 +53,7 @@ private
         procedure :: set => Null_set
         procedure :: visit_energy => Null_visit_energy
         procedure :: visit_contacts => Null_visit_contacts
+        procedure :: visit_min_distance => Null_visit_min_distance
         procedure :: translate => Null_translate
         procedure :: add => Null_add
         procedure :: remove => Null_remove
@@ -179,8 +181,7 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit_energy(overlap, energy_i, particle, this%pair_potential, visit_condition, &
-                i_exclude)
+                visit(overlap, energy_i, particle, this%pair_potential, visit_condition, i_exclude)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -197,11 +198,12 @@ contains
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
-        real(DP) :: contacts_i
+        real(DP) :: contacts_i, min_distance
         integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
         logical :: at_bottom_layer, at_top_layer
         integer :: local_i1, local_i2, local_i3
 
+        min_distance = this%pair_potential%get_min_distance()
         ijk_cell = this%neighbour_cells%index(particle%position)
         at_bottom_layer = (ijk_cell(3) == lbound(this%visitable_lists, 3))
         at_top_layer = (ijk_cell(3) == ubound(this%visitable_lists, 3))
@@ -213,14 +215,50 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit_contacts(overlap, contacts_i, particle, this%pair_potential, visit_condition,&
-                i_exclude)
+                visit(overlap, contacts_i, particle, min_distance, visit_condition, i_exclude)
             if (overlap) return
             contacts = contacts + contacts_i
         end do
         end do
         end do
     end subroutine Abstract_visit_contacts
+
+    subroutine Abstract_visit_min_distance(this, can_overlap, overlap, ratio, particle, &
+        visit_condition, i_exclude)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        logical, intent(out) :: can_overlap, overlap
+        real(DP), intent(out) :: ratio
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        real(DP) :: ratio_i, min_distance, max_distance
+        integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
+        logical :: at_bottom_layer, at_top_layer
+        integer :: local_i1, local_i2, local_i3
+
+        min_distance = this%pair_potential%get_min_distance()
+        max_distance = this%periodic_box%get_max_distance()
+        ratio = max_distance / min_distance
+        ijk_cell = this%neighbour_cells%index(particle%position)
+        at_bottom_layer = (ijk_cell(3) == lbound(this%visitable_lists, 3))
+        at_top_layer = (ijk_cell(3) == ubound(this%visitable_lists, 3))
+        do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
+            if (this%neighbour_cells%skip(at_bottom_layer, at_top_layer, local_i3)) cycle
+        do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
+        do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
+            ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
+                ijk_cell(2), ijk_cell(3))
+            call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
+                visit(can_overlap, overlap, ratio_i, particle, min_distance, max_distance, &
+                    visit_condition, i_exclude)
+            if (.not. can_overlap) cycle
+            if (overlap) return
+            if (ratio_i < ratio) ratio = ratio_i
+        end do
+        end do
+        end do
+    end subroutine Abstract_visit_min_distance
 
     !> No check: to_position & from%position are assumed to be within accessible_domain
     subroutine Abstract_translate(this, to_position, from)
@@ -317,6 +355,18 @@ contains
         overlap = .false.
         contacts = 0._DP
     end subroutine Null_visit_contacts
+
+    subroutine Null_visit_min_distance(this, can_overlap, overlap, ratio, particle, &
+        visit_condition, i_exclude)
+        class(Null_Visitable_Cells), intent(in) :: this
+        logical, intent(out) :: can_overlap, overlap
+        real(DP), intent(out) :: ratio
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+        can_overlap = .false.; overlap = .false.
+        ratio = 0._DP
+    end subroutine Null_visit_min_distance
 
     subroutine Null_translate(this, to_position, from)
         class(Null_Visitable_Cells), intent(inout) :: this

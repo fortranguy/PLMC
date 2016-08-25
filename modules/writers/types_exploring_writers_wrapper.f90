@@ -9,6 +9,7 @@ implicit none
 private
 
     type, public :: Exploring_Writers_Wrapper
+        class(Abstract_Real_Writer), allocatable :: maximum_box_compression_delta
         class(Abstract_Real_Writer), allocatable :: beta_pressure_excess
         type(Concrete_Energies_Writers) :: energies
         class(Abstract_Line_Writer), allocatable :: inv_pow_activities

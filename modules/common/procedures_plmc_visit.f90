@@ -36,6 +36,7 @@ end interface plmc_visit
 interface visit_short
     module procedure :: visit_short_energies
     module procedure :: visit_short_contacts
+    module procedure :: visit_short_min_distance
 end interface visit_short
 
 contains
@@ -238,6 +239,47 @@ contains
             end do
         end do
     end subroutine visit_short_contacts
+
+    subroutine visit_short_min_distance(overlap, min_distance_ratio, &
+        max_distance_ratio, components, short_interactions)
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: min_distance_ratio
+        real(DP), intent(in) :: max_distance_ratio
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+
+        logical :: can_overlap
+        real(DP) :: min_distance_ratio_j
+        integer :: i_component, j_component, i_particle, i_exclude
+        logical :: same_component
+        type(Concrete_Temporary_Particle) :: particle
+        procedure(abstract_visit_condition), pointer :: visit_condition => null()
+
+        overlap = .false.
+        min_distance_ratio = max_distance_ratio
+        do j_component = 1, size(components)
+            do i_component = 1, j_component
+                same_component = i_component == j_component
+                if (same_component) then
+                    visit_condition => visit_lower
+                else
+                    visit_condition => visit_all
+                end if
+                do i_particle = 1, components(j_component)%positions%get_num()
+                    particle%i = i_particle
+                    particle%position = components(j_component)%positions%get(particle%i)
+                    i_exclude = merge(particle%i, 0, same_component)
+                    call short_interactions%visitable_cells(i_component, j_component)%&
+                        visit_min_distance(can_overlap, overlap, min_distance_ratio_j, particle, &
+                            visit_condition, i_exclude)
+                    if (.not. can_overlap) cycle
+                    if (overlap) return
+                    if (min_distance_ratio_j < min_distance_ratio) &
+                        min_distance_ratio = min_distance_ratio_j
+                end do
+            end do
+        end do
+    end subroutine visit_short_min_distance
 
     pure subroutine visit_field(field_energies, external_field, components)
         real(DP), intent(inout) :: field_energies(:)

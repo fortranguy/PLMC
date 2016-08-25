@@ -3,6 +3,7 @@
         "visit": true
     },
     "Volume Change": {
+        "measure maximum compression": true,
         "measure pressure": true,
         "Dirac Distribution Plus": {
             "name": "rectangular",
@@ -10,7 +11,7 @@
         }
     },
     "Particle Insertion": {
-        "mesure chemical potentials": true,
+        "measure chemical potentials": true,
         "Parallelepiped Domain": {
             "name": "domain",
             "origin": [0.0, 0.0, 0.0],

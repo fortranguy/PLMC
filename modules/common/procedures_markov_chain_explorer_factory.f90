@@ -7,12 +7,19 @@ use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use procedures_random_coordinates_factory, only: random_coordinates_create => create, &
     random_coordinates_destroy => destroy
-use procedures_particle_insertion_method_factory, only: particle_insertion_method_create => create,&
-    particle_insertion_method_destroy => destroy
+use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
+use procedures_maximum_box_compression_factory, only: maximum_box_compression_create => create, &
+    maximum_box_compression_destroy => destroy
+use procedures_maximum_box_compression_explorer_factory, only: &
+    maximum_box_compression_explorer_create => create, &
+    maximum_box_compression_explorer_destroy => destroy
 use procedures_volume_change_method_factory, only: volume_change_method_create => create, &
     volume_change_method_destroy => destroy
+use procedures_particle_insertion_method_factory, only: particle_insertion_method_create => create,&
+    particle_insertion_method_destroy => destroy
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
-use procedures_property_inquirers, only: measure_chemical_potentials, measure_pressure
+use procedures_property_inquirers, only: measure_maximum_compression, measure_pressure, &
+    measure_chemical_potentials
 
 implicit none
 
@@ -26,13 +33,21 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(json_file), intent(inout) :: exploring_data
 
-        logical :: measure_inv_pow_activities, measure_pressure_excess
+        class(Abstract_Maximum_Box_Compression), allocatable :: maximum_box_compression
+        logical :: measure_maximum_box_compression, measure_inv_pow_activities
         logical, dimension(size(physical_model%mixture%components)) :: can_exchange, &
             have_positions, have_orientations
 
-        measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
+        measure_maximum_box_compression = measure_maximum_compression(exploring_data, &
+            volume_change_prefix)
+        call maximum_box_compression_create(maximum_box_compression, physical_model%environment%&
+            periodic_box, measure_maximum_box_compression)
+        call maximum_box_compression_explorer_create(markov_chain_explorer%&
+            maximum_box_compression_explorer, physical_model, maximum_box_compression, &
+            measure_maximum_box_compression)
+        call maximum_box_compression_destroy(maximum_box_compression)
         call volume_change_method_create(markov_chain_explorer%volume_change_method, &
-            physical_model, measure_pressure_excess)
+            physical_model, measure_pressure(exploring_data, volume_change_prefix))
         measure_inv_pow_activities = measure_chemical_potentials(exploring_data, &
             particle_insertion_prefix)
         can_exchange = measure_inv_pow_activities ! as if exchange
@@ -59,6 +74,8 @@ contains
         call random_coordinates_destroy(markov_chain_explorer%random_position)
         call box_destroy(markov_chain_explorer%particle_insertion_domain)
         call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
+        call maximum_box_compression_explorer_destroy(markov_chain_explorer%&
+            maximum_box_compression_explorer)
     end subroutine destroy
 
 end module procedures_markov_chain_explorer_factory

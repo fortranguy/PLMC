@@ -2,12 +2,9 @@ module classes_volume_change_method
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
-use classes_number_to_string, only: Concrete_Number_to_String
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
 use procedures_plmc_visit, only: visit_short
@@ -63,7 +60,7 @@ contains
 
     subroutine Abstract_try(this, observables)
         class(Abstract_Volume_Change_Method), intent(in) :: this
-        type(Exploring_Observables_Wrapper), intent(inout) :: observables
+        type(Exploring_Observables_Wrapper), intent(inout) :: observables !too much?
 
         logical :: overlap
         real(DP) :: contacts

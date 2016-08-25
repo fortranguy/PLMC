@@ -26,6 +26,26 @@
         \end{scope}
 
         \begin{scope}[shift={($(ExploringAlgorithm.south) - (0 cm, 3 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{VolumeChangeMethod}{0, 0}
+                \inherit{ExploringAlgorithm}
+                \operation{\procedure{construct}{environment: \type{Environment},
+                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{try}{observables: \type{ExploringObservables}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(VolumeChangeMethod.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{MaximumBoxCompressionMethod}{0, 0}
+                \inherit{ExploringAlgorithm}
+                \operation{\procedure{construct}{environment: \type{Environment},
+                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{try}{observables: \type{ExploringObservables}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(VolumeChangeMethod.north -| Import)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{ParticleInsertionMethod}{0, 0}
                 \inherit{ExploringAlgorithm}
                 \operation{\procedure{construct}{environment: \type{Environment},
@@ -34,16 +54,6 @@
                     numbers: \type{ComponentNumber[:]},
                     randomPosition: \type{RandomCoordinates},
                     randomOrientation: \type{RandomCoordinates}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{try}{observables: \type{ExploringObservables}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ParticleInsertionMethod.north -| Import)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{VolumeChangeMethod}{0, 0}
-                \inherit{ExploringAlgorithm}
-                \operation{\procedure{construct}{environment: \type{Environment},
-                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{try}{observables: \type{ExploringObservables}}}
             \end{abstractclass}

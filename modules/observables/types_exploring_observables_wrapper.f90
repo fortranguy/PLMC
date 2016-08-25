@@ -11,6 +11,7 @@ private
 
     !> beta_pressure_excess becomes the lateral excess pressure in 2D
     type, public :: Exploring_Observables_Wrapper
+        real(DP) :: maximum_box_compression_delta = 0._DP
         real(DP) :: beta_pressure_excess = 0._DP !! \( \beta p_\text{ex} \)
         real(DP), allocatable :: inv_pow_activities(:) !! \( a^{-N} \)
         type(Concrete_Energies) :: energies

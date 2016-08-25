@@ -61,6 +61,9 @@
 		<Unit filename="modules/changes/classes_coordinates_copier.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/changes/classes_maximum_box_compression.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="modules/changes/module_move_tuning.f90">
 			<Option weight="1" />
 		</Unit>
@@ -102,6 +105,9 @@
 		</Unit>
 		<Unit filename="modules/changes/procedures_coordinates_copier_factory.f90">
 			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/changes/procedures_maximum_box_compression_factory.f90">
+			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/changes/types_changes_component_wrapper.f90">
 			<Option weight="3" />
@@ -197,7 +203,7 @@
 			<Option weight="18" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_explorer_wrapper.f90">
-			<Option weight="14" />
+			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_generator_wrapper.f90">
 			<Option weight="20" />
@@ -346,6 +352,9 @@
 		<Unit filename="modules/environment/classes_beta_pressure.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/environment/classes_beta_pressure_excess.f90">
+			<Option weight="6" />
+		</Unit>
 		<Unit filename="modules/environment/classes_permittivity.f90">
 			<Option weight="2" />
 		</Unit>
@@ -369,6 +378,9 @@
 		</Unit>
 		<Unit filename="modules/environment/field/procedures_field_factory.f90">
 			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_beta_pressure_excess_factory.f90">
+			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_beta_pressure_factory.f90">
 			<Option weight="3" />
@@ -421,11 +433,17 @@
 		<Unit filename="modules/exploring_algorithms/classes_exploring_algorithm.f90">
 			<Option weight="3" />
 		</Unit>
+		<Unit filename="modules/exploring_algorithms/classes_maximum_box_compression_explorer.f90">
+			<Option weight="16" />
+		</Unit>
 		<Unit filename="modules/exploring_algorithms/classes_particle_insertion_method.f90">
 			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/classes_volume_change_method.f90">
 			<Option weight="13" />
+		</Unit>
+		<Unit filename="modules/exploring_algorithms/procedures_maximum_box_compression_explorer_factory.f90">
+			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/procedures_particle_insertion_method_factory.f90">
 			<Option weight="12" />
@@ -641,13 +659,13 @@
 			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/classes_neighbour_cells.f90">
-			<Option weight="7" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/classes_visitable_cells.f90">
-			<Option weight="8" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/classes_visitable_cells_memento.f90">
-			<Option weight="17" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/data_cells.f90">
 			<Option weight="1" />
@@ -662,22 +680,22 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/procedures_visitable_cells_factory.f90">
-			<Option weight="9" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/procedures_visitable_cells_memento_factory.f90">
-			<Option weight="18" />
+			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/types_neighbour_cells_wrapper.f90">
-			<Option weight="8" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/short_interactions/classes_dirac_distribution_plus.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/short_interactions/classes_hard_contact.f90">
-			<Option weight="6" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/short_interactions/classes_visitable_list.f90">
-			<Option weight="7" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/short_interactions/module_list_node.f90">
 			<Option weight="1" />
@@ -716,10 +734,10 @@
 			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/short_interactions/procedures_visitable_list_factory.f90">
-			<Option weight="8" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/short_interactions/types_short_interactions_wrapper.f90">
-			<Option weight="9" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/writers/classes_changes_success_writer.f90">
 			<Option weight="2" />

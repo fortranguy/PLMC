@@ -60,6 +60,8 @@ contains
         type(Exploring_Observables_Wrapper), intent(in) :: observables
         integer, intent(in) :: i_snap
 
+        call writers%maximum_box_compression_delta%write(i_snap, observables%&
+            maximum_box_compression_delta)
         call writers%beta_pressure_excess%write(i_snap, observables%beta_pressure_excess)
         call write_energies(writers%energies, observables%energies, i_snap)
         call writers%inv_pow_activities%write(i_snap, observables%inv_pow_activities)

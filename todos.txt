@@ -1,0 +1,8 @@
+- Hide DLC in EwaldReci?
+- Exploration: more decoupling?
+- Radial: to factorise
+- BoxVolumeChange -> BoxSizeChange?
+- Hard Potential: change definition
+- BoxVolumeChange: smarter memento with onlyResized?
+- ExploringAlgorithms: no Abstract?
+- MaximumBoxCompression: avoid r_min /= min_distance confusion
