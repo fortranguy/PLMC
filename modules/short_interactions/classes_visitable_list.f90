@@ -203,9 +203,10 @@ contains
             if (visit_condition(current%i, i_exclude)) then
                 vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
                 call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, vector)
-                if (.not. can_overlap) cycle
-                if (overlap) return
-                if (ratio_i < ratio) ratio = ratio_i
+                if (can_overlap) then
+                    if (overlap) return
+                    if (ratio_i < ratio) ratio = ratio_i
+                end if
             end if
             if (.not.associated(next%next)) return
             current => next
