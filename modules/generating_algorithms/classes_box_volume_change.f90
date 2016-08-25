@@ -2,6 +2,7 @@ module classes_box_volume_change
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
+use types_logical_line, only: Concrete_Logical_Line
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
@@ -97,6 +98,7 @@ contains
         type(Concrete_Energies) :: new_energies
         real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
+        type(Concrete_Logical_Line), allocatable :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
 
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
@@ -105,8 +107,8 @@ contains
         box_size = this%environment%periodic_box%get_size()
         call this%environment%periodic_box%set(box_size * box_size_ratio)
         call this%rescale_positions(box_size_ratio)
-        call box_size_change_reset_cells(this%short_interactions%neighbour_cells, this%&
-            short_interactions%visitable_cells)
+        call box_size_change_reset_cells(this%short_interactions%neighbour_cells, &
+            only_resized_triangle, this%short_interactions%visitable_cells)
         call observables_energies_create(new_energies, size(this%mixture%components))
         call this%metropolis_algorithm(success, new_energies, box_size_ratio, observables%energies)
         if (success) then
@@ -117,7 +119,7 @@ contains
         else
             call this%environment%periodic_box%set(box_size)
             call this%rescale_positions(1._DP / box_size_ratio)
-            call this%restore_cells(neighbour_cells, visitable_cells)
+            call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells)
         end if
     end subroutine Abstract_try
 
@@ -210,9 +212,10 @@ contains
             short_interactions%visitable_cells)
     end subroutine Abstract_save_cells
 
-    subroutine Abstract_restore_cells(this, neighbour_cells, visitable_cells)
+    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)
         class(Abstract_Box_Volume_Change), intent(in) :: this
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
+        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells(:, :)
 
         integer :: i_component, j_component
@@ -227,7 +230,8 @@ contains
             end do
         end do
         call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
-            visitable_cells, this%short_interactions%neighbour_cells, visitable_cells)
+            visitable_cells, this%short_interactions%neighbour_cells, only_resized_triangle, &
+            visitable_cells)
     end subroutine Abstract_restore_cells
 
 !end implementation Abstract_Box_Volume_Change

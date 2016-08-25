@@ -1,5 +1,6 @@
 module procedures_plmc_reset
 
+use types_logical_line, only: Concrete_Logical_Line
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
@@ -46,17 +47,20 @@ contains
         end do
     end subroutine reset_visitable_cells
 
-    subroutine box_size_change_reset_cells(neighbour_cells, visitable_cells)
+    subroutine box_size_change_reset_cells(neighbour_cells, only_resized_triangle, visitable_cells)
         type(Neighbour_Cells_Line), intent(inout) :: neighbour_cells(:)
+        type(Concrete_Logical_Line), allocatable, intent(out) :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(inout) :: visitable_cells(:, :)
 
         integer :: i_component, j_component
-        logical :: only_resized
 
+        allocate(only_resized_triangle(size(neighbour_cells)))
         do j_component = 1, size(neighbour_cells)
+            allocate(only_resized_triangle(j_component)%line(j_component)) ! allocate elsewhere?
             do i_component = 1, size(neighbour_cells(j_component)%line)
-                call neighbour_cells(j_component)%line(i_component)%cells%reset(only_resized)
-                if (.not. only_resized) then
+                call neighbour_cells(j_component)%line(i_component)%cells%&
+                    reset(only_resized_triangle(j_component)%line(i_component))
+                if (.not. only_resized_triangle(j_component)%line(i_component)) then
                     call visitable_cells(i_component, j_component)%reset()
                     if (i_component /= j_component) call visitable_cells(j_component, i_component)%&
                         reset()
