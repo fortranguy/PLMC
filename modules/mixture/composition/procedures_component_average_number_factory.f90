@@ -7,7 +7,7 @@ use classes_component_chemical_potential, only : Abstract_Component_Chemical_Pot
 use classes_component_average_number, only: Abstract_Component_Average_Number, &
     Constant_Component_Average_Number, Variable_Component_Average_Number, &
     Null_Component_Average_Number
-use procedures_property_inquirers, only: component_can_exchange
+use procedures_mixture_inquirers, only: component_can_exchange
 
 implicit none
 

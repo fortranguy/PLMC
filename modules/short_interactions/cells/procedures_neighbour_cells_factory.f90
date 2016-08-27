@@ -3,11 +3,11 @@ module procedures_neighbour_cells_factory
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
+use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells, XYZ_PBC_Neighbour_Cells, &
     XY_PBC_Neighbour_Cells, Null_Neighbour_Cells
-use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 

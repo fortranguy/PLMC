@@ -4,7 +4,7 @@ use json_module, only: json_file
 use data_input_prefixes, only: changes_prefix, writers_prefix
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found, check_positive
-use procedures_property_inquirers, only: write_coordinates
+use procedures_writers_inquirers, only: write_coordinates
 
 implicit none
 

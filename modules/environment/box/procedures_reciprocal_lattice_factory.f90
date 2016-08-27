@@ -5,7 +5,7 @@ use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice, &
     Null_Reciprocal_Lattice
-use procedures_property_inquirers, only: use_reciprocal_lattice
+use procedures_environment_inquirers, only: use_reciprocal_lattice
 
 implicit none
 

@@ -1,10 +1,10 @@
 module procedures_dlc_structures_factory
 
 use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_inquirers, only: periodicity_is_xy
 use types_component_wrapper, only: Component_Wrapper
 use classes_dlc_structures, only: Abstract_DLC_Structures, Concrete_DLC_Structures, &
     Null_DLC_Structures
-use procedures_property_inquirers, only: periodicity_is_xy
 
 implicit none
 

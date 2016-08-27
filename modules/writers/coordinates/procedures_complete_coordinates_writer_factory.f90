@@ -10,7 +10,7 @@ use procedures_component_coordinates_writer_factory, only: component_coordinates
     create, component_coordinates_writer_destroy => destroy
 use classes_complete_coordinates_writer, only: Abstract_Complete_Coordinates_Writer, &
     Concrete_Complete_Coordinates_Writer, Null_Complete_Coordinates_Writer
-use procedures_property_inquirers, only: property_write_coordinates => write_coordinates
+use procedures_writers_inquirers, only: property_write_coordinates => write_coordinates
 
 implicit none
 

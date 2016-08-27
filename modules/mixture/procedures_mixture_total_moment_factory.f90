@@ -3,7 +3,7 @@ module procedures_mixture_total_moment_factory
 use types_component_wrapper, only: Component_Wrapper
 use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
     Concrete_Mixture_Total_Moment, Null_Mixture_Total_Moment
-use procedures_property_inquirers, only: component_is_dipolar
+use procedures_mixture_inquirers, only: component_is_dipolar
 
 implicit none
 

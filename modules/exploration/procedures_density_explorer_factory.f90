@@ -9,9 +9,9 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_environment_inquirers, only: periodicity_is_xy
 use classes_density_explorer, only: Abstract_Density_Explorer, Plain_Density_Explorer, &
     Z_Density_Explorer, XZ_Density_Explorer
-use procedures_property_inquirers, only: periodicity_is_xy
 
 implicit none
 

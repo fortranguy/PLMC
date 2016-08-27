@@ -17,6 +17,12 @@
             \end{class}
         \end{scope}
 
+        \begin{scope}[shift={($(ChangesComponent.north) + (8.5 cm, 0 cm)$)}]
+            \coordinate (import) at (0, 0);
+            \umlnote[text width=\largeTextWidth]{\import{}:\\
+                \namespace{Random} :: RandomCoordinates};
+        \end{scope}
+
         \begin{scope}[shift={($(ChangesComponent.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{MoveTuner}{0, 0}
                 \operation{\procedure{construct}{movedCoordinates: \type{MovedCoordinates},
@@ -24,15 +30,6 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{tune}{tuned: \type{bool}, iStep: \type{int},
                     successRatio: \type{real}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(MoveTuner.north) - (7.5 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{MovedCoordinates}{0, 0}
-                \operation[0]{\procedure{construct}{\ldots}}
-                \operation[0]{\procedure{destroy}{}}
-                \operation[0]{\procedure{increaseDelta}{}}
-                \operation[0]{\procedure{decreaseDelta}{}}
             \end{abstractclass}
         \end{scope}
 
@@ -44,21 +41,37 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(MovedCoordinates |- ChangesComponent.north)$)}]
+        \begin{scope}[shift={($(MoveTunerParameters.north) - (7.5 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{MovedCoordinates}{0, 0}
+                \operation[0]{\procedure{construct}{\ldots}}
+                \operation[0]{\procedure{destroy}{}}
+                \operation[0]{\procedure{increaseDelta}{}}
+                \operation[0]{\procedure{decreaseDelta}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(MovedCoordinates |- MoveTuner.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ChangedBoxSize}{0, 0}
                 \inherit{MovedCoordinates}
                 \operation{\procedure{getRatio}{}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MovedCoordinates |- MoveTunerParameters.north)$)}]
+        \begin{scope}[shift={($(ChangedBoxSize |- ChangesComponent.north)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ChangedBoxSizeRatio}{0, 0}
+                \operation{\procedure{getDelta}{}: \type{real}}
+                \operation[0]{\procedure{get}{}: \type{real[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(MovedCoordinates.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MovedComponentCoordinates}{0, 0}
                 \inherit{MovedCoordinates}
                 \operation[0]{\procedure{get}{iParticle: \type{int}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MovedComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(MoveTunerParameters.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MaximumBoxCompression}{0, 0}
                 \operation[0]{\procedure{getDelta}{minDistanceRatio: \type{real}}: \type{real}}
             \end{abstractclass}
@@ -85,12 +98,9 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(ChangesComponent.north -| Changes.north)$)}]
-            \umlnote[text width=\largeTextWidth]{\import{}:\\
-                \namespace{Random} :: RandomCoordinates};
-        \end{scope}
-
         \begin{scope}[on background layer]
+            \composition{ChangedBoxSize}{\refName{changedBoxSizeRatio}}{\numRef{1}}
+                {ChangedBoxSizeRatio}
             \aggregation{MoveTuner}{\refName{movedCoordinates}}{\numRef{1}}{MovedCoordinates}
         \end{scope}
 

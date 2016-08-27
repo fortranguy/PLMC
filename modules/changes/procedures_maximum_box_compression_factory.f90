@@ -2,9 +2,9 @@ module procedures_maximum_box_compression_factory
 
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
+use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression, &
     XYZ_Maximum_Box_Compression, XY_Maximum_Box_Compression, Null_Maximum_Box_Compression
-use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 

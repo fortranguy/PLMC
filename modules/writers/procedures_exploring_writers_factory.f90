@@ -13,8 +13,8 @@ use procedures_line_writer_factory, only: line_writer_create => create, &
 use procedures_energies_writers_factory, only: energies_writers_create => create, &
     energies_writers_destroy => destroy
 use types_exploring_writers_wrapper, only: Exploring_Writers_Wrapper
-use procedures_property_inquirers, only: measure_maximum_compression, measure_pressure, &
-    measure_chemical_potentials
+use procedures_exploration_inquirers, only: measure_maximum_compression, measure_pressure
+use procedures_exploration_inquirers, only: measure_chemical_potentials
 
 implicit none
 

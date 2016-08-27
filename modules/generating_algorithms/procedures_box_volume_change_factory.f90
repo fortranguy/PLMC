@@ -4,7 +4,7 @@ use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use classes_box_volume_change, only: Abstract_Box_Volume_Change, Concrete_Box_Volume_Change, &
     Null_Box_Volume_Change
-use procedures_property_inquirers, only: box_size_can_change
+use procedures_environment_inquirers, only: box_size_can_change
 
 implicit none
 

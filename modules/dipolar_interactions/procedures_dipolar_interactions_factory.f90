@@ -6,6 +6,7 @@ use procedures_errors, only: warning_continue
 use classes_permittivity, only: Abstract_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_inquirers, only: use_permittivity, use_reciprocal_lattice
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
@@ -17,7 +18,6 @@ use procedures_des_self_factory, only: des_self_create => create, des_self_destr
 use procedures_des_surf_mixture_factory, only: des_surf_mixture_create => create, &
     des_surf_mixture_destroy => destroy
 use procedures_dlc_factory, only: dlc_create => create, dlc_destroy => destroy
-use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattice
 
 implicit none
 

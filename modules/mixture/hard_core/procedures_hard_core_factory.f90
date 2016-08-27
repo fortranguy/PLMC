@@ -4,12 +4,13 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_visitable_walls, only: Abstract_Visitable_Walls
+use procedures_environment_inquirers, only: use_walls
 use classes_min_distance, only: Abstract_Min_Distance
 use types_component_wrapper, only: Component_Wrapper
 use types_min_distance_wrapper, only: Min_Distance_Wrapper, Min_Distances_Line
 use procedures_min_distance_factory, only: min_distance_create_from_json => create_from_json, &
     min_distance_create_from_value => create_from_value, min_distance_destroy => destroy
-use procedures_property_inquirers, only: use_walls, component_exists
+use procedures_mixture_inquirers, only: component_exists
 
 implicit none
 

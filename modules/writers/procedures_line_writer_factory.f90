@@ -1,11 +1,12 @@
 module procedures_line_writer_factory
 
 use classes_external_field, only: Abstract_External_Field
+use procedures_environment_inquirers, only: apply_external_field
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_inquirers, only: component_is_dipolar
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper
+use procedures_short_interactions_inquirers, only: component_interacts_with_wall
 use classes_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer
-use procedures_property_inquirers, only: apply_external_field, component_interacts_with_wall, &
-    component_is_dipolar
 
 implicit none
 

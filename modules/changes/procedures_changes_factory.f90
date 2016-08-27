@@ -6,9 +6,15 @@ use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
 use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_inquirers, only: box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_inquirers, only: component_can_translate, component_can_rotate, &
+    component_can_exchange
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
+use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
+use procedures_changed_box_size_ratio_factory, only: changed_box_size_ratio_create => create, &
+    changed_box_size_ratio_destroy => destroy
 use procedures_changed_box_size_factory, only: changed_box_size_create => create, &
     changed_box_size_destroy => destroy
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
@@ -22,8 +28,6 @@ use procedures_coordinates_copier_factory, only: coordinates_copier_create_posit
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_component_factory, only: changes_component_create, changes_component_destroy
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_property_inquirers, only: box_size_can_change, component_can_translate, &
-    component_can_rotate, component_can_exchange
 
 implicit none
 
@@ -41,6 +45,7 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
+        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
         type(Concrete_Move_Tuning_Parameters) :: box_size_tuning_parameters, &
             components_tuning_parameters
         type(Concrete_Move_Tuner_Parameters) :: box_size_tuner_parameters, &
@@ -54,8 +59,12 @@ contains
         volume_can_change = box_size_can_change(environment%beta_pressure)
         call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, volume_can_change,&
             generating_data, prefix//"Box Size.")
+        call changed_box_size_ratio_create(changed_box_size_ratio, environment%periodic_box, &
+            volume_can_change, generating_data, prefix//"Box Size.")
         call changed_box_size_create(changes%changed_box_size, environment%periodic_box, &
-            box_size_tuning_parameters, volume_can_change, generating_data, prefix//"Box Size.")
+            changed_box_size_ratio, box_size_tuning_parameters, volume_can_change, generating_data,&
+            prefix//"Box Size.")
+        call changed_box_size_ratio_destroy(changed_box_size_ratio)
         call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, volume_can_change, &
             generating_data, prefix//"Box Size.")
         call move_tuner_create_box_size_change(changes%box_size_change_tuner, changes%&

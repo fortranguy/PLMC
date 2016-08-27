@@ -2,6 +2,7 @@ module procedures_generating_writers_factory
 
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_inquirers, only: property_box_size_can_change => box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
 use procedures_complete_coordinates_writer_factory, only: complete_coordinates_writer_create => &
     create, complete_coordinates_writer_destroy => destroy
@@ -22,7 +23,6 @@ use procedures_changes_success_writer_factory, only: changes_success_writer_crea
 use procedures_energies_writers_factory, only: energies_writers_create => create, &
     energies_writers_destroy => destroy
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
-use procedures_property_inquirers, only: property_box_size_can_change => box_size_can_change
 
 implicit none
 

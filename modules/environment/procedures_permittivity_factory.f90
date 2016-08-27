@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity, Null_Permittivity
-use procedures_property_inquirers, only: use_permittivity
+use procedures_environment_inquirers, only: use_permittivity
 
 implicit none
 

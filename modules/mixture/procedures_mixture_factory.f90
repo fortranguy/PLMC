@@ -12,7 +12,7 @@ use procedures_hard_core_factory, only: hard_core_create => create, hard_core_de
 use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
     mixture_total_moment_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_property_inquirers, only: component_has_positions, component_has_orientations, &
+use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations, &
     property_num_components => num_components
 
 implicit none

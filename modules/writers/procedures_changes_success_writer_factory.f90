@@ -2,12 +2,12 @@ module procedures_changes_success_writer_factory
 
 use classes_number_to_string, only: Concrete_Number_to_String
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_inquirers, only:  component_can_translate, component_can_rotate, &
+    component_can_exchange
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use classes_changes_success_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
 use types_changes_success_writer_wrapper, only: Changes_Success_Writer_Wrapper
-use procedures_property_inquirers, only:  component_can_translate, component_can_rotate, &
-    component_can_exchange
 
 implicit none
 

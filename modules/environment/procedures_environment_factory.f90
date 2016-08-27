@@ -19,9 +19,9 @@ use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use procedures_component_factory, only: component_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
-use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
+use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
     box_size_can_change, apply_external_field, use_walls
+use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 
 implicit none
 

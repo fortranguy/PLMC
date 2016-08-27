@@ -11,7 +11,7 @@ use procedures_pair_potential_factory, only: pair_potential_create => create, &
     pair_potential_destroy => destroy
 use procedures_short_pairs_visitor_factory, only: short_pairs_visitor_create => create, &
     short_pairs_visitor_destroy => destroy
-use procedures_property_inquirers, only: components_interact
+use procedures_short_interactions_inquirers, only: components_interact
 
 implicit none
 

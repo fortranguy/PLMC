@@ -2,10 +2,10 @@ module procedures_hard_contact_factory
 
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
+use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 use classes_dirac_distribution_plus, only: Abstract_Dirac_Distribution_Plus
 use classes_hard_contact, only: Abstract_Hard_Contact, XYZ_Hard_Contact, XY_Hard_Contact, &
     Null_Hard_Contact
-use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 

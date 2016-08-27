@@ -3,11 +3,11 @@ module procedures_des_surf_mixture_factory
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity
+use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
     Concrete_Mixture_Total_Moment, Null_Mixture_Total_Moment
 use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture, Spherical_DES_Surf_Mixture, &
     Rectangular_DES_Surf_Mixture, Null_DES_Surf_Mixture
-use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 

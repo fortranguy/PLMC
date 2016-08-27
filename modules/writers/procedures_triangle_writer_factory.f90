@@ -1,12 +1,12 @@
 module procedures_triangle_writer_factory
 
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_inquirers, only: component_exists, component_can_exchange
 use types_pair_potential_wrapper, only: Pair_Potentials_Line
+use procedures_short_interactions_inquirers, only: components_interact
 use types_logical_line, only: Concrete_Logical_Line
 use classes_triangle_writer, only: Abstract_Triangle_Writer, Concrete_Triangle_Writer, &
     Null_Triangle_Writer
-use procedures_property_inquirers, only: component_exists, components_interact, &
-    component_can_exchange
 
 implicit none
 

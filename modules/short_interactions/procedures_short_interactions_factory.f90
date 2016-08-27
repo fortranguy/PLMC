@@ -9,6 +9,7 @@ use procedures_walls_factory, only: walls_create => create, walls_destroy => des
 use procedures_beta_pressure_excess_factory, only: beta_pressure_excess_create => create, &
     beta_pressure_excess_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_inquirers, only: box_size_can_change
 use types_mixture_wrapper, only:  Mixture_Wrapper
 use classes_dirac_distribution_plus, only: Abstract_Dirac_Distribution_Plus
 use procedures_dirac_distribution_plus_factory, only: dirac_distribution_plus_create => create, &
@@ -21,7 +22,7 @@ use procedures_visitable_list_factory, only: visitable_list_allocate => allocate
     visitable_list_deallocate => deallocate
 use procedures_cells_factory, only: cells_create => create, cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_property_inquirers, only: property_measure_pressure => measure_pressure, &
+use procedures_exploration_inquirers, only: property_measure_pressure => measure_pressure, &
     property_measure_maximum_compression => measure_maximum_compression
 
 implicit none
@@ -75,7 +76,8 @@ contains
         call cells_create(short_interactions%visitable_cells, environment%periodic_box, mixture%&
             components, short_interactions%hard_contact, short_interactions%components_pairs, &
             short_interactions%neighbour_cells, list_mold, interact)
-        call cells_create(short_interactions%visitable_cells_memento, list_mold, interact)
+        call cells_create(short_interactions%visitable_cells_memento, list_mold, interact .and. &
+            (box_size_can_change(environment%beta_pressure) .or. measure_pressure))
         call visitable_list_deallocate(list_mold)
     end subroutine short_interactions_create
 

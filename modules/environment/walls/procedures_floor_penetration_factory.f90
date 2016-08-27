@@ -6,7 +6,7 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use classes_floor_penetration, only: Abstract_Floor_Penetration, Flat_Floor_Penetration, &
     Centered_Block_Penetration, Null_Floor_Penetration
-use procedures_property_inquirers, only: use_walls
+use procedures_environment_inquirers, only: use_walls
 
 implicit none
 

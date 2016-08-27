@@ -1,11 +1,11 @@
 module procedures_move_tuner_factory
 
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
+use procedures_environment_inquirers, only: box_size_can_change
+use procedures_mixture_inquirers, only: component_can_translate, component_can_rotate
 use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
 use classes_move_tuner, only: Abstract_Move_Tuner, Concrete_Move_Tuner, Null_Move_Tuner
-use procedures_property_inquirers, only: box_size_can_change, component_can_translate, &
-    component_can_rotate
 
 implicit none
 

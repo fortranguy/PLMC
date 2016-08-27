@@ -7,8 +7,8 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_floor_penetration, only: Abstract_Floor_Penetration
 use classes_visitable_walls, only: Abstract_Visitable_Walls, Concrete_Visitable_Walls, &
     Null_Visitable_Walls
+use procedures_environment_inquirers, only: use_walls
 use classes_min_distance, only: Abstract_Min_Distance
-use procedures_property_inquirers, only: use_walls
 
 implicit none
 

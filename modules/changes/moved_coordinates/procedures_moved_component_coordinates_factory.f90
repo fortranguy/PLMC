@@ -6,12 +6,12 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
+use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations
 use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates, &
     Null_Moved_Component_Coordinates
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
-use procedures_property_inquirers, only: component_has_positions, component_has_orientations
 
 implicit none
 

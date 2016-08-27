@@ -5,7 +5,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_beta_pressure_excess, only: Abstract_Beta_Pressure_Excess, XYZ_Beta_Pressure_Excess, &
     XYZ_Beta_Pressure_Excess, Null_Beta_Pressure_Excess
-use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy
+use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 
 implicit none
 

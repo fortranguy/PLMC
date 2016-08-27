@@ -8,7 +8,7 @@ use procedures_coordinates_factory, only: coordinates_create => create, &
 use procedures_composition_factory, only: composition_create => create, &
     composition_destroy => destroy
 use types_component_wrapper, only: Component_Wrapper
-use procedures_property_inquirers, only: component_is_dipolar, component_can_exchange
+use procedures_mixture_inquirers, only: component_is_dipolar, component_can_exchange
 
 implicit none
 

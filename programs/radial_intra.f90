@@ -18,8 +18,8 @@ use procedures_geometry, only: sphere_surface
 use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_environment_inquirers, only: periodicity_is_xyz
 use procedures_coordinates_reader, only: create_positions_from_file
-use procedures_property_inquirers, only: periodicity_is_xyz
 use types_radial_distribution_component, only: Concrete_Radial_Distribution_Component
 use procedures_plmc_help, only: plmc_catch_radial_help
 

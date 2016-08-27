@@ -9,7 +9,7 @@ use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
     Concrete_Parallelepiped_Domain, Boxed_Parallelepiped_Domain, Walled_Parallelepiped_Domain, &
     Null_Parallelepiped_Domain
-use procedures_property_inquirers, only: use_walls
+use procedures_environment_inquirers, only: use_walls
 
 implicit none
 

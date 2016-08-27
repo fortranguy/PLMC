@@ -4,12 +4,12 @@ use procedures_errors, only: error_exit
 use classes_component_number, only: Abstract_Component_Number
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations
 use types_component_coordinates_reader_selector, only: Component_Coordinates_Reader_Selector
 use classes_component_coordinates_reader, only: Abstract_Component_Coordinates_Reader, &
     Concrete_Component_Coordinates_Reader, Concrete_Component_Positions_Reader, &
     Concrete_Component_Orientations_Reader, Null_Component_Coordinates_Reader
 use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
-use procedures_property_inquirers, only: component_has_positions, component_has_orientations
 
 implicit none
 

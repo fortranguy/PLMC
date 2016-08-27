@@ -2,7 +2,7 @@ module procedures_dlc_weight_factory
 
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_dlc_weight, only: Abstract_DLC_Weight, Concrete_DLC_Weight, Null_DLC_Weight
-use procedures_property_inquirers, only: periodicity_is_xy
+use procedures_environment_inquirers, only: periodicity_is_xy
 
 implicit none
 

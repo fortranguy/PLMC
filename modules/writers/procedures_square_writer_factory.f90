@@ -1,8 +1,8 @@
 module procedures_square_writer_factory
 
 use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_inquirers, only: component_can_exchange
 use classes_square_writer, only: Abstract_Square_Writer, Concrete_Square_Writer, Null_Square_Writer
-use procedures_property_inquirers, only: component_can_exchange
 
 implicit none
 

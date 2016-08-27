@@ -12,13 +12,12 @@ use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
-use types_reals_line, only: Reals_Line
 use procedures_triangle_observables, only: operator(-)
 use types_observables_energies, only: Concrete_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
-use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
+use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_plmc_reset, only: box_size_change_reset_cells
 use procedures_plmc_visit, only: visit_walls, visit_short, visit_field
@@ -102,7 +101,11 @@ contains
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
 
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
+        write(*, *) "Short: visitable_cells: <", size(this%short_interactions%visitable_cells, 1), &
+            size(this%short_interactions%visitable_cells, 2)
         call this%save_cells(neighbour_cells, visitable_cells)
+        write(*, *) "Short: visitable_cells: >", size(this%short_interactions%visitable_cells, 1), &
+            size(this%short_interactions%visitable_cells, 2)
         box_size_ratio = this%changed_box_size%get_ratio()
         box_size = this%environment%periodic_box%get_size()
         call this%environment%periodic_box%set(box_size * box_size_ratio)
@@ -208,8 +211,12 @@ contains
                     short_interactions%neighbour_cells(j_component)%line(i_component)%cells)
             end do
         end do
+        write(*, *) "save visitable_cells <"
+        call this%short_interactions%visitable_cells_memento%test()
+        stop "test"
         call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
             short_interactions%visitable_cells)
+        write(*, *) "save visitable_cells >"
     end subroutine Abstract_save_cells
 
     subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)

@@ -14,14 +14,15 @@ use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use classes_floor_penetration, only: Abstract_Floor_Penetration
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
+use procedures_environment_inquirers, only: use_walls
 use classes_min_distance, only: Abstract_Min_Distance
 use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 use types_raw_coordinates, only: Concrete_Raw_Coordinates
+use procedures_mixture_inquirers, only: property_num_components => num_components, &
+    property_i_component => i_component
 use types_component_coordinates_reader_selector, only: Component_Coordinates_Reader_Selector
 use procedures_complete_coordinates_reader, only: complete_coordinates_read, &
     complete_coordinates_deallocate
-use procedures_property_inquirers, only: use_walls, property_num_components => num_components, &
-    property_i_component => i_component
 use procedures_plmc_iterations, only: plmc_set_num_snaps
 use classes_density_explorer, only: Abstract_Density_Explorer
 use procedures_density_explorer_factory, only: density_explorer_create => create, &

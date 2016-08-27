@@ -4,7 +4,7 @@ use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_box_size_checker, only: Abstract_Box_Size_Checker, Concrete_Box_Size_Checker, &
     Null_Box_Size_Checker
-use procedures_property_inquirers, only: use_reciprocal_lattice, use_walls
+use procedures_environment_inquirers, only: use_reciprocal_lattice, use_walls
 
 implicit none
 
