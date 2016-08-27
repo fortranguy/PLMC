@@ -21,9 +21,10 @@ end interface create
 
 contains
 
-    subroutine create_short_energies(energies, pairs, filename)
+    subroutine create_short_energies(energies, pairs, visit_energies, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
         type(Pair_Potentials_Line), intent(in) :: pairs(:)
+        logical, intent(in) :: visit_energies
         character(len=*), intent(in) :: filename
 
         type(Concrete_Logical_Line) :: selectors(size(pairs))
@@ -40,7 +41,7 @@ contains
             end do
         end do
 
-        if (some_components_interact) then
+        if (some_components_interact .and. visit_energies) then
             allocate(Concrete_Triangle_Writer :: energies)
         else
             allocate(Null_Triangle_Writer :: energies)
@@ -48,9 +49,10 @@ contains
         call energies%construct(selectors, filename)
     end subroutine create_short_energies
 
-    subroutine create_dipolar_energies(energies, are_dipolar, filename)
+    subroutine create_dipolar_energies(energies, are_dipolar, visit_energies, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
         logical, intent(in) :: are_dipolar(:)
+        logical, intent(in) :: visit_energies
         character(len=*), intent(in) :: filename
 
         type(Concrete_Logical_Line) :: selectors(size(are_dipolar))
@@ -67,7 +69,7 @@ contains
             end do
         end do
 
-        if (some_components_interact) then
+        if (some_components_interact .and. visit_energies) then
             allocate(Concrete_Triangle_Writer :: energies)
         else
             allocate(Null_Triangle_Writer :: energies)

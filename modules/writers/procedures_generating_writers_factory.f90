@@ -43,7 +43,7 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        logical :: box_size_can_change, can_exchange(size(components))
+        logical :: box_size_can_change, can_exchange(size(components)), visit_energies
 
         box_size_can_change = property_box_size_can_change(changed_box_size)
         call real_writer_create(writers%accessible_domain_size, box_size_can_change, &
@@ -54,8 +54,9 @@ contains
         call line_writer_create(writers%nums_particles, can_exchange, "nums_particles.out")
         call complete_coordinates_writer_create(writers%complete_coordinates, environment%&
             periodic_box, components, "coordinates", generating_data, prefix)
+        visit_energies = .true.
         call energies_writers_create(writers%energies, environment%external_field, wall_pairs, &
-            components, short_pairs)
+            components, short_pairs, visit_energies)
         call changes_success_writer_create(writers%components_changes, changes_components, &
             components)
         call triangle_writer_create(writers%switches_successes, components, &

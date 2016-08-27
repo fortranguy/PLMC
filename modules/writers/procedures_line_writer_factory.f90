@@ -14,37 +14,17 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_field
     module procedure :: create_walls
+    module procedure :: create_field
     module procedure :: create_line
 end interface
 
 contains
 
-    subroutine create_field(field, external_field, components, filename)
-        class(Abstract_Line_Writer), allocatable, intent(out) :: field
-        class(Abstract_External_Field), intent(in) :: external_field
-        type(Component_Wrapper), intent(in) :: components(:)
-        character(len=*), intent(in) :: filename
-
-        logical :: selector(size(components))
-        integer :: i_component
-
-        do i_component = 1, size(selector)
-            selector(i_component) = component_is_dipolar(components(i_component)%dipole_moments)
-        end do
-
-        if (any(selector) .and. apply_external_field(external_field)) then
-            allocate(Concrete_Line_Writer :: field)
-        else
-            allocate(Null_Line_Writer :: field)
-        end if
-        call field%construct(selector, filename)
-    end subroutine create_field
-
-    subroutine create_walls(walls, wall_pairs, filename)
+    subroutine create_walls(walls, wall_pairs, visit_energies, filename)
         class(Abstract_Line_Writer), allocatable, intent(out) :: walls
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
+        logical, intent(in) :: visit_energies
         character(len=*), intent(in) :: filename
 
         logical :: selector(size(wall_pairs))
@@ -54,13 +34,35 @@ contains
             selector(i_component) = component_interacts_with_wall(wall_pairs(i_component)%potential)
         end do
 
-        if (any(selector)) then
+        if (any(selector) .and. visit_energies) then
             allocate(Concrete_Line_Writer :: walls)
         else
             allocate(Null_Line_Writer :: walls)
         end if
         call walls%construct(selector, filename)
     end subroutine create_walls
+
+    subroutine create_field(field, external_field, components, visit_energies, filename)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: field
+        class(Abstract_External_Field), intent(in) :: external_field
+        type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(in) :: visit_energies
+        character(len=*), intent(in) :: filename
+
+        logical :: selector(size(components))
+        integer :: i_component
+
+        do i_component = 1, size(selector)
+            selector(i_component) = component_is_dipolar(components(i_component)%dipole_moments)
+        end do
+
+        if (any(selector) .and. apply_external_field(external_field) .and. visit_energies) then
+            allocate(Concrete_Line_Writer :: field)
+        else
+            allocate(Null_Line_Writer :: field)
+        end if
+        call field%construct(selector, filename)
+    end subroutine create_field
 
     subroutine create_line(line, selector, filename)
         class(Abstract_Line_Writer), allocatable, intent(out) :: line

@@ -83,18 +83,34 @@ contains
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables !too much?
 
+        logical :: overlap
+        real(DP) :: contacts, delta_energy, d_energy_d_volume
         real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
         type(Concrete_Logical_Line), allocatable :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
-        logical :: overlap
-        real(DP) :: contacts
 
         call visit_short(overlap, contacts, this%components, this%short_interactions)
         if (overlap) call error_exit("Abstract_Volume_Change_Method: try: visit_short: overlap")
         call this%save_cells(neighbour_cells, visitable_cells)
+        box_size_ratio = this%changed_box_size_ratio%get()
+        box_size = this%environment%periodic_box%get_size()
+        call this%environment%periodic_box%set(box_size * box_size_ratio)
+        call this%rescale_positions(box_size_ratio)
+        call box_size_change_reset_cells(this%short_interactions%neighbour_cells, &
+            only_resized_triangle, this%short_interactions%visitable_cells)
+        call this%set_delta_energy(overlap, delta_energy, observables%energies)
+        if (overlap) call error_exit("Abstract_Volume_Change_Method: try: set_delta_energy: "//&
+            "overlap")
+
+        d_energy_d_volume = delta_energy / product(this%environment%accessible_domain%get_size()) /&
+            (product(box_size_ratio) - 1._DP)
         observables%beta_pressure_excess = this%short_interactions%beta_pressure_excess%&
-            get(contacts)
+            get(contacts) - d_energy_d_volume / this%environment%temperature%get()
+
+        call this%environment%periodic_box%set(box_size)
+        call this%rescale_positions(1._DP / box_size_ratio)
+        call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells)
     end subroutine Abstract_try
 
     subroutine Abstract_set_delta_energy(this, overlap, delta_energy, energies)
@@ -103,10 +119,10 @@ contains
         real(DP), intent(out) :: delta_energy
         type(Concrete_Energies), intent(in) :: energies
 
-        type(Concrete_Energies) :: deltas
-        type(Concrete_Energies) :: new_energies
+        type(Concrete_Energies) :: deltas, new_energies
 
         call observables_energies_create(deltas, size(this%components))
+        call observables_energies_create(new_energies, size(this%components))
         call visit_walls(overlap, new_energies%walls_energies, this%components, this%&
             short_interactions)
         if (overlap) return
@@ -118,6 +134,7 @@ contains
         call visit_field(new_energies%field_energies, this%environment%external_field, this%&
             components)
         deltas%field_energies = new_energies%field_energies - energies%field_energies
+        !dipolar interactions
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             triangle_observables_sum(deltas%short_energies)

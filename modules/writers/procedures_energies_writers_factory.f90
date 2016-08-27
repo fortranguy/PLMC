@@ -19,23 +19,27 @@ public :: create, destroy
 
 contains
 
-    subroutine create(energies, external_field, wall_pairs, components, short_pairs)
+    subroutine create(energies, external_field, wall_pairs, components, short_pairs, visit_energies)
         type(Concrete_Energies_Writers), intent(out) :: energies
         class(Abstract_External_Field), intent(in) :: external_field
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
+        logical, intent(in) :: visit_energies
 
         logical, dimension(size(components)) :: are_dipolar
 
-        call line_writer_create(energies%walls_energies, wall_pairs, "walls_energies.out")
+        call line_writer_create(energies%walls_energies, wall_pairs, visit_energies, &
+            "walls_energies.out")
         call line_writer_create(energies%field_energies, external_field, components, &
-            "field_energies.out")
-        call triangle_writer_create(energies%short_energies, short_pairs, "short_energies.out")
+            visit_energies, "field_energies.out")
+        call triangle_writer_create(energies%short_energies, short_pairs, visit_energies, &
+            "short_energies.out")
         call set_are_dipolar(are_dipolar, components)
-        call triangle_writer_create(energies%dipolar_energies, are_dipolar, "dipolar_energies.out")
-        call real_writer_create(energies%dipolar_mixture_energy, any(are_dipolar), &
-            "dipolar_mixture_energy.out")
+        call triangle_writer_create(energies%dipolar_energies, are_dipolar, visit_energies, &
+            "dipolar_energies.out")
+        call real_writer_create(energies%dipolar_mixture_energy, any(are_dipolar) .and. &
+            visit_energies, "dipolar_mixture_energy.out")
     end subroutine create
 
     subroutine destroy(energies)

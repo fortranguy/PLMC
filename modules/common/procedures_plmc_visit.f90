@@ -19,6 +19,7 @@ use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use procedures_observables_factory_micro, only: create_triangle_nodes, destroy_triangle_nodes
 use procedures_triangle_observables, only: triangle_observables_init, &
     triangle_observables_add
+use procedures_property_inquirers, only: logical_from_json
 
 implicit none
 
@@ -26,7 +27,7 @@ private
 public :: plmc_visit_set, plmc_visit, visit_walls, visit_short, visit_field, visit_dipolar
 
 interface plmc_visit_set
-    module procedure :: set_visit
+    module procedure :: set_visit_energies
 end interface plmc_visit_set
 
 interface plmc_visit
@@ -41,18 +42,13 @@ end interface visit_short
 
 contains
 
-    subroutine set_visit(visit, exploring_data, prefix)
-        logical, intent(out) :: visit
+    subroutine set_visit_energies(visit_energies, exploring_data, prefix)
+        logical, intent(out) :: visit_energies
         type(json_file), intent(inout) :: exploring_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"visit"
-        call exploring_data%get(data_field, visit, data_found)
-        call check_data_found(data_field, data_found)
-    end subroutine set_visit
+        visit_energies = logical_from_json(exploring_data, prefix//"visit energies")
+    end subroutine set_visit_energies
 
     subroutine visit_generating(energies, physical_model)
         type(Concrete_Energies), intent(inout) :: energies
@@ -74,14 +70,14 @@ contains
             physical_model%mixture%components, physical_model%dipolar_interactions)
     end subroutine visit_generating
 
-    subroutine visit_exploring(energies, physical_model, visit)
+    subroutine visit_exploring(energies, physical_model, visit_energies)
         type(Concrete_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
-        logical, intent(in) :: visit
+        logical, intent(in) :: visit_energies
 
         logical :: overlap
 
-        if (.not.visit) return
+        if (.not.visit_energies) return
         call visit_walls(overlap, energies%walls_energies, physical_model%mixture%components, &
             physical_model%short_interactions)
         if (overlap) call error_exit("procedures_plmc_visit: visit_exploring: visit_walls: "&

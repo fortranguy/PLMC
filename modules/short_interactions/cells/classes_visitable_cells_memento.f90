@@ -9,17 +9,18 @@ implicit none
 
 private
 
+    !> @bug [[Abstract_save]] must be nopass: gfortran bug?
     type, abstract, public :: Abstract_Visitable_Cells_Memento
     contains
-        procedure(Abstract_save), deferred, nopass :: save
+        procedure(Abstract_save), deferred :: save
         procedure(Abstract_restore), deferred, nopass :: restore
-        procedure, nopass :: test => Abstract_test
     end type Abstract_Visitable_Cells_Memento
 
     abstract interface
 
-        subroutine Abstract_save(visitable_cells_target, visitable_cells_source)
-        import :: Abstract_Visitable_Cells
+        subroutine Abstract_save(this, visitable_cells_target, visitable_cells_source)
+        import :: Abstract_Visitable_Cells, Abstract_Visitable_Cells_Memento
+            class(Abstract_Visitable_Cells_Memento), intent(in) :: this
             class(Abstract_Visitable_Cells), allocatable, intent(out) :: &
                 visitable_cells_target(:, :)
             class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
@@ -39,41 +40,33 @@ private
 
     type, extends(Abstract_Visitable_Cells_Memento), public :: Concrete_Visitable_Lists_Memento
     contains
-        procedure, nopass :: save => Lists_save
+        procedure :: save => Lists_save
         procedure, nopass :: restore => Lists_restore
     end type Concrete_Visitable_Lists_Memento
 
     type, extends(Abstract_Visitable_Cells_Memento), public :: Concrete_Visitable_Arrays_Memento
     contains
-        procedure, nopass :: save => Arrays_save
+        procedure :: save => Arrays_save
         procedure, nopass :: restore => Arrays_restore
     end type Concrete_Visitable_Arrays_Memento
 
     type, extends(Abstract_Visitable_Cells_Memento), public :: Null_Visitable_Cells_Memento
     contains
-        procedure, nopass :: save => Null_save
+        procedure :: save => Null_save
         procedure, nopass :: restore => Null_restore
     end type Null_Visitable_Cells_Memento
 
 contains
 
-    subroutine Abstract_test()
-        write(*, *) "Abstract_Visitable_Cells_Memento: test"
-    end subroutine Abstract_test
-
 !implementation Concrete_Visitable_Lists_Memento
 
-    subroutine Lists_save(visitable_cells_target, visitable_cells_source)
+    subroutine Lists_save(this, visitable_cells_target, visitable_cells_source)
+        class(Concrete_Visitable_Lists_Memento), intent(in) :: this
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells_target(:, :)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
-        !stop "list"
-        write(*, *) "save: visitable_cells_source <", size(visitable_cells_source, 1), &
-            size(visitable_cells_source, 2)
         allocate(Null_Visitable_Cells :: visitable_cells_target(size(visitable_cells_source, 1), &
             size(visitable_cells_source, 2)))
-        write(*, *) "save: visitable_cells_source >", size(visitable_cells_source, 1), &
-            size(visitable_cells_source, 2)
     end subroutine Lists_save
 
     !> @note Instead of copying linked-lists (i.e. array of [[Abstract_Visitable_List]]),
@@ -87,9 +80,6 @@ contains
 
         integer :: i_component, j_component
         integer :: i_pair, j_pair
-
-        write(*, *) "restore: visitable_cells_target", size(visitable_cells_target, 1), &
-            size(visitable_cells_target, 2)
 
         do j_component = 1, size(visitable_cells_source, 2)
             do i_component = 1, size(visitable_cells_source, 1)
@@ -107,11 +97,11 @@ contains
 
 !implementation Concrete_Visitable_Arrays_Memento
 
-    subroutine Arrays_save(visitable_cells_target, visitable_cells_source)
+    subroutine Arrays_save(this, visitable_cells_target, visitable_cells_source)
+        class(Concrete_Visitable_Arrays_Memento), intent(in) :: this
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells_target(:, :)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
-        write(*, *) "array"
         allocate(visitable_cells_target, source=visitable_cells_source)
     end subroutine Arrays_save
 
@@ -149,11 +139,11 @@ contains
 
 !implementation Null_Visitable_Cells_Memento
 
-    subroutine Null_save(visitable_cells_target, visitable_cells_source)
+    subroutine Null_save(this, visitable_cells_target, visitable_cells_source)
+        class(Null_Visitable_Cells_Memento), intent(in) :: this
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells_target(:, :)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
-        write(*, *) "null"
     end subroutine Null_save
 
     subroutine Null_restore(visitable_cells_target, neighbour_cells, only_resized_triangle, &

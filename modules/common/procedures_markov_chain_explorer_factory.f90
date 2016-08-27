@@ -2,6 +2,7 @@ module procedures_markov_chain_explorer_factory
 
 use data_input_prefixes, only: particle_insertion_prefix, volume_change_prefix
 use json_module, only: json_file
+use procedures_errors, only: warning_continue
 use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
@@ -31,9 +32,10 @@ public :: create, destroy
 
 contains
 
-    subroutine create(markov_chain_explorer, physical_model, exploring_data)
+    subroutine create(markov_chain_explorer, physical_model, visit_energies, exploring_data)
         type(Markov_Chain_Explorer_Wrapper), intent(out) :: markov_chain_explorer
         type(Physical_Model_Wrapper), intent(in) :: physical_model
+        logical, intent(in) :: visit_energies
         type(json_file), intent(inout) :: exploring_data
 
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
@@ -52,6 +54,10 @@ contains
             measure_maximum_box_compression)
         call maximum_box_compression_destroy(maximum_box_compression)
         measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
+        if (.not.visit_energies .and. measure_pressure_excess) then
+            call warning_continue("procedures_markov_chain_explorer_factory: create: "//&
+                "measure_pressure_excess needs visit_energies.")
+        end if
         call changed_box_size_ratio_create(changed_box_size_ratio, physical_model%environment%&
             periodic_box, measure_pressure_excess, exploring_data, volume_change_prefix)
         call volume_change_method_create(markov_chain_explorer%volume_change_method, &

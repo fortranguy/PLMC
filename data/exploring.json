@@ -1,10 +1,13 @@
 {
     "Check": {
-        "visit": true
+        "visit energies": true
     },
     "Volume Change": {
         "measure maximum compression": true,
         "measure pressure": true,
+        "Small Change": {
+            "initial delta": 0.01
+        },
         "Dirac Distribution Plus": {
             "name": "rectangular",
             "delta distance": 0.01

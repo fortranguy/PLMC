@@ -21,10 +21,8 @@ contains
         if (needed) then
             if (list_is_linked_list(list_mold)) then
                 allocate(Concrete_Visitable_Lists_Memento :: cells_memento)
-                write(*, *) "Concrete_Visitable_Lists_Memento"
             else if (list_is_array(list_mold)) then
                 allocate(Concrete_Visitable_Arrays_Memento :: cells_memento)
-                write(*, *) "Concrete_Visitable_Arrays_Memento"
             else
                 call error_exit("procedures_visitable_cells_memento_factory: create: "//&
                     "list_mold type is unknown")

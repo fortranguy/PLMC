@@ -101,11 +101,7 @@ contains
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
 
         observables%volume_change_counter%num_hits = observables%volume_change_counter%num_hits + 1
-        write(*, *) "Short: visitable_cells: <", size(this%short_interactions%visitable_cells, 1), &
-            size(this%short_interactions%visitable_cells, 2)
         call this%save_cells(neighbour_cells, visitable_cells)
-        write(*, *) "Short: visitable_cells: >", size(this%short_interactions%visitable_cells, 1), &
-            size(this%short_interactions%visitable_cells, 2)
         box_size_ratio = this%changed_box_size%get_ratio()
         box_size = this%environment%periodic_box%get_size()
         call this%environment%periodic_box%set(box_size * box_size_ratio)
@@ -211,12 +207,8 @@ contains
                     short_interactions%neighbour_cells(j_component)%line(i_component)%cells)
             end do
         end do
-        write(*, *) "save visitable_cells <"
-        call this%short_interactions%visitable_cells_memento%test()
-        stop "test"
         call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
             short_interactions%visitable_cells)
-        write(*, *) "save visitable_cells >"
     end subroutine Abstract_save_cells
 
     subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)

@@ -98,11 +98,12 @@ contains
     end subroutine destroy_generating_readers_writers
 
     subroutine create_exploring_readers_writers(readers, writers, physical_model, &
-        markov_chain_explorer)
+        markov_chain_explorer, visit_energies)
         type(Readers_Wrapper), intent(out) :: readers
         type(Exploring_Writers_Wrapper), intent(out) :: writers
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Markov_Chain_Explorer_Wrapper), intent(in) :: markov_chain_explorer
+        logical, intent(in) :: visit_energies
 
         call readers_create(readers, physical_model%environment, physical_model%mixture%&
             components)
@@ -110,7 +111,7 @@ contains
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
             short_interactions%components_pairs, markov_chain_explorer%&
             maximum_box_compression_explorer, markov_chain_explorer%volume_change_method, &
-            markov_chain_explorer%particle_insertion_method)
+            markov_chain_explorer%particle_insertion_method, visit_energies)
     end subroutine create_exploring_readers_writers
 
     subroutine destroy_exploring_readers_writers(readers, writers)

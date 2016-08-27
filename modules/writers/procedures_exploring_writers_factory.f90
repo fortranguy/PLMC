@@ -24,7 +24,8 @@ public :: create, destroy
 contains
 
     subroutine create(writers, environment, wall_pairs, components, short_pairs, &
-        maximum_box_compression_explorer, volume_change_method, particle_insertion_method)
+        maximum_box_compression_explorer, volume_change_method, particle_insertion_method, &
+        visit_energies)
         type(Exploring_Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
@@ -34,6 +35,7 @@ contains
             maximum_box_compression_explorer
         class(Abstract_Volume_Change_Method), intent(in) :: volume_change_method
         class(Abstract_Particle_Insertion_Method), intent(in) :: particle_insertion_method
+        logical, intent(in) :: visit_energies
 
         logical, dimension(size(components)) :: selector
 
@@ -43,7 +45,7 @@ contains
         call real_writer_create(writers%beta_pressure_excess, &
             measure_pressure(volume_change_method), "beta_pressure_excess.out")
         call energies_writers_create(writers%energies, environment%external_field, wall_pairs, &
-            components, short_pairs)
+            components, short_pairs, visit_energies)
         selector = measure_chemical_potentials(particle_insertion_method)
         call line_writer_create(writers%insertion_successes, selector, "insertion_successes.out")
         call line_writer_create(writers%inv_pow_activities, selector, "inv_pow_activities.out")
