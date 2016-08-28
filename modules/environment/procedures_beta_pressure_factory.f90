@@ -23,10 +23,10 @@ contains
         real(DP) :: density, excess
 
         if (box_size_can_change) then
-            data_field = prefix//"Pressure.density"
+            data_field = prefix//"Beta Pressure.density"
             call generating_data%get(data_field, density, data_found)
             call check_data_found(data_field, data_found)
-            data_field = prefix//"Pressure.excess"
+            data_field = prefix//"Beta Pressure.excess"
             call generating_data%get(data_field, excess, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Beta_Pressure :: beta_pressure)

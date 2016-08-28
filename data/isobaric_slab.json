@@ -2,7 +2,7 @@
     "Environment": {
         "Box": {
             "periodicity": "XYZ",
-            "initial size": [12.0, 12.0, 12.0],
+            "initial size": [12.0, 12.0, 18.0],
             "size can change": true
         },
         "Beta Pressure": {
@@ -13,7 +13,12 @@
             "temperature": 2.0
         },
         "External Field": {
-            "apply": false
+            "apply": true,
+            "name": "constant",
+            "vector": [0.0, 0.0, 1.0],
+            "Parallelepiped Domain": {
+                "name": "walled"
+            }
         },
         "Permittivity": {
             "use": false,
@@ -24,7 +29,10 @@
             "numbers": [8, 8, 8]
         },
         "Walls": {
-            "use": false
+            "use": true,
+            "name": "flat",
+            "gap between centers": 14.0,
+            "minimum distance": 0.8
         }
     },
     "Mixture": {
@@ -65,21 +73,42 @@
             "tabulated": false,
             "epsilon": 1.0,
             "sigma": 1.0,
-            "maximum distance": 2.5
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
         },
         "Component 2": {
             "name": "LJ",
             "tabulated": false,
             "epsilon": 0.5,
             "sigma": 1.0,
-            "maximum distance": 2.5
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
         },
         "Component 3": {
             "name": "LJ",
             "tabulated": false,
             "epsilon": 0.25,
             "sigma": 1.0,
-            "maximum distance": 2.5
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
         },
         "Inter 12": {
             "name": "LJ",
