@@ -99,11 +99,11 @@ contains
 
         call visit_short(overlap, contacts, this%components, this%short_interactions)
         if (overlap) call error_exit("Abstract_Volume_Change_Method: try: visit_short: overlap")
+        box_size = this%environment%periodic_box%get_size()
         beta_pressure_excess_sum = 0._DP
         do i_change = 1, this%num_changes
             call this%save_cells(neighbour_cells, visitable_cells)
             box_size_ratio = this%changed_box_size_ratio%get()
-            box_size = this%environment%periodic_box%get_size()
             call this%environment%periodic_box%set(box_size * box_size_ratio)
             call this%rescale_positions(box_size_ratio)
             call box_size_change_reset_cells(this%short_interactions%neighbour_cells, &
