@@ -5,6 +5,7 @@
     "Volume Change": {
         "measure maximum compression": true,
         "measure pressure": true,
+        "number": 1,
         "Small Change": {
             "initial delta": 0.01
         },

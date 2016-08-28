@@ -61,7 +61,8 @@ contains
         call changed_box_size_ratio_create(changed_box_size_ratio, physical_model%environment%&
             periodic_box, measure_pressure_excess, exploring_data, volume_change_prefix)
         call volume_change_method_create(markov_chain_explorer%volume_change_method, &
-            physical_model, changed_box_size_ratio, measure_pressure_excess)
+            physical_model, changed_box_size_ratio, measure_pressure_excess, exploring_data, &
+            volume_change_prefix)
         call changed_box_size_ratio_destroy(changed_box_size_ratio)
         measure_inv_pow_activities = measure_chemical_potentials(exploring_data, &
             particle_insertion_prefix)
