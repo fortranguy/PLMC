@@ -179,10 +179,10 @@ contains
         end do
     end subroutine Abstract_visit_contacts
 
-    subroutine Abstract_visit_min_distance(this, can_overlap, overlap, ratio, particle, &
-        min_distance, max_distance, visit_condition, i_exclude)
+    subroutine Abstract_visit_min_distance(this, overlap, ratio, particle, min_distance, &
+        max_distance, visit_condition, i_exclude)
         class(Abstract_Visitable_List), intent(in) :: this
-        logical, intent(out) :: can_overlap, overlap
+        logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance, max_distance
@@ -191,9 +191,9 @@ contains
 
         real(DP) :: ratio_i
         real(DP) :: vector(num_dimensions)
+        logical :: can_overlap
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
-        can_overlap = .false.
         overlap = .false.
         ratio = max_distance / min_distance
         current => this%beginning%next
@@ -343,10 +343,10 @@ contains
         end do
     end subroutine Array_visit_contacts
 
-    subroutine Array_visit_min_distance(this, can_overlap, overlap, ratio, particle, min_distance, &
-        max_distance, visit_condition, i_exclude)
+    subroutine Array_visit_min_distance(this, overlap, ratio, particle, min_distance, max_distance,&
+        visit_condition, i_exclude)
         class(Concrete_Visitable_Array), intent(in) :: this
-        logical, intent(out) :: can_overlap, overlap
+        logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance, max_distance
@@ -355,9 +355,9 @@ contains
 
         real(DP) :: ratio_i
         real(DP) :: vector(num_dimensions)
+        logical :: can_overlap
         integer :: i_node
 
-        can_overlap = .false.
         overlap = .false.
         ratio = max_distance / min_distance
         do i_node = 1, this%num_nodes
@@ -441,16 +441,16 @@ contains
         contacts = 0._DP
     end subroutine Null_visit_contacts
 
-    subroutine Null_visit_min_distance(this, can_overlap, overlap, ratio, particle, min_distance, &
+    subroutine Null_visit_min_distance(this, overlap, ratio, particle, min_distance, &
         max_distance, visit_condition, i_exclude)
         class(Null_Visitable_List), intent(in) :: this
-        logical, intent(out) :: can_overlap, overlap
+        logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance, max_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
-        can_overlap = .false.; overlap = .false.
+        overlap = .false.
         ratio = 0._DP
     end subroutine Null_visit_min_distance
 

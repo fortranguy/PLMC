@@ -30,70 +30,80 @@
     "Mixture": {
         "number of components": 3,
         "Component 1": {
-            "initial number": 20,
-            "minimum distance": 1.0,
+            "initial number": 200,
+            "minimum distance": 0.8,
             "is dipolar": false,
             "moment norm": 1.0,
             "can exchange": false
         },
         "Component 2": {
-            "initial number": 100,
-            "minimum distance": 1.0,
+            "initial number": 1000,
+            "minimum distance": 0.8,
             "is dipolar": false,
             "can exchange": false
         },
         "Component 3": {
-            "initial number": 30,
-            "minimum distance": 1.0,
+            "initial number": 300,
+            "minimum distance": 0.8,
             "is dipolar": false,
             "moment norm": 0.25,
             "can exchange": false
         },
         "Inter 12": {
-            "minimum distance": 1.0
+            "minimum distance": 0.8
         },
         "Inter 13": {
-            "minimum distance": 1.0
+            "minimum distance": 0.8
         },
         "Inter 23": {
-            "minimum distance": 1.0
+            "minimum distance": 0.8
         }
     },
     "Short Interactions": {
         "Component 1": {
-            "name": "null",
-            "tabulated": false
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
         },
         "Component 2": {
-            "name": "null",
-            "tabulated": false
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 0.5,
+            "sigma": 1.0,
+            "maximum distance": 2.5
         },
         "Component 3": {
-            "name": "null",
-            "tabulated": false
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 0.25,
+            "sigma": 1.0,
+            "maximum distance": 2.5
         },
         "Inter 12": {
-            "name": "null",
-            "tabulated": false
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
         },
         "Inter 13": {
-            "name": "null",
-            "tabulated": false
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
         },
         "Inter 23": {
-            "name": "null",
-            "tabulated": false
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
         },
         "Cells": {
             "data structure": "list"
-        }
-    },
-    "Dipolar Interactions": {
-        "alpha times box edge": 7.0,
-        "Real": {
-            "tabulated": true,
-            "delta distance": 1.0e-4,
-            "max distance / box edge": 0.5
         }
     },
     "Random Number Generator": {

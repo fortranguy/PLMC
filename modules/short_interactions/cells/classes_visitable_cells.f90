@@ -223,10 +223,10 @@ contains
         end do
     end subroutine Abstract_visit_contacts
 
-    subroutine Abstract_visit_min_distance(this, can_overlap, overlap, ratio, particle, &
-        visit_condition, i_exclude)
+    subroutine Abstract_visit_min_distance(this, overlap, ratio, particle, visit_condition, &
+        i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
-        logical, intent(out) :: can_overlap, overlap
+        logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
         type(Concrete_Temporary_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
@@ -250,9 +250,8 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit(can_overlap, overlap, ratio_i, particle, min_distance, max_distance, &
+                visit(overlap, ratio_i, particle, min_distance, max_distance, &
                     visit_condition, i_exclude)
-            if (.not. can_overlap) cycle
             if (overlap) return
             if (ratio_i < ratio) ratio = ratio_i
         end do
@@ -356,15 +355,14 @@ contains
         contacts = 0._DP
     end subroutine Null_visit_contacts
 
-    subroutine Null_visit_min_distance(this, can_overlap, overlap, ratio, particle, &
-        visit_condition, i_exclude)
+    subroutine Null_visit_min_distance(this, overlap, ratio, particle, visit_condition, i_exclude)
         class(Null_Visitable_Cells), intent(in) :: this
-        logical, intent(out) :: can_overlap, overlap
+        logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
         type(Concrete_Temporary_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
-        can_overlap = .false.; overlap = .false.
+        overlap = .false.
         ratio = 0._DP
     end subroutine Null_visit_min_distance
 

@@ -167,18 +167,18 @@ contains
         real(DP), intent(in) :: min_distance
         real(DP), intent(in) :: vector(:)
 
-        real(DP) :: distance_12
+        real(DP) :: distance
 
-        can_overlap = vector(3) < min_distance
+        can_overlap = abs(vector(3)) < min_distance
         overlap = .false.
         ratio = 0._DP
         if (.not. can_overlap) return
-        distance_12 = norm2(vector(1:2))
-        if (distance_12 < min_distance) then
+        distance = norm2(vector)
+        if (distance < min_distance) then
             overlap = .true.
             return
         end if
-        ratio = distance_12 / min_distance
+        ratio = distance / min_distance
     end subroutine XY_meet_min_distance
 
 !end implementation XY_Hard_Contact
