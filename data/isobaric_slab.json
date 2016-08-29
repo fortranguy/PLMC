@@ -141,14 +141,15 @@
     "Changes": {
         "number of tuning steps": 1000,
         "Box Size": {
+            "number": 10,
+            "Small Change": {
+                "initial delta": 0.01
+            },
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
             "wanted success ratio": 0.75,
-            "tolerance": 0.01,
-            "Small Change": {
-                "initial delta": 0.01
-            }
+            "tolerance": 0.01
         },
         "Components": {
             "increase factor": 1.05,

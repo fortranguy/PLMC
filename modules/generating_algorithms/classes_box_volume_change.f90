@@ -86,7 +86,7 @@ contains
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Box_Volume_Change), intent(in) :: this
 
-        num_choices = 1
+        num_choices = this%changed_box_size%get_num()
     end function Abstract_get_num_choices
 
     subroutine Abstract_try(this, observables)

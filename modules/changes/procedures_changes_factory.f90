@@ -61,9 +61,8 @@ contains
             generating_data, prefix//"Box Size.")
         call changed_box_size_ratio_create(changed_box_size_ratio, environment%periodic_box, &
             volume_can_change, generating_data, prefix//"Box Size.")
-        call changed_box_size_create(changes%changed_box_size, environment%periodic_box, &
-            changed_box_size_ratio, box_size_tuning_parameters, volume_can_change, generating_data,&
-            prefix//"Box Size.")
+        call changed_box_size_create(changes%changed_box_size, changed_box_size_ratio, &
+            box_size_tuning_parameters, volume_can_change, generating_data, prefix//"Box Size.")
         call changed_box_size_ratio_destroy(changed_box_size_ratio)
         call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, volume_can_change, &
             generating_data, prefix//"Box Size.")

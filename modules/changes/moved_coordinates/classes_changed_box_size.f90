@@ -2,7 +2,7 @@ module classes_changed_box_size
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use procedures_checks, only: check_increase_factor
+use procedures_checks, only: check_positive, check_increase_factor
 use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters, set_increase_factor
@@ -14,15 +14,17 @@ private
     type, extends(Abstract_Moved_Coordinates), abstract, public :: Abstract_Changed_Box_Size
     private
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: ratio
+        integer :: num_changes = 0
         type(Concrete_Move_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor = 1._DP
         logical :: max_factor_reached = .false.
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: get_num => Abstract_get_num
+        procedure :: get_ratio => Abstract_get_ratio
         procedure :: increase_delta => Abstract_increase_delta
         procedure :: decrease_delta => Abstract_decrease_delta
-        procedure :: get_ratio => Abstract_get_ratio
     end type Abstract_Changed_Box_Size
 
     type, extends(Abstract_Changed_Box_Size), public :: Concrete_Changed_Box_Size
@@ -32,21 +34,26 @@ private
     type, extends(Abstract_Changed_Box_Size), public :: Null_Changed_Box_Size
     contains
         procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get_num => Null_get_num
+        procedure :: get_ratio => Null_get_ratio
         procedure :: increase_delta => Null_increase_delta
         procedure :: decrease_delta => Null_decrease_delta
-        procedure :: get_ratio => Null_get_ratio
     end type Null_Changed_Box_Size
 
 contains
 
 !implementation Abstract_Changed_Box_Size
 
-    subroutine Abstract_construct(this, ratio, tuning_parameters)
+    subroutine Abstract_construct(this, ratio, num_changes, tuning_parameters)
         class(Abstract_Changed_Box_Size), intent(out) :: this
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
+        integer, intent(in) :: num_changes
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
 
         allocate(this%ratio, source=ratio)
+        call check_positive("Abstract_Changed_Box_Size: construct", "num_changes", num_changes)
+        this%num_changes = num_changes
         call check_increase_factor("Abstract_Changed_Box_Size: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
@@ -61,6 +68,19 @@ contains
 
         if (allocated(this%ratio)) deallocate(this%ratio)
     end subroutine Abstract_destroy
+
+    pure integer function Abstract_get_num(this) result(num_changes)
+        class(Abstract_Changed_Box_Size), intent(in) :: this
+
+        num_changes = this%num_changes
+    end function Abstract_get_num
+
+    function Abstract_get_ratio(this) result(ratio)
+        real(DP) :: ratio(num_dimensions)
+        class(Abstract_Changed_Box_Size), intent(in) :: this
+
+        ratio = this%ratio%get()
+    end function Abstract_get_ratio
 
     subroutine Abstract_increase_delta(this)
         class(Abstract_Changed_Box_Size), intent(inout) :: this
@@ -77,22 +97,31 @@ contains
         call this%ratio%set(this%ratio%get_delta() / this%current_increase_factor)
     end subroutine Abstract_decrease_delta
 
-    function Abstract_get_ratio(this) result(ratio)
-        class(Abstract_Changed_Box_Size), intent(in) :: this
-        real(DP) :: ratio(num_dimensions)
-
-        ratio = this%ratio%get()
-    end function Abstract_get_ratio
-
 !end implementation Abstract_Changed_Box_Size
 
 !implementation Null_Changed_Box_Size
 
-    subroutine Null_construct(this, ratio, tuning_parameters)
+    subroutine Null_construct(this, ratio, num_changes, tuning_parameters)
         class(Null_Changed_Box_Size), intent(out) :: this
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
+        integer, intent(in) :: num_changes
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_construct
+
+    subroutine Null_destroy(this)
+        class(Null_Changed_Box_Size), intent(inout) :: this
+    end subroutine Null_destroy
+
+    pure integer function Null_get_num(this) result(num_changes)
+        class(Null_Changed_Box_Size), intent(in) :: this
+        num_changes = 0
+    end function Null_get_num
+
+    function Null_get_ratio(this) result(ratio)
+        real(DP) :: ratio(num_dimensions)
+        class(Null_Changed_Box_Size), intent(in) :: this
+        ratio = 1._DP
+    end function Null_get_ratio
 
     subroutine Null_increase_delta(this)
         class(Null_Changed_Box_Size), intent(inout) :: this
@@ -101,12 +130,6 @@ contains
     subroutine Null_decrease_delta(this)
         class(Null_Changed_Box_Size), intent(inout) :: this
     end subroutine Null_decrease_delta
-
-    function Null_get_ratio(this) result(ratio)
-        real(DP) :: ratio(num_dimensions)
-        class(Null_Changed_Box_Size), intent(in) :: this
-        ratio = 1._DP
-    end function Null_get_ratio
 
 !end implementation Null_Changed_Box_Size
 
