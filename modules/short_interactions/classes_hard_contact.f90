@@ -154,7 +154,6 @@ contains
             overlap = .true.
             return
         end if
-        if (abs(vector(3)) >= min_distance) return
         contact = (min_distance**2 - vector(3)**2) / min_distance * this%dirac_plus%&
             get(distance - min_distance)
     end subroutine XY_meet_contact
