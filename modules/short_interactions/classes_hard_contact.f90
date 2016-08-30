@@ -16,7 +16,7 @@ private
         procedure :: get_width => Abstract_get_width
         generic :: meet => meet_contact, meet_min_distance
         procedure(Abstract_meet_contact), deferred, private :: meet_contact
-        procedure(Abstract_meet_min_distance), deferred, private :: meet_min_distance
+        procedure(Abstract_meet_min_distance), deferred, nopass, private :: meet_min_distance
     end type Abstract_Hard_Contact
 
     abstract interface
@@ -30,10 +30,9 @@ private
             real(DP), intent(in) :: vector(:) !! \( \vec{r} \)
         end subroutine Abstract_meet_contact
 
-        pure subroutine Abstract_meet_min_distance(this, can_overlap, overlap, ratio, min_distance,&
+        pure subroutine Abstract_meet_min_distance(can_overlap, overlap, ratio, min_distance,&
             vector)
-        import :: DP, Abstract_Hard_Contact
-            class(Abstract_Hard_Contact), intent(in) :: this
+        import :: DP
             logical, intent(out) :: can_overlap !! if the volume changes
             logical, intent(out) :: overlap
             real(DP), intent(out) :: ratio
@@ -46,13 +45,13 @@ private
     type, extends(Abstract_Hard_Contact), public :: XYZ_Hard_Contact
     contains
         procedure, private :: meet_contact => XYZ_meet_contact
-        procedure, private :: meet_min_distance => XYZ_meet_min_distance
+        procedure, nopass, private :: meet_min_distance => XYZ_meet_min_distance
     end type XYZ_Hard_Contact
 
     type, extends(Abstract_Hard_Contact), public :: XY_Hard_Contact
     contains
         procedure, private :: meet_contact => XY_meet_contact
-        procedure, private :: meet_min_distance => XY_meet_min_distance
+        procedure, nopass, private :: meet_min_distance => XY_meet_min_distance
     end type XY_Hard_Contact
 
     type, extends(Abstract_Hard_Contact), public :: Null_Hard_Contact
@@ -61,7 +60,7 @@ private
         procedure :: destroy => Null_destroy
         procedure :: get_width => Null_get_width
         procedure, private :: meet_contact => Null_meet_contact
-        procedure, private :: meet_min_distance => Null_meet_min_distance
+        procedure, nopass, private :: meet_min_distance => Null_meet_min_distance
     end type Null_Hard_Contact
 
 contains
@@ -113,8 +112,7 @@ contains
         contact = min_distance * this%dirac_plus%get(distance - min_distance)
     end subroutine XYZ_meet_contact
 
-    pure subroutine XYZ_meet_min_distance(this, can_overlap, overlap, ratio, min_distance, vector)
-        class(XYZ_Hard_Contact), intent(in) :: this
+    pure subroutine XYZ_meet_min_distance(can_overlap, overlap, ratio, min_distance, vector)
         logical, intent(out) :: can_overlap, overlap
         real(DP), intent(out) :: ratio !! (\ \frac{r}{\sigma} \)
         real(DP), intent(in) :: min_distance
@@ -156,12 +154,12 @@ contains
             overlap = .true.
             return
         end if
+        if (abs(vector(3)) >= min_distance) return
         contact = (min_distance**2 - vector(3)**2) / min_distance * this%dirac_plus%&
             get(distance - min_distance)
     end subroutine XY_meet_contact
 
-    pure subroutine XY_meet_min_distance(this, can_overlap, overlap, ratio, min_distance, vector)
-        class(XY_Hard_Contact), intent(in) :: this
+    pure subroutine XY_meet_min_distance(can_overlap, overlap, ratio, min_distance, vector)
         logical, intent(out) :: can_overlap, overlap
         real(DP), intent(out) :: ratio !! (\ \frac{r_{1:2}}{\sigma} \)
         real(DP), intent(in) :: min_distance
@@ -209,8 +207,7 @@ contains
         contact = 0._DP
     end subroutine Null_meet_contact
 
-    pure subroutine Null_meet_min_distance(this, can_overlap, overlap, ratio, min_distance, vector)
-        class(Null_Hard_Contact), intent(in) :: this
+    pure subroutine Null_meet_min_distance(can_overlap, overlap, ratio, min_distance, vector)
         logical, intent(out) :: can_overlap, overlap
         real(DP), intent(out) :: ratio
         real(DP), intent(in) :: min_distance

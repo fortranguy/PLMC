@@ -151,7 +151,7 @@ contains
 
         overlap = .false.
         energy = 0._DP
-        if (distance < this%domain%min) then
+        if (distance <= this%domain%min) then
             overlap = .true.
         else if (distance < this%domain%max) then
             i_distance = int(distance/this%domain%delta)
@@ -205,7 +205,7 @@ contains
 
         overlap = .false.
         energy = 0._DP
-        if (distance < this%domain%min) then
+        if (distance <= this%domain%min) then
             overlap = .true.
         else if (distance < this%domain%max) then
             energy = this%expression%get(distance) - this%energy_domain_max

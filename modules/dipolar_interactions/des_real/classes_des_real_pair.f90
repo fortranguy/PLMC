@@ -100,6 +100,8 @@ contains
     !>               (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij})
     !>               \right]
     !> \]
+    !> cf. [[procedures_dipolar_interactions_micro:des_real_B]] &
+    !> [[procedures_dipolar_interactions_micro:des_real_C]]
     pure real(DP) function Abstract_meet_energy(this, vector_ij, moment_i, moment_j) result(energy)
         class(Abstract_DES_Real_Pair), intent(in) :: this
         real(DP), dimension(:), intent(in) :: vector_ij
