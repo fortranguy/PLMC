@@ -55,21 +55,23 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        real(DP), allocatable :: block_size(:)
-        real(DP) ::block_radius
         character(len=:), allocatable :: data_field
         logical :: data_found
 
         select type (floor_penetration)
             type is (Flat_Floor_Penetration)
             type is (Centered_Block_Penetration)
-                data_field = prefix//"Walls.size"
-                call generating_data%get(data_field, block_size, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"Walls.radius"
-                call generating_data%get(data_field, block_radius, data_found)
-                call check_data_found(data_field, data_found)
-                call floor_penetration%set(block_size, block_radius)
+                block
+                    real(DP), allocatable :: block_size(:)
+                    real(DP) ::block_radius
+                    data_field = prefix//"Walls.size"
+                    call generating_data%get(data_field, block_size, data_found)
+                    call check_data_found(data_field, data_found)
+                    data_field = prefix//"Walls.radius"
+                    call generating_data%get(data_field, block_radius, data_found)
+                    call check_data_found(data_field, data_found)
+                    call floor_penetration%set(block_size, block_radius)
+                end block
             type is (Null_Floor_Penetration)
             class default
                 call error_exit("floor_penetration type unknown.")

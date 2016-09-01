@@ -4,3 +4,4 @@
 - BoxVolumeChange -> BoxSizeChange?
 - ExploringAlgorithms: no Abstract?
 - MaximumBoxCompression: avoid r_min /= min_distance confusion
+- MaximumBoxCompression and VolumeChangeMethod in one pass?
