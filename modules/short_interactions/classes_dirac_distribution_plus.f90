@@ -117,8 +117,12 @@ contains
         class(Gaussian_Dirac_Distribution_Plus), intent(in) :: this
         real(DP), intent(in) :: distance
 
-        distribution = 1._DP / this%std_dev/sqrt(2._DP*PI) * &
-            exp(-(distance - this%max_distance/2._DP)**2 / 2._DP/this%std_dev**2)
+        if (distance <= this%max_distance) then
+            distribution = 1._DP / this%std_dev/sqrt(2._DP*PI) * &
+                exp(-(distance - this%max_distance/2._DP)**2 / 2._DP/this%std_dev**2)
+        else
+            distribution = 0._DP
+        end if
     end function Gaussian_get
 
 !end implementation Gaussian_Dirac_Distribution_Plus

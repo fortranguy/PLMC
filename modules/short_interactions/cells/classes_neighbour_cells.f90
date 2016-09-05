@@ -281,7 +281,7 @@ contains
     subroutine XY_check_nums(this)
         class(XY_PBC_Neighbour_Cells), intent(in) :: this
 
-        if (any(this%nums(1:2) < nums_local_cells(1:2))) then
+        if (any(this%nums(1:2) < nums_local_cells(1:2)) .or. this%nums(3) < 1) then
             call error_exit("XY_PBC_Neighbour_Cells: this%nums is too small.")
         end if
     end subroutine XY_check_nums

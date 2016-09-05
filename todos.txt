@@ -5,3 +5,4 @@
 - ExploringAlgorithms: no Abstract?
 - MaximumBoxCompression: avoid r_min /= min_distance confusion
 - MaximumBoxCompression and VolumeChangeMethod in one pass?
+- HardContact: NeighbourCells size must be increased: drawback
