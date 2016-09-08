@@ -14,11 +14,11 @@ private
 
     abstract interface
 
-        !> \[u : r \mapsto u(r) \]
+        !> \[r \mapsto u(r) \]
         pure real(DP) function Abstract_get(this, distance) result(expression)
         import :: DP, Abstract_Potential_Expression
             class(Abstract_Potential_Expression), intent(in) :: this
-            real(DP), intent(in) :: distance
+            real(DP), intent(in) :: distance !! \( r \)
         end function Abstract_get
 
     end interface
@@ -30,11 +30,21 @@ private
 
     type, extends(Abstract_Potential_Expression), public :: Lennard_Jones_Expression
     private
-        real(DP) :: epsilon = 0._DP, sigma = 0._DP
+        real(DP) :: epsilon = 0._DP
+        real(DP) :: sigma = 0._DP
     contains
         procedure :: set => LJ_set
         procedure :: get => LJ_get
     end type Lennard_Jones_Expression
+
+    type, extends(Abstract_Potential_Expression), public :: Yukawa_Expression
+    private
+        real(DP) :: epsilon = 0._DP
+        real(DP) :: alpha = 0._DP
+    contains
+        procedure :: set => Yukawa_set
+        procedure :: get => Yukawa_get
+    end type Yukawa_Expression
 
 contains
 
@@ -42,7 +52,8 @@ contains
 
     subroutine LJ_set(this, epsilon, sigma)
         class(Lennard_Jones_Expression), intent(inout) :: this
-        real(DP), intent(in) :: epsilon, sigma
+        real(DP), intent(in) :: epsilon !! \( \epsilon \)
+        real(DP), intent(in) :: sigma !! \( \sigma \)
 
         call check_positive("Lennard_Jones_Expression: set", "epsilon", epsilon)
         this%epsilon = epsilon
@@ -50,8 +61,10 @@ contains
         this%sigma =  sigma
     end subroutine LJ_set
 
-    !> \[ u(r) = 4 \epsilon \left[\left(\frac{\sigma}{r}\right)^{12} -
-    !>      \left(\frac{\sigma}{r}\right)^6 \right] \]
+    !> \[
+    !>      r \mapsto 4 \epsilon \left[\left(\frac{\sigma}{r}\right)^{12} -
+    !>          \left(\frac{\sigma}{r}\right)^6 \right]
+    !> \]
     pure real(DP) function LJ_get(this, distance) result(expression)
         class(Lennard_Jones_Expression), intent(in) :: this
         real(DP), intent(in) :: distance
@@ -61,9 +74,31 @@ contains
 
 !end implementation Lennard_Jones_Expression
 
+!implementation Yukawa_Expression
+
+    subroutine Yukawa_set(this, epsilon, alpha)
+        class(Yukawa_Expression), intent(inout) :: this
+        real(DP), intent(in) :: epsilon !! \( \epsilon \)
+        real(DP), intent(in) :: alpha !! \( \alpha \)
+
+        this%epsilon = epsilon
+        call check_positive("Yukawa_Expression: set", "alpha", alpha)
+        this%alpha = alpha
+    end subroutine Yukawa_set
+
+    !> \[ r \mapsto \frac{\epsilon}{r} \exp(-\alpha r) \]
+    pure real(DP) function Yukawa_get(this, distance) result(expression)
+        class(Yukawa_Expression), intent(in) :: this
+        real(DP), intent(in) :: distance
+
+        expression = this%epsilon / distance * exp(-this%alpha * distance)
+    end function Yukawa_get
+
+!end implementation Yukawa_Expression
+
 !implementation Null_Potential_Expression
 
-    !> \[ u(r) = 0 \]
+    !> \[ r \mapto 0 \]
     pure real(DP) function Null_get(this, distance) result(expression)
         class(Null_Potential_Expression), intent(in) :: this
         real(DP), intent(in) :: distance
