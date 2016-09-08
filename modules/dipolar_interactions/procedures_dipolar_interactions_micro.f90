@@ -26,7 +26,7 @@ contains
     end function dipolar_pair_energy
 
     !> \[
-    !>      B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
+    !>      B_\alpha(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]
     pure function des_real_B(alpha, r)
@@ -38,7 +38,7 @@ contains
     end function des_real_B
 
     !> \[
-    !>      C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
+    !>      C_\alpha(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
     !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]

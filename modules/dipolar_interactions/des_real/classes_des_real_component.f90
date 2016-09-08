@@ -22,9 +22,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        generic :: visit => visit_energy, visit_field
-        procedure, private :: visit_energy => Abstract_visit_energy
-        procedure, private :: visit_field => Abstract_visit_field
+        procedure :: visit => Abstract_visit
     end type Abstract_DES_Real_Component
 
     type, extends(Abstract_DES_Real_Component), public :: Concrete_DES_Real_Component
@@ -35,8 +33,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure, private :: visit_energy => Null_visit_energy
-        procedure, private :: visit_field => Null_visit_field
+        procedure :: visit => Null_visit
     end type Null_DES_Real_Component
 
 contains
@@ -65,7 +62,7 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
-    pure subroutine Abstract_visit_energy(this, energy, particle, visit_condition, i_exclude)
+    pure subroutine Abstract_visit(this, energy, particle, visit_condition, i_exclude)
         class(Abstract_DES_Real_Component), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
@@ -78,29 +75,11 @@ contains
         energy = 0._DP
         do j_particle = 1, this%positions%get_num()
             if (.not.visit_condition(j_particle, i_exclude)) cycle
-            vector_ij = this%periodic_box%vector(particle%position, this%positions%&
-                get(j_particle))
+            vector_ij = this%periodic_box%vector(particle%position, this%positions%get(j_particle))
             energy = energy + this%des_real_pair%meet(vector_ij, particle%dipole_moment, &
                 this%dipole_moments%get(j_particle))
         end do
-    end subroutine Abstract_visit_energy
-
-    pure subroutine Abstract_visit_field(this, field, particle, i_exclude)
-        class(Abstract_DES_Real_Component), intent(in) :: this
-        real(DP), intent(out) :: field(num_dimensions)
-        type(Concrete_Temporary_Particle), intent(in) :: particle
-        integer, intent(in) :: i_exclude
-
-        real(DP) :: vector_ij(num_dimensions)
-        integer :: j_particle
-
-        field = 0._DP
-        do j_particle = 1, this%positions%get_num()
-            if (j_particle == i_exclude) cycle
-            vector_ij = this%periodic_box%vector(particle%position, this%positions%get(j_particle))
-            field = field + this%des_real_pair%meet(vector_ij, this%dipole_moments%get(j_particle))
-        end do
-    end subroutine Abstract_visit_field
+    end subroutine Abstract_visit
 
 !end implementation Abstract_DES_Real_Component
 
@@ -118,22 +97,14 @@ contains
         class(Null_DES_Real_Component), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure subroutine Null_visit_energy(this, energy, particle, visit_condition, i_exclude)
+    pure subroutine Null_visit(this, energy, particle, visit_condition, i_exclude)
         class(Null_DES_Real_Component), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         energy = 0._DP
-    end subroutine Null_visit_energy
-
-    pure subroutine Null_visit_field(this, field, particle, i_exclude)
-        class(Null_DES_Real_Component), intent(in) :: this
-        real(DP), intent(out) :: field(num_dimensions)
-        type(Concrete_Temporary_Particle), intent(in) :: particle
-        integer, intent(in) :: i_exclude
-        field = 0._DP
-    end subroutine Null_visit_field
+    end subroutine Null_visit
 
 !end implementation Null_DES_Real_Component
 
