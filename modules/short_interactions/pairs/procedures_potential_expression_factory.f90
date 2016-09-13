@@ -5,7 +5,7 @@ use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use classes_potential_expression, only: Abstract_Potential_Expression, Lennard_Jones_Expression, &
-    Null_Potential_Expression
+    Yukawa_Expression, Null_Potential_Expression
 
 implicit none
 
@@ -43,9 +43,11 @@ contains
                     allocate(Null_Potential_Expression :: expression)
                 case ("LJ")
                     allocate(Lennard_Jones_Expression :: expression)
+                case ("Yukawa")
+                    allocate(Yukawa_Expression :: expression)
                 case default
                     call error_exit(potential_name//" unknown potential_name. "//&
-                        "Choose between: 'null' and LJ.")
+                        "Choose between: 'null', 'LJ' and 'Yukawa'.")
             end select
         else
             allocate(Null_Potential_Expression :: expression)
@@ -71,6 +73,17 @@ contains
                     call generating_data%get(data_field, sigma, data_found)
                     call check_data_found(data_field, data_found)
                     call expression%set(epsilon, sigma)
+                end block
+            type is (Yukawa_Expression)
+                block
+                    real(DP) :: epsilon, alpha
+                    data_field = prefix//"epsilon"
+                    call generating_data%get(data_field, epsilon, data_found)
+                    call check_data_found(data_field, data_found)
+                    data_field = prefix//"alpha"
+                    call generating_data%get(data_field, alpha, data_found)
+                    call check_data_found(data_field, data_found)
+                    call expression%set(epsilon, alpha)
                 end block
             type is (Null_Potential_Expression)
             class default
