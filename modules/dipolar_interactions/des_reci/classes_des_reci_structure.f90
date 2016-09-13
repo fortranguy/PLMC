@@ -3,6 +3,7 @@ module classes_des_reci_structure
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -16,6 +17,7 @@ private
     type, extends(Abstract_Structure_Factor), abstract, public :: Abstract_DES_Reci_Structure
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Box_Volume_Memento), pointer :: box_volume_memento => null()
         integer :: reci_numbers(num_dimensions) = 0
         type(Component_Wrapper), pointer :: components(:) => null()
         logical, allocatable :: are_dipolar(:)
@@ -57,14 +59,17 @@ contains
 
 !implementation Abstract_DES_Reci_Structure
 
-    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, components, are_dipolar)
+    subroutine Abstract_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, &
+        components, are_dipolar)
         class(Abstract_DES_Reci_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Component_Wrapper), target, intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
 
         this%periodic_box => periodic_box
+        this%box_volume_memento => box_volume_memento
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%components => components
         allocate(this%are_dipolar(size(are_dipolar)))
@@ -81,6 +86,7 @@ contains
         if (allocated(this%structure)) deallocate(this%structure)
         if (allocated(this%are_dipolar)) deallocate(this%are_dipolar)
         this%components => null()
+        this%box_volume_memento => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
@@ -132,7 +138,7 @@ contains
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old, &
             wave_vector
         integer :: n_1, n_2, n_3
@@ -157,6 +163,7 @@ contains
         call set_fourier(fourier_position_new_1, this%reci_numbers(1), wave_1_x_position_new(1))
         call set_fourier(fourier_position_new_2, this%reci_numbers(2), wave_1_x_position_new(2))
         call set_fourier(fourier_position_new_3, this%reci_numbers(3), wave_1_x_position_new(3))
+        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -173,7 +180,7 @@ contains
                         fourier_position_new_2(n_2) * fourier_position_new_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, old%dipole_moment) * &
+                        box_edge_ratio * dot_product(wave_vector, old%dipole_moment) * &
                         (fourier_position_new - fourier_position_old)
                 end do
             end do
@@ -192,7 +199,7 @@ contains
         real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
         integer :: n_1, n_2, n_3
 
@@ -209,6 +216,7 @@ contains
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
         call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
+        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -223,8 +231,8 @@ contains
                         fourier_position_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, new_dipole_moment - old%dipole_moment) * &
-                        fourier_position
+                        box_edge_ratio * dot_product(wave_vector, &
+                            new_dipole_moment - old%dipole_moment) * fourier_position
                 end do
             end do
         end do
@@ -369,9 +377,11 @@ contains
 
 !implementation Null_DES_Reci_Structure
 
-    subroutine Null_construct(this, periodic_box, reciprocal_lattice, components, are_dipolar)
+    subroutine Null_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, &
+        components, are_dipolar)
         class(Null_DES_Reci_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Component_Wrapper), target, intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)

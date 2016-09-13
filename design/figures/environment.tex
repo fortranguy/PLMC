@@ -144,6 +144,15 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(BoxSizeChecker |- BetaPressureExcess.north)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{BoxVolumeMemento}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{save}{}}
+                \operation{\procedure{getRatio}{}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[on background layer]
             \aggregation{ParallelepipedDomain}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \aggregation{ReciprocalLattice}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}

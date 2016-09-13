@@ -73,11 +73,16 @@ contains
     subroutine reset_dipolar(dipolar_interactions)
         type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
 
+        call dipolar_interactions%box_volume_memento%save()
         call dipolar_interactions%real_pair%reset()
         call dipolar_interactions%reci_weight%reset()
         call dipolar_interactions%reci_structure%reset()
         call dipolar_interactions%dlc_weight%reset()
         call dipolar_interactions%dlc_structures%reset()
     end subroutine reset_dipolar
+
+    subroutine box_size_change_reset_dipolar(dipolar_interactions)
+        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
+    end subroutine box_size_change_reset_dipolar
 
 end module procedures_plmc_reset

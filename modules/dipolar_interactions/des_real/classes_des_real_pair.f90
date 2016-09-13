@@ -23,10 +23,8 @@ private
         procedure(Abstract_construct), deferred :: construct
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_reset), deferred :: reset
-        generic :: meet => meet_energy, meet_field
+        procedure :: meet => Abstract_meet
         procedure(Abstract_expression), private, deferred :: expression
-        procedure, private :: meet_energy => Abstract_meet_energy
-        procedure, private :: meet_field => Abstract_meet_field
     end type Abstract_DES_Real_Pair
 
     abstract interface
@@ -86,9 +84,8 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_reset
+        procedure :: meet => Null_meet
         procedure, private :: expression => Null_expression
-        procedure, private :: meet_energy => Null_meet_energy
-        procedure, private :: meet_field => Null_meet_field
     end type Null_DES_Real_Pair
 
 contains
@@ -96,13 +93,15 @@ contains
 !implementation Abstract_DES_Real_Pair
 
     !> \[
-    !>      u_{ij} = \frac{1}{4\pi\epsilon} \left[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
-    !>               (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij})
-    !>               \right]
+    !>      u(\vec{r}_{ij}, \vec{\mu}_i, \vec{\mu}_j) = \frac{1}{4\pi \epsilon}
+    !>          \left[ (\vec{\mu}_i \cdot \vec{\mu}_j) B_\alpha(r_{ij}) -
+    !>              (\vec{\mu}_i \cdot \vec{r}_{ij}) (\vec{\mu}_j \cdot \vec{r}_{ij})
+    !>                  C_\alpha(r_{ij})
+    !>          \right]
     !> \]
     !> cf. [[procedures_dipolar_interactions_micro:des_real_B]] &
     !> [[procedures_dipolar_interactions_micro:des_real_C]]
-    pure real(DP) function Abstract_meet_energy(this, vector_ij, moment_i, moment_j) result(energy)
+    pure real(DP) function Abstract_meet(this, vector_ij, moment_i, moment_j) result(energy)
         class(Abstract_DES_Real_Pair), intent(in) :: this
         real(DP), dimension(:), intent(in) :: vector_ij
         real(DP), dimension(:), intent(in) :: moment_i, moment_j
@@ -112,23 +111,7 @@ contains
         coefficient(1) = dot_product(moment_i, moment_j)
         coefficient(2) =-dot_product(moment_i, vector_ij) * dot_product(moment_j, vector_ij)
         energy = dot_product(coefficient, this%expression(norm2(vector_ij)))
-    end function Abstract_meet_energy
-
-    !> \[
-    !>      \vec{E}(\vec{r}_i) = \frac{1}{4\pi\epsilon} \left[ -B_\alpha(r_{ij}) |\vec{\mu}_j) +
-    !>                           (\vec{r}_{ij}\cdot\vec{\mu}_j) C_\alpha(r_{ij}) |\vec{r}_{ij})
-    !>                           \right]
-    !> \]
-    pure function Abstract_meet_field(this, vector_ij, moment_j) result(field)
-        real(DP) :: field(num_dimensions)
-        class(Abstract_DES_Real_Pair), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: vector_ij, moment_j
-
-        real(DP), dimension(2) :: expression
-
-        expression = this%expression(norm2(vector_ij))
-        field =-expression(1)*moment_j + dot_product(vector_ij, moment_j)*expression(2) * vector_ij
-    end function Abstract_meet_field
+    end function Abstract_meet
 
 !end implementation Abstract_DES_Real_Pair
 
@@ -300,19 +283,12 @@ contains
         expression = 0._DP
     end function Null_expression
 
-    pure real(DP) function Null_meet_energy(this, vector_ij, moment_i, moment_j) result(energy)
+    pure real(DP) function Null_meet(this, vector_ij, moment_i, moment_j) result(energy)
         class(Null_DES_Real_Pair), intent(in) :: this
         real(DP), dimension(:), intent(in) :: vector_ij
         real(DP), dimension(:), intent(in) :: moment_i, moment_j
         energy = 0._DP
-    end function Null_meet_energy
-
-    pure function Null_meet_field(this, vector_ij, moment_j) result(field)
-        real(DP) :: field(num_dimensions)
-        class(Null_DES_Real_Pair), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: vector_ij, moment_j
-        field = 0._DP
-    end function Null_meet_field
+    end function Null_meet
 
 !end implementation Null_DES_Real_Pair
 

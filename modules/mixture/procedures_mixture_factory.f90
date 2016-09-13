@@ -109,7 +109,7 @@ contains
     end subroutine set_nums_particles
 
     subroutine set_have_positions(have_positions, components)
-        logical, intent(out) :: have_positions(:)
+        logical, intent(inout) :: have_positions(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component
@@ -120,7 +120,7 @@ contains
     end subroutine set_have_positions
 
     subroutine set_have_orientations(have_orientations, components)
-        logical, intent(out) :: have_orientations(:)
+        logical, intent(inout) :: have_orientations(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component

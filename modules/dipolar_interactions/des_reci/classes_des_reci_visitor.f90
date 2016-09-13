@@ -3,6 +3,7 @@ module classes_des_reci_visitor
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use classes_des_reci_weight, only: Abstract_DES_Reci_Weight
@@ -17,6 +18,7 @@ private
     type, extends(Abstract_Structure_Visitor), abstract, public :: Abstract_DES_Reci_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Box_Volume_Memento), pointer :: box_volume_memento => null()
         integer :: reci_numbers(num_dimensions) = 0
         class(Abstract_DES_Reci_Weight), pointer :: weight => null()
         class(Abstract_DES_Reci_Structure), pointer :: structure => null()
@@ -52,14 +54,17 @@ contains
 
 !implementation Abstract_DES_Reci_Visitor
 
-    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, weight, structure)
+    subroutine Abstract_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, &
+        weight, structure)
         class(Abstract_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
         class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
 
         this%periodic_box => periodic_box
+        this%box_volume_memento => box_volume_memento
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%weight => weight
         this%structure => structure
@@ -70,6 +75,7 @@ contains
 
         this%structure => null()
         this%weight => null()
+        this%box_volume_memento => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
@@ -117,7 +123,7 @@ contains
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
@@ -145,6 +151,8 @@ contains
         call set_fourier(fourier_position_new_1, this%reci_numbers(1), wave_1_x_position_new(1))
         call set_fourier(fourier_position_new_2, this%reci_numbers(2), wave_1_x_position_new(2))
         call set_fourier(fourier_position_new_3, this%reci_numbers(3), wave_1_x_position_new(3))
+        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -159,7 +167,7 @@ contains
                         fourier_position_old_2(n_2) * fourier_position_old_3(n_3)
                     fourier_position_new = fourier_position_new_1(n_1) * &
                         fourier_position_new_2(n_2) * fourier_position_new_3(n_3)
-                    wave_dot_moment = dot_product(wave_vector, old%dipole_moment)
+                    wave_dot_moment = box_edge_ratio * dot_product(wave_vector, old%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &
                         real((fourier_position_new - fourier_position_old) * &
@@ -172,7 +180,8 @@ contains
                 end do
             end do
         end do
-        delta_energy = 4._DP * delta_energy ! symmetry: half wave vectors -> double energy
+        delta_energy = box_volume_ratio * 4._DP * delta_energy
+            !! symmetry: half wave vectors -> double energy
     end function Abstract_visit_translation
 
     !> Energy delta when a particle is transmuted:
@@ -191,7 +200,7 @@ contains
         real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position
@@ -211,6 +220,8 @@ contains
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
         call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
+        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -223,7 +234,7 @@ contains
 
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)
-                    wave_dot_delta_moment = dot_product(wave_vector, &
+                    wave_dot_delta_moment = box_edge_ratio * dot_product(wave_vector, &
                         new_dipole_moment - old%dipole_moment)
 
                     real_fourier_x_conjg_structure = real(fourier_position * &
@@ -235,7 +246,8 @@ contains
                 end do
             end do
         end do
-        delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
+        delta_energy = box_volume_ratio * 2._DP * delta_energy
+            !! symmetry: half wave vectors -> double energy
     end function Abstract_visit_transmutation
 
     pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old) &
@@ -407,9 +419,11 @@ contains
 
 !implementation Null_DES_Reci_Visitor
 
-    subroutine Null_construct(this, periodic_box, reciprocal_lattice, weight, structure)
+    subroutine Null_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, weight, &
+        structure)
         class(Null_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
         class(Abstract_DES_Reci_Structure), target, intent(in) :: structure

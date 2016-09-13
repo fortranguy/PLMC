@@ -37,7 +37,7 @@ contains
     end subroutine destroy
 
     subroutine set_are_dipolar(are_dipolar, components)
-        logical, intent(out) :: are_dipolar(:)
+        logical, intent(inout) :: are_dipolar(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component

@@ -71,6 +71,7 @@
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciStructure}{0, 0}
                 \inherit{StructureFactor}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    boxVolumeMemento: \type{BoxVolumeMemento},
                     reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
                     areDipolar: \type{bool[:]}}}
                 \operation{\procedure{destroy}{}}
@@ -84,6 +85,7 @@
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciVisitor}{0, 0}
                 \inherit{StructureVisitor}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    boxVolumeMemento: \type{BoxVolumeMemento},
                     reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DESreciWeight},
                     structure: \type{DESreciStructure}}}
                 \operation{\procedure{destroy}{}}

@@ -2,6 +2,7 @@ module procedures_des_real_factory
 
 use json_module, only: json_file
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
 use types_component_wrapper, only: Component_Wrapper
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use procedures_des_real_pair_factory, only: des_real_pair_create => create, &
@@ -29,9 +30,11 @@ end interface destroy
 
 contains
 
-    subroutine create_components(components, periodic_box, mixture_components, are_dipolar, pair)
+    subroutine create_components(components, periodic_box, box_volume_memento, mixture_components, &
+        are_dipolar, pair)
         type(DES_Real_Component_Wrapper), allocatable, intent(out) :: components(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), intent(in) ::box_volume_memento
         type(Component_Wrapper), intent(in) :: mixture_components(:)
         logical, intent(in) :: are_dipolar(:)
         class(Abstract_DES_Real_Pair), intent(in) :: pair
@@ -45,8 +48,8 @@ contains
             do i_component = 1, size(components, 1)
                 interact_ij = are_dipolar(i_component) .and. are_dipolar(j_component)
                 call create(components(i_component, j_component)%component, periodic_box, &
-                    mixture_components(i_component)%positions, mixture_components(i_component)%&
-                    dipole_moments, interact_ij, pair)
+                    box_volume_memento, mixture_components(i_component)%positions, &
+                    mixture_components(i_component)%dipole_moments, interact_ij, pair)
             end do
         end do
     end subroutine create_components

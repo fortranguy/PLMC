@@ -128,7 +128,7 @@
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/common/classes_plmc_propagator.f90">
-			<Option weight="15" />
+			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/common/data_arguments.f90">
 			<Option weight="0" />
@@ -173,7 +173,7 @@
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/common/procedures_markov_chain_generator_factory.f90">
-			<Option weight="17" />
+			<Option weight="19" />
 		</Unit>
 		<Unit filename="modules/common/procedures_mixture_inquirers.f90">
 			<Option weight="5" />
@@ -185,7 +185,7 @@
 			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_factory.f90">
-			<Option weight="18" />
+			<Option weight="20" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_help.f90">
 			<Option weight="1" />
@@ -194,7 +194,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_propagator_factory.f90">
-			<Option weight="16" />
+			<Option weight="18" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_reset.f90">
 			<Option weight="12" />
@@ -230,7 +230,7 @@
 			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_generator_wrapper.f90">
-			<Option weight="16" />
+			<Option weight="18" />
 		</Unit>
 		<Unit filename="modules/common/types_physical_model_wrapper.f90">
 			<Option weight="11" />
@@ -243,6 +243,9 @@
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_des_surf_mixture.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/dipolar_interactions/classes_dipolar_visitor.f90">
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_structure_factor.f90">
 			<Option weight="2" />
@@ -257,10 +260,10 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_component_factory.f90">
-			<Option weight="6" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_factory.f90">
-			<Option weight="8" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_pair_factory.f90">
 			<Option weight="5" />
@@ -334,6 +337,9 @@
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_micro.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="modules/dipolar_interactions/procedures_dipolar_visitor_factory.f90">
+			<Option weight="14" />
+		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipoles_field_interaction.f90">
 			<Option weight="7" />
 		</Unit>
@@ -342,6 +348,9 @@
 		</Unit>
 		<Unit filename="modules/environment/box/classes_box_size_checker.f90">
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/environment/box/classes_box_volume_memento.f90">
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/environment/box/classes_parallelepiped_domain.f90">
 			<Option weight="5" />
@@ -357,6 +366,9 @@
 		</Unit>
 		<Unit filename="modules/environment/box/procedures_box_size_checker_factory.f90">
 			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/environment/box/procedures_box_volume_memento_factory.f90">
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/environment/box/procedures_parallelepiped_domain_factory.f90">
 			<Option weight="8" />
@@ -476,7 +488,7 @@
 			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_box_volume_change.f90">
-			<Option weight="13" />
+			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_generating_algorithm.f90">
 			<Option weight="3" />
@@ -494,10 +506,10 @@
 			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_box_volume_change_factory.f90">
-			<Option weight="14" />
+			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_generating_algorithms_factory.f90">
-			<Option weight="15" />
+			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_metropolis_algorithm.f90">
 			<Option weight="0" />
@@ -515,7 +527,7 @@
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/types_generating_algorithms_wrapper.f90">
-			<Option weight="14" />
+			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/mixture/classes_mixture_total_moment.f90">
 			<Option weight="8" />
@@ -837,11 +849,11 @@
 			<Option target="density" />
 		</Unit>
 		<Unit filename="programs/plmc_explore.f90">
-			<Option weight="19" />
+			<Option weight="21" />
 			<Option target="plmc_explore" />
 		</Unit>
 		<Unit filename="programs/plmc_generate.f90">
-			<Option weight="19" />
+			<Option weight="21" />
 			<Option target="plmc_generate" />
 		</Unit>
 		<Unit filename="programs/radial_inter.f90">

@@ -6,3 +6,6 @@
 - MaximumBoxCompression: avoid r_min /= min_distance confusion
 - MaximumBoxCompression and VolumeChangeMethod in one pass?
 - HardContact: NeighbourCells size must be increased: drawback
+- DESrealPair: reset() if volume increases (Tabulated)
+- PLMCvisit: visitShortEnergies(): cycle if VolumeChangeRatio > 1 && cells.size > potential.rMax
+- DipolarVisitor: Self is scalable (O(N))

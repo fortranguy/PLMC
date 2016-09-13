@@ -17,8 +17,7 @@ use types_reals_line, only: Reals_Line
 use types_observables_energies, only: Concrete_Energies
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use procedures_observables_factory_micro, only: create_triangle_nodes, destroy_triangle_nodes
-use procedures_triangle_observables, only: triangle_observables_init, &
-    triangle_observables_add
+use procedures_triangle_observables, only: triangle_observables_init, triangle_observables_add
 use procedures_property_inquirers, only: logical_from_json
 
 implicit none

@@ -11,6 +11,7 @@
         \begin{scope}
             \begin{abstractclass}[text width=\largeTextWidth]{DESrealComponent}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox,
+                    boxVolumeMemento: \type{BoxVolumeMemento},
                     positions: \type{ComponentCoordinates},
                     dipoleMoments: \type{ComponentDipoleMoments}, realPair: \type{DESrealPair}}}}
                 \operation{\procedure{destroy}{}}
@@ -33,8 +34,9 @@
 
         \begin{scope}[shift={($(DESselfComponent.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
-            \umlnote[text width=\largeTextWidth]{\import{}::\\
-                \namespace{Environment} :: PeriodicBox, ReciprocalLattice, Permittivity\\
+            \umlnote[text width=\largeTextWidth]{\import{}:: \\
+                \namespace{Environment} :: PeriodicBox, BoxVolumeMemento, ReciprocalLattice,
+                    Permittivity \\
                 \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
                     ComponentDipoleMoments, TemporaryParticle};
         \end{scope}
@@ -77,8 +79,17 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESrealPair.north -| Import)$)}]
+        \begin{scope}[shift={($(Import.south) - (0 cm, 4 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DipolarVisitor}{0, 0}
+                \operation[0]{\procedure{construct}{\ldots}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESrealPair.north -| Import) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{DipolarInteractions}{0, 0}
+                \UMLattribute{boxVolumeMemento: \type{BoxVolumeMemento}}
                 \UMLattribute{alpha: \type{DESconvergenceParameter}}
                 \UMLattribute{realPair: \type{DESrealPair}}
                 \UMLattribute{realComponents: \type{DESrealComponent[::]}}
@@ -94,7 +105,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(DESconvergenceParameter.south)!0.5!(DipolarInteractions.south) -
-            (0 cm, 2.5 cm)$)}]
+            (0 cm, 3.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{StructureVisitor}{0, 0}
             \end{abstractclass}
         \end{scope}

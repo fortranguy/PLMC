@@ -69,6 +69,8 @@ contains
         this%dipole_moments => null()
     end subroutine Abstract_destroy
 
+    !> \[ \sum_{\vec{\mu}} u(\vec{\mu}) \]
+    !> where \( u(\vec{\mu}) \) is [[Abstract_meet]].
     pure real(DP) function Abstract_visit(this) result(energy)
         class(Abstract_DES_Self_Component), intent(in) :: this
 

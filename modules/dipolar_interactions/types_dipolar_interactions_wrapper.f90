@@ -1,5 +1,6 @@
 module types_dipolar_interactions_wrapper
 
+use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
@@ -17,6 +18,7 @@ implicit none
 private
 
     type, public :: Dipolar_Interactions_Wrapper
+        class(Abstract_Box_Volume_Memento), allocatable :: box_volume_memento
         class(Abstract_DES_Convergence_Parameter), allocatable :: alpha
         class(Abstract_DES_Real_Pair), allocatable :: real_pair
         type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
