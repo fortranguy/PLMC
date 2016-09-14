@@ -54,11 +54,12 @@ contains
         type(Concrete_Single_Energies), intent(in) :: deltas
         integer, intent(in) :: i_actor
 
-        energies%walls_energies(i_actor) = energies%walls_energies(i_actor) + deltas%walls
-        call add_energies(energies%short_energies, deltas%short, i_actor)
-        energies%field_energies(i_actor) = energies%field_energies(i_actor) + deltas%field
-        call add_energies(energies%dipolar_energies, deltas%dipolar, i_actor)
-        energies%dipolar_mixture_energy = energies%dipolar_mixture_energy + deltas%dipolar_mixture
+        energies%walls_energies(i_actor) = energies%walls_energies(i_actor) + deltas%walls_energy
+        call add_energies(energies%short_energies, deltas%short_energies, i_actor)
+        energies%field_energies(i_actor) = energies%field_energies(i_actor) + deltas%field_energy
+        call add_energies(energies%dipolar_energies, deltas%dipolar_energies, i_actor)
+        energies%dipolar_shared_energy = energies%dipolar_shared_energy + deltas%&
+            dipolar_shared_energy
     end subroutine add_single
 
     pure subroutine add_double(energies, deltas, ij_actors)
@@ -70,13 +71,15 @@ contains
 
         do i = 1, size(ij_actors)
             energies%walls_energies(ij_actors(i)) = energies%walls_energies(ij_actors(i)) + deltas%&
-                walls(i)
-            call add_energies(energies%short_energies, deltas%short(:, i), ij_actors(i))
+                walls_energies(i)
+            call add_energies(energies%short_energies, deltas%short_energies(:, i), ij_actors(i))
             energies%field_energies(ij_actors(i)) = energies%field_energies(ij_actors(i)) + deltas%&
-                field(i)
-            call add_energies(energies%dipolar_energies, deltas%dipolar(:, i),  ij_actors(i))
+                field_energies(i)
+            call add_energies(energies%dipolar_energies, deltas%dipolar_energies(:, i),  &
+                ij_actors(i))
         end do
-        energies%dipolar_mixture_energy = energies%dipolar_mixture_energy + deltas%dipolar_mixture
+        energies%dipolar_shared_energy = energies%dipolar_shared_energy + deltas%&
+            dipolar_shared_energy
     end subroutine add_double
 
     pure subroutine add_energies(energies, deltas, i_actor)
@@ -103,7 +106,7 @@ contains
         target_energies%field_energies = source_energies%field_energies
         call set_energies_triangle(target_energies%dipolar_energies, source_energies%&
             dipolar_energies)
-        target_energies%dipolar_mixture_energy = source_energies%dipolar_mixture_energy
+        target_energies%dipolar_shared_energy = source_energies%dipolar_shared_energy
     end subroutine set_energies
 
     pure subroutine set_energies_triangle(energies_target, energies_source)

@@ -15,6 +15,13 @@ implicit none
 
 private
 
+    !> @note
+    !> In [[classes_des_reci_visitor:Abstract_visit]],
+    !> [[classes_des_reci_visitor:Abstract_visit_translation]],
+    !> [[classes_des_reci_visitor:Abstract_visit_transmutation]],
+    !> [[classes_des_reci_visitor:Abstract_visit_switch]],
+    !> [[classes_des_reci_visitor:Abstract_visit_exchange]]
+    !> only half wave vectors are visited (symmetry). Hence energy is doubled.
     type, extends(Abstract_Structure_Visitor), abstract, public :: Abstract_DES_Reci_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
@@ -99,7 +106,7 @@ contains
                 end do
             end do
         end do
-        energy = 2._DP * energy ! symmetry: half wave vectors -> double energy
+        energy = 2._DP * energy
     end function Abstract_visit
 
     !> Energy delta when a particle is translated:
@@ -143,6 +150,9 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
+        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_old_1, this%reci_numbers(1), wave_1_x_position_old(1))
         call set_fourier(fourier_position_old_2, this%reci_numbers(2), wave_1_x_position_old(2))
@@ -151,8 +161,6 @@ contains
         call set_fourier(fourier_position_new_1, this%reci_numbers(1), wave_1_x_position_new(1))
         call set_fourier(fourier_position_new_2, this%reci_numbers(2), wave_1_x_position_new(2))
         call set_fourier(fourier_position_new_3, this%reci_numbers(3), wave_1_x_position_new(3))
-        box_volume_ratio = this%box_volume_memento%get_ratio()
-        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -181,7 +189,6 @@ contains
             end do
         end do
         delta_energy = box_volume_ratio * 4._DP * delta_energy
-            !! symmetry: half wave vectors -> double energy
     end function Abstract_visit_translation
 
     !> Energy delta when a particle is transmuted:
@@ -216,12 +223,13 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return !shortcut?
 
         box_size = this%periodic_box%get_size()
+        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+
         wave_1_x_position = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
         call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
-        box_volume_ratio = this%box_volume_memento%get_ratio()
-        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -247,7 +255,6 @@ contains
             end do
         end do
         delta_energy = box_volume_ratio * 2._DP * delta_energy
-            !! symmetry: half wave vectors -> double energy
     end function Abstract_visit_transmutation
 
     pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old) &
@@ -291,7 +298,7 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position
@@ -306,6 +313,9 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
+        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+
         wave_1_x_position = 2._DP*PI * particle%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
@@ -322,7 +332,8 @@ contains
 
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)
-                    wave_dot_moment = dot_product(wave_vector, particle%dipole_moment)
+                    wave_dot_moment = box_edge_ratio * dot_product(wave_vector, &
+                        particle%dipole_moment)
 
                     real_fourier_x_conjg_structure = signed * real(fourier_position * &
                         conjg(this%structure%get(n_1, n_2, n_3)), DP)
@@ -333,7 +344,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
+        delta_energy = box_volume_ratio * 2._DP * delta_energy
     end function Abstract_visit_exchange
 
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
@@ -357,7 +368,7 @@ contains
         integer, intent(in) :: ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2
@@ -374,9 +385,12 @@ contains
 
         delta_energy = 0._DP
         if (.not.(this%structure%is_dipolar(ij_components(1)) .or. &
-            this%structure%is_dipolar(ij_components(2)))) return ! move shortcut?
+            this%structure%is_dipolar(ij_components(2)))) return
 
         box_size = this%periodic_box%get_size()
+        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
         call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))
         call set_fourier(fourier_position_1_2, this%reci_numbers(2), wave_1_x_position_1(2))
@@ -399,8 +413,8 @@ contains
                         fourier_position_1_3(n_3)
                     fourier_position_2 = fourier_position_2_1(n_1) * fourier_position_2_2(n_2) * &
                         fourier_position_2_3(n_3)
-                    wave_dot_delta_moment = dot_product(wave_vector, particles(1)%dipole_moment - &
-                        particles(2)%dipole_moment)
+                    wave_dot_delta_moment = box_edge_ratio* dot_product(wave_vector, &
+                        particles(1)%dipole_moment - particles(2)%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &
                         real((fourier_position_2 - fourier_position_1) * &
@@ -413,7 +427,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = 4._DP * delta_energy ! symmetry: half wave vectors -> double energy
+        delta_energy = box_volume_ratio * 4._DP * delta_energy
     end function Abstract_visit_switch
 !end implementation Abstract_DES_Reci_Visitor
 

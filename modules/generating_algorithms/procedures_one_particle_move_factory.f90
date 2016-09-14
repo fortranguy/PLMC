@@ -33,7 +33,8 @@ contains
         end if
 
         call one_particle_translation%construct(physical_model%environment, physical_model%&
-            mixture, physical_model%short_interactions, physical_model%dipolar_interactions, &
+            mixture, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_dynamic, physical_model%dipolar_interactions_static, &
             changes_components, can_translate, selector_mold)
     end subroutine create_translation
 
@@ -56,8 +57,9 @@ contains
         end if
 
         call one_particle_rotation%construct(physical_model%environment, physical_model%mixture, &
-            physical_model%short_interactions, physical_model%dipolar_interactions, &
-            changes_components, can_rotate, selector_mold)
+            physical_model%short_interactions, physical_model%dipolar_interactions_dynamic, &
+            physical_model%dipolar_interactions_static, changes_components, can_rotate, &
+            selector_mold)
     end subroutine create_rotation
 
     subroutine destroy(one_particle_move)

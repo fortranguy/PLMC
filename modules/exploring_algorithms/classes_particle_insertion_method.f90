@@ -7,7 +7,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: visit_different
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add
 use classes_random_coordinates, only: Abstract_Random_Coordinates
 use types_observables_energies, only: Concrete_Single_Energies
@@ -24,7 +24,8 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+            null()
         class(Abstract_Random_Coordinates), pointer :: random_position => null(), &
             random_orientation => null()
         class(Abstract_Component_Number), allocatable :: numbers(:)
@@ -54,12 +55,13 @@ contains
 !implementation Abstract_Particle_Insertion_Method
 
     subroutine Abstract_construct(this, environment, components, short_interactions, &
-        dipolar_interactions, numbers, random_position, random_orientation)
+        dipolar_interactions_dynamic, numbers, random_position, random_orientation)
         class(Abstract_Particle_Insertion_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
         class(Abstract_Component_Number), intent(in) :: numbers(:)
         class(Abstract_Random_Coordinates), target, intent(in) :: random_position, &
             random_orientation
@@ -67,7 +69,7 @@ contains
         this%environment => environment
         this%components => components
         this%short_interactions => short_interactions
-        this%dipolar_interactions => dipolar_interactions
+        this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
         allocate(this%numbers, source=numbers)
         this%random_position => random_position
         this%random_orientation => random_orientation
@@ -79,7 +81,7 @@ contains
         this%random_orientation => null()
         this%random_position => null()
         if (allocated(this%numbers)) deallocate(this%numbers)
-        this%dipolar_interactions => null()
+        this%dipolar_interactions_dynamic => null()
         this%short_interactions => null()
         this%components => null()
         this%environment => null()
@@ -95,8 +97,8 @@ contains
         integer :: i_component, i_particle
         logical :: overlap
 
-        allocate(deltas%short(size(observables%inv_pow_activities)))
-        allocate(deltas%dipolar(size(deltas%short)))
+        allocate(deltas%short_energies(size(observables%inv_pow_activities)))
+        allocate(deltas%dipolar_energies(size(deltas%short_energies)))
         observables%inv_pow_activities = 0._DP
         test%i = 0
         do i_component = 1, size(this%numbers)
@@ -110,15 +112,17 @@ contains
                 test%dipole_moment = this%components(i_component)%dipole_moments%get_norm() * &
                     test%orientation
 
-                call this%visit_field(deltas%field, test)
-                call this%visit_walls(overlap, deltas%walls, i_component, test)
+                call this%visit_walls(overlap, deltas%walls_energy, i_component, test)
                 if (overlap) cycle
-                call this%visit_short(overlap, deltas%short, i_component, test)
+                call this%visit_short(overlap, deltas%short_energies, i_component, test)
                 if (overlap) cycle
-                call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, i_component, test)
+                call this%visit_field(deltas%field_energy, test)
+                call this%visit_dipolar(deltas%dipolar_energies, deltas%dipolar_shared_energy, &
+                    i_component, test)
 
-                delta_energy = deltas%field + deltas%walls + sum(deltas%short + deltas%dipolar) + &
-                    deltas%dipolar_mixture
+                delta_energy = deltas%field_energy + deltas%walls_energy + &
+                    sum(deltas%short_energies + deltas%dipolar_energies) + deltas%&
+                    dipolar_shared_energy
                 inv_pow_activity_sum = inv_pow_activity_sum + exp(-delta_energy/this%environment%&
                     temperature%get())
                 observables%insertion_counters(i_component)%num_successes = observables%&
@@ -165,25 +169,27 @@ contains
         delta = dipoles_field_visit_add(this%environment%external_field, test)
     end subroutine Abstract_visit_field
 
-    subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, i_component, test)
+    subroutine Abstract_visit_dipolar(this, deltas, delta_shared_energy, i_component, test)
         class(Abstract_Particle_Insertion_Method), intent(in) :: this
         real(DP), intent(out) :: deltas(:)
-        real(DP), intent(out) :: mixture_delta
+        real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: test
 
         integer :: j_component, i_exclude
 
-        do j_component = 1, size(this%dipolar_interactions%real_components, 1)
+        do j_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
             i_exclude = merge(test%i, 0, j_component == i_component)
-            call this%dipolar_interactions%real_components(j_component, i_component)%component%&
-                visit(deltas(j_component), test, visit_different, i_exclude)
+            call this%dipolar_interactions_dynamic%real_components(j_component, i_component)%&
+                component%visit(deltas(j_component), test, visit_different, i_exclude)
         end do
-        deltas(i_component) = deltas(i_component) - this%dipolar_interactions%&
+        deltas(i_component) = deltas(i_component) - this%dipolar_interactions_dynamic%&
             self_components(i_component)%component%meet(test%dipole_moment)
-        mixture_delta = this%dipolar_interactions%reci_visitor%visit_add(i_component, test) + &
-            this%dipolar_interactions%surf_mixture%visit_add(i_component, test%dipole_moment) - &
-            this%dipolar_interactions%dlc_visitor%visit_add(i_component, test)
+        delta_shared_energy = &
+            this%dipolar_interactions_dynamic%reci_visitor%visit_add(i_component, test) + &
+            this%dipolar_interactions_dynamic%surf_mixture%&
+                visit_add(i_component, test%dipole_moment) - &
+            this%dipolar_interactions_dynamic%dlc_visitor%visit_add(i_component, test)
     end subroutine Abstract_visit_dipolar
 
 !end implementation Abstract_Particle_Insertion_Method
@@ -191,12 +197,13 @@ contains
 !implementation Null_Particle_Insertion_Method
 
     subroutine Null_construct(this, environment, components, short_interactions, &
-        dipolar_interactions, numbers, random_position, random_orientation)
+        dipolar_interactions_dynamic, numbers, random_position, random_orientation)
         class(Null_Particle_Insertion_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
         class(Abstract_Component_Number), intent(in) :: numbers(:)
         class(Abstract_Random_Coordinates), target, intent(in) :: random_position, &
             random_orientation

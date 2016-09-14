@@ -8,4 +8,5 @@
 - HardContact: NeighbourCells size must be increased: drawback
 - DESrealPair: reset() if volume increases (Tabulated)
 - PLMCvisit: visitShortEnergies(): cycle if VolumeChangeRatio > 1 && cells.size > potential.rMax
-- DipolarVisitor: Self is scalable (O(N))
+- DipolarVisitor: Self is scalable (instead of O(N)): is it worth it?
+- In DESreciStructure & DESreciVisitor, document the role of boxVolumeMemento

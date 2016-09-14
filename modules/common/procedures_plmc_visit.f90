@@ -9,8 +9,9 @@ use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
+use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
 use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_reals_line, only: Reals_Line
@@ -65,8 +66,8 @@ contains
             //"overlap.")
         call visit_field(energies%field_energies, physical_model%environment%external_field, &
             physical_model%mixture%components)
-        call visit_dipolar(energies%dipolar_energies, energies%dipolar_mixture_energy, &
-            physical_model%mixture%components, physical_model%dipolar_interactions)
+        call visit_dipolar(energies%dipolar_energies, energies%dipolar_shared_energy, &
+            physical_model%mixture%components, physical_model%dipolar_interactions_dynamic)
     end subroutine visit_generating
 
     subroutine visit_exploring(energies, physical_model, visit_energies)
@@ -87,21 +88,21 @@ contains
             "visit_short: overlap.")
         call visit_field(energies%field_energies, physical_model%environment%external_field, &
             physical_model%mixture%components)
-        call visit_dipolar(energies%dipolar_energies, energies%dipolar_mixture_energy, &
-            physical_model%mixture%components, physical_model%dipolar_interactions)
+        call visit_dipolar(energies%dipolar_energies, energies%dipolar_shared_energy, &
+            physical_model%mixture%components, physical_model%dipolar_interactions_dynamic)
     end subroutine visit_exploring
 
-    pure subroutine visit_walls(overlap, walls_energies, components, short_interactions)
+    pure subroutine visit_walls(overlap, energies, components, short_interactions)
         logical, intent(out) :: overlap
-        real(DP), intent(inout) :: walls_energies(:)
+        real(DP), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         integer :: i_component
 
         overlap = .false.
-        do i_component = 1, size(walls_energies)
-            call short_interactions%walls_visitor%visit(overlap, walls_energies(i_component), &
+        do i_component = 1, size(energies)
+            call short_interactions%walls_visitor%visit(overlap, energies(i_component), &
                 components(i_component)%positions, &
                 short_interactions%wall_pairs(i_component)%potential)
             if (overlap) return
@@ -274,25 +275,24 @@ contains
         end do
     end subroutine visit_short_min_distance
 
-    pure subroutine visit_field(field_energies, external_field, components)
-        real(DP), intent(inout) :: field_energies(:)
+    pure subroutine visit_field(energies, external_field, components)
+        real(DP), intent(inout) :: energies(:)
         class(Abstract_External_Field), intent(in) :: external_field
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component
 
-        do i_component = 1, size(field_energies)
-            field_energies(i_component) = dipoles_field_visit_component(external_field, &
+        do i_component = 1, size(energies)
+            energies(i_component) = dipoles_field_visit_component(external_field, &
                 components(i_component)%positions, components(i_component)%dipole_moments)
         end do
     end subroutine visit_field
 
-    subroutine visit_dipolar(energies, mixture_energy, components, &
-        dipolar_interactions)
+    subroutine visit_dipolar(energies, shared_energy, components, dipolar_interactions_dynamic)
         type(Reals_Line), intent(inout) :: energies(:)
-        real(DP), intent(out) :: mixture_energy
+        real(DP), intent(out) :: shared_energy
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
 
         type(Reals_Line) :: real_energies(size(components))
         real(DP) :: self_energies(size(components))
@@ -300,21 +300,22 @@ contains
         call triangle_observables_init(energies)
 
         call create_triangle_nodes(real_energies)
-        call visit_des_real(real_energies, components, dipolar_interactions)
+        call visit_des_real(real_energies, components, dipolar_interactions_dynamic%real_components)
         call triangle_observables_add(energies, real_energies)
         call destroy_triangle_nodes(real_energies)
 
-        mixture_energy = dipolar_interactions%reci_visitor%visit() + dipolar_interactions%&
-            surf_mixture%visit() - dipolar_interactions%dlc_visitor%visit()
+        shared_energy = dipolar_interactions_dynamic%reci_visitor%visit() + &
+            dipolar_interactions_dynamic%surf_mixture%visit() - &
+            dipolar_interactions_dynamic%dlc_visitor%visit()
 
-        call visit_des_self(self_energies, dipolar_interactions%self_components)
+        call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
         call triangle_observables_add(energies, -self_energies)
     end subroutine visit_dipolar
 
-    subroutine visit_des_real(energies, components, dipolar_interactions)
+    subroutine visit_des_real(energies, components, real_components)
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
+        type(DES_Real_Component_Wrapper), intent(in) :: real_components(:, :)
 
         real(DP) :: energy_ij, energy_j
         integer :: i_component, j_component, i_particle, i_exclude
@@ -336,7 +337,7 @@ contains
                     particle%position = components(j_component)%positions%get(particle%i)
                     particle%dipole_moment = components(j_component)%dipole_moments%get(particle%i)
                     i_exclude = merge(particle%i, 0, same_component)
-                    call dipolar_interactions%real_components(i_component, j_component)%component%&
+                    call real_components(i_component, j_component)%component%&
                         visit(energy_j, particle, visit_condition, i_exclude)
                     energy_ij = energy_ij + energy_j
                 end do

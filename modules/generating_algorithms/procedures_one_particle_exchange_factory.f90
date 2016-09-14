@@ -32,8 +32,8 @@ contains
         end if
 
         call one_particle_exchange%construct(physical_model%environment, physical_model%mixture, &
-            physical_model%short_interactions, physical_model%dipolar_interactions, changes, &
-            can_exchange, selector_mold)
+            physical_model%short_interactions, physical_model%dipolar_interactions_dynamic, &
+            physical_model%dipolar_interactions_static, changes, can_exchange, selector_mold)
     end subroutine create_add
 
     subroutine create_remove(one_particle_exchange, physical_model, changes)
@@ -55,8 +55,8 @@ contains
         end if
 
         call one_particle_exchange%construct(physical_model%environment, physical_model%mixture, &
-            physical_model%short_interactions, physical_model%dipolar_interactions, changes, &
-            can_exchange, selector_mold)
+            physical_model%short_interactions, physical_model%dipolar_interactions_dynamic, &
+            physical_model%dipolar_interactions_static, changes, can_exchange, selector_mold)
     end subroutine create_remove
 
     subroutine destroy(one_particle_exchange)

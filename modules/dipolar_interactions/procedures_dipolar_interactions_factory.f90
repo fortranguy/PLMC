@@ -11,7 +11,8 @@ use procedures_environment_inquirers, only: periodicity_is_xyz, box_size_can_cha
     use_permittivity, use_reciprocal_lattice
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
+use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_des_convergence_parameter_factory, only: des_convergence_parameter_create => create,&
     des_convergence_parameter_destroy => destroy
 use procedures_des_real_factory, only: des_real_create => create, des_real_destroy => destroy
@@ -28,9 +29,10 @@ public :: dipolar_interactions_create, dipolar_interactions_destroy
 
 contains
 
-    subroutine dipolar_interactions_create(dipolar_interactions, environment, mixture, &
-        generating_data, prefix)
-        type(Dipolar_Interactions_Wrapper), intent(out) :: dipolar_interactions
+    subroutine dipolar_interactions_create(dipolar_interactions_dynamic, &
+        dipolar_interactions_static, environment, mixture, generating_data, prefix)
+        type(Dipolar_Interactions_Dynamic_Wrapper), intent(out) :: dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Static_Wrapper), intent(out) :: dipolar_interactions_static
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: generating_data
@@ -42,60 +44,62 @@ contains
         call check_consistency(environment%reciprocal_lattice, environment%permittivity, &
             any(are_dipolar))
 
-        call box_create(dipolar_interactions%box_volume_memento, environment%periodic_box, &
+        call box_create(dipolar_interactions_static%box_volume_memento, environment%periodic_box, &
             periodicity_is_xyz(environment%periodic_box) .and. &
             box_size_can_change(environment%beta_pressure) .and. any(are_dipolar))
-        call des_convergence_parameter_create(dipolar_interactions%alpha, environment%periodic_box,&
-            any(are_dipolar), generating_data, prefix)
+        call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, environment%&
+            periodic_box, any(are_dipolar), generating_data, prefix)
 
-        call des_real_create(dipolar_interactions%real_pair, environment%permittivity, mixture%&
-            components_min_distances, any(are_dipolar), dipolar_interactions%alpha, &
+        call des_real_create(dipolar_interactions_static%real_pair, environment%permittivity, &
+            mixture%components_min_distances, any(are_dipolar), dipolar_interactions_dynamic%alpha,&
             generating_data, prefix//"Real.")
-        call des_real_create(dipolar_interactions%real_components, environment%periodic_box, &
-            dipolar_interactions%box_volume_memento, mixture%components, are_dipolar, &
-            dipolar_interactions%real_pair)
+        call des_real_create(dipolar_interactions_dynamic%real_components, environment%&
+            periodic_box, dipolar_interactions_static%box_volume_memento, mixture%components, &
+            are_dipolar, dipolar_interactions_static%real_pair)
 
-        call des_reci_create(dipolar_interactions%reci_weight, environment, any(are_dipolar), &
-            dipolar_interactions%alpha)
-        call des_reci_create(dipolar_interactions%reci_structure, environment, &
-            dipolar_interactions%box_volume_memento, mixture%components, are_dipolar)
-        call des_reci_create(dipolar_interactions%reci_visitor, environment, dipolar_interactions%&
-            box_volume_memento, dipolar_interactions%reci_weight, dipolar_interactions%&
-            reci_structure)
+        call des_reci_create(dipolar_interactions_static%reci_weight, environment, &
+            any(are_dipolar), dipolar_interactions_dynamic%alpha)
+        call des_reci_create(dipolar_interactions_static%reci_structure, environment, &
+            dipolar_interactions_static%box_volume_memento, mixture%components, are_dipolar)
+        call des_reci_create(dipolar_interactions_dynamic%reci_visitor, environment, &
+            dipolar_interactions_static%box_volume_memento, dipolar_interactions_static%&
+            reci_weight, dipolar_interactions_static%reci_structure)
 
-        call des_self_create(dipolar_interactions%self_components, environment%permittivity, &
-            mixture%components, are_dipolar, dipolar_interactions%alpha)
+        call des_self_create(dipolar_interactions_dynamic%self_components, environment%&
+            permittivity, mixture%components, are_dipolar, dipolar_interactions_dynamic%alpha)
 
-        call des_surf_mixture_create(dipolar_interactions%surf_mixture, environment%periodic_box, &
-            environment%permittivity, mixture%total_moment)
+        call des_surf_mixture_create(dipolar_interactions_dynamic%surf_mixture, environment%&
+            periodic_box, environment%permittivity, mixture%total_moment)
 
-        call dlc_create(dipolar_interactions%dlc_weight, environment, any(are_dipolar))
-        call dlc_create(dipolar_interactions%dlc_structures, environment, mixture%components, &
-            are_dipolar)
-        call dlc_create(dipolar_interactions%dlc_visitor, environment, dipolar_interactions%&
-            dlc_weight, dipolar_interactions%dlc_structures)
+        call dlc_create(dipolar_interactions_static%dlc_weight, environment, any(are_dipolar))
+        call dlc_create(dipolar_interactions_static%dlc_structures, environment, mixture%&
+            components, are_dipolar)
+        call dlc_create(dipolar_interactions_dynamic%dlc_visitor, environment, &
+            dipolar_interactions_static%dlc_weight, dipolar_interactions_static%dlc_structures)
     end subroutine dipolar_interactions_create
 
-    subroutine dipolar_interactions_destroy(dipolar_interactions)
-        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
+    subroutine dipolar_interactions_destroy(dipolar_interactions_dynamic, &
+        dipolar_interactions_static)
+        type(Dipolar_Interactions_Dynamic_Wrapper), intent(inout) :: dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
 
-        call dlc_destroy(dipolar_interactions%dlc_visitor)
-        call dlc_destroy(dipolar_interactions%dlc_structures)
-        call dlc_destroy(dipolar_interactions%dlc_weight)
+        call dlc_destroy(dipolar_interactions_dynamic%dlc_visitor)
+        call dlc_destroy(dipolar_interactions_static%dlc_structures)
+        call dlc_destroy(dipolar_interactions_static%dlc_weight)
 
-        call des_surf_mixture_destroy(dipolar_interactions%surf_mixture)
+        call des_surf_mixture_destroy(dipolar_interactions_dynamic%surf_mixture)
 
-        call des_self_destroy(dipolar_interactions%self_components)
+        call des_self_destroy(dipolar_interactions_dynamic%self_components)
 
-        call des_reci_destroy(dipolar_interactions%reci_visitor)
-        call des_reci_destroy(dipolar_interactions%reci_structure)
-        call des_reci_destroy(dipolar_interactions%reci_weight)
+        call des_reci_destroy(dipolar_interactions_dynamic%reci_visitor)
+        call des_reci_destroy(dipolar_interactions_static%reci_structure)
+        call des_reci_destroy(dipolar_interactions_static%reci_weight)
 
-        call des_real_destroy(dipolar_interactions%real_components)
-        call des_real_destroy(dipolar_interactions%real_pair)
+        call des_real_destroy(dipolar_interactions_dynamic%real_components)
+        call des_real_destroy(dipolar_interactions_static%real_pair)
 
-        call des_convergence_parameter_destroy(dipolar_interactions%alpha)
-        call box_destroy(dipolar_interactions%box_volume_memento)
+        call des_convergence_parameter_destroy(dipolar_interactions_dynamic%alpha)
+        call box_destroy(dipolar_interactions_static%box_volume_memento)
     end subroutine dipolar_interactions_destroy
 
     subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)

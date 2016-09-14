@@ -77,7 +77,7 @@ contains
         call writers%walls_energies%write(i_step, energies%walls_energies)
         call writers%short_energies%write(i_step, energies%short_energies)
         call writers%dipolar_energies%write(i_step, energies%dipolar_energies)
-        call writers%dipolar_mixture_energy%write(i_step, energies%dipolar_mixture_energy)
+        call writers%dipolar_shared_energy%write(i_step, energies%dipolar_shared_energy)
     end subroutine write_energies
 
 end module procedures_plmc_write

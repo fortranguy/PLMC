@@ -9,7 +9,9 @@ use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_cells_factory, only: cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
+use classes_dipolar_visitor, only: Abstract_Dipolar_Visitor
+use procedures_dipolar_visitor_factory, only: dipolar_visitor_destroy => destroy
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
@@ -22,8 +24,6 @@ use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_plmc_reset, only: box_size_change_reset_cells
 use procedures_plmc_visit, only: visit_walls, visit_short, visit_field
-use classes_dipolar_visitor, only: Abstract_Dipolar_Visitor
-use procedures_dipolar_visitor_factory, only: dipolar_visitor_destroy => destroy
 use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
@@ -35,9 +35,9 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
-        class(Abstract_Changed_Box_Size), pointer :: changed_box_size => null()
+        type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static => null()
         class(Abstract_Dipolar_Visitor), allocatable :: dipolar_visitor
+        class(Abstract_Changed_Box_Size), pointer :: changed_box_size => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -67,29 +67,29 @@ contains
 !implementation Abstract_Box_Volume_Change
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions, changed_box_size, dipolar_visitor)
+        dipolar_interactions_static, dipolar_visitor, changed_box_size)
         class(Abstract_Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
-        class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         class(Abstract_Dipolar_Visitor), intent(in) :: dipolar_visitor
+        class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
 
         this%environment => environment
         this%mixture => mixture
         this%short_interactions => short_interactions
-        this%dipolar_interactions => dipolar_interactions
-        this%changed_box_size => changed_box_size
+        this%dipolar_interactions_static => dipolar_interactions_static
         allocate(this%dipolar_visitor, source=dipolar_visitor)
+        this%changed_box_size => changed_box_size
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Box_Volume_Change), intent(inout) :: this
 
-        call dipolar_visitor_destroy(this%dipolar_visitor)
         this%changed_box_size => null()
-        this%dipolar_interactions => null()
+        call dipolar_visitor_destroy(this%dipolar_visitor)
+        this%dipolar_interactions_static => null()
         this%short_interactions => null()
         this%mixture => null()
         this%environment => null()
@@ -159,17 +159,16 @@ contains
         call visit_field(new_energies%field_energies, this%environment%external_field, this%&
             mixture%components)
         deltas%field_energies = new_energies%field_energies - energies%field_energies
-        !dipolar interactions
         call this%dipolar_visitor%visit(new_energies%dipolar_energies, new_energies%&
-            dipolar_mixture_energy, product(box_size_ratio), energies%dipolar_energies, energies%&
-            dipolar_mixture_energy)
+            dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies, energies%&
+            dipolar_shared_energy)
         deltas%dipolar_energies = new_energies%dipolar_energies - energies%dipolar_energies
-        deltas%dipolar_mixture_energy = new_energies%dipolar_mixture_energy - energies%&
-            dipolar_mixture_energy
+        deltas%dipolar_shared_energy = new_energies%dipolar_shared_energy - energies%&
+            dipolar_shared_energy
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             triangle_observables_sum(deltas%short_energies) + &
-            triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_mixture_energy
+            triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_shared_energy
         success = metropolis_algorithm(this%acceptation_probability(box_size_ratio, delta_energy))
     end subroutine Abstract_metropolis_algorithm
 
@@ -256,15 +255,15 @@ contains
 
 !implementation Null_Box_Volume_Change
 
-    subroutine Null_construct(this, environment, mixture, short_interactions, dipolar_interactions,&
-        changed_box_size, dipolar_visitor)
+    subroutine Null_construct(this, environment, mixture, short_interactions, &
+        dipolar_interactions_static, dipolar_visitor, changed_box_size)
         class(Null_Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
-        class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         class(Abstract_Dipolar_Visitor), intent(in) :: dipolar_visitor
+        class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

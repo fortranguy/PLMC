@@ -11,7 +11,7 @@ private
     type, public :: Concrete_Energies_Writers
         class(Abstract_Line_Writer), allocatable :: walls_energies, field_energies
         class(Abstract_Triangle_Writer), allocatable :: short_energies, dipolar_energies
-        class(Abstract_Real_Writer), allocatable :: dipolar_mixture_energy
+        class(Abstract_Real_Writer), allocatable :: dipolar_shared_energy
     end type Concrete_Energies_Writers
 
 end module types_energies_writers

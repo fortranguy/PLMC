@@ -11,6 +11,9 @@ use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_cells_factory, only: cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
+use classes_dipolar_visitor, only: Abstract_Dipolar_Visitor
+use procedures_dipolar_visitor_factory, only: dipolar_visitor_destroy => destroy
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use procedures_changed_box_size_ratio_factory, only: changed_box_size_ratio_destroy => destroy
 use procedures_triangle_observables, only: operator(-)
@@ -31,6 +34,8 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
+        type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static => null()
+        class(Abstract_Dipolar_Visitor), allocatable :: dipolar_visitor
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
         integer :: num_changes = 0
     contains
@@ -59,17 +64,21 @@ contains
 !implementation Abstract_Volume_Change_Method
 
     subroutine Abstract_construct(this, environment, components, short_interactions, &
-        changed_box_size_ratio, num_changes)
+        dipolar_interactions_static, dipolar_visitor, changed_box_size_ratio, num_changes)
         class(Abstract_Volume_Change_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
+        class(Abstract_Dipolar_Visitor), intent(in) :: dipolar_visitor
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
         integer, intent(in) :: num_changes
 
         this%environment => environment
         this%components => components
         this%short_interactions => short_interactions
+        this%dipolar_interactions_static => dipolar_interactions_static
+        allocate(this%dipolar_visitor, source=dipolar_visitor)
         allocate(this%changed_box_size_ratio, source=changed_box_size_ratio)
         call check_positive("Abstract_Volume_Change_Method: construct", "num_changes", num_changes)
         this%num_changes = num_changes
@@ -79,6 +88,8 @@ contains
         class(Abstract_Volume_Change_Method), intent(inout) :: this
 
         call changed_box_size_ratio_destroy(this%changed_box_size_ratio)
+        call dipolar_visitor_destroy(this%dipolar_visitor)
+        this%dipolar_interactions_static => null()
         this%short_interactions => null()
         this%components => null()
         this%environment => null()
@@ -108,7 +119,7 @@ contains
             call this%rescale_positions(box_size_ratio)
             call box_size_change_reset_cells(this%short_interactions%neighbour_cells, &
                 only_resized_triangle, this%short_interactions%visitable_cells)
-            call this%set_delta_energy(overlap, delta_energy, observables%energies)
+            call this%set_delta_energy(overlap, delta_energy, box_size_ratio, observables%energies)
             if (overlap) call error_exit("Abstract_Volume_Change_Method: try: set_delta_energy: "//&
                 "overlap")
             delta_volume = product(this%environment%accessible_domain%get_size()) * &
@@ -123,10 +134,11 @@ contains
             get(contacts) + beta_pressure_excess_sum / this%num_changes
     end subroutine Abstract_try
 
-    subroutine Abstract_set_delta_energy(this, overlap, delta_energy, energies)
+    subroutine Abstract_set_delta_energy(this, overlap, delta_energy, box_size_ratio, energies)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
+        real(DP), intent(in) :: box_size_ratio(:)
         type(Concrete_Energies), intent(in) :: energies
 
         type(Concrete_Energies) :: deltas, new_energies
@@ -144,10 +156,16 @@ contains
         call visit_field(new_energies%field_energies, this%environment%external_field, this%&
             components)
         deltas%field_energies = new_energies%field_energies - energies%field_energies
-        !dipolar interactions
+        call this%dipolar_visitor%visit(new_energies%dipolar_energies, new_energies%&
+            dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies, energies%&
+            dipolar_shared_energy)
+        deltas%dipolar_energies = new_energies%dipolar_energies - energies%dipolar_energies
+        deltas%dipolar_shared_energy = new_energies%dipolar_shared_energy - energies%&
+            dipolar_shared_energy
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
-            triangle_observables_sum(deltas%short_energies)
+            triangle_observables_sum(deltas%short_energies) + &
+            triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_shared_energy
     end subroutine Abstract_set_delta_energy
 
     subroutine Abstract_rescale_positions(this, box_size_ratio)
@@ -209,11 +227,13 @@ contains
 !implementation Null_Volume_Change_Method
 
     subroutine Null_construct(this, environment, components, short_interactions, &
-        changed_box_size_ratio, num_changes)
+        dipolar_interactions_static, dipolar_visitor, changed_box_size_ratio, num_changes)
         class(Null_Volume_Change_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
+        class(Abstract_Dipolar_Visitor), intent(in) :: dipolar_visitor
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
         integer, intent(in) :: num_changes
     end subroutine Null_construct

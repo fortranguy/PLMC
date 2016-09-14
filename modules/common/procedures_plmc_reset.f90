@@ -3,7 +3,7 @@ module procedures_plmc_reset
 use types_logical_line, only: Concrete_Logical_Line
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 
 implicit none
@@ -19,7 +19,7 @@ contains
         call physical_model%mixture%total_moment%reset()
         call reset_neighbour_cells(physical_model%short_interactions%neighbour_cells)
         call reset_visitable_cells(physical_model%short_interactions%visitable_cells)
-        call reset_dipolar(physical_model%dipolar_interactions)
+        call reset_dipolar(physical_model%dipolar_interactions_static)
     end subroutine plmc_reset
 
     subroutine reset_neighbour_cells(cells)
@@ -70,19 +70,15 @@ contains
     end subroutine box_size_change_reset_cells
 
     !> Some dipolar accumulators may need to be reset to reflect the current configuration.
-    subroutine reset_dipolar(dipolar_interactions)
-        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
+    subroutine reset_dipolar(dipolar_interactions_static)
+        type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
 
-        call dipolar_interactions%box_volume_memento%save()
-        call dipolar_interactions%real_pair%reset()
-        call dipolar_interactions%reci_weight%reset()
-        call dipolar_interactions%reci_structure%reset()
-        call dipolar_interactions%dlc_weight%reset()
-        call dipolar_interactions%dlc_structures%reset()
+        call dipolar_interactions_static%box_volume_memento%save()
+        call dipolar_interactions_static%real_pair%reset()
+        call dipolar_interactions_static%reci_weight%reset()
+        call dipolar_interactions_static%reci_structure%reset()
+        call dipolar_interactions_static%dlc_weight%reset()
+        call dipolar_interactions_static%dlc_structures%reset()
     end subroutine reset_dipolar
-
-    subroutine box_size_change_reset_dipolar(dipolar_interactions)
-        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
-    end subroutine box_size_change_reset_dipolar
 
 end module procedures_plmc_reset

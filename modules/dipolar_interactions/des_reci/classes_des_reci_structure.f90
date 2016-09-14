@@ -14,6 +14,13 @@ implicit none
 
 private
 
+    !> @note
+    !> Only half structure factor is stored in [[Abstract_DES_Reci_Structure:structure]] (symmetry).
+    !> Hence in [[classes_des_reci_structure:Abstract_update_translation]],
+    !> [[classes_des_reci_structure:Abstract_update_transmulation]],
+    !> [[classes_des_reci_structure:Abstract_update_switch]],
+    !> [[classes_des_reci_structure:Abstract_update_exchange]]
+    !> the updates only run over half wave vectors.
     type, extends(Abstract_Structure_Factor), abstract, public :: Abstract_DES_Reci_Structure
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
@@ -131,7 +138,6 @@ contains
     !>      \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu})
     !>          \left( e^{i\vec{k}\cdot\vec{x}^\prime} - e^{i\vec{k}\cdot\vec{x}} \right)
     !>  \]
-    !> Warning: only half wave vectors are updated.
     pure subroutine Abstract_update_translation(this, i_component, new_position, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -155,6 +161,8 @@ contains
         if (.not.this%are_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
+        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_old_1, this%reci_numbers(1), wave_1_x_position_old(1))
         call set_fourier(fourier_position_old_2, this%reci_numbers(2), wave_1_x_position_old(2))
@@ -163,7 +171,6 @@ contains
         call set_fourier(fourier_position_new_1, this%reci_numbers(1), wave_1_x_position_new(1))
         call set_fourier(fourier_position_new_2, this%reci_numbers(2), wave_1_x_position_new(2))
         call set_fourier(fourier_position_new_3, this%reci_numbers(3), wave_1_x_position_new(3))
-        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -192,7 +199,6 @@ contains
     !>  \[
     !>      \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
     !>  \]
-    !> Warning: only half wave vectors are updated.
     pure subroutine Abstract_update_transmulation(this, ij_components, new_dipole_moment, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
@@ -212,11 +218,12 @@ contains
             return
 
         box_size = this%periodic_box%get_size()
+        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+
         wave_1_x_position = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
         call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
-        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
 
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
@@ -247,7 +254,7 @@ contains
         call this%update_transmutation([i_component, i_component], new_dipole_moment, old)
     end subroutine Abstract_update_rotation
 
-    !> cf. [[Abstract_update_exchange]]
+    !> cf. [[classes_des_reci_structure:Abstract_update_exchange]]
     pure subroutine Abstract_update_add(this, i_component, particle)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -256,7 +263,7 @@ contains
         call this%update_exchange(i_component, particle, +1._DP)
     end subroutine Abstract_update_add
 
-    !> cf. [[Abstract_update_exchange]]
+    !> cf. [[classes_des_reci_structure:Abstract_update_exchange]]
     pure subroutine Abstract_update_remove(this, i_component, particle)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -266,7 +273,7 @@ contains
     end subroutine Abstract_update_remove
 
     !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added
-    !> (\( + )\) or removed (\( - \)):
+    !> (\( + )\) or removed (\( - \)).
     !> \[
     !>      \Delta S(\vec{k}) = \pm (\vec{k}\cdot\vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
     !> \]
@@ -276,7 +283,7 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
         integer :: n_1, n_2, n_3
 
@@ -288,6 +295,8 @@ contains
         if (.not.this%are_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
+        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+
         wave_1_x_position = 2._DP*PI * particle%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
@@ -306,7 +315,7 @@ contains
                         fourier_position_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        signed * dot_product(wave_vector, particle%dipole_moment) * &
+                        signed*box_edge_ratio * dot_product(wave_vector, particle%dipole_moment) * &
                         fourier_position
                 end do
             end do
@@ -324,7 +333,7 @@ contains
         integer, intent(in) :: ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        real(DP) :: box_size(num_dimensions)
+        real(DP) :: box_size(num_dimensions), box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2, &
             wave_vector
         integer :: n_1, n_2, n_3
@@ -342,6 +351,8 @@ contains
             return
 
         box_size = this%periodic_box%get_size()
+        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
         call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))
         call set_fourier(fourier_position_1_2, this%reci_numbers(2), wave_1_x_position_1(2))
@@ -366,8 +377,8 @@ contains
                         fourier_position_2_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, particles(1)%dipole_moment - particles(2)%&
-                            dipole_moment) * (fourier_position_2 - fourier_position_1)
+                        box_edge_ratio * dot_product(wave_vector, particles(1)%dipole_moment - &
+                            particles(2)%dipole_moment) * (fourier_position_2 - fourier_position_1)
                 end do
             end do
         end do

@@ -79,7 +79,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Import.south) - (0 cm, 4 cm)$)}]
+        \begin{scope}[shift={($(Import.south |- DESconvergenceParameter.north)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DipolarVisitor}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
@@ -87,25 +87,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESrealPair.north -| Import) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{DipolarInteractions}{0, 0}
-                \UMLattribute{boxVolumeMemento: \type{BoxVolumeMemento}}
-                \UMLattribute{alpha: \type{DESconvergenceParameter}}
-                \UMLattribute{realPair: \type{DESrealPair}}
-                \UMLattribute{realComponents: \type{DESrealComponent[::]}}
-                \UMLattribute{reciWeight: \type{DESreciWeight}}
-                \UMLattribute{reciStructure: \type{DESreciStructure}}
-                \UMLattribute{reciVisitor: \type{DESreciVisitor}}
-                \UMLattribute{selfComponents: \type{DESselfComponent[:]}}
-                \UMLattribute{surfMixture: \type{DESsurfMixture}}
-                \UMLattribute{dlcWeight: \type{DLCweight}}
-                \UMLattribute{dlcStructures: \type{DLCstructures}}
-                \UMLattribute{dlcVisitor: \type{DLCvisitor}}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(DESconvergenceParameter.south)!0.5!(DipolarInteractions.south) -
-            (0 cm, 3.5 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.south) + (4.5 cm, -1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{StructureVisitor}{0, 0}
             \end{abstractclass}
         \end{scope}
@@ -147,6 +129,28 @@
             \begin{abstractclass}[text width=\smallTextWidth]{DLCvisitor}{0, 0}
                 \inherit{StructureVisitor}
             \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESreciStructure.south)!0.5!(StructureFactor) + (-1.5 cm, -1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{DipolarInteractionsDynamic}{0, 0}
+                \UMLattribute{alpha: \type{DESconvergenceParameter}}
+                \UMLattribute{realComponents: \type{DESrealComponent[::]}}
+                \UMLattribute{reciVisitor: \type{DESreciVisitor}}
+                \UMLattribute{selfComponents: \type{DESselfComponent[:]}}
+                \UMLattribute{surfMixture: \type{DESsurfMixture}}
+                \UMLattribute{dlcVisitor: \type{DLCvisitor}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureFactor.south)!0.5!(DLCstructures) + (1.5 cm, -1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{DipolarInteractionsStatic}{0, 0}
+                \UMLattribute{boxVolumeMemento: \type{BoxVolumeMemento}}
+                \UMLattribute{realPair: \type{DESrealPair}}
+                \UMLattribute{reciWeight: \type{DESreciWeight}}
+                \UMLattribute{reciStructure: \type{DESreciStructure}}
+                \UMLattribute{dlcWeight: \type{DLCweight}}
+                \UMLattribute{dlcStructures: \type{DLCstructures}}
+            \end{class}
         \end{scope}
 
         \begin{scope}[on background layer]

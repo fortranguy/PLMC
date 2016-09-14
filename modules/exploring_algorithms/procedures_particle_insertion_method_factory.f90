@@ -49,7 +49,7 @@ contains
         end if
         call particle_insertion_method%construct(physical_model%environment, physical_model%&
             mixture%components, physical_model%short_interactions, physical_model%&
-            dipolar_interactions, numbers, random_position, random_orientation)
+            dipolar_interactions_dynamic, numbers, random_position, random_orientation)
     end subroutine create
 
     subroutine destroy(particle_insertion_method)

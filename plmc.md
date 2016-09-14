@@ -8,8 +8,9 @@ extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORT
 output_dir: ./doc
 page_dir: ./modules
 predocmark: >
-search: false
-graph: false
+search: true
+graph: true
+coloured_edges: true
 display: public
     protected
     private

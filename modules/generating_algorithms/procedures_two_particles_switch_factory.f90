@@ -32,8 +32,9 @@ contains
 
         call couples%construct(size(physical_model%mixture%components))
         call two_particles_switch%construct(physical_model%environment, physical_model%mixture%&
-            components, physical_model%short_interactions, physical_model%dipolar_interactions, &
-            couples, selector_mold)
+            components, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_dynamic, physical_model%dipolar_interactions_static, couples, &
+            selector_mold)
         call couples%destroy()
     end subroutine create
 

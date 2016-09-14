@@ -7,7 +7,8 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: visit_different
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
+use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipoles_field_interaction, only: &
     dipoles_field_visit_translation => visit_translation, &
     dipoles_field_visit_rotation => visit_rotation
@@ -29,7 +30,9 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+            null()
+        type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static => null()
         type(Changes_Component_Wrapper), pointer :: changes_components(:) => null()
         logical, allocatable :: can_move(:)
         class(Abstract_Tower_Sampler), allocatable :: selector
@@ -60,36 +63,37 @@ private
             integer, intent(in) :: i_actor
         end subroutine Abstract_define_change
 
-        subroutine Abstract_visit_walls(this, overlap, delta, i_actor, new, old)
+        subroutine Abstract_visit_walls(this, overlap, delta_energy, i_actor, new, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
             class(Abstract_One_Particle_Move), intent(in) :: this
             logical, intent(out) :: overlap
-            real(DP), intent(out) :: delta
+            real(DP), intent(out) :: delta_energy
             integer, intent(in) :: i_actor
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_visit_walls
 
-        subroutine Abstract_visit_short(this, overlap, deltas, i_actor, new, old)
+        subroutine Abstract_visit_short(this, overlap, delta_energies, i_actor, new, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
             class(Abstract_One_Particle_Move), intent(in) :: this
             logical, intent(out) :: overlap
-            real(DP), intent(out) :: deltas(:)
+            real(DP), intent(out) :: delta_energies(:)
             integer, intent(in) :: i_actor
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_visit_short
 
-        subroutine Abstract_visit_field(this, delta, new, old)
+        subroutine Abstract_visit_field(this, delta_energy, new, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
             class(Abstract_One_Particle_Move), intent(in) :: this
-            real(DP), intent(out) :: delta
+            real(DP), intent(out) :: delta_energy
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_visit_field
 
-        subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
+        subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_actor, new, &
+            old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
             class(Abstract_One_Particle_Move), intent(in) :: this
-            real(DP), intent(out) :: deltas(:)
-            real(DP), intent(out) :: mixture_delta
+            real(DP), intent(out) :: delta_energies(:)
+            real(DP), intent(out) :: delta_shared_energy
             integer, intent(in) :: i_actor
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_visit_dipolar
@@ -160,12 +164,15 @@ contains
 !implementation Abstract_One_Particle_Move
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions, changes_components, can_move, selector_mold)
+        dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
+        selector_mold)
         class(Abstract_One_Particle_Move), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         type(Changes_Component_Wrapper), target, intent(in) :: changes_components(:)
         logical, intent(in) :: can_move(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector_mold
@@ -173,7 +180,8 @@ contains
         this%environment => environment
         this%mixture => mixture
         this%short_interactions => short_interactions
-        this%dipolar_interactions => dipolar_interactions
+        this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
+        this%dipolar_interactions_static => dipolar_interactions_static
         this%changes_components => changes_components
         allocate(this%can_move, source=can_move)
         allocate(this%selector, mold=selector_mold)
@@ -189,7 +197,8 @@ contains
         end if
         !this%can_move: early deallocation in [[Abstract_set_selector]]
         this%changes_components => null()
-        this%dipolar_interactions => null()
+        this%dipolar_interactions_static => null()
+        this%dipolar_interactions_dynamic => null()
         this%short_interactions => null()
         this%mixture => null()
         this%environment => null()
@@ -224,8 +233,8 @@ contains
 
         i_actor = this%selector%get()
         call this%increment_hit(observables%changes_counters(i_actor))
-        allocate(deltas%short(size(observables%energies%short_energies)))
-        allocate(deltas%dipolar(size(observables%energies%dipolar_energies)))
+        allocate(deltas%short_energies(size(observables%energies%short_energies)))
+        allocate(deltas%dipolar_energies(size(observables%energies%dipolar_energies)))
         call this%metropolis_algorithm(success, deltas, i_actor)
         if (success) then
             call observables_energies_set(observables%energies, deltas, i_actor)
@@ -247,15 +256,16 @@ contains
         call this%define_change(abort, new, old, i_actor)
         if (abort) return
 
-        call this%visit_walls(overlap, deltas%walls, i_actor, new, old)
+        call this%visit_walls(overlap, deltas%walls_energy, i_actor, new, old)
         if (overlap) return
-        call this%visit_short(overlap, deltas%short, i_actor, new, old)
+        call this%visit_short(overlap, deltas%short_energies, i_actor, new, old)
         if (overlap) return
-        call this%visit_field(deltas%field, new, old)
-        call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, i_actor, new, old)
+        call this%visit_field(deltas%field_energy, new, old)
+        call this%visit_dipolar(deltas%dipolar_energies, deltas%dipolar_shared_energy, i_actor, &
+            new, old)
 
-        delta_energy = deltas%walls + deltas%field + sum(deltas%short + deltas%dipolar) + &
-            deltas%dipolar_mixture
+        delta_energy = deltas%walls_energy + deltas%field_energy + &
+            sum(deltas%short_energies + deltas%dipolar_energies) + deltas%dipolar_shared_energy
         success = metropolis_algorithm(min(1._DP, &
             exp(-delta_energy/this%environment%temperature%get())))
         if (success) call this%update_actor(i_actor, new, old)
@@ -287,10 +297,10 @@ contains
         new%dipole_moment = old%dipole_moment
     end subroutine Translation_define_change
 
-    subroutine Translation_visit_walls(this, overlap, delta, i_actor, new, old)
+    subroutine Translation_visit_walls(this, overlap, delta_energy, i_actor, new, old)
         class(Concrete_One_Particle_Translation), intent(in) :: this
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: delta
+        real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
@@ -301,17 +311,17 @@ contains
         if (overlap) return
         call this%environment%visitable_walls%visit(overlap, energy_old, old%position, this%&
             short_interactions%wall_pairs(i_actor)%potential)
-        delta = energy_new - energy_old
+        delta_energy = energy_new - energy_old
     end subroutine Translation_visit_walls
 
-    subroutine Translation_visit_short(this, overlap, deltas, i_actor, new, old)
+    subroutine Translation_visit_short(this, overlap, delta_energies, i_actor, new, old)
         class(Concrete_One_Particle_Translation), intent(in) :: this
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: deltas(:)
+        real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        real(DP), dimension(size(deltas)) :: energies_new, energies_old
+        real(DP), dimension(size(delta_energies)) :: energies_new, energies_old
         integer :: i_component, i_exclude
 
         do i_component = 1, size(this%short_interactions%visitable_cells, 1)
@@ -325,38 +335,42 @@ contains
             call this%short_interactions%visitable_cells(i_component, i_actor)%&
                 visit_energy(overlap, energies_old(i_component), old, visit_different, i_exclude)
         end do
-        deltas = energies_new - energies_old
+        delta_energies = energies_new - energies_old
     end subroutine Translation_visit_short
 
-    subroutine Translation_visit_field(this, delta, new, old)
+    subroutine Translation_visit_field(this, delta_energy, new, old)
         class(Concrete_One_Particle_Translation), intent(in) :: this
-        real(DP), intent(out) :: delta
+        real(DP), intent(out) :: delta_energy
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        delta = dipoles_field_visit_translation(this%environment%external_field, new%position, old)
+        delta_energy = dipoles_field_visit_translation(this%environment%external_field, new%&
+            position, old)
     end subroutine Translation_visit_field
 
-    subroutine Translation_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
+    subroutine Translation_visit_dipolar(this, delta_energies, delta_shared_energy, i_actor, new, &
+        old)
         class(Concrete_One_Particle_Translation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:)
-        real(DP), intent(out) :: mixture_delta
+        real(DP), intent(out) :: delta_energies(:)
+        real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        real(DP), dimension(size(deltas)) :: real_energies_new, real_energies_old
+        real(DP), dimension(size(delta_energies)) :: real_energies_new, real_energies_old
         integer :: i_component, i_exclude
 
-        do i_component = 1, size(this%dipolar_interactions%real_components, 1)
+        do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
-            call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
+            call this%dipolar_interactions_dynamic%real_components(i_component, i_actor)%component%&
                 visit(real_energies_new(i_component), new, visit_different, i_exclude)
-            call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
+            call this%dipolar_interactions_dynamic%real_components(i_component, i_actor)%component%&
                 visit(real_energies_old(i_component), old, visit_different, i_exclude)
         end do
-        mixture_delta = &
-            this%dipolar_interactions%reci_visitor%visit_translation(i_actor, new%position, old) - &
-            this%dipolar_interactions%dlc_visitor%visit_translation(i_actor, new%position, old)
-        deltas = real_energies_new - real_energies_old
+        delta_shared_energy = &
+            this%dipolar_interactions_dynamic%reci_visitor%&
+                visit_translation(i_actor, new%position, old) - &
+            this%dipolar_interactions_dynamic%dlc_visitor%&
+                visit_translation(i_actor, new%position, old)
+        delta_energies = real_energies_new - real_energies_old
     end subroutine Translation_visit_dipolar
 
     subroutine Translation_update_actor(this, i_actor, new, old)
@@ -371,8 +385,10 @@ contains
             call this%short_interactions%visitable_cells(i_actor, i_component)%translate(new%&
                 position, old)
         end do
-        call this%dipolar_interactions%reci_structure%update_translation(i_actor, new%position, old)
-        call this%dipolar_interactions%dlc_structures%update_translation(i_actor, new%position, old)
+        call this%dipolar_interactions_static%reci_structure%&
+            update_translation(i_actor, new%position, old)
+        call this%dipolar_interactions_static%dlc_structures%&
+            update_translation(i_actor, new%position, old)
     end subroutine Translation_update_actor
 
     subroutine Translation_increment_hit(changes_counters)
@@ -414,59 +430,60 @@ contains
             orientation
     end subroutine Rotation_define_change
 
-    subroutine Rotation_visit_walls(this, overlap, delta, i_actor, new, old)
+    subroutine Rotation_visit_walls(this, overlap, delta_energy, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: delta
+        real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         overlap = .false.
-        delta = 0._DP
+        delta_energy = 0._DP
     end subroutine Rotation_visit_walls
 
-    subroutine Rotation_visit_short(this, overlap, deltas, i_actor, new, old)
+    subroutine Rotation_visit_short(this, overlap, delta_energies, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: deltas(:)
+        real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         overlap = .false.
-        deltas = 0._DP
+        delta_energies = 0._DP
     end subroutine Rotation_visit_short
 
-    subroutine Rotation_visit_field(this, delta, new, old)
+    subroutine Rotation_visit_field(this, delta_energy, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
-        real(DP), intent(out) :: delta
+        real(DP), intent(out) :: delta_energy
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        delta = dipoles_field_visit_rotation(this%environment%external_field, new%dipole_moment, &
-            old)
+        delta_energy = dipoles_field_visit_rotation(this%environment%external_field, new%&
+            dipole_moment, old)
     end subroutine Rotation_visit_field
 
-    subroutine Rotation_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
+    subroutine Rotation_visit_dipolar(this, delta_energies, delta_shared_energy, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:)
-        real(DP), intent(out) :: mixture_delta
+        real(DP), intent(out) :: delta_energies(:)
+        real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        real(DP), dimension(size(deltas)) :: real_energies_new, real_energies_old
+        real(DP), dimension(size(delta_energies)) :: real_energies_new, real_energies_old
         integer :: i_component, i_exclude
 
-        do i_component = 1, size(this%dipolar_interactions%real_components, 1)
+        do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
-            call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
+            call this%dipolar_interactions_dynamic%real_components(i_component, i_actor)%component%&
                 visit(real_energies_new(i_component), new, visit_different, i_exclude)
-            call this%dipolar_interactions%real_components(i_component, i_actor)%component%&
+            call this%dipolar_interactions_dynamic%real_components(i_component, i_actor)%component%&
                 visit(real_energies_old(i_component), old, visit_different, i_exclude)
         end do
-        deltas = real_energies_new - real_energies_old
-        mixture_delta = &
-            this%dipolar_interactions%reci_visitor%visit_rotation(i_actor, new%dipole_moment, &
-                old) + &
-            this%dipolar_interactions%surf_mixture%visit_rotation(i_actor, new%dipole_moment, &
-                old%dipole_moment) - &
-            this%dipolar_interactions%dlc_visitor%visit_rotation(i_actor, new%dipole_moment, old)
+        delta_energies = real_energies_new - real_energies_old
+        delta_shared_energy = &
+            this%dipolar_interactions_dynamic%reci_visitor%&
+                visit_rotation(i_actor, new%dipole_moment, old) + &
+            this%dipolar_interactions_dynamic%surf_mixture%&
+                visit_rotation(i_actor, new%dipole_moment, old%dipole_moment) - &
+            this%dipolar_interactions_dynamic%dlc_visitor%&
+                visit_rotation(i_actor, new%dipole_moment, old)
     end subroutine Rotation_visit_dipolar
 
     subroutine Rotation_update_actor(this, i_actor, new, old)
@@ -477,10 +494,10 @@ contains
         call this%mixture%components(i_actor)%orientations%set(new%i, new%orientation)
         call this%mixture%total_moment%remove(i_actor, old%dipole_moment)
         call this%mixture%total_moment%add(i_actor, new%dipole_moment)
-        call this%dipolar_interactions%reci_structure%update_rotation(i_actor, new%dipole_moment, &
-            old)
-        call this%dipolar_interactions%dlc_structures%update_rotation(i_actor, new%dipole_moment, &
-            old)
+        call this%dipolar_interactions_static%reci_structure%&
+            update_rotation(i_actor, new%dipole_moment, old)
+        call this%dipolar_interactions_static%dlc_structures%&
+            update_rotation(i_actor, new%dipole_moment, old)
     end subroutine Rotation_update_actor
 
     subroutine Rotation_increment_hit(changes_counters)
@@ -499,13 +516,16 @@ contains
 
 !implementation Null_One_Particle_Move
 
-    subroutine Null_construct(this, environment, mixture, short_interactions, dipolar_interactions,&
-        changes_components, can_move, selector_mold)
+    subroutine Null_construct(this, environment, mixture, short_interactions, &
+        dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
+        selector_mold)
         class(Null_One_Particle_Move), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         type(Changes_Component_Wrapper), target, intent(in) :: changes_components(:)
         logical, intent(in) :: can_move(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector_mold
@@ -535,8 +555,9 @@ contains
         type(Concrete_Single_Energies), intent(inout) :: deltas
         integer, intent(in) :: i_actor
         success = .false.
-        deltas%field = 0._DP; deltas%walls = 0._DP; deltas%short = 0._DP; deltas%dipolar = 0._DP
-        deltas%dipolar_mixture = 0._DP
+        deltas%field_energy = 0._DP; deltas%walls_energy = 0._DP
+        deltas%short_energies = 0._DP; deltas%dipolar_energies = 0._DP
+        deltas%dipolar_shared_energy = 0._DP
     end subroutine Null_metropolis_algorithm
 
     subroutine Null_define_change(this, abort, new, old, i_actor)
@@ -549,40 +570,40 @@ contains
          old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipole_moment = 0._DP
      end subroutine Null_define_change
 
-     subroutine Null_visit_walls(this, overlap, delta, i_actor, new, old)
+     subroutine Null_visit_walls(this, overlap, delta_energy, i_actor, new, old)
          class(Null_One_Particle_Move), intent(in) :: this
          logical, intent(out) :: overlap
-         real(DP), intent(out) :: delta
+         real(DP), intent(out) :: delta_energy
          integer, intent(in) :: i_actor
          type(Concrete_Temporary_Particle), intent(in) :: new, old
          overlap = .false.
-         delta = 0._DP
+         delta_energy = 0._DP
      end subroutine Null_visit_walls
 
-     subroutine Null_visit_short(this, overlap, deltas, i_actor, new, old)
+     subroutine Null_visit_short(this, overlap, delta_energies, i_actor, new, old)
          class(Null_One_Particle_Move), intent(in) :: this
          logical, intent(out) :: overlap
-         real(DP), intent(out) :: deltas(:)
+         real(DP), intent(out) :: delta_energies(:)
          integer, intent(in) :: i_actor
          type(Concrete_Temporary_Particle), intent(in) :: new, old
          overlap = .false.
-         deltas = 0._DP
+         delta_energies = 0._DP
      end subroutine Null_visit_short
 
-    subroutine Null_visit_field(this, delta, new, old)
+    subroutine Null_visit_field(this, delta_energy, new, old)
         class(Null_One_Particle_Move), intent(in) :: this
-        real(DP), intent(out) :: delta
+        real(DP), intent(out) :: delta_energy
         type(Concrete_Temporary_Particle), intent(in) :: new, old
-        delta = 0._DP
+        delta_energy = 0._DP
     end subroutine Null_visit_field
 
-     subroutine Null_visit_dipolar(this, deltas, mixture_delta, i_actor, new, old)
+     subroutine Null_visit_dipolar(this, delta_energies, delta_shared_energy, i_actor, new, old)
          class(Null_One_Particle_Move), intent(in) :: this
-         real(DP), intent(out) :: deltas(:)
-         real(DP), intent(out) :: mixture_delta
+         real(DP), intent(out) :: delta_energies(:)
+         real(DP), intent(out) :: delta_shared_energy
          type(Concrete_Temporary_Particle), intent(in) :: new, old
          integer, intent(in) :: i_actor
-         deltas = 0._DP; mixture_delta = 0._DP
+         delta_energies = 0._DP; delta_shared_energy = 0._DP
      end subroutine Null_visit_dipolar
 
      subroutine Null_update_actor(this, i_actor, new, old)

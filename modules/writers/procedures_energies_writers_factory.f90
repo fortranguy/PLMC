@@ -38,14 +38,14 @@ contains
         call set_are_dipolar(are_dipolar, components)
         call triangle_writer_create(energies%dipolar_energies, are_dipolar, visit_energies, &
             "dipolar_energies.out")
-        call real_writer_create(energies%dipolar_mixture_energy, any(are_dipolar) .and. &
-            visit_energies, "dipolar_mixture_energy.out")
+        call real_writer_create(energies%dipolar_shared_energy, any(are_dipolar) .and. &
+            visit_energies, "dipolar_shared_energy.out")
     end subroutine create
 
     subroutine destroy(energies)
         type(Concrete_Energies_Writers), intent(inout) :: energies
 
-        call real_writer_destroy(energies%dipolar_mixture_energy)
+        call real_writer_destroy(energies%dipolar_shared_energy)
         call triangle_writer_destroy(energies%dipolar_energies)
         call triangle_writer_destroy(energies%short_energies)
         call line_writer_destroy(energies%field_energies)

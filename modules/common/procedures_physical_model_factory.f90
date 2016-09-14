@@ -27,8 +27,9 @@ contains
             mixture_prefix)
         call short_interactions_create(physical_model%short_interactions, physical_model%&
             environment, physical_model%mixture, generating_data, short_interactions_prefix)
-        call dipolar_interactions_create(physical_model%dipolar_interactions, physical_model%&
-            environment, physical_model%mixture, generating_data, dipolar_interactions_prefix)
+        call dipolar_interactions_create(physical_model%dipolar_interactions_dynamic, &
+            physical_model%dipolar_interactions_static, physical_model%environment, physical_model%&
+            mixture, generating_data, dipolar_interactions_prefix)
     end subroutine create_generating
 
     subroutine create_exploring(physical_model, generating_data, exploring_data)
@@ -41,14 +42,16 @@ contains
         call short_interactions_create(physical_model%short_interactions, physical_model%&
             environment, physical_model%mixture, generating_data, short_interactions_prefix, &
             exploring_data, volume_change_prefix)
-        call dipolar_interactions_create(physical_model%dipolar_interactions, physical_model%&
-            environment, physical_model%mixture, generating_data, dipolar_interactions_prefix)
+        call dipolar_interactions_create(physical_model%dipolar_interactions_dynamic, &
+            physical_model%dipolar_interactions_static, physical_model%environment, physical_model%&
+            mixture, generating_data, dipolar_interactions_prefix)
     end subroutine create_exploring
 
     subroutine destroy(physical_model)
         type(Physical_Model_Wrapper), intent(inout) :: physical_model
 
-        call dipolar_interactions_destroy(physical_model%dipolar_interactions)
+        call dipolar_interactions_destroy(physical_model%dipolar_interactions_dynamic, &
+            physical_model%dipolar_interactions_static)
         call short_interactions_destroy(physical_model%short_interactions)
         call mixture_destroy(physical_model%mixture)
         call environment_destroy(physical_model%environment)

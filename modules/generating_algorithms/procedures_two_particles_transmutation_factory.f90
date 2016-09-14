@@ -38,8 +38,9 @@ contains
 
         call couples%construct(size(can_exchange))
         call two_particles_transmutation%construct(physical_model%environment, physical_model%&
-            mixture, physical_model%short_interactions, physical_model%dipolar_interactions, &
-            changes, can_exchange, couples, selector_mold)
+            mixture, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_dynamic, physical_model%dipolar_interactions_static, changes, &
+            can_exchange, couples, selector_mold)
         call couples%destroy()
     end subroutine create
 

@@ -7,7 +7,8 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: visit_different
-use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
+use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add, &
     dipoles_field_visit_remove => visit_remove
 use classes_tower_sampler, only: Abstract_Tower_Sampler
@@ -29,7 +30,9 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Wrapper), pointer :: dipolar_interactions => null()
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+            null()
+        type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static => null()
         type(Changes_Wrapper), pointer :: changes => null()
         logical, allocatable :: can_exchange(:)
         class(Abstract_Hetero_Couples), allocatable :: couples
@@ -69,12 +72,15 @@ contains
 !implementation Abstract_Two_Particles_Transmutation
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions, changes, can_exchange, couples, selector_mold)
+        dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, couples, &
+        selector_mold)
         class(Abstract_Two_Particles_Transmutation), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         type(Changes_Wrapper), target, intent(in) :: changes
         logical, intent(in) :: can_exchange(:)
         class(Abstract_Hetero_Couples), intent(in) :: couples
@@ -83,7 +89,8 @@ contains
         this%environment => environment
         this%mixture => mixture
         this%short_interactions => short_interactions
-        this%dipolar_interactions => dipolar_interactions
+        this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
+        this%dipolar_interactions_static => dipolar_interactions_static
         this%changes => changes
         allocate(this%can_exchange, source=can_exchange)
         allocate(this%couples, source=couples)
@@ -104,7 +111,8 @@ contains
         end if
         !this%can_exchange: early deallocation in [[Abstract_set_selector]]
         this%changes => null()
-        this%dipolar_interactions => null()
+        this%dipolar_interactions_static => null()
+        this%dipolar_interactions_dynamic => null()
         this%short_interactions => null()
         this%mixture => null()
         this%environment => null()
@@ -145,8 +153,8 @@ contains
         ij_actors = this%couples%get(this%selector%get())
         observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits = &
             observables%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits + 1
-        allocate(deltas%short(size(observables%energies%short_energies), 2))
-        allocate(deltas%dipolar(size(observables%energies%dipolar_energies), 2))
+        allocate(deltas%short_energies(size(observables%energies%short_energies), 2))
+        allocate(deltas%dipolar_energies(size(observables%energies%dipolar_energies), 2))
         call this%metropolis_algorithm(success, deltas, ij_actors)
         if (success) then
             call observables_energies_set(observables%energies, deltas, ij_actors)
@@ -169,15 +177,16 @@ contains
         call this%define_transmutation(abort, particles, ij_actors)
         if (abort) return
 
-        call this%visit_walls(overlap, deltas%walls, ij_actors, particles)
+        call this%visit_walls(overlap, deltas%walls_energies, ij_actors, particles)
         if (overlap) return
-        call this%visit_short(overlap, deltas%short, ij_actors, particles)
+        call this%visit_short(overlap, deltas%short_energies, ij_actors, particles)
         if (overlap) return
-        call this%visit_field(deltas%field, particles)
-        call this%visit_dipolar(deltas%dipolar, deltas%dipolar_mixture, ij_actors, particles)
+        call this%visit_field(deltas%field_energies, particles)
+        call this%visit_dipolar(deltas%dipolar_energies, deltas%dipolar_shared_energy, ij_actors, &
+            particles)
 
-        delta_energy = sum(deltas%walls + deltas%field) + sum(deltas%short + deltas%dipolar) + &
-            deltas%dipolar_mixture
+        delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
+            sum(deltas%short_energies + deltas%dipolar_energies) + deltas%dipolar_shared_energy
         success = metropolis_algorithm(this%acceptation_probability(ij_actors, delta_energy))
         if (success) call this%update_actors(ij_actors, particles)
     end subroutine Abstract_metropolis_algorithm
@@ -232,27 +241,27 @@ contains
         probability = min(1._DP, probability)
     end function Abstract_acceptation_probability
 
-    subroutine Abstract_visit_walls(this, overlap, deltas, ij_actors, particles)
+    subroutine Abstract_visit_walls(this, overlap, delta_energies, ij_actors, particles)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: deltas(:)
+        real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: ij_actors(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         integer :: i
 
         do i = size(particles), 1, -1
-            call this%environment%visitable_walls%visit(overlap, deltas(i), particles(i)%position, &
-                this%short_interactions%wall_pairs(ij_actors(i))%potential)
+            call this%environment%visitable_walls%visit(overlap, delta_energies(i), particles(i)%&
+                position, this%short_interactions%wall_pairs(ij_actors(i))%potential)
             if (overlap) return
         end do
-        deltas(1) = -deltas(1)
+        delta_energies(1) = -delta_energies(1)
     end subroutine Abstract_visit_walls
 
-    subroutine Abstract_visit_short(this, overlap, deltas, ij_actors, particles)
+    subroutine Abstract_visit_short(this, overlap, delta_energies, ij_actors, particles)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: deltas(:, :)
+        real(DP), intent(out) :: delta_energies(:, :)
         integer, intent(in) :: ij_actors(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
@@ -262,50 +271,54 @@ contains
             do i_component = 1, size(this%short_interactions%visitable_cells, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, particles, i)
                 call this%short_interactions%visitable_cells(i_component, ij_actors(i))%&
-                    visit_energy(overlap, deltas(i_component, i), particles(i), visit_different, &
-                    i_exclude)
+                    visit_energy(overlap, delta_energies(i_component, i), particles(i), &
+                    visit_different, i_exclude)
                 if (overlap) return
             end do
         end do
-        deltas(:, 1) = -deltas(:, 1)
+        delta_energies(:, 1) = -delta_energies(:, 1)
     end subroutine Abstract_visit_short
 
-    subroutine Abstract_visit_field(this, deltas, particles)
+    subroutine Abstract_visit_field(this, delta_energies, particles)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:)
+        real(DP), intent(out) :: delta_energies(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        deltas = [dipoles_field_visit_remove(this%environment%external_field, particles(1)), &
+        delta_energies = &
+            [dipoles_field_visit_remove(this%environment%external_field, particles(1)), &
             dipoles_field_visit_add(this%environment%external_field, particles(2))]
     end subroutine Abstract_visit_field
 
-    subroutine Abstract_visit_dipolar(this, deltas, mixture_delta, ij_actors, particles)
+    subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, ij_actors, &
+        particles)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
-        real(DP), intent(out) :: deltas(:, :)
-        real(DP), intent(out) :: mixture_delta
+        real(DP), intent(out) :: delta_energies(:, :)
+        real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: ij_actors(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         integer :: i_component, i_exclude, i
 
         do i = 1, size(particles)
-            do i_component = 1, size(this%dipolar_interactions%real_components, 1)
+            do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, particles, i)
-                call this%dipolar_interactions%real_components(i_component, ij_actors(i))%&
-                    component%visit(deltas(i_component, i), particles(i), visit_different, &
+                call this%dipolar_interactions_dynamic%real_components(i_component, ij_actors(i))%&
+                    component%visit(delta_energies(i_component, i), particles(i), visit_different, &
                     i_exclude)
             end do
-            deltas(ij_actors(i), i) = deltas(ij_actors(i), i) - this%dipolar_interactions%&
-                self_components(ij_actors(i))%component%meet(particles(i)%dipole_moment)
+            delta_energies(ij_actors(i), i) = delta_energies(ij_actors(i), i) - &
+                this%dipolar_interactions_dynamic%self_components(ij_actors(i))%component%&
+                meet(particles(i)%dipole_moment)
         end do
-        deltas(:, 1) = -deltas(:, 1)
-        mixture_delta = &
-            this%dipolar_interactions%reci_visitor%visit_transmutation(ij_actors, particles(2)%&
-                dipole_moment, particles(1)) + &
-            this%dipolar_interactions%surf_mixture%visit_transmutation(ij_actors, particles(2)%&
-                dipole_moment, particles(1)%dipole_moment) - &
-            this%dipolar_interactions%dlc_visitor%visit_transmutation(ij_actors, particles(2)%&
-                dipole_moment, particles(1))
+        delta_energies(:, 1) = -delta_energies(:, 1)
+        delta_shared_energy = &
+            this%dipolar_interactions_dynamic%reci_visitor%&
+                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)) + &
+            this%dipolar_interactions_dynamic%surf_mixture%&
+                visit_transmutation(ij_actors, particles(2)%dipole_moment, &
+                    particles(1)%dipole_moment) - &
+            this%dipolar_interactions_dynamic%dlc_visitor%&
+                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
     end subroutine Abstract_visit_dipolar
 
     pure integer function i_exclude_particle(i_component, ij_actors, particles, i) result(i_exclude)
@@ -352,23 +365,26 @@ contains
                 add(particles(2))
         end do
 
-        call this%dipolar_interactions%reci_structure%update_transmutation(ij_actors, particles(2)%&
-            dipole_moment, particles(1))
-        call this%dipolar_interactions%dlc_structures%update_transmutation(ij_actors, particles(2)%&
-            dipole_moment, particles(1))
+        call this%dipolar_interactions_static%reci_structure%&
+            update_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
+        call this%dipolar_interactions_static%dlc_structures%&
+            update_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
     end subroutine Abstract_update_actors
 
 !end implementation Abstract_Two_Particles_Transmutation
 
 !implementation Null_Two_Particles_Transmutation
 
-    subroutine Null_construct(this, environment, mixture, short_interactions, dipolar_interactions,&
-        changes, can_exchange, couples, selector_mold)
+    subroutine Null_construct(this, environment, mixture, short_interactions, &
+        dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, couples, &
+        selector_mold)
         class(Null_Two_Particles_Transmutation), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Wrapper), target, intent(in) :: dipolar_interactions
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         type(Changes_Wrapper), target, intent(in) :: changes
         logical, intent(in) :: can_exchange(:)
         class(Abstract_Hetero_Couples), intent(in) :: couples
