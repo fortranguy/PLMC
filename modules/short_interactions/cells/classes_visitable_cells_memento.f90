@@ -9,7 +9,7 @@ implicit none
 
 private
 
-    !> @bug [[Abstract_save]] must be nopass: gfortran bug?
+    !> @bug [[classes_visitable_cells_memento:Abstract_save]] must be nopass: gfortran bug?
     type, abstract, public :: Abstract_Visitable_Cells_Memento
     contains
         procedure(Abstract_save), deferred :: save
@@ -70,7 +70,7 @@ contains
     end subroutine Lists_save
 
     !> @note Instead of copying linked-lists (i.e. array of [[Abstract_Visitable_List]]),
-    !> [[Lists_restore]] rebuilds them.
+    !> [[classes_visitable_cells_memento:Lists_restore]] rebuilds them.
     subroutine Lists_restore(visitable_cells_target, neighbour_cells, only_resized_triangle, &
         visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)

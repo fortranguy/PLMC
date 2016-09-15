@@ -15,20 +15,20 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: save => Abstract_save
-        procedure :: get_ratio => Abstract_get_ratio
+        procedure :: get => Abstract_get
     end type Abstract_Box_Volume_Memento
 
     type, extends(Abstract_Box_Volume_Memento), public :: Concrete_Box_Volume_Memento
 
     end type Concrete_Box_Volume_Memento
 
-    type, extends(Abstract_Box_Volume_Memento), public :: Null_Box_Volume_Memento
+    type, extends(Abstract_Box_Volume_Memento), public :: Forgetful_Box_Volume_Memento
     contains
-        procedure :: construct => Null_construct
-        procedure :: destroy => Null_destroy
-        procedure :: save => Null_save
-        procedure :: get_ratio => Null_get_ratio
-    end type Null_Box_Volume_Memento
+        procedure :: construct => Forgetful_construct
+        procedure :: destroy => Forgetful_destroy
+        procedure :: save => Forgetful_save
+        procedure :: get => Forgetful_get
+    end type Forgetful_Box_Volume_Memento
 
 contains
 
@@ -54,35 +54,36 @@ contains
         this%box_volume = product(this%periodic_box%get_size())
     end subroutine Abstract_save
 
-    !> \[ \frac{V_\text{saved}}{V} \]
-    pure real(DP) function Abstract_get_ratio(this) result(ratio)
+    !> \[ V_\text{s} \]
+    pure real(DP) function Abstract_get(this) result(box_volume)
         class(Abstract_Box_Volume_Memento), intent(in) :: this
 
-        ratio = this%box_volume / product(this%periodic_box%get_size())
-    end function Abstract_get_ratio
+        box_volume = this%box_volume
+    end function Abstract_get
 
 !end implementation Abstract_Box_Volume_Memento
 
-!implementation Null_Box_Volume_Memento
+!implementation Forgetful_Box_Volume_Memento
 
-    subroutine Null_construct(this, periodic_box)
-        class(Null_Box_Volume_Memento), intent(out) :: this
+    subroutine Forgetful_construct(this, periodic_box)
+        class(Forgetful_Box_Volume_Memento), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-    end subroutine Null_construct
+    end subroutine Forgetful_construct
 
-    subroutine Null_destroy(this)
-        class(Null_Box_Volume_Memento), intent(inout) :: this
-    end subroutine Null_destroy
+    subroutine Forgetful_destroy(this)
+        class(Forgetful_Box_Volume_Memento), intent(inout) :: this
+    end subroutine Forgetful_destroy
 
-    subroutine Null_save(this)
-        class(Null_Box_Volume_Memento), intent(inout) :: this
-    end subroutine Null_save
+    subroutine Forgetful_save(this)
+        class(Forgetful_Box_Volume_Memento), intent(inout) :: this
+    end subroutine Forgetful_save
 
-    pure real(DP) function Null_get_ratio(this) result(ratio)
-        class(Null_Box_Volume_Memento), intent(in) :: this
-        ratio = 1._DP
-    end function Null_get_ratio
+    !> \[ V \]
+    pure real(DP) function Forgetful_get(this) result(box_volume)
+        class(Forgetful_Box_Volume_Memento), intent(in) :: this
+        box_volume = product(this%periodic_box%get_size())
+    end function Forgetful_get
 
-!end implementation Null_Box_Volume_Memento
+!end implementation Forgetful_Box_Volume_Memento
 
 end module classes_box_volume_memento

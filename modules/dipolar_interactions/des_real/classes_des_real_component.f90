@@ -73,7 +73,7 @@ contains
     !>          \frac{V_\text{s}}{V} \right)^{1/3} \vec{r}_{ij}, \vec{\mu}_i, \vec{\mu}_j
     !>      \right)
     !> \]
-    !> cf. [[classes_box_volume_memento:Abstract_get_ratio]] and
+    !> cf. [[classes_box_volume_memento:Abstract_get]] and
     !> [[classes_des_real_pair:Abstract_meet]]
     pure subroutine Abstract_visit(this, energy, particle, visit_condition, i_exclude)
         class(Abstract_DES_Real_Component), intent(in) :: this
@@ -86,7 +86,7 @@ contains
         real(DP) :: vector_ij(num_dimensions)
         integer :: j_particle
 
-        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_volume_ratio = this%box_volume_memento%get() / product(this%periodic_box%get_size())
         box_edge_ratio = box_volume_ratio**(1._DP/3._DP)
         energy = 0._DP
         do j_particle = 1, this%positions%get_num()

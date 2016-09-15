@@ -161,7 +161,7 @@ contains
         if (.not.this%are_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+        box_edge_ratio = (product(box_size) / this%box_volume_memento%get())**(1._DP/3._DP)
 
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_old_1, this%reci_numbers(1), wave_1_x_position_old(1))
@@ -218,7 +218,7 @@ contains
             return
 
         box_size = this%periodic_box%get_size()
-        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+        box_edge_ratio = (product(box_size) / this%box_volume_memento%get())**(1._DP/3._DP)
 
         wave_1_x_position = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
@@ -295,7 +295,7 @@ contains
         if (.not.this%are_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+        box_edge_ratio = (product(box_size) / this%box_volume_memento%get())**(1._DP/3._DP)
 
         wave_1_x_position = 2._DP*PI * particle%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
@@ -351,7 +351,7 @@ contains
             return
 
         box_size = this%periodic_box%get_size()
-        box_edge_ratio = this%box_volume_memento%get_ratio()**(-1._DP/3._DP)
+        box_edge_ratio = (product(box_size) / this%box_volume_memento%get())**(1._DP/3._DP)
 
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
         call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))

@@ -150,7 +150,7 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
         box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
@@ -223,7 +223,7 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return !shortcut?
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
         box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         wave_1_x_position = 2._DP*PI * old%position / box_size
@@ -313,7 +313,7 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
         box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         wave_1_x_position = 2._DP*PI * particle%position / box_size
@@ -388,7 +388,7 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get_ratio()
+        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
         box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
 
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
@@ -413,7 +413,7 @@ contains
                         fourier_position_1_3(n_3)
                     fourier_position_2 = fourier_position_2_1(n_1) * fourier_position_2_2(n_2) * &
                         fourier_position_2_3(n_3)
-                    wave_dot_delta_moment = box_edge_ratio* dot_product(wave_vector, &
+                    wave_dot_delta_moment = box_edge_ratio * dot_product(wave_vector, &
                         particles(1)%dipole_moment - particles(2)%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &

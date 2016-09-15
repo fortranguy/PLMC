@@ -2,7 +2,7 @@ module procedures_box_volume_memento_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_volume_memento, only: Abstract_Box_Volume_Memento, Concrete_Box_Volume_Memento, &
-    Null_Box_Volume_Memento
+    Forgetful_Box_Volume_Memento
 
 implicit none
 
@@ -19,7 +19,7 @@ contains
         if (needed) then
             allocate(Concrete_Box_Volume_Memento :: volume_memento)
         else
-            allocate(Null_Box_Volume_Memento :: volume_memento)
+            allocate(Forgetful_Box_Volume_Memento :: volume_memento)
         end if
 
         call volume_memento%construct(periodic_box)
