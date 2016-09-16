@@ -79,15 +79,23 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Import.south |- DESconvergenceParameter.north)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{DipolarVisitor}{0, 0}
+        \begin{scope}[shift={($(Import.south) - (0 cm, 4.25 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DipolarInteractionsFacade}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{visit}{}}
+                \operation{\procedure{save}{dipolarInteractionsStatic:
+                    \type{DipolarInteractionsStatic}, newBoxVolume: \type{real}}}
+                \operation{\procedure{restore}{dipolarInteractionsStatic:
+                    \type{DipolarInteractionsStatic}}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{visit}{newEnergies: \type{real[:.]},
+                    newSharedEnergy: \type{real}, boxVolumeRatio: \type{real},
+                    energies: \type{real[:.]}, sharedEnergy: \type{real}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.south) + (4.5 cm, -1.5 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.south)!0.5!(DipolarInteractionsFacade.south)
+            - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{StructureVisitor}{0, 0}
             \end{abstractclass}
         \end{scope}

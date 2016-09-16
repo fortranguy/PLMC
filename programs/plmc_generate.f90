@@ -6,9 +6,9 @@ use types_markov_chain_generator_wrapper, only: Markov_Chain_Generator_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_generating_io, only: Generating_IO_Wrapper
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
-use procedures_plmc_reset, only: plmc_reset
-use procedures_plmc_visit, only: plmc_visit
-use procedures_plmc_write, only: plmc_write
+use procedures_plmc_resetter, only: plmc_reset
+use procedures_plmc_visitor, only: plmc_visit
+use procedures_plmc_writer, only: plmc_write
 use procedures_plmc_help, only: plmc_catch_generating_help
 
 implicit none

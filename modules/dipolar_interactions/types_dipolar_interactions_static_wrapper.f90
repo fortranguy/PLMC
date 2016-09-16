@@ -12,8 +12,9 @@ implicit none
 private
 
     type, public :: Dipolar_Interactions_Static_Wrapper
-        class(Abstract_Box_Volume_Memento), allocatable :: box_volume_memento
+        class(Abstract_Box_Volume_Memento), allocatable :: box_volume_memento_real
         class(Abstract_DES_Real_Pair), allocatable :: real_pair
+        class(Abstract_Box_Volume_Memento), allocatable :: box_volume_memento_reci
         class(Abstract_DES_Reci_Weight), allocatable :: reci_weight
         class(Abstract_DES_Reci_Structure), allocatable :: reci_structure
         class(Abstract_DLC_Weight), allocatable :: dlc_weight

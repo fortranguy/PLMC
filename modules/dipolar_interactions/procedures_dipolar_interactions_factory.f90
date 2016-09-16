@@ -44,25 +44,27 @@ contains
         call check_consistency(environment%reciprocal_lattice, environment%permittivity, &
             any(are_dipolar))
 
-        call box_create(dipolar_interactions_static%box_volume_memento, environment%periodic_box, &
-            periodicity_is_xyz(environment%periodic_box) .and. &
-            box_size_can_change(environment%beta_pressure) .and. any(are_dipolar))
         call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, environment%&
             periodic_box, any(are_dipolar), generating_data, prefix)
 
+        call box_create(dipolar_interactions_static%box_volume_memento_real, environment%&
+            periodic_box, periodicity_is_xyz(environment%periodic_box) .and. &
+            box_size_can_change(environment%beta_pressure) .and. any(are_dipolar))
         call des_real_create(dipolar_interactions_static%real_pair, environment%permittivity, &
             mixture%components_min_distances, any(are_dipolar), dipolar_interactions_dynamic%alpha,&
             generating_data, prefix//"Real.")
         call des_real_create(dipolar_interactions_dynamic%real_components, environment%&
-            periodic_box, dipolar_interactions_static%box_volume_memento, mixture%components, &
+            periodic_box, dipolar_interactions_static%box_volume_memento_real, mixture%components, &
             are_dipolar, dipolar_interactions_static%real_pair)
 
+        allocate(dipolar_interactions_static%box_volume_memento_reci, &
+            source=dipolar_interactions_static%box_volume_memento_real)
         call des_reci_create(dipolar_interactions_static%reci_weight, environment, &
             any(are_dipolar), dipolar_interactions_dynamic%alpha)
         call des_reci_create(dipolar_interactions_static%reci_structure, environment, &
-            dipolar_interactions_static%box_volume_memento, mixture%components, are_dipolar)
+            dipolar_interactions_static%box_volume_memento_reci, mixture%components, are_dipolar)
         call des_reci_create(dipolar_interactions_dynamic%reci_visitor, environment, &
-            dipolar_interactions_static%box_volume_memento, dipolar_interactions_static%&
+            dipolar_interactions_static%box_volume_memento_reci, dipolar_interactions_static%&
             reci_weight, dipolar_interactions_static%reci_structure)
 
         call des_self_create(dipolar_interactions_dynamic%self_components, environment%&
@@ -94,12 +96,13 @@ contains
         call des_reci_destroy(dipolar_interactions_dynamic%reci_visitor)
         call des_reci_destroy(dipolar_interactions_static%reci_structure)
         call des_reci_destroy(dipolar_interactions_static%reci_weight)
+        call box_destroy(dipolar_interactions_static%box_volume_memento_reci)
 
         call des_real_destroy(dipolar_interactions_dynamic%real_components)
         call des_real_destroy(dipolar_interactions_static%real_pair)
+        call box_destroy(dipolar_interactions_static%box_volume_memento_real)
 
         call des_convergence_parameter_destroy(dipolar_interactions_dynamic%alpha)
-        call box_destroy(dipolar_interactions_static%box_volume_memento)
     end subroutine dipolar_interactions_destroy
 
     subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)

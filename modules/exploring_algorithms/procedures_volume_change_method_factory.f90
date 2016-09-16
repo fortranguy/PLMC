@@ -2,9 +2,6 @@ module procedures_volume_change_method_factory
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use classes_dipolar_visitor, only: Abstract_Dipolar_Visitor
-use procedures_dipolar_visitor_factory, only: dipolar_visitor_create => create, &
-    dipolar_visitor_destroy => destroy
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use classes_volume_change_method, only: Abstract_Volume_Change_Method, &
@@ -26,7 +23,6 @@ contains
         type(json_file), intent(inout) :: exploring_data
         character(len=*), intent(in) :: prefix
 
-        class(Abstract_Dipolar_Visitor), allocatable :: dipolar_visitor
         integer :: num_changes
         character(len=:), allocatable :: data_field
         logical :: data_found
@@ -40,13 +36,9 @@ contains
             allocate(Null_Volume_Change_Method :: volume_change_method)
             num_changes = 0
         end if
-        call dipolar_visitor_create(dipolar_visitor, physical_model%environment%periodic_box, &
-            measure_pressure_excess, physical_model%mixture%components, physical_model%&
-            dipolar_interactions_dynamic)
         call volume_change_method%construct(physical_model%environment, physical_model%mixture%&
             components, physical_model%short_interactions, physical_model%&
-            dipolar_interactions_static, dipolar_visitor, changed_box_size_ratio, num_changes)
-        call dipolar_visitor_destroy(dipolar_visitor)
+            dipolar_interactions_facade, changed_box_size_ratio, num_changes)
     end subroutine create
 
     subroutine destroy(volume_change_method)

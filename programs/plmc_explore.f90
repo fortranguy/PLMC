@@ -8,9 +8,9 @@ use types_exploring_io, only: Exploring_IO_Wrapper
 use procedures_markov_chain_explorer_factory, markov_chain_explorer_create => create, &
     markov_chain_explorer_destroy => destroy
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
-use procedures_plmc_reset, only: plmc_reset
-use procedures_plmc_visit, only: plmc_visit_set, plmc_visit
-use procedures_plmc_write, only: plmc_write
+use procedures_plmc_resetter, only: plmc_reset
+use procedures_plmc_visitor, only: plmc_visit_set, plmc_visit
+use procedures_plmc_writer, only: plmc_write
 use procedures_plmc_help, only: plmc_catch_exploring_help
 
 implicit none

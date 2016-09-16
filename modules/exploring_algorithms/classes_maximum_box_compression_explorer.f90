@@ -5,10 +5,10 @@ use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use procedures_short_interactions_visitor, only: short_interactions_visit_cells => visit_cells
 use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
-use procedures_plmc_visit, only: visit_short
 
 implicit none
 
@@ -93,10 +93,10 @@ contains
         real(DP) :: min_distance_ratio, max_distance_ratio
 
         max_distance_ratio = this%environment%periodic_box%get_max_distance() / this%min_distance
-        call visit_short(overlap, min_distance_ratio, max_distance_ratio, this%components, this%&
-            short_interactions)
+        call short_interactions_visit_cells(overlap, min_distance_ratio, max_distance_ratio, this%&
+            components, this%short_interactions)
         if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&
-            "visit_short: overlap")
+            "short_interactions_visit_cells: overlap")
         observables%maximum_box_compression_delta = this%maximum_box_compression%&
             get_delta(min_distance_ratio)
     end subroutine Abstract_try

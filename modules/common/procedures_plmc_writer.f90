@@ -1,4 +1,4 @@
-module procedures_plmc_write
+module procedures_plmc_writer
 
 use data_output_objects, only: random_number_generator_object
 use json_module, only: json_core, json_value
@@ -80,4 +80,4 @@ contains
         call writers%dipolar_shared_energy%write(i_step, energies%dipolar_shared_energy)
     end subroutine write_energies
 
-end module procedures_plmc_write
+end module procedures_plmc_writer

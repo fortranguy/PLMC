@@ -76,8 +76,8 @@ contains
         call cells_create(short_interactions%visitable_cells, environment%periodic_box, mixture%&
             components, short_interactions%hard_contact, short_interactions%components_pairs, &
             short_interactions%neighbour_cells, list_mold, interact)
-        call cells_create(short_interactions%visitable_cells_memento, list_mold, interact .and. &
-            (box_size_can_change(environment%beta_pressure) .or. measure_pressure))
+        call cells_create(short_interactions%visitable_cells_memento, list_mold, &
+            (box_size_can_change(environment%beta_pressure) .or. measure_pressure) .and. interact)
         call visitable_list_deallocate(list_mold)
     end subroutine short_interactions_create
 
