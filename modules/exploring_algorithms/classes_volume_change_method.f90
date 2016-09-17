@@ -9,7 +9,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use procedures_cells_factory, only: cells_destroy => destroy
+use procedures_cells_memento, only: cells_save => save, cells_restore => restore
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit, &
@@ -45,8 +45,6 @@ private
         procedure :: try => Abstract_try
         procedure, private :: set_delta_energy => Abstract_set_delta_energy
         procedure, private :: rescale_positions => Abstract_rescale_positions
-        procedure, private :: save_cells => Abstract_save_cells
-        procedure, private :: restore_cells => Abstract_restore_cells
     end type Abstract_Volume_Change_Method
 
     type, extends(Abstract_Volume_Change_Method), public :: Concrete_Volume_Change_Method
@@ -117,9 +115,11 @@ contains
         box_size = this%environment%periodic_box%get_size()
         beta_pressure_excess_sum = 0._DP
         do i_change = 1, this%num_changes
-            call this%save_cells(neighbour_cells, visitable_cells)
             box_size_ratio = this%changed_box_size_ratio%get()
             new_box_size = box_size * box_size_ratio
+            call cells_save(this%short_interactions%visitable_cells_memento, neighbour_cells, &
+                visitable_cells, this%short_interactions%neighbour_cells, this%short_interactions%&
+                visitable_cells)
             call this%dipolar_interactions_facade%save(dipolar_interactions_static, &
                 product(new_box_size))
 
@@ -138,7 +138,9 @@ contains
 
             call this%environment%periodic_box%set(box_size)
             call this%rescale_positions(1._DP / box_size_ratio)
-            call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells)
+            call cells_restore(this%short_interactions%visitable_cells_memento, this%&
+                short_interactions%neighbour_cells, this%short_interactions%visitable_cells, &
+                neighbour_cells, only_resized_triangle, visitable_cells)
             call this%dipolar_interactions_facade%restore(dipolar_interactions_static)
         end do
         observables%beta_pressure_excess = this%short_interactions%beta_pressure_excess%&
@@ -189,49 +191,6 @@ contains
             call this%components(i_component)%positions%rescale_all(box_size_ratio)
         end do
     end subroutine Abstract_rescale_positions
-
-    subroutine Abstract_save_cells(this, neighbour_cells, visitable_cells)
-        class(Abstract_Volume_Change_Method), intent(in) :: this
-        type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
-        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
-
-        integer :: i_component, j_component
-
-        if (allocated(neighbour_cells)) deallocate(neighbour_cells)
-        allocate(neighbour_cells(size(this%short_interactions%neighbour_cells)))
-        do j_component = 1, size(neighbour_cells)
-            allocate(neighbour_cells(j_component)%line(j_component))
-            do i_component = 1, size(neighbour_cells(j_component)%line)
-                allocate(neighbour_cells(j_component)%line(i_component)%cells, source=this%&
-                    short_interactions%neighbour_cells(j_component)%line(i_component)%cells)
-            end do
-        end do
-        if (allocated(visitable_cells)) deallocate(visitable_cells)
-        call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
-            short_interactions%visitable_cells)
-    end subroutine Abstract_save_cells
-
-    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)
-        class(Abstract_Volume_Change_Method), intent(in) :: this
-        type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells(:, :)
-
-        integer :: i_component, j_component
-
-        call cells_destroy(this%short_interactions%neighbour_cells)
-        allocate(this%short_interactions%neighbour_cells(size(neighbour_cells)))
-        do j_component = 1, size(neighbour_cells)
-            allocate(this%short_interactions%neighbour_cells(j_component)%line(j_component))
-            do i_component = 1, size(neighbour_cells(j_component)%line)
-                allocate(this%short_interactions%neighbour_cells(j_component)%line(i_component)%&
-                    cells, source=neighbour_cells(j_component)%line(i_component)%cells)
-            end do
-        end do
-        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
-            visitable_cells, this%short_interactions%neighbour_cells, only_resized_triangle, &
-            visitable_cells)
-    end subroutine Abstract_restore_cells
 
 !end implementation Abstract_Volume_Change_Method
 
