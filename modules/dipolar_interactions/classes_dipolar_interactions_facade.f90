@@ -87,6 +87,7 @@ private
     type, extends(Abstract_Dipolar_Interactions_Facade), public :: Null_Dipolar_Interactions_Facade
     contains
         procedure :: destroy => Null_destroy
+        procedure :: save => Null_save
         procedure :: reset => Null_reset
         procedure :: visit => Null_visit
         procedure, private :: clone => Null_clone
@@ -246,6 +247,12 @@ contains
     subroutine Null_destroy(this)
         class(Null_Dipolar_Interactions_Facade), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_save(this, dipolar_interactions_static, new_box_volume)
+        class(Null_Dipolar_Interactions_Facade), intent(inout) :: this
+        type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
+        real(DP), intent(in) :: new_box_volume
+    end subroutine Null_save
 
     subroutine Null_clone(this, dipolar_interactions_static_target, &
         dipolar_interactions_static_source)
