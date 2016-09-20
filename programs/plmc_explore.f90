@@ -46,6 +46,8 @@ implicit none
         call plmc_reset(physical_model)
         call plmc_visit(observables%energies, physical_model, visit_energies)
         call markov_chain_explorer%maximum_box_compression_explorer%try(observables)
+        call markov_chain_explorer%changed_box_size_ratio%set(observables%&
+            maximum_box_compression_delta)
         call markov_chain_explorer%volume_change_method%try(observables)
         call markov_chain_explorer%particle_insertion_method%try(observables)
         call plmc_set(observables)

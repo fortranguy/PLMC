@@ -7,8 +7,7 @@ use procedures_box_factory, only: box_create => create, box_destroy => destroy
 use classes_permittivity, only: Abstract_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_inquirers, only: periodicity_is_xyz, box_size_can_change, &
-    use_permittivity, use_reciprocal_lattice
+use procedures_environment_inquirers, only: use_permittivity, use_reciprocal_lattice
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_total_moment_factory, only: set_are_dipolar
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
@@ -48,17 +47,17 @@ contains
             periodic_box, any(are_dipolar), generating_data, prefix)
 
         call box_create(dipolar_interactions_static%box_volume_memento_real, environment%&
-            periodic_box, periodicity_is_xyz(environment%periodic_box) .and. &
-            box_size_can_change(environment%beta_pressure) .and. any(are_dipolar))
-        call des_real_create(dipolar_interactions_static%real_pair, environment%permittivity, &
-            mixture%components_min_distances, any(are_dipolar), dipolar_interactions_dynamic%alpha,&
-            generating_data, prefix//"Real.")
+            periodic_box, environment%beta_pressure, any(are_dipolar))
+        call des_real_create(dipolar_interactions_static%real_pair, dipolar_interactions_static%&
+            box_volume_memento_real, environment%permittivity, mixture%components_min_distances, &
+            any(are_dipolar), dipolar_interactions_dynamic%alpha, generating_data, prefix//"Real.")
         call des_real_create(dipolar_interactions_dynamic%real_components, environment%&
             periodic_box, dipolar_interactions_static%box_volume_memento_real, mixture%components, &
             are_dipolar, dipolar_interactions_static%real_pair)
 
         allocate(dipolar_interactions_static%box_volume_memento_reci, &
             source=dipolar_interactions_static%box_volume_memento_real)
+        call dipolar_interactions_static%box_volume_memento_reci%target(environment%periodic_box)
         call des_reci_create(dipolar_interactions_static%reci_weight, environment, &
             any(are_dipolar), dipolar_interactions_dynamic%alpha)
         call des_reci_create(dipolar_interactions_static%reci_structure, environment, &

@@ -85,8 +85,8 @@ contains
             do i_component = 1, size(visitable_cells_source, 1)
                 j_pair = maxval([i_component, j_component])
                 i_pair = minval([i_component, j_component])
-                call visitable_cells_target(i_component, j_component)%set(neighbour_cells(j_pair)%&
-                    line(i_pair)%cells)
+                call visitable_cells_target(i_component, j_component)%&
+                    target(neighbour_cells(j_pair)%line(i_pair)%cells)
                 if (only_resized_triangle(j_pair)%line(i_pair)) cycle
                 call visitable_cells_target(i_component, j_component)%reset()
             end do
@@ -129,8 +129,8 @@ contains
             do i_component = 1, size(visitable_cells_target, 1)
                 j_pair = maxval([i_component, j_component])
                 i_pair = minval([i_component, j_component])
-                call visitable_cells_target(i_component, j_component)%set(neighbour_cells(j_pair)%&
-                    line(i_pair)%cells)
+                call visitable_cells_target(i_component, j_component)%&
+                    target(neighbour_cells(j_pair)%line(i_pair)%cells)
             end do
         end do
     end subroutine Arrays_restore
@@ -143,7 +143,6 @@ contains
         class(Null_Visitable_Cells_Memento), intent(in) :: this
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells_target(:, :)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
-
     end subroutine Null_save
 
     subroutine Null_restore(visitable_cells_target, neighbour_cells, only_resized_triangle, &

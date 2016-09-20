@@ -21,6 +21,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: target => Abstract_target
         procedure :: reset => Abstract_set
         procedure :: get => Abstract_get
         procedure, private :: set => Abstract_set
@@ -34,6 +35,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: reset => Null_set
         procedure :: get => Null_get
     end type Null_DES_Reci_Weight
@@ -44,15 +46,14 @@ contains
 
     subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
         class(Abstract_DES_Reci_Weight), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
 
-        this%periodic_box => periodic_box
+        call this%target(periodic_box, alpha)
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%permittivity = permittivity%get()
-        this%alpha => alpha
         allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2), &
                              0:this%reci_numbers(3)))
         this%weight = 0._DP
@@ -66,6 +67,15 @@ contains
         this%alpha => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_target(this, periodic_box, alpha)
+        class(Abstract_DES_Reci_Weight), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+
+        this%periodic_box => periodic_box
+        this%alpha => alpha
+    end subroutine Abstract_target
 
     pure subroutine Abstract_set(this)
         class(Abstract_DES_Reci_Weight), intent(inout) :: this
@@ -117,15 +127,21 @@ contains
 
     subroutine Null_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
         class(Null_DES_Reci_Weight), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_DES_Reci_Weight), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, periodic_box, alpha)
+        class(Null_DES_Reci_Weight), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+    end subroutine Null_target
 
     pure subroutine Null_set(this)
         class(Null_DES_Reci_Weight), intent(inout) :: this

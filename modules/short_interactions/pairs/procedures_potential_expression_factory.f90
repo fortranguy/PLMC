@@ -31,14 +31,14 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field, potential_name
+        character(len=:), allocatable :: data_field, name
         logical :: data_found
 
         if (interact) then
             data_field = prefix//"name"
-            call generating_data%get(data_field, potential_name, data_found)
+            call generating_data%get(data_field, name, data_found)
             call check_data_found(data_field, data_found)
-            select case (potential_name)
+            select case (name)
                 case ("null")
                     allocate(Null_Potential_Expression :: expression)
                 case ("LJ")
@@ -46,8 +46,8 @@ contains
                 case ("Yukawa")
                     allocate(Yukawa_Expression :: expression)
                 case default
-                    call error_exit(potential_name//" unknown potential_name. "//&
-                        "Choose between: 'null', 'LJ' and 'Yukawa'.")
+                    call error_exit("procedures_potential_expression_factory: allocate: "//name//&
+                        " unknown name. Choose between: 'null', 'LJ' and 'Yukawa'.")
             end select
         else
             allocate(Null_Potential_Expression :: expression)

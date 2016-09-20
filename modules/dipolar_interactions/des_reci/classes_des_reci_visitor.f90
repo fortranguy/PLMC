@@ -32,6 +32,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: target => Abstract_target
         procedure :: visit => Abstract_visit
         procedure :: visit_translation => Abstract_visit_translation
         procedure :: visit_transmutation => Abstract_visit_transmutation
@@ -50,6 +51,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: visit => Null_visit
         procedure :: visit_translation => Null_visit_translation
         procedure :: visit_transmutation => Null_visit_transmutation
@@ -65,16 +67,14 @@ contains
         weight, structure)
         class(Abstract_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
-        class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
+        class(Abstract_DES_Reci_Weight), intent(in) :: weight
+        class(Abstract_DES_Reci_Structure), intent(in) :: structure
 
         this%periodic_box => periodic_box
-        this%box_volume_memento => box_volume_memento
+        call this%target(box_volume_memento, weight, structure)
         this%reci_numbers = reciprocal_lattice%get_numbers()
-        this%weight => weight
-        this%structure => structure
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -85,6 +85,17 @@ contains
         this%box_volume_memento => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_target(this, box_volume_memento, weight, structure)
+        class(Abstract_DES_Reci_Visitor), intent(inout) :: this
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
+        class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
+
+        this%box_volume_memento => box_volume_memento
+        this%weight => weight
+        this%structure => structure
+    end subroutine Abstract_target
 
     !> \[
     !>      U = \sum_{\vec{k}} w_\alpha(\vec{k}) |S(\vec{k})|^2
@@ -437,15 +448,22 @@ contains
         structure)
         class(Null_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
-        class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
+        class(Abstract_DES_Reci_Weight), intent(in) :: weight
+        class(Abstract_DES_Reci_Structure), intent(in) :: structure
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_DES_Reci_Visitor), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, box_volume_memento, weight, structure)
+        class(Null_DES_Reci_Visitor), intent(inout) :: this
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
+        class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
+    end subroutine Null_target
 
     pure real(DP) function Null_visit(this) result(energy)
         class(Null_DES_Reci_Visitor), intent(in) :: this

@@ -23,6 +23,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: target => Abstract_target
         procedure :: reset => Abstract_set
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get_plus => Abstract_get_plus
@@ -45,6 +46,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: reset => Null_set
         procedure :: is_dipolar => Null_is_dipolar
         procedure :: get_plus => Null_get
@@ -61,14 +63,13 @@ contains
 
     subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, components, are_dipolar)
         class(Abstract_DLC_Structures), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
 
-        this%periodic_box => periodic_box
+        call this%target(periodic_box, components)
         this%reci_numbers = reshape(reciprocal_lattice%get_numbers(), [2])
-        this%components => components
         allocate(this%are_dipolar(size(are_dipolar)))
         this%are_dipolar = are_dipolar
         allocate(this%structure_p(-this%reci_numbers(1):this%reci_numbers(1), &
@@ -87,6 +88,15 @@ contains
         this%components => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_target(this, periodic_box, components)
+        class(Abstract_DLC_Structures), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        type(Component_Wrapper), target, intent(in) :: components(:)
+
+        this%periodic_box => periodic_box
+        this%components => components
+    end subroutine Abstract_target
 
     subroutine Abstract_set(this)
         class(Abstract_DLC_Structures), intent(inout) :: this
@@ -427,15 +437,21 @@ contains
 
     subroutine Null_construct(this, periodic_box, reciprocal_lattice, components, are_dipolar)
         class(Null_DLC_Structures), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_DLC_Structures), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, periodic_box, components)
+        class(Null_DLC_Structures), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        type(Component_Wrapper), target, intent(in) :: components(:)
+    end subroutine Null_target
 
     subroutine Null_set(this)
         class(Null_DLC_Structures), intent(inout) :: this

@@ -32,6 +32,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: target => Abstract_target
         procedure :: reset => Abstract_set
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get => Abstract_get
@@ -53,6 +54,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: reset => Null_set
         procedure :: is_dipolar => Null_is_dipolar
         procedure :: get => Null_get
@@ -69,16 +71,14 @@ contains
     subroutine Abstract_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, &
         components, are_dipolar)
         class(Abstract_DES_Reci_Structure), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
 
-        this%periodic_box => periodic_box
-        this%box_volume_memento => box_volume_memento
+        call this%target(periodic_box, box_volume_memento, components)
         this%reci_numbers = reciprocal_lattice%get_numbers()
-        this%components => components
         allocate(this%are_dipolar(size(are_dipolar)))
         this%are_dipolar = are_dipolar
         allocate(this%structure(-this%reci_numbers(1):this%reci_numbers(1), &
@@ -96,6 +96,17 @@ contains
         this%box_volume_memento => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_target(this, periodic_box, box_volume_memento, components)
+        class(Abstract_DES_Reci_Structure), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        type(Component_Wrapper), target, intent(in) :: components(:)
+
+        this%periodic_box => periodic_box
+        this%box_volume_memento => box_volume_memento
+        this%components => components
+    end subroutine Abstract_target
 
     pure logical function Abstract_is_dipolar(this, i_component) result(is_dipolar)
         class(Abstract_DES_Reci_Structure), intent(in) :: this
@@ -391,16 +402,23 @@ contains
     subroutine Null_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, &
         components, are_dipolar)
         class(Null_DES_Reci_Structure), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_DES_Reci_Structure), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, periodic_box, box_volume_memento, components)
+        class(Null_DES_Reci_Structure), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        type(Component_Wrapper), target, intent(in) :: components(:)
+    end subroutine Null_target
 
     pure logical function Null_is_dipolar(this, i_component) result(is_dipolar)
         class(Null_DES_Reci_Structure), intent(in) :: this

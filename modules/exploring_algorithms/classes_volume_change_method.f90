@@ -18,7 +18,6 @@ use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
-use procedures_changed_box_size_ratio_factory, only: changed_box_size_ratio_destroy => destroy
 use procedures_triangle_observables, only: operator(-)
 use types_observables_energies, only: Concrete_Energies
 use procedures_triangle_observables, only: triangle_observables_sum
@@ -37,7 +36,7 @@ private
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facade => &
             null()
-        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size_Ratio), pointer :: changed_box_size_ratio => null()
         integer :: num_changes = 0
     contains
         procedure :: construct => Abstract_construct
@@ -70,14 +69,14 @@ contains
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facade
-        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size_Ratio), target, intent(in) :: changed_box_size_ratio
         integer, intent(in) :: num_changes
 
         this%environment => environment
         this%components => components
         this%short_interactions => short_interactions
         this%dipolar_interactions_facade => dipolar_interactions_facade
-        allocate(this%changed_box_size_ratio, source=changed_box_size_ratio)
+        this%changed_box_size_ratio => changed_box_size_ratio
         call check_positive("Abstract_Volume_Change_Method: construct", "num_changes", num_changes)
         this%num_changes = num_changes
     end subroutine Abstract_construct
@@ -85,7 +84,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Volume_Change_Method), intent(inout) :: this
 
-        call changed_box_size_ratio_destroy(this%changed_box_size_ratio)
+        this%changed_box_size_ratio => null()
         this%dipolar_interactions_facade => null()
         this%short_interactions => null()
         this%components => null()
@@ -204,7 +203,7 @@ contains
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facade
-        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size_Ratio), target, intent(in) :: changed_box_size_ratio
         integer, intent(in) :: num_changes
     end subroutine Null_construct
 

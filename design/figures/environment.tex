@@ -65,20 +65,19 @@
                 \operation{\procedure{set}{temperature: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
-            % Parallel Tempering?
         \end{scope}
 
-        \begin{scope}[shift={($(Temperature.south) - (0 cm, 1 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
-                \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
-                    numbers: \type{int[3]}}}
+        \begin{scope}[shift={($(Temperature.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{BoxVolumeMemento}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{isSparseInZ}{}: \type{bool}}
-                \operation{\procedure{getNumbers}{}: \type{int[3]}}
+                \operation{\procedure{target}{periodicBox: \type{PeriodicBox}}}
+                \operation{\procedure{save}{}}
+                \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ReciprocalLattice.south) - (0 cm, 1 cm)$)}]
+        \begin{scope}[shift={($(BoxVolumeMemento.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BetaPressure}{0, 0}
                 \operation{\procedure{set}{density \type{real}, excess: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
@@ -122,6 +121,25 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
+                \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
+                    wallsPotential: \type{VisitableWalls}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{check}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PeriodicBox |- BoxSizeChecker.north)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{ReciprocalLattice}{0, 0}
+                \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
+                    numbers: \type{int[3]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{isSparseInZ}{}: \type{bool}}
+                \operation{\procedure{getNumbers}{}: \type{int[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ReciprocalLattice.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{Environment}{0, 0}
                 \UMLattribute{periodicBox: \type{PeriodicBox}}
                 \UMLattribute{temperature: \type{Temperature}}
@@ -135,24 +153,6 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox |- Environment.north)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
-                \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
-                    wallsPotential: \type{VisitableWalls}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{check}{}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(BoxSizeChecker |- BetaPressureExcess.north)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{BoxVolumeMemento}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{save}{}}
-                \operation{\procedure{get}{}: \type{real}}
-            \end{abstractclass}
-        \end{scope}
-
         \begin{scope}[on background layer]
             \aggregation{ParallelepipedDomain}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \aggregation{ReciprocalLattice}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
@@ -163,6 +163,7 @@
             \composition{VisitableWalls}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
             \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}
             \aggregation{BoxSizeChecker}{\refName{wallsPotential}}{\numRef{1}}{VisitableWalls}
+            \aggregation{BoxVolumeMemento}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
         \end{scope}
     \end{tikzpicture}
 

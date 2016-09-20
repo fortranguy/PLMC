@@ -23,6 +23,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: target => Abstract_target
         procedure :: visit => Abstract_visit
         procedure :: visit_translation => Abstract_visit_translation
         procedure :: visit_transmutation => Abstract_visit_transmutation
@@ -41,6 +42,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: visit => Null_visit
         procedure :: visit_translation => Null_visit_translation
         procedure :: visit_transmutation => Null_visit_transmutation
@@ -56,13 +58,12 @@ contains
         class(Abstract_DLC_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_DLC_Weight), target, intent(in) :: weight
-        class(Abstract_DLC_Structures), target, intent(in) :: structures
+        class(Abstract_DLC_Weight), intent(in) :: weight
+        class(Abstract_DLC_Structures), intent(in) :: structures
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
-        this%weight => weight
-        this%structures => structures
+        call this%target(weight, structures)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -72,6 +73,15 @@ contains
         this%weight => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_target(this, weight, structures)
+        class(Abstract_DLC_Visitor), intent(inout) :: this
+        class(Abstract_DLC_Weight), target, intent(in) :: weight
+        class(Abstract_DLC_Structures), target, intent(in) :: structures
+
+        this%weight => weight
+        this%structures => structures
+    end subroutine Abstract_target
 
     !> \[
     !>      U = \sum_{\vec{k}_{1:2}} w(\vec{k}_{1:2})
@@ -500,13 +510,19 @@ contains
         class(Null_DLC_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_DLC_Weight), target, intent(in) :: weight
-        class(Abstract_DLC_Structures), target, intent(in) :: structures
+        class(Abstract_DLC_Weight), intent(in) :: weight
+        class(Abstract_DLC_Structures), intent(in) :: structures
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_DLC_Visitor), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, weight, structures)
+        class(Null_DLC_Visitor), intent(inout) :: this
+        class(Abstract_DLC_Weight), target, intent(in) :: weight
+        class(Abstract_DLC_Structures), target, intent(in) :: structures
+    end subroutine Null_target
 
     pure real(DP) function Null_visit(this) result(energy)
         class(Null_DLC_Visitor), intent(in) :: this

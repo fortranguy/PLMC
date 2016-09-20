@@ -22,8 +22,7 @@ use procedures_volume_change_method_factory, only: volume_change_method_create =
 use procedures_particle_insertion_method_factory, only: particle_insertion_method_create => create,&
     particle_insertion_method_destroy => destroy
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
-use procedures_exploration_inquirers, only: measure_maximum_compression, measure_pressure, &
-    measure_chemical_potentials
+use procedures_exploration_inquirers, only: measure_pressure, measure_chemical_potentials
 
 implicit none
 
@@ -38,32 +37,28 @@ contains
         logical, intent(in) :: visit_energies
         type(json_file), intent(inout) :: exploring_data
 
-        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
         class(Abstract_Maximum_Box_Compression), allocatable :: maximum_box_compression
-        logical :: measure_maximum_box_compression, measure_pressure_excess, &
-            measure_inv_pow_activities
+        logical :: measure_pressure_excess, measure_inv_pow_activities
         logical, dimension(size(physical_model%mixture%components)) :: can_exchange, &
             have_positions, have_orientations
 
-        measure_maximum_box_compression = measure_maximum_compression(exploring_data, &
-            volume_change_prefix)
-        call maximum_box_compression_create(maximum_box_compression, physical_model%environment%&
-            periodic_box, measure_maximum_box_compression)
-        call maximum_box_compression_explorer_create(markov_chain_explorer%&
-            maximum_box_compression_explorer, physical_model, maximum_box_compression, &
-            measure_maximum_box_compression)
-        call maximum_box_compression_destroy(maximum_box_compression)
         measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
         if (.not.visit_energies .and. measure_pressure_excess) then
             call warning_continue("procedures_markov_chain_explorer_factory: create: "//&
                 "measure_pressure_excess needs visit_energies.")
         end if
-        call changed_box_size_ratio_create(changed_box_size_ratio, physical_model%environment%&
-            periodic_box, measure_pressure_excess, exploring_data, volume_change_prefix)
-        call volume_change_method_create(markov_chain_explorer%volume_change_method, &
-            physical_model, changed_box_size_ratio, measure_pressure_excess, exploring_data, &
+        call maximum_box_compression_create(maximum_box_compression, physical_model%environment%&
+            periodic_box, measure_pressure_excess)
+        call maximum_box_compression_explorer_create(markov_chain_explorer%&
+            maximum_box_compression_explorer, physical_model, maximum_box_compression, &
+            measure_pressure_excess)
+        call maximum_box_compression_destroy(maximum_box_compression)
+        call changed_box_size_ratio_create(markov_chain_explorer%changed_box_size_ratio, &
+            physical_model%environment%periodic_box, measure_pressure_excess, exploring_data, &
             volume_change_prefix)
-        call changed_box_size_ratio_destroy(changed_box_size_ratio)
+        call volume_change_method_create(markov_chain_explorer%volume_change_method, &
+            physical_model, markov_chain_explorer%changed_box_size_ratio, measure_pressure_excess, &
+            exploring_data, volume_change_prefix)
         measure_inv_pow_activities = measure_chemical_potentials(exploring_data, &
             particle_insertion_prefix)
         can_exchange = measure_inv_pow_activities ! as if exchange
@@ -90,6 +85,7 @@ contains
         call random_coordinates_destroy(markov_chain_explorer%random_position)
         call box_destroy(markov_chain_explorer%particle_insertion_domain)
         call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
+        call changed_box_size_ratio_destroy(markov_chain_explorer%changed_box_size_ratio)
         call maximum_box_compression_explorer_destroy(markov_chain_explorer%&
             maximum_box_compression_explorer)
     end subroutine destroy

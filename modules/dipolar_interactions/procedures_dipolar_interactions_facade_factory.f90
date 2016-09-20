@@ -51,10 +51,10 @@ contains
 
         select type (facade)
             type is (Scalable_Dipolar_Interactions_Facade)
-                call facade%construct(dipolar_interactions_static)
+                call facade%construct(dipolar_interactions_dynamic, dipolar_interactions_static)
             type is (Unscalable_Dipolar_Interactions_Facade)
-                call facade%construct(components, dipolar_interactions_dynamic, &
-                    dipolar_interactions_static)
+                call facade%construct(environment%periodic_box, components, &
+                    dipolar_interactions_dynamic, dipolar_interactions_static)
             type is (Null_Dipolar_Interactions_Facade)
             class default
                 call error_exit("procedures_dipolar_interactions_facade_factory: create: "//&

@@ -19,6 +19,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: target => Abstract_target
         procedure :: reset => Abstract_set
         procedure :: get => Abstract_get
         procedure, private :: set => Abstract_set
@@ -32,6 +33,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: reset => Null_set
         procedure :: get => Null_get
     end type Null_DLC_Weight
@@ -42,11 +44,11 @@ contains
 
     subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, permittivity)
         class(Abstract_DLC_Weight), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
 
-        this%periodic_box => periodic_box
+        call this%target(periodic_box)
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%permittivity = permittivity%get()
         allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2)))
@@ -59,6 +61,13 @@ contains
         if (allocated(this%weight)) deallocate(this%weight)
         this%periodic_box => null()
     end subroutine Abstract_destroy
+
+    subroutine Abstract_target(this, periodic_box)
+        class(Abstract_DLC_Weight), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+
+        this%periodic_box => periodic_box
+    end subroutine Abstract_target
 
     subroutine Abstract_set(this)
         class(Abstract_DLC_Weight), intent(inout) :: this
@@ -106,7 +115,7 @@ contains
 
     subroutine Null_construct(this, periodic_box, reciprocal_lattice, permittivity)
         class(Null_DLC_Weight), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
     end subroutine Null_construct
@@ -114,6 +123,11 @@ contains
     subroutine Null_destroy(this)
         class(Null_DLC_Weight), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, periodic_box)
+        class(Null_DLC_Weight), intent(inout) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+    end subroutine Null_target
 
     subroutine Null_set(this)
         class(Null_DLC_Weight), intent(inout) :: this

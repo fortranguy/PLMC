@@ -12,10 +12,11 @@
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     positions: \type{ComponentCoordinates}, hardContact: \type{HardContact},
-                    pairPotential: \type{PairPotential}, listMold: \type{VisitableList}}}
+                    pairPotential: \type{PairPotential}, neighbourCells: \type{NeighbourCells},
+                    listMold: \type{VisitableList}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
-                \operation{\procedure{set}{neighbourCells: \type{NeighbourCells}}}
+                \operation{\procedure{target}{neighbourCells: \type{NeighbourCells}}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{TemporaryParticle},
                     visitCondition: \procedure{visitCondition}

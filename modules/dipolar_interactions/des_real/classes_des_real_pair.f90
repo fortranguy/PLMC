@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive, check_potential_domain
+use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
 use classes_permittivity, only: Abstract_Permittivity
 use procedures_dipolar_interactions_micro, only: des_real_B, des_real_C
 use types_potential_domain, only: Dipolar_Potential_Domain
@@ -15,6 +16,7 @@ private
 
     type, abstract, public :: Abstract_DES_Real_Pair
     private
+        class(Abstract_Box_Volume_Memento), pointer :: box_volume_memento => null()
         type(Dipolar_Potential_Domain) :: domain
         real(DP) :: domain_max = 0._DP
         real(DP) :: coulomb = 0._DP
@@ -22,6 +24,7 @@ private
     contains
         procedure(Abstract_construct), deferred :: construct
         procedure(Abstract_destroy), deferred :: destroy
+        procedure :: target => Abstract_target
         procedure(Abstract_reset), deferred :: reset
         procedure :: meet => Abstract_meet
         procedure(Abstract_expression), private, deferred :: expression
@@ -29,12 +32,13 @@ private
 
     abstract interface
 
-        subroutine Abstract_construct(this, permittivity, alpha, domain)
-        import :: Abstract_Permittivity, Dipolar_Potential_Domain, &
+        subroutine Abstract_construct(this, box_volume_memento, permittivity, alpha, domain)
+        import :: Abstract_Box_Volume_Memento, Abstract_Permittivity, Dipolar_Potential_Domain, &
             Abstract_DES_Convergence_Parameter, Abstract_DES_Real_Pair
             class(Abstract_DES_Real_Pair), intent(out) :: this
+            class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
             class(Abstract_Permittivity), intent(in) :: permittivity
-            class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+            class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
             type(Dipolar_Potential_Domain), intent(in) :: domain
         end subroutine Abstract_construct
 
@@ -83,6 +87,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: target => Null_target
         procedure :: reset => Null_reset
         procedure :: meet => Null_meet
         procedure, private :: expression => Null_expression
@@ -91,6 +96,13 @@ private
 contains
 
 !implementation Abstract_DES_Real_Pair
+
+    subroutine Abstract_target(this, alpha)
+        class(Abstract_DES_Real_Pair), intent(inout) :: this
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+
+        this%alpha => alpha
+    end subroutine Abstract_target
 
     !> \[
     !>      u(\vec{r}_{ij}, \vec{\mu}_i, \vec{\mu}_j) = \frac{1}{4\pi \epsilon}
@@ -117,14 +129,15 @@ contains
 
 !implementation Tabulated_DES_Real_Pair
 
-    subroutine Tabulated_construct(this, permittivity, alpha, domain)
+    subroutine Tabulated_construct(this, box_volume_memento, permittivity, alpha, domain)
         class(Tabulated_DES_Real_Pair), intent(out) :: this
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(Dipolar_Potential_Domain), intent(in) :: domain
 
         this%coulomb = 1._DP / (4._DP*PI * permittivity%get())
-        this%alpha => alpha
+        call this%target(alpha)
         call this%set_domain(domain)
         call this%create_tabulation()
     end subroutine Tabulated_construct
@@ -165,6 +178,7 @@ contains
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
         this%alpha => null()
+        this%box_volume_memento => null()
     end subroutine Tabulated_destroy
 
     subroutine Tabulated_reset(this)
@@ -200,14 +214,15 @@ contains
 
 !implementation Raw_DES_Real_Pair
 
-    subroutine Raw_construct(this, permittivity, alpha, domain)
+    subroutine Raw_construct(this, box_volume_memento, permittivity, alpha, domain)
         class(Raw_DES_Real_Pair), intent(out) :: this
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(Dipolar_Potential_Domain), intent(in) :: domain
 
         this%coulomb = 1._DP / (4._DP * PI * permittivity%get())
-        this%alpha => alpha
+        call this%target(alpha)
         call this%set_domain(domain)
     end subroutine Raw_construct
 
@@ -230,6 +245,7 @@ contains
         class(Raw_DES_Real_Pair), intent(inout) :: this
 
         this%alpha => null()
+        this%box_volume_memento => null()
     end subroutine Raw_destroy
 
     subroutine Raw_reset(this)
@@ -261,16 +277,22 @@ contains
 
 !implementation Null_DES_Real_Pair
 
-    subroutine Null_construct(this, permittivity, alpha, domain)
+    subroutine Null_construct(this, box_volume_memento, permittivity, alpha, domain)
         class(Null_DES_Real_Pair), intent(out) :: this
+        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(Dipolar_Potential_Domain), intent(in) :: domain
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_DES_Real_Pair), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_target(this, alpha)
+        class(Null_DES_Real_Pair), intent(inout) :: this
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+    end subroutine Null_target
 
     subroutine Null_reset(this)
         class(Null_DES_Real_Pair), intent(inout) :: this

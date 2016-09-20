@@ -3,7 +3,6 @@
         "visit energies": true
     },
     "Volume Change": {
-        "measure maximum compression": true,
         "measure pressure": true,
         "number": 1,
         "Small Change": {

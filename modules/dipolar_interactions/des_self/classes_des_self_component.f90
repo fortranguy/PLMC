@@ -14,8 +14,7 @@ private
     private
         real(DP) :: permittivity = 0._DP
         class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
-        real(DP) :: alpha_cube = 0._DP
-        real(DP) :: factor_denominator = 1._DP
+        real(DP) :: factor_denominator = 0._DP
         class(Abstract_Component_Dipole_Moments), pointer :: dipole_moments => null()
     contains
         procedure :: construct => Abstract_construct
@@ -58,7 +57,6 @@ contains
     subroutine Abstract_set(this)
         class(Abstract_DES_Self_Component), intent(inout) :: this
 
-        this%alpha_cube = this%alpha%get()**3
         this%factor_denominator = 6._DP * this%permittivity * PI**(3._DP/2._DP)
     end subroutine Abstract_set
 
@@ -69,17 +67,19 @@ contains
         this%dipole_moments => null()
     end subroutine Abstract_destroy
 
-    !> \[ \sum_{\vec{\mu}} u(\vec{\mu}) \]
-    !> where \( u(\vec{\mu}) \) is [[Abstract_meet]].
+    !> \[ \frac{\alpha^3}{6\epsilon\pi^{3/2}} \sum_{\vec{\mu}} \vec{\mu}\cdot\vec{\mu} \]
     pure real(DP) function Abstract_visit(this) result(energy)
         class(Abstract_DES_Self_Component), intent(in) :: this
 
+        real(DP) :: moment_squared_sum
         integer :: i_particle
 
-        energy = 0._DP
+        moment_squared_sum = 0._DP
         do i_particle = 1, this%dipole_moments%get_num()
-            energy = energy + this%meet(this%dipole_moments%get(i_particle))
+            moment_squared_sum = moment_squared_sum + dot_product(this%dipole_moments%&
+                get(i_particle), this%dipole_moments%get(i_particle))
         end do
+        energy = this%alpha%get()**3 / this%factor_denominator * moment_squared_sum
     end function Abstract_visit
 
     !> \[ u(\mu) = \frac{\alpha^3}{6\epsilon\pi^{3/2}} \vec{\mu}\cdot\vec{\mu} \]
@@ -87,7 +87,8 @@ contains
         class(Abstract_DES_Self_Component), intent(in) :: this
         real(DP), intent(in) :: dipole_moment(:)
 
-        energy = this%alpha_cube/this%factor_denominator * dot_product(dipole_moment, dipole_moment)
+        energy = this%alpha%get()**3 / this%factor_denominator * dot_product(dipole_moment, &
+            dipole_moment)
     end function Abstract_meet
 
 !end implementation Abstract_DES_Self_Component

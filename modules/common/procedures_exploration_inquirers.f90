@@ -2,8 +2,6 @@ module procedures_exploration_inquirers
 
 use json_module, only: json_file
 use procedures_property_inquirers, only: logical_from_json
-use classes_maximum_box_compression_explorer, only: Abstract_Maximum_Box_Compression_Explorer, &
-    Concrete_Maximum_Box_Compression_Explorer
 use classes_volume_change_method, only: Abstract_Volume_Change_Method, Concrete_Volume_Change_Method
 use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method, &
     Concrete_Particle_Insertion_Method
@@ -11,12 +9,7 @@ use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method,
 implicit none
 
 private
-public :: measure_maximum_compression, measure_pressure, measure_chemical_potentials
-
-interface measure_maximum_compression
-    module procedure :: measure_maximum_compression_from_json
-    module procedure :: measure_maximum_compression_from_explorer
-end interface measure_maximum_compression
+public :: measure_pressure, measure_chemical_potentials
 
 interface measure_pressure
     module procedure :: measure_pressure_from_json
@@ -29,28 +22,6 @@ interface measure_chemical_potentials
 end interface measure_chemical_potentials
 
 contains
-
-    logical function measure_maximum_compression_from_json(exploring_data, prefix) &
-        result(measure_maximum_compression)
-        type(json_file), intent(inout) :: exploring_data
-        character(len=*), intent(in) :: prefix
-
-        measure_maximum_compression = logical_from_json(exploring_data, &
-            prefix//"measure maximum compression")
-    end function measure_maximum_compression_from_json
-
-    pure logical function measure_maximum_compression_from_explorer(&
-        maximum_box_compression_explorer) result(measure_maximum_compression)
-        class(Abstract_Maximum_Box_Compression_Explorer), intent(in) :: &
-            maximum_box_compression_explorer
-
-        select type (maximum_box_compression_explorer)
-            type is (Concrete_Maximum_Box_Compression_Explorer)
-                measure_maximum_compression = .true.
-            class default
-                measure_maximum_compression = .false.
-        end select
-    end function measure_maximum_compression_from_explorer
 
     logical function measure_pressure_from_json(exploring_data, prefix) result(measure_pressure)
         type(json_file), intent(inout) :: exploring_data

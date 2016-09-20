@@ -43,8 +43,8 @@ contains
                 associate (pair_ij => pairs(j_pair)%line(i_pair)%potential, &
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &
-                        components(i_component)%positions, hard_contact, pair_ij, list_mold)
-                    call cells(i_component, j_component)%set(neighbours_ij)
+                        components(i_component)%positions, hard_contact, pair_ij, neighbours_ij, &
+                        list_mold)
                 end associate
             end do
         end do

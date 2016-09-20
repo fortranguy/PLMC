@@ -2,12 +2,12 @@
     "Environment": {
         "Box": {
             "periodicity": "XY",
-            "initial size": [12.0, 12.0, 18.0],
+            "initial size": [18.0, 18.0, 18.0],
             "size can change": true
         },
         "Beta Pressure": {
-            "density": 0.1,
-            "excess": 0.02
+            "density": 0.7891414141414141,
+            "excess": 2.2551339629609926
         },
         "Thermostat": {
             "temperature": 2.0
@@ -21,12 +21,12 @@
             }
         },
         "Permittivity": {
-            "use": false,
+            "use": true,
             "value": 1.0
         },
         "Reciprocal Lattice": {
-            "use": false,
-            "numbers": [8, 8, 8]
+            "use": true,
+            "numbers": [8, 8, 12]
         },
         "Walls": {
             "use": true,
@@ -40,7 +40,7 @@
         "Component 1": {
             "initial number": 200,
             "minimum distance": 0.8,
-            "is dipolar": false,
+            "is dipolar": true,
             "moment norm": 1.0,
             "can exchange": false
         },
@@ -53,7 +53,7 @@
         "Component 3": {
             "initial number": 300,
             "minimum distance": 0.8,
-            "is dipolar": false,
+            "is dipolar": true,
             "moment norm": 0.25,
             "can exchange": false
         },
@@ -133,6 +133,14 @@
         },
         "Cells": {
             "data structure": "list"
+        }
+    },
+    "Dipolar Interactions": {
+        "alpha times box edge": 7.0,
+        "Real": {
+            "tabulated": true,
+            "delta distance": 1.0e-4,
+            "max distance / box edge": 0.5
         }
     },
     "Random Number Generator": {

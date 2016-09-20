@@ -78,6 +78,7 @@ module PLMC
                     components[iComponent].positions'))
             end
         end
+        close(outputFile)
         println("Coordinates written in ", outputFile.name)
     end
 

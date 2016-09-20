@@ -1,7 +1,9 @@
 module classes_dipolar_interactions_facade
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
+use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use types_reals_line, only: Reals_Line
@@ -14,6 +16,8 @@ private
 
     type, abstract, public :: Abstract_Dipolar_Interactions_Facade
     private
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+                null()
         type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static => null()
         logical :: real_pair_must_be_reset = .false.
     contains
@@ -23,6 +27,9 @@ private
         procedure(Abstract_reset), deferred :: reset
         procedure(Abstract_visit), deferred :: visit
         procedure(Abstract_clone), deferred, private :: clone
+        procedure(Abstract_target), deferred, private :: target
+        procedure, private :: clone_real_pair => Abstract_clone_real_pair
+        procedure, private :: target_real => Abstract_target_real
     end type Abstract_Dipolar_Interactions_Facade
 
     abstract interface
@@ -41,6 +48,11 @@ private
             type(Dipolar_Interactions_Static_Wrapper), intent(in) :: &
                 dipolar_interactions_static_source
         end subroutine Abstract_clone
+
+        subroutine Abstract_target(this)
+        import :: Abstract_Dipolar_Interactions_Facade
+            class(Abstract_Dipolar_Interactions_Facade), intent(in) :: this
+        end subroutine Abstract_target
 
         subroutine Abstract_reset(this)
         import :: Abstract_Dipolar_Interactions_Facade
@@ -68,20 +80,21 @@ private
         procedure :: reset => Scalable_reset
         procedure :: visit => Scalable_visit
         procedure, private :: clone => Scalable_clone
+        procedure, private :: target => Scalable_target
     end type Scalable_Dipolar_Interactions_Facade
 
     type, extends(Abstract_Dipolar_Interactions_Facade), public :: &
         Unscalable_Dipolar_Interactions_Facade
     private
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         type(Component_Wrapper), pointer :: components(:) => null()
-        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
-            null()
     contains
         procedure :: construct => Unscalable_construct
         procedure :: destroy => Unscalable_destroy
         procedure :: reset => Unscalable_reset
         procedure :: visit => Unscalable_visit
         procedure, private :: clone => Unscalable_clone
+        procedure, private :: target => Unscalable_target
     end type Unscalable_Dipolar_Interactions_Facade
 
     type, extends(Abstract_Dipolar_Interactions_Facade), public :: Null_Dipolar_Interactions_Facade
@@ -91,6 +104,7 @@ private
         procedure :: reset => Null_reset
         procedure :: visit => Null_visit
         procedure, private :: clone => Null_clone
+        procedure, private :: target => Null_target
     end type Null_Dipolar_Interactions_Facade
 
 contains
@@ -112,16 +126,50 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static
 
         call this%clone(this%dipolar_interactions_static, dipolar_interactions_static)
+        call this%target()
     end subroutine Abstract_restore
+
+    subroutine Abstract_clone_real_pair(this, real_pair_target, real_pair_source)
+        class(Abstract_Dipolar_Interactions_Facade), intent(in) :: this
+        class(Abstract_DES_Real_Pair), allocatable, intent(inout) :: real_pair_target
+        class(Abstract_DES_Real_Pair), intent(in) :: real_pair_source
+
+        if (this%real_pair_must_be_reset) then
+            if (allocated(real_pair_target)) deallocate(real_pair_target)
+            allocate(real_pair_target, source=real_pair_source)
+        end if
+    end subroutine Abstract_clone_real_pair
+
+    subroutine Abstract_target_real(this)
+        class(Abstract_Dipolar_Interactions_Facade), intent(in) :: this
+
+        integer :: i_component, j_component
+
+        if (this%real_pair_must_be_reset) then
+            call this%dipolar_interactions_static%real_pair%target(this%&
+                dipolar_interactions_dynamic%alpha)
+            do j_component = 1, size(this%dipolar_interactions_dynamic%real_components, 2)
+                do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
+                    call this%dipolar_interactions_dynamic%&
+                        real_components(i_component, j_component)%component%&
+                        target(this%dipolar_interactions_static%box_volume_memento_real, this%&
+                            dipolar_interactions_static%real_pair)
+                end do
+            end do
+        end if
+    end subroutine Abstract_target_real
 
 !end implementation Abstract_Dipolar_Interactions_Facade
 
 !implementation Scalable_Dipolar_Interactions_Facade
 
-    subroutine Scalable_construct(this, dipolar_interactions_static)
+    subroutine Scalable_construct(this, dipolar_interactions_dynamic, dipolar_interactions_static)
         class(Scalable_Dipolar_Interactions_Facade), intent(out) :: this
+        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
+            dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
 
+        this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
         this%dipolar_interactions_static => dipolar_interactions_static
     end subroutine Scalable_construct
 
@@ -129,7 +177,14 @@ contains
         class(Scalable_Dipolar_Interactions_Facade), intent(inout) :: this
 
         this%dipolar_interactions_static => null()
+        this%dipolar_interactions_dynamic => null()
     end subroutine Scalable_destroy
+
+    subroutine Scalable_target(this)
+        class(Scalable_Dipolar_Interactions_Facade), intent(in) :: this
+
+        call this%target_real()
+    end subroutine Scalable_target
 
     subroutine Scalable_clone(this, dipolar_interactions_static_target, &
         dipolar_interactions_static_source)
@@ -138,10 +193,8 @@ contains
             dipolar_interactions_static_target
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static_source
 
-        if (this%real_pair_must_be_reset) then
-            allocate(dipolar_interactions_static_target%real_pair, &
-                source=dipolar_interactions_static_source%real_pair)
-        end if
+        call this%clone_real_pair(dipolar_interactions_static_target%real_pair, &
+            dipolar_interactions_static_source%real_pair)
     end subroutine Scalable_clone
 
     subroutine Scalable_reset(this)
@@ -174,14 +227,16 @@ contains
 
 !implementation Unscalable_Dipolar_Interactions_Facade
 
-    subroutine Unscalable_construct(this, components, dipolar_interactions_dynamic, &
+    subroutine Unscalable_construct(this, periodic_box, components, dipolar_interactions_dynamic, &
         dipolar_interactions_static)
         class(Unscalable_Dipolar_Interactions_Facade), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
             dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
 
+        this%periodic_box => periodic_box
         this%components => components
         this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
         this%dipolar_interactions_static => dipolar_interactions_static
@@ -193,7 +248,28 @@ contains
         this%dipolar_interactions_static => null()
         this%dipolar_interactions_dynamic => null()
         this%components => null()
+        this%periodic_box => null()
     end subroutine Unscalable_destroy
+
+    subroutine Unscalable_target(this)
+        class(Unscalable_Dipolar_Interactions_Facade), intent(in) :: this
+
+        call this%dipolar_interactions_static%box_volume_memento_real%target(this%periodic_box)
+        call this%target_real()
+        call this%dipolar_interactions_static%box_volume_memento_reci%target(this%periodic_box)
+        call this%dipolar_interactions_static%reci_weight%target(this%periodic_box, this%&
+            dipolar_interactions_dynamic%alpha)
+        call this%dipolar_interactions_static%reci_structure%target(this%periodic_box, this%&
+            dipolar_interactions_static%box_volume_memento_reci, this%components)
+        call this%dipolar_interactions_dynamic%reci_visitor%target(this%&
+            dipolar_interactions_static%box_volume_memento_reci, this%dipolar_interactions_static%&
+            reci_weight, this%dipolar_interactions_static%reci_structure)
+        call this%dipolar_interactions_static%dlc_weight%target(this%periodic_box)
+        call this%dipolar_interactions_static%dlc_structures%target(this%periodic_box, this%&
+            components)
+        call this%dipolar_interactions_dynamic%dlc_visitor%target(this%dipolar_interactions_static%&
+            dlc_weight, this%dipolar_interactions_static%dlc_structures)
+    end subroutine Unscalable_target
 
     subroutine Unscalable_clone(this, dipolar_interactions_static_target, &
         dipolar_interactions_static_source)
@@ -202,20 +278,30 @@ contains
             dipolar_interactions_static_target
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static_source
 
+        if (allocated(dipolar_interactions_static_target%box_volume_memento_real)) &
+            deallocate(dipolar_interactions_static_target%box_volume_memento_real)
         allocate(dipolar_interactions_static_target%box_volume_memento_real, &
             source=dipolar_interactions_static_source%box_volume_memento_real)
-        if (this%real_pair_must_be_reset) then
-            allocate(dipolar_interactions_static_target%real_pair, &
-                source=dipolar_interactions_static_source%real_pair)
-        end if
+        call this%clone_real_pair(dipolar_interactions_static_target%real_pair, &
+            dipolar_interactions_static_source%real_pair)
+        if (allocated(dipolar_interactions_static_target%box_volume_memento_reci)) &
+            deallocate(dipolar_interactions_static_target%box_volume_memento_reci)
         allocate(dipolar_interactions_static_target%box_volume_memento_reci, &
             source=dipolar_interactions_static_source%box_volume_memento_reci)
+        if (allocated(dipolar_interactions_static_target%reci_weight)) &
+            deallocate(dipolar_interactions_static_target%reci_weight)
         allocate(dipolar_interactions_static_target%reci_weight, &
             source=dipolar_interactions_static_source%reci_weight)
+        if (allocated(dipolar_interactions_static_target%reci_structure)) &
+            deallocate(dipolar_interactions_static_target%reci_structure)
         allocate(dipolar_interactions_static_target%reci_structure, &
             source=dipolar_interactions_static_source%reci_structure)
+        if (allocated(dipolar_interactions_static_target%dlc_weight)) &
+            deallocate(dipolar_interactions_static_target%dlc_weight)
         allocate(dipolar_interactions_static_target%dlc_weight, &
             source=dipolar_interactions_static_source%dlc_weight)
+        if (allocated(dipolar_interactions_static_target%dlc_structures)) &
+            deallocate(dipolar_interactions_static_target%dlc_structures)
         allocate(dipolar_interactions_static_target%dlc_structures, &
             source=dipolar_interactions_static_source%dlc_structures)
     end subroutine Unscalable_clone
@@ -253,6 +339,10 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
         real(DP), intent(in) :: new_box_volume
     end subroutine Null_save
+
+    subroutine Null_target(this)
+        class(Null_Dipolar_Interactions_Facade), intent(in) :: this
+    end subroutine Null_target
 
     subroutine Null_clone(this, dipolar_interactions_static_target, &
         dipolar_interactions_static_source)

@@ -109,8 +109,7 @@ contains
             components)
         call exploring_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
-            short_interactions%components_pairs, markov_chain_explorer%&
-            maximum_box_compression_explorer, markov_chain_explorer%volume_change_method, &
+            short_interactions%components_pairs, markov_chain_explorer%volume_change_method, &
             markov_chain_explorer%particle_insertion_method, visit_energies)
     end subroutine create_exploring_readers_writers
 

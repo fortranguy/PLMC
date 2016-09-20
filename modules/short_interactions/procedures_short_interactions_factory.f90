@@ -22,8 +22,7 @@ use procedures_visitable_list_factory, only: visitable_list_allocate => allocate
     visitable_list_deallocate => deallocate
 use procedures_cells_factory, only: cells_create => create, cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_exploration_inquirers, only: property_measure_pressure => measure_pressure, &
-    property_measure_maximum_compression => measure_maximum_compression
+use procedures_exploration_inquirers, only: property_measure_pressure => measure_pressure
 
 implicit none
 
@@ -42,17 +41,14 @@ contains
         type(json_file), optional, intent(inout) :: exploring_data
         character(len=*), optional, intent(in) :: volume_change_prefix
 
-        logical :: interact_with_walls, interact, measure_maximum_compression, measure_pressure
+        logical :: interact_with_walls, interact, measure_pressure
         class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
         class(Abstract_Visitable_List), allocatable :: list_mold
 
         if (present(exploring_data) .and. present(volume_change_prefix)) then
             measure_pressure = property_measure_pressure(exploring_data, volume_change_prefix)
-            measure_maximum_compression = property_measure_maximum_compression(exploring_data, &
-                volume_change_prefix)
         else
             measure_pressure = .false.
-            measure_maximum_compression = .false.
         end if
 
         call beta_pressure_excess_create(short_interactions%beta_pressure_excess, environment%&
@@ -60,7 +56,7 @@ contains
         call dirac_distribution_plus_create(dirac_plus, measure_pressure, exploring_data, &
             volume_change_prefix)
         call hard_contact_create(short_interactions%hard_contact, environment%periodic_box, &
-            dirac_plus, measure_pressure .or. measure_maximum_compression)
+            dirac_plus, measure_pressure)
         call dirac_distribution_plus_destroy(dirac_plus)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
             wall_min_distances, generating_data, prefix)
