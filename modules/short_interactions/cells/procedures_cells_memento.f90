@@ -23,7 +23,7 @@ contains
 
         integer :: i_component, j_component
 
-        if (allocated(neighbour_cells_target)) deallocate(neighbour_cells_target)
+        call cells_destroy(neighbour_cells_target)
         allocate(neighbour_cells_target(size(neighbour_cells_source)))
         do j_component = 1, size(neighbour_cells_target)
             allocate(neighbour_cells_target(j_component)%line(j_component))
@@ -32,7 +32,7 @@ contains
                     source=neighbour_cells_source(j_component)%line(i_component)%cells)
             end do
         end do
-        if (allocated(visitable_cells_target)) deallocate(visitable_cells_target)
+        call cells_destroy(visitable_cells_target)
         call visitable_cells_memento%save(visitable_cells_target, visitable_cells_source)
     end subroutine save
 

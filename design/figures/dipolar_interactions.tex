@@ -45,11 +45,14 @@
 
         \begin{scope}[shift={($(DESrealComponent.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESrealPair}{0, 0}
-                \operation[0]{\procedure{construct}{permittivity: \type{Permittivity},
-                    alpha: \type{DESconvergenceParameter}, domain: \type{DipolarPotentialDomain}}}
+                \operation[0]{\procedure{construct}{boxVolumeMemento: \type{BoxVolumeMemento},
+                    permittivity: \type{Permittivity}, alpha: \type{DESconvergenceParameter},
+                    domain: \type{DipolarPotentialDomain}}}
                 \operation[0]{\procedure{destroy}{}}
-                \operation{\procedure{target}{alpha: \type{DESconvergenceParameter}}}
+                \operation{\procedure{target}{boxVolumeMemento: \type{BoxVolumeMemento},
+                    alpha: \type{DESconvergenceParameter}}}
                 \operation[0]{\procedure{reset}{}}
+                \operation{\procedure{setDomainMax}{}}
                 \operation{\procedure{meet}{vectorIJ: \type{real[3]}, momentI: \type{real[3]},
                     momentJ: \type{real[3]}}}
             \end{abstractclass}
