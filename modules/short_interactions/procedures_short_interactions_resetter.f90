@@ -44,14 +44,12 @@ contains
 
     subroutine box_size_change_reset_cells(neighbour_cells, only_resized_triangle, visitable_cells)
         type(Neighbour_Cells_Line), intent(inout) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), allocatable, intent(out) :: only_resized_triangle(:)
+        type(Concrete_Logical_Line), intent(inout) :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(inout) :: visitable_cells(:, :)
 
         integer :: i_component, j_component
 
-        allocate(only_resized_triangle(size(neighbour_cells)))
         do j_component = 1, size(neighbour_cells)
-            allocate(only_resized_triangle(j_component)%line(j_component)) ! allocate elsewhere?
             do i_component = 1, size(neighbour_cells(j_component)%line)
                 call neighbour_cells(j_component)%line(i_component)%cells%&
                     reset(only_resized_triangle(j_component)%line(i_component))

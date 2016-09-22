@@ -15,7 +15,7 @@ use procedures_visitable_cells_memento_factory, only: visitable_cells_memento_cr
 implicit none
 
 private
-public :: create, destroy
+public :: create, destroy, allocate_triangle
 
 interface create
     module procedure :: visitable_cells_create
@@ -44,9 +44,8 @@ contains
 
         integer :: i_component, j_component
 
-        allocate(cells(size(pairs)))
+        call allocate_triangle(cells, size(pairs))
         do j_component = 1, size(cells)
-            allocate(cells(j_component)%line(j_component))
             do i_component = 1, size(cells(j_component)%line)
                 associate(pair_ij => pairs(j_component)%line(i_component)%potential)
                     call create(cells(j_component)%line(i_component)%cells, periodic_box, &
@@ -55,6 +54,18 @@ contains
             end do
         end do
     end subroutine create_components
+
+    subroutine allocate_triangle(cells, num_components)
+        type(Neighbour_Cells_Line), allocatable, intent(out) :: cells(:)
+        integer, intent(in) :: num_components
+
+        integer :: i_component
+
+        allocate(cells(num_components))
+        do i_component = 1, size(cells)
+            allocate(cells(i_component)%line(i_component))
+        end do
+    end subroutine allocate_triangle
 
     subroutine destroy_components(cells)
         type(Neighbour_Cells_Line), allocatable, intent(inout) :: cells(:)

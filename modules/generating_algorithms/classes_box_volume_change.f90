@@ -3,11 +3,13 @@ module classes_box_volume_change
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use types_logical_line, only: Concrete_Logical_Line
+use procedures_logical_factory, only: logical_create => create
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_cells_memento, only: cells_save => save, cells_restore => restore
+use procedures_cells_factory, only: cells_allocate_triangle => allocate_triangle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit, &
@@ -112,6 +114,7 @@ contains
         box_size = this%environment%periodic_box%get_size()
         box_size_ratio = this%changed_box_size%get_ratio()
         new_box_size = box_size * box_size_ratio
+        call cells_allocate_triangle(neighbour_cells, size(this%mixture%components))
         call cells_save(this%short_interactions%visitable_cells_memento, neighbour_cells, &
             visitable_cells, this%short_interactions%neighbour_cells, this%short_interactions%&
             visitable_cells)
@@ -120,6 +123,7 @@ contains
 
         call this%environment%periodic_box%set(new_box_size)
         call this%rescale_positions(box_size_ratio)
+        call logical_create(only_resized_triangle, size(this%mixture%components))
         call short_interactions_reset(this%short_interactions%neighbour_cells, &
             only_resized_triangle, this%short_interactions%visitable_cells)
         call this%dipolar_interactions_facade%reset()
