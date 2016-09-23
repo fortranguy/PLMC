@@ -8,8 +8,8 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use procedures_cells_memento, only: cells_save => save, cells_restore => restore
-use procedures_cells_factory, only: cells_allocate_triangle => allocate_triangle
+use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_triangle => &
+    allocate_triangle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit, &
@@ -47,6 +47,8 @@ private
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure, private :: acceptation_probability => Abstract_acceptation_probability
         procedure, private :: rescale_positions => Abstract_rescale_positions
+        procedure, private :: save_cells => Abstract_save_cells
+        procedure, private :: restore_cells => Abstract_restore_cells
     end type Abstract_Box_Volume_Change
 
     type, extends(Abstract_Box_Volume_Change), public :: Concrete_Box_Volume_Change
@@ -114,16 +116,13 @@ contains
         box_size = this%environment%periodic_box%get_size()
         box_size_ratio = this%changed_box_size%get_ratio()
         new_box_size = box_size * box_size_ratio
-        call cells_allocate_triangle(neighbour_cells, size(this%mixture%components))
-        call cells_save(this%short_interactions%visitable_cells_memento, neighbour_cells, &
-            visitable_cells, this%short_interactions%neighbour_cells, this%short_interactions%&
-            visitable_cells)
         call this%dipolar_interactions_facade%save(dipolar_interactions_static, &
             product(new_box_size))
 
         call this%environment%periodic_box%set(new_box_size)
         call this%rescale_positions(box_size_ratio)
         call logical_create(only_resized_triangle, size(this%mixture%components))
+        call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells)
         call short_interactions_reset(this%short_interactions%neighbour_cells, &
             only_resized_triangle, this%short_interactions%visitable_cells)
         call this%dipolar_interactions_facade%reset()
@@ -138,9 +137,7 @@ contains
         else
             call this%environment%periodic_box%set(box_size)
             call this%rescale_positions(1._DP / box_size_ratio)
-            call cells_restore(this%short_interactions%visitable_cells_memento, this%&
-                short_interactions%neighbour_cells, this%short_interactions%visitable_cells, &
-                neighbour_cells, only_resized_triangle, visitable_cells)
+            call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells)
             call this%dipolar_interactions_facade%restore(dipolar_interactions_static)
         end if
     end subroutine Abstract_try
@@ -220,6 +217,70 @@ contains
             call this%mixture%components(i_component)%positions%rescale_all(box_size_ratio)
         end do
     end subroutine Abstract_rescale_positions
+
+    !> @note
+    !> [[classes_box_volume_change:Abstract_save_cells]] &
+    !> [[classes_volume_change_method:Abstract_save_cells]]
+    !> should be factorised. However, this would create a memory leak.
+    !> @todo
+    !> Send a bug report to gfortran.
+    subroutine Abstract_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)
+        class(Abstract_Box_Volume_Change), intent(in) :: this
+        type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
+        type(Concrete_Logical_Line), intent(inout) ::only_resized_triangle(:)
+        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
+
+        integer :: i_component, j_component
+
+        call cells_allocate_triangle(neighbour_cells, size(this%mixture%components))
+        do j_component = 1, size(neighbour_cells)
+            do i_component = 1, size(neighbour_cells(j_component)%line)
+                only_resized_triangle(j_component)%line(i_component) = this%short_interactions%&
+                    neighbour_cells(j_component)%line(i_component)%cells%resize_only()
+                if (.not. only_resized_triangle(j_component)%line(i_component)) then
+                    allocate(neighbour_cells(j_component)%line(i_component)%cells, source=this%&
+                        short_interactions%neighbour_cells(j_component)%line(i_component)%cells)
+                end if
+            end do
+        end do
+        call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
+            short_interactions%visitable_cells)
+    end subroutine Abstract_save_cells
+
+    !> @note
+    !> [[classes_box_volume_change:Abstract_restore_cells]] &
+    !> [[classes_volume_change_method:Abstract_restore_cells]]
+    !> should be factorised. However, this would create a memory leak.
+    !> @todo
+    !> Send a bug report to gfortran.
+    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)
+        class(Abstract_Box_Volume_Change), intent(in) :: this
+        type(Neighbour_Cells_Line), allocatable, intent(inout) :: neighbour_cells(:)
+        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
+        class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells(:, :)
+
+        integer :: i_component, j_component
+
+        do j_component = 1, size(this%short_interactions%neighbour_cells)
+            do i_component = 1, size(this%short_interactions%neighbour_cells(j_component)%line)
+                if (only_resized_triangle(j_component)%line(i_component)) then
+                    call this%short_interactions%neighbour_cells(j_component)%line(i_component)%&
+                        cells%reset()
+                else
+                    call cells_destroy(this%short_interactions%neighbour_cells(j_component)%&
+                        line(i_component)%cells)
+                    allocate(this%short_interactions%neighbour_cells(j_component)%&
+                        line(i_component)%cells, source=neighbour_cells(j_component)%&
+                        line(i_component)%cells)
+                end if
+            end do
+        end do
+        call cells_destroy(neighbour_cells)
+        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
+            visitable_cells, this%short_interactions%neighbour_cells, only_resized_triangle, &
+            visitable_cells)
+        call cells_destroy(visitable_cells)
+    end subroutine Abstract_restore_cells
 
 !end implementation Abstract_Box_Volume_Change
 

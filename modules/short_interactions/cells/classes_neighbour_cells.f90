@@ -26,6 +26,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: resize_only => Abstract_resize_only
         procedure :: reset => Abstract_reset
         procedure :: get_global_lbounds => Abstract_get_global_lbounds
         procedure :: get_global_ubounds => Abstract_get_global_ubounds
@@ -69,6 +70,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
+        procedure :: resize_only => Null_resize_only
         procedure :: reset => Null_reset
         procedure :: get_global_lbounds => Null_get_global_bounds
         procedure :: get_global_ubounds => Null_get_global_bounds
@@ -107,9 +109,14 @@ contains
         this%accessible_domain => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset(this, only_resized)
+    pure logical function Abstract_resize_only(this) result(resize_only)
+        class(Abstract_Neighbour_Cells), intent(in) :: this
+
+        resize_only = all(this%nums == floor(this%accessible_domain%get_size() / this%max_distance))
+    end function Abstract_resize_only
+
+    subroutine Abstract_reset(this)
         class(Abstract_Neighbour_Cells), intent(inout) :: this
-        logical, intent(out) :: only_resized
 
         integer :: nums(num_dimensions)
 
@@ -117,10 +124,7 @@ contains
         if (all(this%nums == nums)) then
             this%size = this%accessible_domain%get_size() / real(this%nums, DP)
             call this%check_size()
-            only_resized = .true.
             return
-        else
-            only_resized = .false.
         end if
         this%nums = nums
         call this%check_nums()
@@ -301,9 +305,13 @@ contains
         class(Null_Neighbour_Cells), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_reset(this, only_resized)
+    pure logical function Null_resize_only(this) result(resize_only)
+        class(Null_Neighbour_Cells), intent(in) :: this
+        resize_only = .false.
+    end function Null_resize_only
+
+    subroutine Null_reset(this)
         class(Null_Neighbour_Cells), intent(inout) :: this
-        logical, intent(out) :: only_resized
     end subroutine Null_reset
 
     pure function Null_get_global_bounds(this) result(bounds)

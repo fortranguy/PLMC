@@ -21,11 +21,10 @@ contains
         type(Neighbour_Cells_Line), intent(inout) :: cells(:)
 
         integer :: i_component, j_component
-        logical :: only_resized_dummy
 
         do j_component = 1, size(cells)
             do i_component = 1, size(cells(j_component)%line)
-                call cells(j_component)%line(i_component)%cells%reset(only_resized_dummy)
+                call cells(j_component)%line(i_component)%cells%reset()
             end do
         end do
     end subroutine reset_neighbour_cells
@@ -44,15 +43,14 @@ contains
 
     subroutine box_size_change_reset_cells(neighbour_cells, only_resized_triangle, visitable_cells)
         type(Neighbour_Cells_Line), intent(inout) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(inout) :: only_resized_triangle(:)
+        type(Concrete_Logical_Line), intent(in) :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(inout) :: visitable_cells(:, :)
 
         integer :: i_component, j_component
 
         do j_component = 1, size(neighbour_cells)
             do i_component = 1, size(neighbour_cells(j_component)%line)
-                call neighbour_cells(j_component)%line(i_component)%cells%&
-                    reset(only_resized_triangle(j_component)%line(i_component))
+                call neighbour_cells(j_component)%line(i_component)%cells%reset()
                 if (.not. only_resized_triangle(j_component)%line(i_component)) then
                     call visitable_cells(i_component, j_component)%reset()
                     if (i_component /= j_component) call visitable_cells(j_component, i_component)%&
