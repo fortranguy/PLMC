@@ -3,7 +3,7 @@ module classes_des_real_component
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
+use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -17,7 +17,7 @@ private
     type, abstract, public :: Abstract_DES_Real_Component
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Box_Volume_Memento), pointer :: box_volume_memento => null()
+        class(Abstract_Box_Size_Memento), pointer :: box_size_memento => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Component_Dipole_Moments), pointer :: dipole_moments => null()
         class(Abstract_DES_Real_Pair), pointer :: real_pair => null()
@@ -44,11 +44,11 @@ contains
 
 !implementation Abstract_DES_Real_Component
 
-    subroutine Abstract_construct(this, periodic_box, box_volume_memento, positions, &
+    subroutine Abstract_construct(this, periodic_box, box_size_memento, positions, &
         dipole_moments, real_pair)
         class(Abstract_DES_Real_Component), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Component_Dipole_Moments), target, intent(in) :: dipole_moments
         class(Abstract_DES_Real_Pair), intent(in) :: real_pair
@@ -56,7 +56,7 @@ contains
         this%periodic_box => periodic_box
         this%positions => positions
         this%dipole_moments => dipole_moments
-        call this%target(box_volume_memento, real_pair)
+        call this%target(box_size_memento, real_pair)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -65,16 +65,16 @@ contains
         this%real_pair => null()
         this%dipole_moments => null()
         this%positions => null()
-        this%box_volume_memento => null()
+        this%box_size_memento => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_target(this, box_volume_memento, real_pair)
+    subroutine Abstract_target(this, box_size_memento, real_pair)
         class(Abstract_DES_Real_Component), intent(inout) :: this
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
         class(Abstract_DES_Real_Pair), target, intent(in) :: real_pair
 
-        this%box_volume_memento => box_volume_memento
+        this%box_size_memento => box_size_memento
         this%real_pair => real_pair
     end subroutine Abstract_target
 
@@ -83,7 +83,7 @@ contains
     !>          \frac{V_\text{s}}{V} \right)^{1/3} \vec{r}_{ij}, \vec{\mu}_i, \vec{\mu}_j
     !>      \right)
     !> \]
-    !> cf. [[classes_box_volume_memento:Abstract_get]] and
+    !> cf. [[classes_box_size_memento:Abstract_get]] and
     !> [[classes_des_real_pair:Abstract_meet]]
     pure subroutine Abstract_visit(this, energy, particle, visit_condition, i_exclude)
         class(Abstract_DES_Real_Component), intent(in) :: this
@@ -92,12 +92,12 @@ contains
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
-        real(DP) :: box_volume_ratio, box_edge_ratio
+        real(DP) :: box_size_ratio(num_dimensions), box_edge_ratio
         real(DP) :: vector_ij(num_dimensions)
         integer :: j_particle
 
-        box_volume_ratio = this%box_volume_memento%get() / product(this%periodic_box%get_size())
-        box_edge_ratio = box_volume_ratio**(1._DP/3._DP)
+        box_size_ratio = this%box_size_memento%get() / this%periodic_box%get_size()
+        box_edge_ratio = box_size_ratio(1)
         energy = 0._DP
         do j_particle = 1, this%positions%get_num()
             if (.not.visit_condition(j_particle, i_exclude)) cycle
@@ -105,18 +105,18 @@ contains
             energy = energy + this%real_pair%meet(box_edge_ratio * vector_ij, particle%&
                 dipole_moment, this%dipole_moments%get(j_particle))
         end do
-        energy = box_volume_ratio * energy
+        energy = product(box_size_ratio) * energy
     end subroutine Abstract_visit
 
 !end implementation Abstract_DES_Real_Component
 
 !implementation Null_DES_Real_Component
 
-    subroutine Null_construct(this, periodic_box, box_volume_memento, positions, dipole_moments, &
+    subroutine Null_construct(this, periodic_box, box_size_memento, positions, dipole_moments, &
         real_pair)
         class(Null_DES_Real_Component), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Component_Dipole_Moments), target, intent(in) :: dipole_moments
         class(Abstract_DES_Real_Pair), intent(in) :: real_pair
@@ -126,9 +126,9 @@ contains
         class(Null_DES_Real_Component), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_target(this, box_volume_memento, real_pair)
+    subroutine Null_target(this, box_size_memento, real_pair)
         class(Null_DES_Real_Component), intent(inout) :: this
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
         class(Abstract_DES_Real_Pair), target, intent(in) :: real_pair
     end subroutine Null_target
 

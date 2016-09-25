@@ -11,11 +11,11 @@
         \begin{scope}
             \begin{abstractclass}[text width=\largeTextWidth]{DESrealComponent}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox,
-                    boxVolumeMemento: \type{BoxVolumeMemento},
+                    boxSizeMemento: \type{BoxSizeMemento},
                     positions: \type{ComponentCoordinates},
                     dipoleMoments: \type{ComponentDipoleMoments}, realPair: \type{DESrealPair}}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{target}{boxVolumeMemento: \type{BoxVolumeMemento},
+                \operation{\procedure{target}{boxSizeMemento: \type{BoxSizeMemento},
                     realPair: \type{DESrealPair}}}
                 \operation{\procedure{visit}{energy: \type{real}, particle:
                     \type{TemporaryParticle}, iExclude: \type{int}}}
@@ -37,7 +37,7 @@
         \begin{scope}[shift={($(DESselfComponent.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth]{\import{}:: \\
-                \namespace{Environment} :: PeriodicBox, BoxVolumeMemento, ReciprocalLattice,
+                \namespace{Environment} :: PeriodicBox, BoxSizeMemento, ReciprocalLattice,
                     Permittivity \\
                 \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
                     ComponentDipoleMoments, TemporaryParticle};
@@ -45,14 +45,13 @@
 
         \begin{scope}[shift={($(DESrealComponent.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESrealPair}{0, 0}
-                \operation[0]{\procedure{construct}{boxVolumeMemento: \type{BoxVolumeMemento},
+                \operation[0]{\procedure{construct}{boxSizeMemento: \type{BoxSizeMemento},
                     permittivity: \type{Permittivity}, alpha: \type{DESconvergenceParameter},
                     domain: \type{DipolarPotentialDomain}}}
                 \operation[0]{\procedure{destroy}{}}
-                \operation{\procedure{target}{boxVolumeMemento: \type{BoxVolumeMemento},
+                \operation{\procedure{target}{boxSizeMemento: \type{BoxSizeMemento},
                     alpha: \type{DESconvergenceParameter}}}
                 \operation[0]{\procedure{reset}{}}
-                \operation{\procedure{setDomainMax}{}}
                 \operation{\procedure{meet}{vectorIJ: \type{real[3]}, momentI: \type{real[3]},
                     momentJ: \type{real[3]}}}
             \end{abstractclass}
@@ -61,10 +60,9 @@
         \begin{scope}[shift={($(DESrealPair.north -| DESselfComponent)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESconvergenceParameter}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    alphaXbox: \type{real}}}
+                    alphaXboxEdge: \type{real}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getBoxEdge}{}: \type{real}}
-                \operation{\procedure{get}{}: \type{real}}
+                \operation{\procedure{getTimesBoxEdge}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -158,9 +156,9 @@
 
         \begin{scope}[shift={($(StructureFactor.south)!0.5!(DLCstructures) + (1.5 cm, -1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{DipolarInteractionsStatic}{0, 0}
-                \UMLattribute{boxVolumeMementoReal: \type{BoxVolumeMemento}}
+                \UMLattribute{boxSizeMementoReal: \type{BoxSizeMemento}}
                 \UMLattribute{realPair: \type{DESrealPair}}
-                \UMLattribute{boxVolumeMementoReci: \type{BoxVolumeMemento}}
+                \UMLattribute{boxSizeMementoReci: \type{BoxSizeMemento}}
                 \UMLattribute{reciWeight: \type{DESreciWeight}}
                 \UMLattribute{reciStructure: \type{DESreciStructure}}
                 \UMLattribute{dlcWeight: \type{DLCweight}}

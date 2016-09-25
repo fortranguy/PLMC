@@ -3,7 +3,7 @@ module classes_des_reci_visitor
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
+use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use classes_des_reci_weight, only: Abstract_DES_Reci_Weight
@@ -25,7 +25,7 @@ private
     type, extends(Abstract_Structure_Visitor), abstract, public :: Abstract_DES_Reci_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Box_Volume_Memento), pointer :: box_volume_memento => null()
+        class(Abstract_Box_Size_Memento), pointer :: box_size_memento => null()
         integer :: reci_numbers(num_dimensions) = 0
         class(Abstract_DES_Reci_Weight), pointer :: weight => null()
         class(Abstract_DES_Reci_Structure), pointer :: structure => null()
@@ -63,17 +63,17 @@ contains
 
 !implementation Abstract_DES_Reci_Visitor
 
-    subroutine Abstract_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, &
+    subroutine Abstract_construct(this, periodic_box, box_size_memento, reciprocal_lattice, &
         weight, structure)
         class(Abstract_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_DES_Reci_Weight), intent(in) :: weight
         class(Abstract_DES_Reci_Structure), intent(in) :: structure
 
         this%periodic_box => periodic_box
-        call this%target(box_volume_memento, weight, structure)
+        call this%target(box_size_memento, weight, structure)
         this%reci_numbers = reciprocal_lattice%get_numbers()
     end subroutine Abstract_construct
 
@@ -82,17 +82,17 @@ contains
 
         this%structure => null()
         this%weight => null()
-        this%box_volume_memento => null()
+        this%box_size_memento => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_target(this, box_volume_memento, weight, structure)
+    subroutine Abstract_target(this, box_size_memento, weight, structure)
         class(Abstract_DES_Reci_Visitor), intent(inout) :: this
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
         class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
         class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
 
-        this%box_volume_memento => box_volume_memento
+        this%box_size_memento => box_size_memento
         this%weight => weight
         this%structure => structure
     end subroutine Abstract_target
@@ -141,7 +141,8 @@ contains
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
+        real(DP) box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
@@ -161,8 +162,8 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
-        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+        box_size_ratio = this%box_size_memento%get() / box_size
+        box_edge_ratio = 1._DP / box_size_ratio(1)
 
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_old_1, this%reci_numbers(1), wave_1_x_position_old(1))
@@ -199,7 +200,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = box_volume_ratio * 4._DP * delta_energy
+        delta_energy = product(box_size_ratio) * 4._DP * delta_energy
     end function Abstract_visit_translation
 
     !> Energy delta when a particle is transmuted:
@@ -218,7 +219,8 @@ contains
         real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
+        real(DP) box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position
@@ -234,8 +236,8 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return !shortcut?
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
-        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+        box_size_ratio = this%box_size_memento%get() / box_size
+        box_edge_ratio = 1._DP / box_size_ratio(1)
 
         wave_1_x_position = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
@@ -265,7 +267,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = box_volume_ratio * 2._DP * delta_energy
+        delta_energy = product(box_size_ratio) * 2._DP * delta_energy
     end function Abstract_visit_transmutation
 
     pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old) &
@@ -309,7 +311,8 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
-        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
+        real(DP) box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position
@@ -324,8 +327,8 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
-        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+        box_size_ratio = this%box_size_memento%get() / box_size
+        box_edge_ratio = 1._DP / box_size_ratio(1)
 
         wave_1_x_position = 2._DP*PI * particle%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
@@ -355,7 +358,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = box_volume_ratio * 2._DP * delta_energy
+        delta_energy = product(box_size_ratio) * 2._DP * delta_energy
     end function Abstract_visit_exchange
 
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
@@ -379,7 +382,8 @@ contains
         integer, intent(in) :: ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        real(DP) :: box_size(num_dimensions), box_volume_ratio, box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
+        real(DP) box_edge_ratio
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2
@@ -399,8 +403,8 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return
 
         box_size = this%periodic_box%get_size()
-        box_volume_ratio = this%box_volume_memento%get() / product(box_size)
-        box_edge_ratio = box_volume_ratio**(-1._DP/3._DP)
+        box_size_ratio = this%box_size_memento%get() / box_size
+        box_edge_ratio = 1._DP / box_size_ratio(1)
 
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
         call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))
@@ -438,17 +442,17 @@ contains
                 end do
             end do
         end do
-        delta_energy = box_volume_ratio * 4._DP * delta_energy
+        delta_energy = product(box_size_ratio) * 4._DP * delta_energy
     end function Abstract_visit_switch
 !end implementation Abstract_DES_Reci_Visitor
 
 !implementation Null_DES_Reci_Visitor
 
-    subroutine Null_construct(this, periodic_box, box_volume_memento, reciprocal_lattice, weight, &
+    subroutine Null_construct(this, periodic_box, box_size_memento, reciprocal_lattice, weight, &
         structure)
         class(Null_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_DES_Reci_Weight), intent(in) :: weight
         class(Abstract_DES_Reci_Structure), intent(in) :: structure
@@ -458,9 +462,9 @@ contains
         class(Null_DES_Reci_Visitor), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_target(this, box_volume_memento, weight, structure)
+    subroutine Null_target(this, box_size_memento, weight, structure)
         class(Null_DES_Reci_Visitor), intent(inout) :: this
-        class(Abstract_Box_Volume_Memento), target, intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
         class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
         class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
     end subroutine Null_target

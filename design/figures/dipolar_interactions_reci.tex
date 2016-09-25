@@ -74,11 +74,11 @@
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciVisitor}{0, 0}
                 \inherit{StructureVisitor}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    boxVolumeMemento: \type{BoxVolumeMemento},
+                    boxSizeMemento: \type{BoxSizeMemento},
                     reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DESreciWeight},
                     structure: \type{DESreciStructure}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{target}{boxVolumeMemento: \type{BoxVolumeMemento},
+                \operation{\procedure{target}{boxSizeMemento: \type{BoxSizeMemento},
                     weight: \type{DESreciWeight}, structure: \type{DESreciStructure}}}
             \end{abstractclass}
         \end{scope}
@@ -87,12 +87,12 @@
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciStructure}{0, 0}
                 \inherit{StructureFactor}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    boxVolumeMemento: \type{BoxVolumeMemento},
+                    boxSizeMemento: \type{BoxSizeMemento},
                     reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
                     areDipolar: \type{bool[:]}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox},
-                    boxVolumeMemento: \type{BoxVolumeMemento},
+                    boxSizeMemento: \type{BoxSizeMemento},
                     components: \type{Component[:]}}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{get}{n1: \type{int}, n2: \type{int}, n3: \type{int}}:

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use types_potential_domain, only: Dipolar_Potential_Domain
-use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
+use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_permittivity, only: Abstract_Permittivity
 use types_min_distance_wrapper, only: Min_Distances_Line
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
@@ -18,10 +18,10 @@ public :: create, destroy
 
 contains
 
-    subroutine create(pair, box_volume_memento, permittivity, min_distances, dipoles_exist, alpha, &
+    subroutine create(pair, box_size_memento, permittivity, min_distances, dipoles_exist, alpha, &
         generating_data, prefix)
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
-        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
         type(Min_Distances_Line), intent(in) :: min_distances(:)
         logical, intent(in) :: dipoles_exist
@@ -43,7 +43,7 @@ contains
         end do
 
         call allocate(pair, dipoles_exist, generating_data, prefix)
-        call construct(pair, box_volume_memento, permittivity, min_distance, dipoles_exist, alpha, &
+        call construct(pair, box_size_memento, permittivity, min_distance, dipoles_exist, alpha, &
             generating_data, prefix)
     end subroutine create
 
@@ -70,10 +70,10 @@ contains
         end if
     end subroutine allocate
 
-    subroutine construct(pair, box_volume_memento, permittivity, min_distance, dipoles_exist, &
-        alpha, generating_data, prefix)
+    subroutine construct(pair, box_size_memento, permittivity, min_distance, dipoles_exist, alpha, &
+        generating_data, prefix)
         class(Abstract_DES_Real_Pair), intent(inout) :: pair
-        class(Abstract_Box_Volume_Memento), intent(in) :: box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
         real(DP), intent(in) :: min_distance
         logical, intent(in) :: dipoles_exist
@@ -97,7 +97,7 @@ contains
                     call check_data_found(data_field, data_found)
             end select
         end if
-        call pair%construct(box_volume_memento, permittivity, alpha, domain)
+        call pair%construct(box_size_memento, permittivity, alpha, domain)
     end subroutine construct
 
     subroutine destroy(pair)

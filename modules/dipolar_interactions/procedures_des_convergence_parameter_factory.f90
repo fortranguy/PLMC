@@ -23,17 +23,17 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP) :: alpha_x_box
+        real(DP) :: alpha_x_box_edge
 
         if (dipoles_exist) then
             data_field = prefix//"alpha times box edge"
-            call generating_data%get(data_field, alpha_x_box, data_found)
+            call generating_data%get(data_field, alpha_x_box_edge, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_DES_Convergence_Parameter :: alpha)
         else
             allocate(Null_DES_Convergence_Parameter :: alpha)
         end if
-        call alpha%construct(periodic_box, alpha_x_box)
+        call alpha%construct(periodic_box, alpha_x_box_edge)
     end subroutine create
 
     subroutine destroy(alpha)

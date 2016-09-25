@@ -68,16 +68,16 @@
         \end{scope}
 
         \begin{scope}[shift={($(Temperature.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{BoxVolumeMemento}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{BoxSizeMemento}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{save}{}}
-                \operation{\procedure{get}{}: \type{real}}
+                \operation{\procedure{get}{}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxVolumeMemento.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(BoxSizeMemento.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BetaPressure}{0, 0}
                 \operation{\procedure{set}{density \type{real}, excess: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
@@ -163,7 +163,7 @@
             \composition{VisitableWalls}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
             \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}
             \aggregation{BoxSizeChecker}{\refName{wallsPotential}}{\numRef{1}}{VisitableWalls}
-            \aggregation{BoxVolumeMemento}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
+            \aggregation{BoxSizeMemento}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
         \end{scope}
     \end{tikzpicture}
 

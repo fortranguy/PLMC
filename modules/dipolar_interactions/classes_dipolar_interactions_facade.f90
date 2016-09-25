@@ -116,8 +116,9 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
         real(DP), intent(in) :: new_box_volume
 
-        this%real_pair_must_be_reset = new_box_volume > this%dipolar_interactions_static%&
-            box_volume_memento_real%get()
+        this%real_pair_must_be_reset = .false.
+            !new_box_volume > this%dipolar_interactions_static%&
+            !box_size_memento_real%get()
         call this%clone(dipolar_interactions_static, this%dipolar_interactions_static)
     end subroutine Abstract_save
 
@@ -136,13 +137,13 @@ contains
 
         if (this%real_pair_must_be_reset) then
             call this%dipolar_interactions_static%real_pair%target(this%&
-                dipolar_interactions_static%box_volume_memento_real, this%&
+                dipolar_interactions_static%box_size_memento_real, this%&
                 dipolar_interactions_dynamic%alpha)
             do j_component = 1, size(this%dipolar_interactions_dynamic%real_components, 2)
                 do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
                     call this%dipolar_interactions_dynamic%&
                         real_components(i_component, j_component)%component%&
-                        target(this%dipolar_interactions_static%box_volume_memento_real, this%&
+                        target(this%dipolar_interactions_static%box_size_memento_real, this%&
                             dipolar_interactions_static%real_pair)
                 end do
             end do
@@ -194,7 +195,7 @@ contains
         class(Scalable_Dipolar_Interactions_Facade), intent(in) :: this
 
         call dipolar_interactions_reset_real(this%dipolar_interactions_static%&
-            box_volume_memento_real, this%dipolar_interactions_static%real_pair, &
+            box_size_memento_real, this%dipolar_interactions_static%real_pair, &
             this%real_pair_must_be_reset)
     end subroutine Scalable_reset
 
@@ -246,15 +247,15 @@ contains
     subroutine Unscalable_target(this)
         class(Unscalable_Dipolar_Interactions_Facade), intent(in) :: this
 
-        call this%dipolar_interactions_static%box_volume_memento_real%target(this%periodic_box)
+        call this%dipolar_interactions_static%box_size_memento_real%target(this%periodic_box)
         call this%target_real()
-        call this%dipolar_interactions_static%box_volume_memento_reci%target(this%periodic_box)
+        call this%dipolar_interactions_static%box_size_memento_reci%target(this%periodic_box)
         call this%dipolar_interactions_static%reci_weight%target(this%periodic_box, this%&
             dipolar_interactions_dynamic%alpha)
         call this%dipolar_interactions_static%reci_structure%target(this%periodic_box, this%&
-            dipolar_interactions_static%box_volume_memento_reci, this%components)
+            dipolar_interactions_static%box_size_memento_reci, this%components)
         call this%dipolar_interactions_dynamic%reci_visitor%target(this%&
-            dipolar_interactions_static%box_volume_memento_reci, this%dipolar_interactions_static%&
+            dipolar_interactions_static%box_size_memento_reci, this%dipolar_interactions_static%&
             reci_weight, this%dipolar_interactions_static%reci_structure)
         call this%dipolar_interactions_static%dlc_weight%target(this%periodic_box)
         call this%dipolar_interactions_static%dlc_structures%target(this%periodic_box, this%&
@@ -270,19 +271,19 @@ contains
             dipolar_interactions_static_target
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static_source
 
-        if (allocated(dipolar_interactions_static_target%box_volume_memento_real)) &
-            deallocate(dipolar_interactions_static_target%box_volume_memento_real)
-        allocate(dipolar_interactions_static_target%box_volume_memento_real, &
-            source=dipolar_interactions_static_source%box_volume_memento_real)
+        if (allocated(dipolar_interactions_static_target%box_size_memento_real)) &
+            deallocate(dipolar_interactions_static_target%box_size_memento_real)
+        allocate(dipolar_interactions_static_target%box_size_memento_real, &
+            source=dipolar_interactions_static_source%box_size_memento_real)
         if (this%real_pair_must_be_reset) then
             call des_real_destroy(dipolar_interactions_static_target%real_pair)
             allocate(dipolar_interactions_static_target%real_pair, &
                 source=dipolar_interactions_static_source%real_pair)
         end if
-        if (allocated(dipolar_interactions_static_target%box_volume_memento_reci)) &
-            deallocate(dipolar_interactions_static_target%box_volume_memento_reci)
-        allocate(dipolar_interactions_static_target%box_volume_memento_reci, &
-            source=dipolar_interactions_static_source%box_volume_memento_reci)
+        if (allocated(dipolar_interactions_static_target%box_size_memento_reci)) &
+            deallocate(dipolar_interactions_static_target%box_size_memento_reci)
+        allocate(dipolar_interactions_static_target%box_size_memento_reci, &
+            source=dipolar_interactions_static_source%box_size_memento_reci)
         if (allocated(dipolar_interactions_static_target%reci_weight)) &
             deallocate(dipolar_interactions_static_target%reci_weight)
         allocate(dipolar_interactions_static_target%reci_weight, &

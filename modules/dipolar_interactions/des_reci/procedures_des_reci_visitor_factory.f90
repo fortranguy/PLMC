@@ -1,7 +1,7 @@
 module procedures_des_reci_visitor_factory
 
 use procedures_errors, only: error_exit
-use classes_box_volume_memento, only: Abstract_Box_Volume_Memento
+use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_des_reci_weight, only: Abstract_DES_Reci_Weight
 use classes_des_reci_structure, only: Abstract_DES_Reci_Structure, Concrete_DES_Reci_Structure, &
@@ -16,10 +16,10 @@ public :: create, destroy
 
 contains
 
-    subroutine create(visitor, environment, box_volume_memento, weight, structure)
+    subroutine create(visitor, environment, box_size_memento, weight, structure)
         class(Abstract_DES_Reci_Visitor), allocatable, intent(out) :: visitor
         type(Environment_Wrapper), intent(in) :: environment
-        class(Abstract_Box_Volume_Memento), intent(in) ::box_volume_memento
+        class(Abstract_Box_Size_Memento), intent(in) ::box_size_memento
         class(Abstract_DES_Reci_Weight), intent(in) :: weight
         class(Abstract_DES_Reci_Structure), intent(in) :: structure
 
@@ -32,7 +32,7 @@ contains
                 call error_exit("procedures_des_reci_visitor_factory: create: structure"//&
                     " type unknown.")
         end select
-        call visitor%construct(environment%periodic_box, box_volume_memento, environment%&
+        call visitor%construct(environment%periodic_box, box_size_memento, environment%&
             reciprocal_lattice, weight, structure)
     end subroutine create
 
