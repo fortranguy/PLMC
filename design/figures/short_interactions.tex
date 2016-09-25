@@ -70,7 +70,7 @@
 
         \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{PairPotential}{0, 0}
-                \operation[0]{\procedure{construct}{domain: \type{ShortPotentialDomain},
+                \operation[0]{\procedure{construct}{domain: \type{PotentialDomain},
                     expression: \type{PotentialExpression}}}
                 \operation[0]{\procedure{destroy}{}}
                 \operation{\procedure{getMinDistance}{}: \type{real}}
@@ -105,6 +105,7 @@
         \begin{scope}[shift={($(HardContact.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth] {\import{}: \\
+                \namespace{Common} :: PotentialDomain \\
                 \namespace{Environment} :: PeriodicBox, ParallelepipedDomain, WallsVisitor,
                     BetaPressureExcess \\
                 \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle \\

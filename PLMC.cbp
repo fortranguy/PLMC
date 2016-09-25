@@ -241,8 +241,9 @@
 		<Unit filename="modules/common/types_potential_domain.f90">
 			<Option weight="0" />
 		</Unit>
+		<Unit filename="modules/common/types_potential_domain_selector.f90" />
 		<Unit filename="modules/dipolar_interactions/classes_des_convergence_parameter.f90">
-			<Option weight="3" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_des_surf_mixture.f90">
 			<Option weight="9" />
@@ -257,22 +258,22 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/classes_des_real_component.f90">
-			<Option weight="5" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/classes_des_real_pair.f90">
-			<Option weight="4" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_component_factory.f90">
-			<Option weight="6" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_factory.f90">
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_pair_factory.f90">
-			<Option weight="5" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/types_des_real_component_wrapper.f90">
-			<Option weight="6" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_structure.f90">
 			<Option weight="8" />
@@ -281,7 +282,7 @@
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_weight.f90">
-			<Option weight="4" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/procedures_des_reci_factory.f90">
 			<Option weight="11" />
@@ -329,7 +330,7 @@
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_des_convergence_parameter_factory.f90">
-			<Option weight="4" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_des_surf_mixture_factory.f90">
 			<Option weight="10" />

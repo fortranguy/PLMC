@@ -37,6 +37,7 @@
         \begin{scope}[shift={($(DESselfComponent.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth]{\import{}:: \\
+                \namespace{Common} :: PotentialDomain \\
                 \namespace{Environment} :: PeriodicBox, BoxSizeMemento, ReciprocalLattice,
                     Permittivity \\
                 \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
@@ -47,7 +48,7 @@
             \begin{abstractclass}[text width=\largeTextWidth]{DESrealPair}{0, 0}
                 \operation[0]{\procedure{construct}{boxSizeMemento: \type{BoxSizeMemento},
                     permittivity: \type{Permittivity}, alpha: \type{DESconvergenceParameter},
-                    domain: \type{DipolarPotentialDomain}}}
+                    domain: \type{PotentialDomain}}}
                 \operation[0]{\procedure{destroy}{}}
                 \operation{\procedure{target}{boxSizeMemento: \type{BoxSizeMemento}}}
                 \operation[0]{\procedure{reset}{}}

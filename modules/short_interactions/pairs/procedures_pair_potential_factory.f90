@@ -3,7 +3,7 @@ module procedures_pair_potential_factory
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use classes_min_distance, only: Abstract_Min_Distance
-use types_potential_domain, only: Short_Potential_Domain
+use types_potential_domain, only: Concrete_Potential_Domain
 use classes_potential_expression, only: Abstract_Potential_Expression, Null_Potential_Expression
 use classes_pair_potential, only: Abstract_Pair_Potential, Tabulated_Pair_Potential, &
     Raw_Pair_Potential, Null_Pair_Potential
@@ -60,7 +60,7 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        type(Short_Potential_Domain) :: domain
+        type(Concrete_Potential_Domain) :: domain
 
         if (interact) then
             domain%min = min_distance%get()

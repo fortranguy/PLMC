@@ -7,7 +7,8 @@ use procedures_checks, only: check_positive, check_potential_domain
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_permittivity, only: Abstract_Permittivity
 use procedures_dipolar_interactions_micro, only: des_real_B, des_real_C
-use types_potential_domain, only: Dipolar_Potential_Domain
+use types_potential_domain, only: Concrete_Potential_Domain
+use types_potential_domain_selector, only: Concrete_Potential_Domain_Selector
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 
 implicit none
@@ -17,8 +18,7 @@ private
     type, abstract, public :: Abstract_DES_Real_Pair
     private
         class(Abstract_Box_Size_Memento), pointer :: box_size_memento => null()
-        type(Dipolar_Potential_Domain) :: domain
-        real(DP) :: domain_max = 0._DP
+        type(Concrete_Potential_Domain) :: domain
         real(DP) :: coulomb = 0._DP
         real(DP) :: alpha_x_box_edge = 0._DP
     contains
@@ -33,13 +33,13 @@ private
     abstract interface
 
         subroutine Abstract_construct(this, box_size_memento, permittivity, alpha, domain)
-        import :: Abstract_Box_Size_Memento, Abstract_Permittivity, Dipolar_Potential_Domain, &
+        import :: Abstract_Box_Size_Memento, Abstract_Permittivity, Concrete_Potential_Domain, &
             Abstract_DES_Convergence_Parameter, Abstract_DES_Real_Pair
             class(Abstract_DES_Real_Pair), intent(out) :: this
             class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
             class(Abstract_Permittivity), intent(in) :: permittivity
             class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-            type(Dipolar_Potential_Domain), intent(in) :: domain
+            type(Concrete_Potential_Domain), intent(in) :: domain
         end subroutine Abstract_construct
 
         subroutine Abstract_destroy(this)
@@ -137,7 +137,7 @@ contains
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-        type(Dipolar_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
 
         call this%target(box_size_memento)
         this%coulomb = 1._DP / (4._DP*PI * permittivity%get())
@@ -150,13 +150,17 @@ contains
     !> redefine [[types_potential_domain:Potential_Domain]]
     subroutine Tabulated_set_domain(this, domain)
         class(Tabulated_DES_Real_Pair), intent(inout) :: this
-        type(Dipolar_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
 
-        call check_potential_domain("Tabulated_DES_Real_Pair: set_domain", domain, 0._DP)
+        type(Concrete_Potential_Domain_Selector) :: selector
+
         this%domain%min = domain%min
-        this%domain%max_over_box = domain%max_over_box
-        this%domain_max = this%domain%max_over_box * this%box_size_memento%get_edge()
+        this%domain%max_over_box_edge = domain%max_over_box_edge
+        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         this%domain%delta = domain%delta
+        selector%check_max_over_box_edge = .true.
+        selector%check_delta = .true.
+        call check_potential_domain("Tabulated_DES_Real_Pair: set_domain", this%domain, selector)
     end subroutine Tabulated_set_domain
 
     pure subroutine Tabulated_create_tabulation(this)
@@ -166,7 +170,7 @@ contains
         integer :: i_min, i_max, i_distance
 
         i_min = int(this%domain%min / this%domain%delta)
-        i_max = int(this%domain_max / this%domain%delta) + 1
+        i_max = int(this%domain%max / this%domain%delta) + 1
         allocate(this%tabulation(i_min:i_max, 2))
         alpha = this%alpha_x_box_edge / this%box_size_memento%get_edge()
         do i_distance = i_min, i_max
@@ -188,7 +192,7 @@ contains
     subroutine Tabulated_reset(this)
         class(Tabulated_DES_Real_Pair), intent(inout) :: this
 
-        this%domain_max = this%domain%max_over_box * this%box_size_memento%get_edge()
+        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         if (allocated(this%tabulation)) deallocate(this%tabulation)
         call this%create_tabulation()
     end subroutine Tabulated_reset
@@ -202,7 +206,7 @@ contains
         integer :: i_distance
         real(DP) :: distance_i
 
-        if (distance < this%domain_max) then
+        if (distance < this%domain%max) then
             i_distance = int(distance/this%domain%delta)
             distance_i = real(i_distance, DP) * this%domain%delta
             expression = this%tabulation(i_distance, :) + &
@@ -223,7 +227,7 @@ contains
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-        type(Dipolar_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
 
         call this%target(box_size_memento)
         this%coulomb = 1._DP / (4._DP * PI * permittivity%get())
@@ -232,23 +236,21 @@ contains
         call this%set_domain(domain)
     end subroutine Raw_construct
 
-    !> @todo
-    !> Unify in check
     subroutine Raw_set_domain(this, domain)
         class(Raw_DES_Real_Pair), intent(inout) :: this
-        type(Dipolar_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
 
-        call check_positive("Raw_DES_Real_Pair", "domain%min", domain%min)
-        call check_positive("Raw_DES_Real_Pair", "domain%max_over_box", domain%max_over_box)
+        type(Concrete_Potential_Domain_Selector) :: selector
+
         this%domain%min = domain%min
-        this%domain%max_over_box = domain%max_over_box
-        this%domain_max = this%domain%max_over_box * this%box_size_memento%get_edge()
-        this%expression_domain_max =  [des_real_B(this%alpha, this%domain_max), &
-            des_real_C(this%alpha, this%domain_max)]
-        if (this%domain%min > this%domain_max) then
-            call error_exit("Raw_DES_Real_Pair: set_domain: min > max.")
-        end if
+        this%domain%max_over_box_edge = domain%max_over_box_edge
+        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         this%domain%delta = 0._DP
+        selector%check_max_over_box_edge = .true.
+        selector%check_delta = .false.
+        call check_potential_domain("Raw_DES_Real_Pair: set_domain", this%domain, selector)
+        this%expression_domain_max =  [des_real_B(this%alpha, this%domain%max), &
+            des_real_C(this%alpha, this%domain%max)]
     end subroutine Raw_set_domain
 
     subroutine Raw_destroy(this)
@@ -260,13 +262,13 @@ contains
     subroutine Raw_reset(this)
         class(Raw_DES_Real_Pair), intent(inout) :: this
 
-        this%domain_max = this%domain%max_over_box * this%box_size_memento%get_edge()
-        if (this%domain%min > this%domain_max) then
-            call error_exit("Raw_DES_Real_Pair: reset: min > max.")
+        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
+        if (this%domain%min > this%domain%max) then
+            call error_exit("Raw_DES_Real_Pair: reset: domain: min > max.")
         end if
         this%alpha = this%alpha_x_box_edge / this%box_size_memento%get_edge()
-        this%expression_domain_max =  [des_real_B(this%alpha, this%domain_max), &
-            des_real_C(this%alpha, this%domain_max)]
+        this%expression_domain_max =  [des_real_B(this%alpha, this%domain%max), &
+            des_real_C(this%alpha, this%domain%max)]
     end subroutine Raw_reset
 
     pure function Raw_expression(this, distance) result(expression)
@@ -274,7 +276,7 @@ contains
         class(Raw_DES_Real_Pair), intent(in) :: this
         real(DP), intent(in) :: distance
 
-        if (distance < this%domain_max) then
+        if (distance < this%domain%max) then
             expression = [des_real_B(this%alpha, distance), des_real_C(this%alpha, distance)]
             expression = this%coulomb * (expression - this%expression_domain_max)
         else
@@ -291,7 +293,7 @@ contains
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
-        type(Dipolar_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

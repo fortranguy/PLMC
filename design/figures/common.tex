@@ -20,24 +20,12 @@
         \begin{scope}[shift={($(HeteroCouples.south) - (0 cm, 2 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{PotentialDomain}{0, 0}
                 \UMLattribute{min: \type{real}}
+                \UMLattribute{maxOverBoxEdge: \type{real}}
+                \UMLattribute{max: \type{real}}
                 \UMLattribute{delta: \type{real}}
             \end{class}
         \end{scope}
-
-        \begin{scope}[shift={($(PotentialDomain.south) + (-4 cm, -2 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{ShortPotentialDomain}{0, 0}
-                \inherit{PotentialDomain}
-                \UMLattribute{max: \type{real}}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(PotentialDomain.south) + (4 cm, -2 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{DipolarPotentialDomain}{0, 0}
-                \inherit{PotentialDomain}
-                \UMLattribute{maxOverBox: \type{real}}
-            \end{class}
-        \end{scope}
-
+        
     \end{tikzpicture}
 
 \end{document}

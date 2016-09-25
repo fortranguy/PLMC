@@ -4,8 +4,9 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
 use data_strings, only: max_word_length
 use procedures_errors, only: warning_continue, error_exit
-use types_potential_domain, only: Abstract_Potential_Domain, Short_Potential_Domain, &
-    Dipolar_Potential_Domain
+use types_potential_domain, only: Concrete_Potential_Domain
+use types_potential_domain_selector, only: Concrete_Potential_Domain_Selector
+
 
 implicit none
 
@@ -25,11 +26,6 @@ interface check_positive
     module procedure :: check_positive_real_scalar
     module procedure :: check_positive_real_array
 end interface check_positive
-
-interface check_potential_domain
-    module procedure :: check_short_potential_domain
-    module procedure :: check_dipolar_potential_domain
-end interface check_potential_domain
 
 contains
 
@@ -191,45 +187,33 @@ contains
         end if
     end subroutine check_increase_factor
 
-!implementation check_potential_domain
-
-    subroutine check_short_potential_domain(context, domain)
+    subroutine check_potential_domain(context, domain, selector)
         character(len=*), intent(in) :: context
-        type(Short_Potential_Domain), intent(in) :: domain
-
-        call check_potential_domain_core(context, domain, domain%max)
-    end subroutine check_short_potential_domain
-
-    subroutine check_dipolar_potential_domain(context, domain, box_edge)
-        character(len=*), intent(in) :: context
-        type(Dipolar_Potential_Domain), intent(in) :: domain
-        real(DP), intent(in) :: box_edge
-
-        call check_potential_domain_core(context, domain, domain%max_over_box*box_edge)
-    end subroutine check_dipolar_potential_domain
-
-    subroutine check_potential_domain_core(context, domain, domain_max)
-        character(len=*), intent(in) :: context
-        class(Abstract_Potential_Domain), intent(in) :: domain
-        real(DP), intent(in) :: domain_max
+        type(Concrete_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain_Selector), intent(in) :: selector
 
         real(DP) :: distance_range
+
         call check_positive(context, "min", domain%min)
-        call check_positive(context, "max", domain_max)
-        if (domain%min > domain_max) then
+        call check_positive(context, "max", domain%max)
+        if (domain%min > domain%max) then
             call error_exit(context//": min > max.")
         end if
-        call check_positive(context, "domain%delta", domain%delta)
-        distance_range = domain_max - domain%min
+        distance_range = domain%max - domain%min
         if (distance_range < real_zero) then
             call warning_continue(context//"distance_range may be too small.")
         end if
+
+        if (selector%check_max_over_box_edge) then
+            call check_positive(context, "max_over_box_edge", domain%max_over_box_edge)
+        end if
+
+        if (.not. selector%check_delta) return
+        call check_positive(context, "domain%delta", domain%delta)
         if (distance_range / domain%delta < 1._DP) then
             call warning_continue(context//": delta may be too big.")
         end if
-    end subroutine check_potential_domain_core
-
-!end implementation check_potential_domain
+    end subroutine check_potential_domain
 
     subroutine check_ratio(context, ratio_name, ratio)
         character(len=*), intent(in) :: context, ratio_name

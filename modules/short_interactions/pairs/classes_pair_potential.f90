@@ -5,7 +5,8 @@ use data_constants, only: real_zero
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_positive, check_potential_domain
 use classes_potential_expression, only: Abstract_Potential_Expression
-use types_potential_domain, only: Short_Potential_Domain
+use types_potential_domain, only: Concrete_Potential_Domain
+use types_potential_domain_selector, only: Concrete_Potential_Domain_Selector
 
 implicit none
 
@@ -14,7 +15,7 @@ private
     type, abstract, public :: Abstract_Pair_Potential
     private
         class(Abstract_Potential_Expression), allocatable :: expression
-        type(Short_Potential_Domain) :: domain
+        type(Concrete_Potential_Domain) :: domain
     contains
         procedure(Abstract_construct), deferred :: construct
         procedure(Abstract_destroy), deferred :: destroy
@@ -26,9 +27,9 @@ private
     abstract interface
 
         subroutine Abstract_construct(this, domain, expression)
-        import :: Short_Potential_Domain, Abstract_Potential_Expression, Abstract_Pair_Potential
+        import :: Concrete_Potential_Domain, Abstract_Potential_Expression, Abstract_Pair_Potential
             class(Abstract_Pair_Potential), intent(out) :: this
-            type(Short_Potential_Domain), intent(in) :: domain
+            type(Concrete_Potential_Domain), intent(in) :: domain
             class(Abstract_Potential_Expression), intent(in) :: expression
         end subroutine Abstract_construct
 
@@ -99,7 +100,7 @@ contains
 
     subroutine Tabulated_construct(this, domain, expression)
         class(Tabulated_Pair_Potential), intent(out) :: this
-        type(Short_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), intent(in) :: expression
 
         allocate(this%expression, source = expression)
@@ -109,9 +110,13 @@ contains
 
     subroutine Tabulated_set_domain(this, domain)
         class(Tabulated_Pair_Potential), intent(inout) :: this
-        type(Short_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
 
-        call check_potential_domain("Tabulated_set_domain", domain)
+        type(Concrete_Potential_Domain_Selector) :: selector
+
+        selector%check_delta = .true.
+        selector%check_max_over_box_edge = .false.
+        call check_potential_domain("Tabulated_Pair_Potential: set_domain", domain, selector)
         this%domain%min = domain%min
         this%domain%max = domain%max
         this%domain%delta = domain%delta
@@ -169,7 +174,7 @@ contains
 
     subroutine Raw_construct(this, domain, expression)
         class(Raw_Pair_Potential), intent(out) :: this
-        type(Short_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), intent(in) :: expression
 
         allocate(this%expression, source = expression)
@@ -179,13 +184,13 @@ contains
 
     subroutine Raw_set_domain(this, domain)
         class(Raw_Pair_Potential), intent(inout) :: this
-        type(Short_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
 
-        call check_positive("Raw_Pair_Potential", "domain%min", domain%min)
-        call check_positive("Raw_Pair_Potential", "domain%max", domain%max)
-        if (domain%min > domain%max) then
-            call error_exit("Raw_set_domain: min > max.")
-        end if
+        type(Concrete_Potential_Domain_Selector) :: selector
+
+        selector%check_delta = .false.
+        selector%check_max_over_box_edge = .false.
+        call check_potential_domain("Raw_Pair_Potential: set_domain", domain, selector)
         this%domain%min = domain%min
         this%domain%max = domain%max
         this%domain%delta = 0._DP
@@ -218,7 +223,7 @@ contains
 
     subroutine Null_construct(this, domain, expression)
         class(Null_Pair_Potential), intent(out) :: this
-        type(Short_Potential_Domain), intent(in) :: domain
+        type(Concrete_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), intent(in) :: expression
     end subroutine Null_construct
 

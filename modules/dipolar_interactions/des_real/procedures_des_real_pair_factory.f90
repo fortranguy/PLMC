@@ -3,7 +3,7 @@ module procedures_des_real_pair_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use types_potential_domain, only: Dipolar_Potential_Domain
+use types_potential_domain, only: Concrete_Potential_Domain
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_permittivity, only: Abstract_Permittivity
 use types_min_distance_wrapper, only: Min_Distances_Line
@@ -83,12 +83,12 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        type(Dipolar_Potential_Domain) :: domain
+        type(Concrete_Potential_Domain) :: domain
 
         if (dipoles_exist) then
             domain%min = min_distance
             data_field = prefix//"max distance / box edge"
-            call generating_data%get(data_field, domain%max_over_box, data_found)
+            call generating_data%get(data_field, domain%max_over_box_edge, data_found)
             call check_data_found(data_field, data_found)
             select type (pair)
                 type is (Tabulated_DES_Real_Pair)
