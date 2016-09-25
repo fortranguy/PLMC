@@ -3,7 +3,6 @@ module procedures_des_convergence_parameter_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter, &
     Concrete_DES_Convergence_Parameter, Null_DES_Convergence_Parameter
 
@@ -14,9 +13,8 @@ public :: create, destroy
 
 contains
 
-    subroutine create(alpha, periodic_box, dipoles_exist, generating_data, prefix)
+    subroutine create(alpha, dipoles_exist, generating_data, prefix)
         class(Abstract_DES_Convergence_Parameter), allocatable, intent(out) :: alpha
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: dipoles_exist
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
@@ -33,7 +31,7 @@ contains
         else
             allocate(Null_DES_Convergence_Parameter :: alpha)
         end if
-        call alpha%construct(periodic_box, alpha_x_box_edge)
+        call alpha%construct(alpha_x_box_edge)
     end subroutine create
 
     subroutine destroy(alpha)

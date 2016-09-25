@@ -43,8 +43,8 @@ contains
         call check_consistency(environment%reciprocal_lattice, environment%permittivity, &
             any(are_dipolar))
 
-        call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, environment%&
-            periodic_box, any(are_dipolar), generating_data, prefix)
+        call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, any(are_dipolar),&
+            generating_data, prefix)
 
         call box_create(dipolar_interactions_static%box_size_memento_real, environment%&
             periodic_box, environment%beta_pressure, any(are_dipolar))
@@ -59,7 +59,8 @@ contains
             source=dipolar_interactions_static%box_size_memento_real)
         call dipolar_interactions_static%box_size_memento_reci%target(environment%periodic_box)
         call des_reci_create(dipolar_interactions_static%reci_weight, environment, &
-            any(are_dipolar), dipolar_interactions_dynamic%alpha)
+            dipolar_interactions_static%box_size_memento_reci, any(are_dipolar), &
+            dipolar_interactions_dynamic%alpha)
         call des_reci_create(dipolar_interactions_static%reci_structure, environment, &
             dipolar_interactions_static%box_size_memento_reci, mixture%components, are_dipolar)
         call des_reci_create(dipolar_interactions_dynamic%reci_visitor, environment, &

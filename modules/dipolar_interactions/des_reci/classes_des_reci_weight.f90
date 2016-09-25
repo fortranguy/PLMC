@@ -2,9 +2,9 @@ module classes_des_reci_weight
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
-use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_permittivity, only: Abstract_Permittivity
+use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
+use classes_permittivity, only: Abstract_Permittivity
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 
 implicit none
@@ -13,10 +13,10 @@ private
 
     type, abstract, public :: Abstract_DES_Reci_Weight
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Box_Size_Memento), pointer :: box_size_memento => null()
         integer :: reci_numbers(num_dimensions) = 0
         real(DP) :: permittivity = 0._DP
-        class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
+        real(DP) :: alpha_x_box_edge = 0._DP
         real(DP), allocatable :: weight(:, :, :)
     contains
         procedure :: construct => Abstract_construct
@@ -44,16 +44,17 @@ contains
 
 !implementation Abstract_DES_Reci_Weight
 
-    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
+    subroutine Abstract_construct(this, box_size_memento, reciprocal_lattice, permittivity, alpha)
         class(Abstract_DES_Reci_Weight), intent(out) :: this
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
 
-        call this%target(periodic_box, alpha)
+        call this%target(box_size_memento)
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%permittivity = permittivity%get()
+        this%alpha_x_box_edge = alpha%get_times_box_edge()
         allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2), &
                              0:this%reci_numbers(3)))
         this%weight = 0._DP
@@ -64,17 +65,14 @@ contains
         class(Abstract_DES_Reci_Weight), intent(inout) :: this
 
         if (allocated(this%weight)) deallocate(this%weight)
-        this%alpha => null()
-        this%periodic_box => null()
+        this%box_size_memento => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_target(this, periodic_box, alpha)
+    subroutine Abstract_target(this, box_size_memento)
         class(Abstract_DES_Reci_Weight), intent(inout) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
 
-        this%periodic_box => periodic_box
-        this%alpha => alpha
+        this%box_size_memento => box_size_memento
     end subroutine Abstract_target
 
     pure subroutine Abstract_set(this)
@@ -84,8 +82,8 @@ contains
         real(DP), dimension(num_dimensions) :: box_size, wave_vector
         real(DP) :: alpha, wave_squared
 
-        box_size = this%periodic_box%get_size()
-        alpha = this%alpha%get()
+        box_size = this%box_size_memento%get()
+        alpha = this%alpha_x_box_edge / box_size(1)
         do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
         do n_2 = 0, this%reci_numbers(2)
@@ -125,9 +123,9 @@ contains
 
 !implementation Null_DES_Reci_Weight
 
-    subroutine Null_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
+    subroutine Null_construct(this, box_size_memento, reciprocal_lattice, permittivity, alpha)
         class(Null_DES_Reci_Weight), intent(out) :: this
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
@@ -137,10 +135,9 @@ contains
         class(Null_DES_Reci_Weight), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_target(this, periodic_box, alpha)
+    subroutine Null_target(this, box_size_memento)
         class(Null_DES_Reci_Weight), intent(inout) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
     end subroutine Null_target
 
     pure subroutine Null_set(this)

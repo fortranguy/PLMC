@@ -18,6 +18,7 @@ private
         procedure :: target => Abstract_target
         procedure :: save => Abstract_save
         procedure :: get => Abstract_get
+        procedure :: get_edge => Abstract_get_edge
     end type Abstract_Box_Size_Memento
 
     type, extends(Abstract_Box_Size_Memento), public :: Retentive_Box_Size_Memento
@@ -30,6 +31,7 @@ private
         procedure :: destroy => Forgetful_destroy
         procedure :: save => Forgetful_save
         procedure :: get => Forgetful_get
+        procedure :: get_edge => Forgetful_get_edge
     end type Forgetful_Box_Size_Memento
 
     type, extends(Abstract_Box_Size_Memento), public :: Null_Box_Size_Memento
@@ -39,6 +41,7 @@ private
         procedure :: target => Null_target
         procedure :: save => Null_save
         procedure :: get => Null_get
+        procedure :: get_edge => Null_get_edge
     end type Null_Box_Size_Memento
 
 contains
@@ -79,6 +82,12 @@ contains
         box_size = this%box_size
     end function Abstract_get
 
+    pure real(DP) function Abstract_get_edge(this) result(box_edge)
+        class(Abstract_Box_Size_Memento), intent(in) :: this
+
+        box_edge = this%box_size(1)
+    end function Abstract_get_edge
+
 !end implementation Abstract_Box_Size_Memento
 
 !implementation Forgetful_Box_Size_Memento
@@ -104,6 +113,15 @@ contains
 
         box_size = this%periodic_box%get_size()
     end function Forgetful_get
+
+    pure real(DP) function Forgetful_get_edge(this) result(box_edge)
+        class(Forgetful_Box_Size_Memento), intent(in) :: this
+
+        real(DP) :: box_size(num_dimensions)
+
+        box_size = this%periodic_box%get_size()
+        box_edge = box_size(1)
+    end function Forgetful_get_edge
 
 !end implementation Forgetful_Box_Size_Memento
 
@@ -132,6 +150,11 @@ contains
         class(Null_Box_Size_Memento), intent(in) :: this
         box_size = 0._DP
     end function Null_get
+
+    pure real(DP) function Null_get_edge(this) result(box_edge)
+        class(Null_Box_Size_Memento), intent(in) :: this
+        box_edge = 0._DP
+    end function Null_get_edge
 
 !end implementation Null_Box_Size_Memento
 

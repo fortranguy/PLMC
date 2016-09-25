@@ -141,8 +141,7 @@ contains
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
-        real(DP) box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
@@ -162,8 +161,7 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_size_ratio = this%box_size_memento%get() / box_size
-        box_edge_ratio = 1._DP / box_size_ratio(1)
+        saved_box_size = this%box_size_memento%get()
 
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_old_1, this%reci_numbers(1), wave_1_x_position_old(1))
@@ -175,11 +173,11 @@ contains
         call set_fourier(fourier_position_new_3, this%reci_numbers(3), wave_1_x_position_new(3))
 
         do n_3 = 0, this%reci_numbers(3)
-            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / saved_box_size(3)
             do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
-                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / saved_box_size(2)
                 do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
-                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / saved_box_size(1)
 
                     if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
 
@@ -187,7 +185,7 @@ contains
                         fourier_position_old_2(n_2) * fourier_position_old_3(n_3)
                     fourier_position_new = fourier_position_new_1(n_1) * &
                         fourier_position_new_2(n_2) * fourier_position_new_3(n_3)
-                    wave_dot_moment = box_edge_ratio * dot_product(wave_vector, old%dipole_moment)
+                    wave_dot_moment = dot_product(wave_vector, old%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &
                         real((fourier_position_new - fourier_position_old) * &
@@ -200,7 +198,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = product(box_size_ratio) * 4._DP * delta_energy
+        delta_energy = product(saved_box_size / box_size) * 4._DP * delta_energy
     end function Abstract_visit_translation
 
     !> Energy delta when a particle is transmuted:
@@ -219,8 +217,7 @@ contains
         real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
 
-        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
-        real(DP) box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position
@@ -236,8 +233,7 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return !shortcut?
 
         box_size = this%periodic_box%get_size()
-        box_size_ratio = this%box_size_memento%get() / box_size
-        box_edge_ratio = 1._DP / box_size_ratio(1)
+        saved_box_size = this%box_size_memento%get()
 
         wave_1_x_position = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
@@ -245,17 +241,17 @@ contains
         call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
 
         do n_3 = 0, this%reci_numbers(3)
-            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / saved_box_size(3)
             do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
-                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / saved_box_size(2)
                 do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
-                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / saved_box_size(1)
 
                     if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
 
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)
-                    wave_dot_delta_moment = box_edge_ratio * dot_product(wave_vector, &
+                    wave_dot_delta_moment = dot_product(wave_vector, &
                         new_dipole_moment - old%dipole_moment)
 
                     real_fourier_x_conjg_structure = real(fourier_position * &
@@ -267,7 +263,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = product(box_size_ratio) * 2._DP * delta_energy
+        delta_energy = product(saved_box_size / box_size) * 2._DP * delta_energy
     end function Abstract_visit_transmutation
 
     pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old) &
@@ -311,8 +307,7 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
-        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
-        real(DP) box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position
@@ -327,8 +322,7 @@ contains
         if (.not.this%structure%is_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-        box_size_ratio = this%box_size_memento%get() / box_size
-        box_edge_ratio = 1._DP / box_size_ratio(1)
+        saved_box_size = this%box_size_memento%get()
 
         wave_1_x_position = 2._DP*PI * particle%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
@@ -336,18 +330,17 @@ contains
         call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
 
         do n_3 = 0, this%reci_numbers(3)
-            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / saved_box_size(3)
             do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
-                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / saved_box_size(2)
                 do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
-                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / saved_box_size(1)
 
                     if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
 
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)
-                    wave_dot_moment = box_edge_ratio * dot_product(wave_vector, &
-                        particle%dipole_moment)
+                    wave_dot_moment = dot_product(wave_vector, particle%dipole_moment)
 
                     real_fourier_x_conjg_structure = signed * real(fourier_position * &
                         conjg(this%structure%get(n_1, n_2, n_3)), DP)
@@ -358,7 +351,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = product(box_size_ratio) * 2._DP * delta_energy
+        delta_energy = product(saved_box_size / box_size) * 2._DP * delta_energy
     end function Abstract_visit_exchange
 
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
@@ -382,8 +375,7 @@ contains
         integer, intent(in) :: ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        real(DP), dimension(num_dimensions) :: box_size, box_size_ratio
-        real(DP) box_edge_ratio
+        real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2
@@ -403,8 +395,7 @@ contains
             this%structure%is_dipolar(ij_components(2)))) return
 
         box_size = this%periodic_box%get_size()
-        box_size_ratio = this%box_size_memento%get() / box_size
-        box_edge_ratio = 1._DP / box_size_ratio(1)
+        saved_box_size = this%box_size_memento%get()
 
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
         call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))
@@ -416,11 +407,11 @@ contains
         call set_fourier(fourier_position_2_3, this%reci_numbers(3), wave_1_x_position_2(3))
 
         do n_3 = 0, this%reci_numbers(3)
-            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / saved_box_size(3)
             do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
-                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / saved_box_size(2)
                 do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
-                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / saved_box_size(1)
 
                     if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
 
@@ -428,7 +419,7 @@ contains
                         fourier_position_1_3(n_3)
                     fourier_position_2 = fourier_position_2_1(n_1) * fourier_position_2_2(n_2) * &
                         fourier_position_2_3(n_3)
-                    wave_dot_delta_moment = box_edge_ratio * dot_product(wave_vector, &
+                    wave_dot_delta_moment = dot_product(wave_vector, &
                         particles(1)%dipole_moment - particles(2)%dipole_moment)
 
                     real_delta_fourier_x_conjg_structure = &
@@ -442,7 +433,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = product(box_size_ratio) * 4._DP * delta_energy
+        delta_energy = product(saved_box_size / box_size) * 4._DP * delta_energy
     end function Abstract_visit_switch
 !end implementation Abstract_DES_Reci_Visitor
 

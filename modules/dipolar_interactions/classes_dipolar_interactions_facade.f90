@@ -137,8 +137,7 @@ contains
 
         if (this%real_pair_must_be_reset) then
             call this%dipolar_interactions_static%real_pair%target(this%&
-                dipolar_interactions_static%box_size_memento_real, this%&
-                dipolar_interactions_dynamic%alpha)
+                dipolar_interactions_static%box_size_memento_real)
             do j_component = 1, size(this%dipolar_interactions_dynamic%real_components, 2)
                 do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
                     call this%dipolar_interactions_dynamic%&
@@ -250,8 +249,8 @@ contains
         call this%dipolar_interactions_static%box_size_memento_real%target(this%periodic_box)
         call this%target_real()
         call this%dipolar_interactions_static%box_size_memento_reci%target(this%periodic_box)
-        call this%dipolar_interactions_static%reci_weight%target(this%periodic_box, this%&
-            dipolar_interactions_dynamic%alpha)
+        call this%dipolar_interactions_static%reci_weight%target(this%dipolar_interactions_static%&
+            box_size_memento_reci)
         call this%dipolar_interactions_static%reci_structure%target(this%periodic_box, this%&
             dipolar_interactions_static%box_size_memento_reci, this%components)
         call this%dipolar_interactions_dynamic%reci_visitor%target(this%&
