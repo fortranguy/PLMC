@@ -306,15 +306,14 @@ contains
                     component%visit(delta_energies(i_component, i), particles(i), visit_different, &
                     i_exclude)
             end do
+            delta_energies(ij_actors(i), i) = delta_energies(ij_actors(i), i) - &
+                this%dipolar_interactions_dynamic%self_components(ij_actors(i))%component%&
+                meet(particles(i)%dipole_moment)
         end do
         delta_energies(:, 1) = -delta_energies(:, 1)
         delta_shared_energy = &
             this%dipolar_interactions_dynamic%reci_visitor%&
-                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)) - &
-            this%dipolar_interactions_dynamic%self_components(ij_actors(2))%component%&
-                meet(particles(2)%dipole_moment) + &
-            this%dipolar_interactions_dynamic%self_components(ij_actors(1))%component%&
-                meet(particles(1)%dipole_moment) + &
+                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)) + &
             this%dipolar_interactions_dynamic%surf_mixture%&
                 visit_transmutation(ij_actors, particles(2)%dipole_moment, &
                     particles(1)%dipole_moment) - &

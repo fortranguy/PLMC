@@ -369,10 +369,10 @@ contains
             call this%dipolar_interactions_dynamic%real_components(i_component, i_actor)%component%&
                 visit(delta_energies(i_component), particle, visit_different, i_exclude)
         end do
+        delta_energies(i_actor) = delta_energies(i_actor) - this%dipolar_interactions_dynamic%&
+            self_components(i_actor)%component%meet(particle%dipole_moment)
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitor%visit_add(i_actor, particle) - &
-            this%dipolar_interactions_dynamic%self_components(i_actor)%component%&
-                meet(particle%dipole_moment) + &
+            this%dipolar_interactions_dynamic%reci_visitor%visit_add(i_actor, particle) + &
             this%dipolar_interactions_dynamic%surf_mixture%visit_add(i_actor, particle%&
                 dipole_moment) - &
             this%dipolar_interactions_dynamic%dlc_visitor%visit_add(i_actor, particle)
@@ -503,11 +503,11 @@ contains
             call this%dipolar_interactions_dynamic%real_components(i_component, i_actor)%component%&
                 visit(delta_energies(i_component), particle, visit_different, i_exclude)
         end do
+        delta_energies(i_actor) = delta_energies(i_actor) - this%dipolar_interactions_dynamic%&
+            self_components(i_actor)%component%meet(particle%dipole_moment)
         delta_energies = -delta_energies
         delta_shared_energy = &
             this%dipolar_interactions_dynamic%reci_visitor%visit_remove(i_actor, particle) + &
-            this%dipolar_interactions_dynamic%self_components(i_actor)%component%&
-                meet(particle%dipole_moment) + &
             this%dipolar_interactions_dynamic%surf_mixture%visit_remove(i_actor, particle%&
                 dipole_moment) - &
             this%dipolar_interactions_dynamic%dlc_visitor%visit_remove(i_actor, particle)

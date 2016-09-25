@@ -54,9 +54,11 @@ contains
         call visit_des_real(real_energies, components, dipolar_interactions_dynamic%real_components)
         call triangle_observables_add(energies, real_energies)
         call destroy_triangle_nodes(real_energies)
-        call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
 
-        shared_energy = dipolar_interactions_dynamic%reci_visitor%visit() - sum(self_energies) + &
+        call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
+        call triangle_observables_add(energies, -self_energies)
+
+        shared_energy = dipolar_interactions_dynamic%reci_visitor%visit() + &
             dipolar_interactions_dynamic%surf_mixture%visit() - &
             dipolar_interactions_dynamic%dlc_visitor%visit()
     end subroutine visit_dipolar
