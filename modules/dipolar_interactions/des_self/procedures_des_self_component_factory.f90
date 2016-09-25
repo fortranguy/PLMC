@@ -1,5 +1,6 @@
 module procedures_des_self_component_factory
 
+use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity
 use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
@@ -13,8 +14,9 @@ public :: create, destroy
 
 contains
 
-    subroutine create(component, permittivity, dipole_moments, is_dipolar, alpha)
+    subroutine create(component, periodic_box, permittivity, dipole_moments, is_dipolar, alpha)
         class(Abstract_DES_Self_Component), allocatable, intent(out) :: component
+        class(Abstract_Periodic_Box), intent(in) ::periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Component_Dipole_Moments), intent(in) :: dipole_moments
         logical, intent(in) :: is_dipolar
@@ -25,7 +27,7 @@ contains
         else
             allocate(Null_DES_Self_Component :: component)
         end if
-        call component%construct(permittivity, dipole_moments, alpha)
+        call component%construct(periodic_box, permittivity, dipole_moments, alpha)
     end subroutine create
 
     subroutine destroy(component)

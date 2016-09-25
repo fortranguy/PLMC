@@ -1,5 +1,6 @@
 module procedures_des_self_factory
 
+use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity
 use types_component_wrapper, only: Component_Wrapper
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
@@ -24,8 +25,10 @@ end interface destroy
 
 contains
 
-    subroutine create_components(components, permittivity, mixture_components, are_dipolar, alpha)
+    subroutine create_components(components, periodic_box, permittivity, mixture_components, &
+        are_dipolar, alpha)
         type(DES_Self_Component_Wrapper), allocatable, intent(out) :: components(:)
+        class(Abstract_Periodic_Box), intent(in) ::periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
         type(Component_Wrapper), intent(in) :: mixture_components(:)
         logical, intent(in) :: are_dipolar(:)
@@ -35,7 +38,7 @@ contains
 
         allocate(components(size(mixture_components)))
         do i_component = 1, size(components)
-            call create(components(i_component)%component, permittivity, &
+            call create(components(i_component)%component, periodic_box, permittivity, &
                 mixture_components(i_component)%dipole_moments, are_dipolar(i_component), alpha)
         end do
     end subroutine create_components

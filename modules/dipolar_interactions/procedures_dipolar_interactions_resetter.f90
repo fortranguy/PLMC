@@ -33,8 +33,6 @@ contains
         if (real_pair_must_be_reset) then
             call box_size_memento%save()
             call real_pair%reset()
-        else
-            !call real_pair%set_domain_max()
         end if
     end subroutine reset_real
 

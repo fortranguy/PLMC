@@ -68,7 +68,8 @@ contains
             reci_weight, dipolar_interactions_static%reci_structure)
 
         call des_self_create(dipolar_interactions_dynamic%self_components, environment%&
-            permittivity, mixture%components, are_dipolar, dipolar_interactions_dynamic%alpha)
+            periodic_box, environment%permittivity, mixture%components, are_dipolar, &
+            dipolar_interactions_dynamic%alpha)
 
         call des_surf_mixture_create(dipolar_interactions_dynamic%surf_mixture, environment%&
             periodic_box, environment%permittivity, mixture%total_moment)

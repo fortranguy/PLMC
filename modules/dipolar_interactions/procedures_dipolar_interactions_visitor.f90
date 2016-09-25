@@ -21,6 +21,7 @@ public :: visit
 interface visit
     module procedure :: visit_field
     module procedure :: visit_dipolar
+    module procedure :: visit_des_real
 end interface visit
 
 contains
@@ -53,13 +54,11 @@ contains
         call visit_des_real(real_energies, components, dipolar_interactions_dynamic%real_components)
         call triangle_observables_add(energies, real_energies)
         call destroy_triangle_nodes(real_energies)
+        call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
 
-        shared_energy = dipolar_interactions_dynamic%reci_visitor%visit() + &
+        shared_energy = dipolar_interactions_dynamic%reci_visitor%visit() - sum(self_energies) + &
             dipolar_interactions_dynamic%surf_mixture%visit() - &
             dipolar_interactions_dynamic%dlc_visitor%visit()
-
-        call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
-        call triangle_observables_add(energies, -self_energies)
     end subroutine visit_dipolar
 
     subroutine visit_des_real(energies, components, real_components)

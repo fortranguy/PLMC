@@ -183,10 +183,10 @@ contains
             call this%dipolar_interactions_dynamic%real_components(j_component, i_component)%&
                 component%visit(deltas(j_component), test, visit_different, i_exclude)
         end do
-        deltas(i_component) = deltas(i_component) - this%dipolar_interactions_dynamic%&
-            self_components(i_component)%component%meet(test%dipole_moment)
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitor%visit_add(i_component, test) + &
+            this%dipolar_interactions_dynamic%reci_visitor%visit_add(i_component, test) - &
+            this%dipolar_interactions_dynamic%self_components(i_component)%component%&
+                meet(test%dipole_moment) + &
             this%dipolar_interactions_dynamic%surf_mixture%&
                 visit_add(i_component, test%dipole_moment) - &
             this%dipolar_interactions_dynamic%dlc_visitor%visit_add(i_component, test)
