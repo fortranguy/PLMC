@@ -12,12 +12,12 @@ public :: reset, reset_real
 contains
 
     !> Some dipolar accumulators may need to be reset to reflect the current configuration.
-    subroutine reset(dipolar_interactions_static, real_pair_must_be_reset)
+    subroutine reset(dipolar_interactions_static, reset_real_pair)
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
-        logical, intent(in) :: real_pair_must_be_reset
+        logical, intent(in) :: reset_real_pair
 
         call reset_real(dipolar_interactions_static%box_size_memento_real, &
-            dipolar_interactions_static%real_pair, real_pair_must_be_reset)
+            dipolar_interactions_static%real_pair, reset_real_pair)
         call dipolar_interactions_static%box_size_memento_reci%save()
         call dipolar_interactions_static%reci_weight%reset()
         call dipolar_interactions_static%reci_structure%reset()
@@ -25,12 +25,12 @@ contains
         call dipolar_interactions_static%dlc_structures%reset()
     end subroutine reset
 
-    subroutine reset_real(box_size_memento, real_pair, real_pair_must_be_reset)
+    subroutine reset_real(box_size_memento, real_pair, reset_real_pair)
         class(Abstract_Box_Size_Memento), intent(inout) :: box_size_memento
         class(Abstract_DES_Real_Pair), intent(inout) :: real_pair
-        logical, intent(in) :: real_pair_must_be_reset
+        logical, intent(in) :: reset_real_pair
 
-        if (real_pair_must_be_reset) then
+        if (reset_real_pair) then
             call box_size_memento%save()
             call real_pair%reset()
         end if

@@ -17,7 +17,6 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: get_times_box_edge => Abstract_get_times_box_edge
-        procedure :: get => Abstract_get
     end type Abstract_DES_Convergence_Parameter
 
     type, extends(Abstract_DES_Convergence_Parameter), public :: &
@@ -29,7 +28,6 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: get_times_box_edge => Null_get_times_box_edge
-        procedure :: get => Null_get
     end type Null_DES_Convergence_Parameter
 
 contains
@@ -57,17 +55,6 @@ contains
         alpha_x_box_edge = this%alpha_x_box_edge
     end function Abstract_get_times_box_edge
 
-    !> @todo
-    !> to remove
-    pure real(DP) function Abstract_get(this) result(alpha)
-        class(Abstract_DES_Convergence_Parameter), intent(in) :: this
-
-        real(DP) :: box_size(num_dimensions)
-
-        box_size = this%box_size_memento%get()
-        alpha = this%alpha_x_box_edge / box_size(1)
-    end function Abstract_get
-
 !end implementation Abstract_DES_Convergence_Parameter
 
 !implementation Null_DES_Convergence_Parameter
@@ -85,11 +72,6 @@ contains
         class(Null_DES_Convergence_Parameter), intent(in) :: this
         alpha_x_box_edge = 0._DP
     end function Null_get_times_box_edge
-
-    pure real(DP) function Null_get(this) result(alpha)
-        class(Null_DES_Convergence_Parameter), intent(in) :: this
-        alpha = 0._DP
-    end function Null_get
 
 !end implementation Null_DES_Convergence_Parameter
 
