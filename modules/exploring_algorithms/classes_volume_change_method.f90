@@ -120,8 +120,7 @@ contains
         do i_change = 1, this%num_changes
             box_size_ratio = this%changed_box_size_ratio%get()
             new_box_size = box_size * box_size_ratio
-            call this%dipolar_interactions_facade%save(dipolar_interactions_static, &
-                product(new_box_size))
+            call this%dipolar_interactions_facade%save(dipolar_interactions_static, new_box_size)
 
             call this%environment%periodic_box%set(box_size * box_size_ratio)
             call this%rescale_positions(box_size_ratio)
