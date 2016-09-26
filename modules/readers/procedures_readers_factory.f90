@@ -27,7 +27,7 @@ contains
         type(Component_Wrapper), intent(in) :: components(:)
 
         call complete_coordinates_reader_create(readers%complete_coordinates, environment%&
-            periodic_box, components)
+            periodic_box, environment%box_size_checker, components)
     end subroutine create
 
     subroutine destroy(readers)

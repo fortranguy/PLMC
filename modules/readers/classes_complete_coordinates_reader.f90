@@ -5,6 +5,7 @@ use data_constants, only: num_dimensions
 use data_strings, only: max_line_length, max_word_length
 use procedures_checks, only: check_file_exists
 use classes_periodic_box, only: Abstract_Periodic_Box
+use classes_box_size_checker, only: Abstract_Box_Size_Checker
 use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
 use procedures_component_coordinates_reader_factory, only: component_coordinates_reader_destroy => &
     destroy
@@ -16,6 +17,7 @@ private
     type, abstract, public :: Abstract_Complete_Coordinates_Reader
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Box_Size_Checker), pointer :: box_size_checker => null()
         type(Component_Coordinates_Reader_wrapper), allocatable :: components_coordinates(:)
     contains
         procedure :: construct => Abstract_construct
@@ -29,20 +31,23 @@ private
 
 contains
 
-    subroutine Abstract_construct(this, periodic_box, components_coordinates)
+    subroutine Abstract_construct(this, periodic_box, box_size_checker, components_coordinates)
         class(Abstract_Complete_Coordinates_Reader), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Box_Size_Checker), target, intent(in) :: box_size_checker
         type(Component_Coordinates_Reader_wrapper), intent(in) :: components_coordinates(:)
 
         this%periodic_box => periodic_box
+        this%box_size_checker => box_size_checker
         allocate(this%components_coordinates, source=components_coordinates)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Complete_Coordinates_Reader), intent(out) :: this
 
-        this%periodic_box => null()
         call component_coordinates_reader_destroy(this%components_coordinates)
+        this%box_size_checker => null()
+        this%periodic_box => null()
     end subroutine Abstract_destroy
 
     subroutine Abstract_read(this, coordinates_filename)
@@ -60,6 +65,7 @@ contains
             status="old", action="read")
         read(coordinates_unit, *) comment_character, field, box_size
         call this%periodic_box%set(box_size)
+        call this%box_size_checker%check()
         read(coordinates_unit, *) comment_character, field, nums_particles
         read(coordinates_unit, *) comment_character !components coordinates legend
         do i_component = 1, size(this%components_coordinates)

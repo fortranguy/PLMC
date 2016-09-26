@@ -153,7 +153,7 @@ contains
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento_source
         class(Abstract_DES_Real_Pair), intent(in) :: des_real_pair_source
 
-        if (this%reset_real_pair) then
+        if (this%crop_real_pair .or. this%reset_real_pair) then
             call des_real_destroy(des_real_pair_target)
             call box_destroy(box_size_memento_target)
             allocate(box_size_memento_target, source=box_size_memento_source)
@@ -166,7 +166,7 @@ contains
 
         integer :: i_component, j_component
 
-        if (this%reset_real_pair) then
+        if (this%crop_real_pair .or. this%reset_real_pair) then
             call this%dipolar_interactions_static%real_pair%target(this%&
                 dipolar_interactions_static%box_size_memento_real)
             do j_component = 1, size(this%dipolar_interactions_dynamic%real_components, 2)
