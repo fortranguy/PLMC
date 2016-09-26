@@ -4,13 +4,10 @@
     },
     "Volume Change": {
         "measure pressure": true,
-        "number": 1,
-        "Small Change": {
-            "initial delta": 0.01
-        },
+        "number": 10,
         "Dirac Distribution Plus": {
             "name": "rectangular",
-            "delta distance": 0.01
+            "delta distance": 0.005
         }
     },
     "Particle Insertion": {

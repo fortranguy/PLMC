@@ -20,8 +20,8 @@ contains
         class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: changes_box_size_ratio
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: can_change
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        type(json_file), optional, intent(inout) :: input_data
+        character(len=*), optional, intent(in) :: prefix
 
         call allocate(changes_box_size_ratio, periodic_box, can_change)
         call construct(changes_box_size_ratio, input_data, prefix)
@@ -48,8 +48,8 @@ contains
 
     subroutine construct(changed_box_size_ratio, input_data, prefix)
         class(Abstract_Changed_Box_Size_Ratio), intent(inout) :: changed_box_size_ratio
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        type(json_file), optional, intent(inout) :: input_data
+        character(len=*), optional, intent(in) :: prefix
 
         real(DP) :: initial_delta
         logical :: is_xyz_or_xy
@@ -67,7 +67,7 @@ contains
                 call error_exit("procedures_changed_box_size_ratio_factory: construct: "//&
                     "changed_box_size: type unknown.")
         end select
-        if (is_xyz_or_xy) then
+        if (is_xyz_or_xy .and. present(input_data) .and. present(input_data)) then
             data_field = prefix//"Small Change.initial delta"
             call input_data%get(data_field, initial_delta, data_found)
             call check_data_found(data_field, data_found)

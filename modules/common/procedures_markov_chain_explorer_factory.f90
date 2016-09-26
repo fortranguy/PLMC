@@ -54,8 +54,7 @@ contains
             measure_pressure_excess)
         call maximum_box_compression_destroy(maximum_box_compression)
         call changed_box_size_ratio_create(markov_chain_explorer%changed_box_size_ratio, &
-            physical_model%environment%periodic_box, measure_pressure_excess, exploring_data, &
-            volume_change_prefix)
+            physical_model%environment%periodic_box, measure_pressure_excess)
         call volume_change_method_create(markov_chain_explorer%volume_change_method, &
             physical_model, markov_chain_explorer%changed_box_size_ratio, measure_pressure_excess, &
             exploring_data, volume_change_prefix)

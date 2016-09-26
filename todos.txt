@@ -11,5 +11,4 @@
 - DipolarVisitor: Self is scalable (instead of O(N)): is it worth it?
 - In DESreciStructure & DESreciVisitor, document the role of boxVolumeMemento
 - doc: \epsilon -> \varepsilon
-- PLMCexplore: doesn't need initial volume delta
 - VolumeChange: + or - in observable
