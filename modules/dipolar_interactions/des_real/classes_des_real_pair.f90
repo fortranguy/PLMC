@@ -146,8 +146,6 @@ contains
         call this%create_tabulation()
     end subroutine Tabulated_construct
 
-    !> @todo
-    !> redefine [[types_potential_domain:Potential_Domain]]
     subroutine Tabulated_set_domain(this, domain)
         class(Tabulated_DES_Real_Pair), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain

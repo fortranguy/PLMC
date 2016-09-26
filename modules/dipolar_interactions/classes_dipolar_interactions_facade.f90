@@ -33,6 +33,7 @@ private
         procedure :: restore => Abstract_restore
         procedure(Abstract_reset), deferred :: reset
         procedure(Abstract_visit), deferred :: visit
+        procedure(Abstract_set_reset_condition), private, deferred :: set_reset_condition
         procedure(Abstract_clone), deferred, private :: clone
         procedure, private :: clone_real => Abstract_clone_real
         procedure(Abstract_target), deferred, private :: target
@@ -45,6 +46,12 @@ private
         import :: Abstract_Dipolar_Interactions_Facade
             class(Abstract_Dipolar_Interactions_Facade), intent(inout) :: this
         end subroutine Abstract_destroy
+
+        subroutine Abstract_set_reset_condition(this, new_box_volume)
+        import :: DP, Abstract_Dipolar_Interactions_Facade
+            class(Abstract_Dipolar_Interactions_Facade), intent(inout) :: this
+            real(DP), intent(in) :: new_box_volume
+        end subroutine Abstract_set_reset_condition
 
         subroutine Abstract_clone(this, dipolar_interactions_static_target, &
             dipolar_interactions_static_source)
@@ -86,6 +93,7 @@ private
         procedure :: destroy => Scalable_destroy
         procedure :: reset => Scalable_reset
         procedure :: visit => Scalable_visit
+        procedure, private :: set_reset_condition => Scalable_set_reset_condition
         procedure, private :: clone => Scalable_clone
         procedure, private :: target => Scalable_target
     end type Scalable_Dipolar_Interactions_Facade
@@ -99,6 +107,7 @@ private
         procedure :: destroy => Unscalable_destroy
         procedure :: reset => Unscalable_reset
         procedure :: visit => Unscalable_visit
+        procedure, private :: set_reset_condition => Unscalable_set_reset_condition
         procedure, private :: clone => Unscalable_clone
         procedure, private :: target => Unscalable_target
     end type Unscalable_Dipolar_Interactions_Facade
@@ -109,6 +118,7 @@ private
         procedure :: save => Null_save
         procedure :: reset => Null_reset
         procedure :: visit => Null_visit
+        procedure, private :: set_reset_condition => Null_set_reset_condition
         procedure, private :: clone => Null_clone
         procedure, private :: target => Null_target
     end type Null_Dipolar_Interactions_Facade
@@ -122,8 +132,7 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
         real(DP), intent(in) :: new_box_volume
 
-        this%real_pair_must_be_reset = new_box_volume > product(this%dipolar_interactions_static%&
-            box_size_memento_real%get())
+        call this%set_reset_condition(new_box_volume)
         call this%clone(dipolar_interactions_static, this%dipolar_interactions_static)
     end subroutine Abstract_save
 
@@ -195,6 +204,14 @@ contains
         this%components => null()
     end subroutine Scalable_destroy
 
+    subroutine Scalable_set_reset_condition(this, new_box_volume)
+        class(Scalable_Dipolar_Interactions_Facade), intent(inout) :: this
+        real(DP), intent(in) :: new_box_volume
+
+        this%real_pair_must_be_reset = new_box_volume > product(this%dipolar_interactions_static%&
+            box_size_memento_real%get())
+    end subroutine Scalable_set_reset_condition
+
     subroutine Scalable_target(this)
         class(Scalable_Dipolar_Interactions_Facade), intent(in) :: this
 
@@ -265,6 +282,13 @@ contains
         this%components => null()
         this%periodic_box => null()
     end subroutine Unscalable_destroy
+
+    subroutine Unscalable_set_reset_condition(this, new_box_volume)
+        class(Unscalable_Dipolar_Interactions_Facade), intent(inout) :: this
+        real(DP), intent(in) :: new_box_volume
+
+        this%real_pair_must_be_reset = .true.
+    end subroutine Unscalable_set_reset_condition
 
     subroutine Unscalable_target(this)
         class(Unscalable_Dipolar_Interactions_Facade), intent(in) :: this
@@ -340,6 +364,11 @@ contains
     subroutine Null_destroy(this)
         class(Null_Dipolar_Interactions_Facade), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_set_reset_condition(this, new_box_volume)
+        class(Null_Dipolar_Interactions_Facade), intent(inout) :: this
+        real(DP), intent(in) :: new_box_volume
+    end subroutine Null_set_reset_condition
 
     subroutine Null_save(this, dipolar_interactions_static, new_box_volume)
         class(Null_Dipolar_Interactions_Facade), intent(inout) :: this
