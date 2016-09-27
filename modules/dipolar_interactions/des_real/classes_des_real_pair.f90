@@ -25,7 +25,6 @@ private
         procedure(Abstract_construct), deferred :: construct
         procedure(Abstract_destroy), deferred :: destroy
         procedure :: target => Abstract_target
-        procedure(Abstract_crop), deferred :: crop
         procedure(Abstract_reset), deferred :: reset
         procedure :: meet => Abstract_meet
         procedure(Abstract_expression), private, deferred :: expression
@@ -48,11 +47,6 @@ private
             class(Abstract_DES_Real_Pair), intent(inout) :: this
         end subroutine Abstract_destroy
 
-        subroutine Abstract_crop(this)
-        import :: Abstract_DES_Real_Pair
-            class(Abstract_DES_Real_Pair), intent(inout) :: this
-        end subroutine Abstract_crop
-
         subroutine Abstract_reset(this)
         import :: Abstract_DES_Real_Pair
             class(Abstract_DES_Real_Pair), intent(inout) :: this
@@ -74,7 +68,6 @@ private
     contains
         procedure :: construct => Tabulated_construct
         procedure :: destroy => Tabulated_destroy
-        procedure :: crop => Tabulated_crop
         procedure :: reset => Tabulated_reset
         procedure, private :: set_domain => Tabulated_set_domain
         procedure, private :: create_tabulation => Tabulated_create_tabulation
@@ -88,7 +81,6 @@ private
     contains
         procedure :: construct => Raw_construct
         procedure :: destroy => Raw_destroy
-        procedure :: crop => Raw_reset
         procedure :: reset => Raw_reset
         procedure, private :: set_domain => Raw_set_domain
         procedure, private :: expression => Raw_expression
@@ -99,7 +91,6 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: target => Null_target
-        procedure :: crop => Null_reset
         procedure :: reset => Null_reset
         procedure :: meet => Null_meet
         procedure, private :: expression => Null_expression
@@ -195,25 +186,6 @@ contains
         if (allocated(this%tabulation)) deallocate(this%tabulation)
         this%box_size_memento => null()
     end subroutine Tabulated_destroy
-
-    subroutine Tabulated_crop(this)
-        class(Tabulated_DES_Real_Pair), intent(inout) :: this
-
-        real(DP) :: domain_max
-        integer :: i_max
-
-        domain_max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
-        if (domain_max > this%domain%max) then
-            call error_exit("Tabulated_DES_Real_Pair: crop: domain: max too big.")
-        end if
-        this%domain%max = domain_max
-        if (this%domain%min > this%domain%max) then
-            call error_exit("Tabulated_DES_Real_Pair: reset: domain: min > max.")
-        end if
-        i_max = int(this%domain%max / this%domain%delta) + 1
-        this%tabulation(:, 1) = this%tabulation(:, 1) - this%tabulation(i_max, 1)
-        this%tabulation(:, 2) = this%tabulation(:, 2) - this%tabulation(i_max, 2)
-    end subroutine Tabulated_crop
 
     subroutine Tabulated_reset(this)
         class(Tabulated_DES_Real_Pair), intent(inout) :: this

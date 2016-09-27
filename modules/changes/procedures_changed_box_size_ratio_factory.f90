@@ -72,7 +72,7 @@ contains
             call input_data%get(data_field, initial_delta, data_found)
             call check_data_found(data_field, data_found)
         else
-            initial_delta = 0._DP
+            initial_delta = 1._DP
         end if
         call changed_box_size_ratio%set(initial_delta)
     end subroutine construct
