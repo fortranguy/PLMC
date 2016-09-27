@@ -201,7 +201,7 @@ contains
         end if
         distance_range = domain%max - domain%min
         if (distance_range < real_zero) then
-            call warning_continue(context//"distance_range may be too small.")
+            call warning_continue(context//": distance_range may be too small.")
         end if
 
         if (selector%check_max_over_box_edge) then
