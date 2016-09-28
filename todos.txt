@@ -8,3 +8,4 @@
 - In DESreciStructure & DESreciVisitor, document the role of boxVolumeMemento
 - doc: \epsilon -> \varepsilon
 - VolumeChange: + or - in observable?
+- Generalise ParticleInsertionMethod (Widom), cf. FS02

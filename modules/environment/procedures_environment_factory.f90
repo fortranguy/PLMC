@@ -93,15 +93,15 @@ contains
         call box_destroy(environment%periodic_box)
     end subroutine environment_destroy
 
-    subroutine check(periodic_box, walls)
+    subroutine check(periodic_box, visitable_walls)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Visitable_Walls), intent(in) :: walls
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
-        if (periodicity_is_xyz(periodic_box) .and. use_walls(walls)) then
+        if (periodicity_is_xyz(periodic_box) .and. use_walls(visitable_walls)) then
             call warning_continue("procedures_environment_factory: check: "//&
                 "periodicity is XYZ but walls are used.")
         end if
-        if (periodicity_is_xy(periodic_box) .and. .not.use_walls(walls)) then
+        if (periodicity_is_xy(periodic_box) .and. .not.use_walls(visitable_walls)) then
             call warning_continue("procedures_environment_factory: check: "//&
                 "periodicity is XY but walls are not used.")
         end if

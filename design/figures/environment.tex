@@ -93,7 +93,7 @@
 
         \begin{scope}[shift={($(ExternalField.north) - (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{WallsVisitor}{0, 0}
-                \operation{\procedure{construct}{wallsPotential: \type{VisitableWalls}}}
+                \operation{\procedure{construct}{visitableWalls: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
                     positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
@@ -124,7 +124,7 @@
         \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
                 \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
-                    wallsPotential: \type{VisitableWalls}}}
+                    visitableWalls: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{check}{}}
             \end{abstractclass}
@@ -148,7 +148,7 @@
                 \UMLattribute{externalField: \type{ExternalField}}
                 \UMLattribute{reciprocalLattice: \type{ReciprocalLattice}}
                 \UMLattribute{wallMinDistance: \type{MinDistance}}
-                \UMLattribute{wallsPotential: \type{VisitableWalls}}
+                \UMLattribute{visitableWalls: \type{VisitableWalls}}
                 \UMLattribute{boxSizeChecker: \type{BoxSizeChecker}}
                 \UMLattribute{accessibleDomain: \type{ParallelepipedDomain}}
             \end{class}
@@ -163,7 +163,7 @@
             \aggregation{VisitableWalls}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \composition{VisitableWalls}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
             \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}
-            \aggregation{BoxSizeChecker}{\refName{wallsPotential}}{\numRef{1}}{VisitableWalls}
+            \aggregation{BoxSizeChecker}{\refName{visitableWalls}}{\numRef{1}}{VisitableWalls}
             \aggregation{BoxSizeMemento}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
         \end{scope}
     \end{tikzpicture}

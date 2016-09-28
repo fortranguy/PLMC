@@ -10,9 +10,9 @@ public :: create, destroy
 
 contains
 
-    subroutine create(visitor, walls, interact)
+    subroutine create(visitor, visitable_walls, interact)
         class(Abstract_Walls_Visitor), allocatable, intent(out) :: visitor
-        class(Abstract_Visitable_Walls), intent(in) :: walls
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
         logical, intent(in) :: interact
 
         if (interact) then
@@ -20,7 +20,7 @@ contains
         else
             allocate(Null_Walls_Visitor :: visitor)
         end if
-        call visitor%construct(walls)
+        call visitor%construct(visitable_walls)
     end subroutine create
 
     subroutine destroy(visitor)

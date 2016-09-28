@@ -11,7 +11,7 @@ private
 
     type, abstract, public :: Abstract_Walls_Visitor
     private
-        class(Abstract_Visitable_Walls), pointer :: walls => null()
+        class(Abstract_Visitable_Walls), pointer :: visitable_walls => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -33,17 +33,17 @@ contains
 
 !implementation Abstract_Walls_Visitor
 
-    subroutine Abstract_construct(this, walls)
+    subroutine Abstract_construct(this, visitable_walls)
         class(Abstract_Walls_Visitor), intent(out) :: this
-        class(Abstract_Visitable_Walls), target, intent(in) :: walls
+        class(Abstract_Visitable_Walls), target, intent(in) :: visitable_walls
 
-        this%walls => walls
+        this%visitable_walls => visitable_walls
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Walls_Visitor), intent(inout) :: this
 
-        this%walls => null()
+        this%visitable_walls => null()
     end subroutine Abstract_destroy
 
     pure subroutine Abstract_visit(this, overlap, energy, positions, pair_potential)
@@ -59,7 +59,7 @@ contains
         overlap = .false.
         energy = 0._DP
         do i_particle = 1, positions%get_num()
-            call this%walls%visit(overlap, energy_i, positions%get(i_particle), &
+            call this%visitable_walls%visit(overlap, energy_i, positions%get(i_particle), &
                 pair_potential)
             if (overlap) return
             energy = energy + energy_i
@@ -70,9 +70,9 @@ contains
 
 !implementation Null_Walls_Visitor
 
-    subroutine Null_construct(this, walls)
+    subroutine Null_construct(this, visitable_walls)
         class(Null_Walls_Visitor), intent(out) :: this
-        class(Abstract_Visitable_Walls), target, intent(in) :: walls
+        class(Abstract_Visitable_Walls), target, intent(in) :: visitable_walls
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

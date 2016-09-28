@@ -13,17 +13,17 @@ public :: create, destroy
 
 contains
 
-    subroutine create(box_size_checker, reciprocal_lattice, walls)
+    subroutine create(box_size_checker, reciprocal_lattice, visitable_walls)
         class(Abstract_Box_Size_Checker), allocatable, intent(out) :: box_size_checker
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Visitable_Walls), intent(in) :: walls
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
-        if (use_reciprocal_lattice(reciprocal_lattice) .or. use_walls(walls)) then
+        if (use_reciprocal_lattice(reciprocal_lattice) .or. use_walls(visitable_walls)) then
             allocate(Concrete_Box_Size_Checker :: box_size_checker)
         else
             allocate(Null_Box_Size_Checker :: box_size_checker)
         end if
-        call box_size_checker%construct(reciprocal_lattice, walls)
+        call box_size_checker%construct(reciprocal_lattice, visitable_walls)
     end subroutine create
 
     subroutine destroy(box_size_checker)

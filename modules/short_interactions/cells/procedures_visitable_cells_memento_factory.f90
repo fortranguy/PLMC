@@ -3,7 +3,8 @@ module procedures_visitable_cells_memento_factory
 use procedures_errors, only: error_exit
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_visitable_cells_memento, only: Abstract_Visitable_Cells_Memento, &
-    Concrete_Visitable_Lists_Memento, Concrete_Visitable_Arrays_Memento, Null_Visitable_Cells_Memento
+    Concrete_Visitable_Lists_Memento, Concrete_Visitable_Arrays_Memento, &
+    Null_Visitable_Cells_Memento
 use procedures_short_interactions_inquirers, only: list_is_linked_list, list_is_array
 
 implicit none

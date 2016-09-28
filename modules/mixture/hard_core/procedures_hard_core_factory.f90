@@ -32,12 +32,12 @@ end interface
 contains
 
     subroutine create_wall_component(min_distances, wall_min_distance, components_min_distances, &
-        components, walls)
+        components, visitable_walls)
         type(Min_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         class(Abstract_Min_Distance), intent(in) :: wall_min_distance
         type(Min_Distances_Line), intent(in) :: components_min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        class(Abstract_Visitable_Walls), intent(in) :: walls
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
         real(DP) :: min_distance_i
         integer :: i_component
@@ -45,7 +45,8 @@ contains
 
         allocate(min_distances(size(components)))
         do i_component = 1, size(min_distances)
-            exists = use_walls(walls) .and. component_exists(components(i_component)%number)
+            exists = use_walls(visitable_walls) .and. component_exists(components(i_component)%&
+                number)
             min_distance_i = (wall_min_distance%get() + components_min_distances(i_component)%&
             line(i_component)%distance%get()) / 2._DP
             call create(min_distances(i_component)%distance, exists, min_distance_i)

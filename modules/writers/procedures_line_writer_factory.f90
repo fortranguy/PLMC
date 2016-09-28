@@ -21,8 +21,8 @@ end interface
 
 contains
 
-    subroutine create_walls(walls, wall_pairs, visit_energies, filename)
-        class(Abstract_Line_Writer), allocatable, intent(out) :: walls
+    subroutine create_walls(walls_energies, wall_pairs, visit_energies, filename)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: walls_energies
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         logical, intent(in) :: visit_energies
         character(len=*), intent(in) :: filename
@@ -35,15 +35,15 @@ contains
         end do
 
         if (any(selector) .and. visit_energies) then
-            allocate(Concrete_Line_Writer :: walls)
+            allocate(Concrete_Line_Writer :: walls_energies)
         else
-            allocate(Null_Line_Writer :: walls)
+            allocate(Null_Line_Writer :: walls_energies)
         end if
-        call walls%construct(selector, filename)
+        call walls_energies%construct(selector, filename)
     end subroutine create_walls
 
-    subroutine create_field(field, external_field, components, visit_energies, filename)
-        class(Abstract_Line_Writer), allocatable, intent(out) :: field
+    subroutine create_field(field_energies, external_field, components, visit_energies, filename)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: field_energies
         class(Abstract_External_Field), intent(in) :: external_field
         type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: visit_energies
@@ -57,11 +57,11 @@ contains
         end do
 
         if (any(selector) .and. apply_external_field(external_field) .and. visit_energies) then
-            allocate(Concrete_Line_Writer :: field)
+            allocate(Concrete_Line_Writer :: field_energies)
         else
-            allocate(Null_Line_Writer :: field)
+            allocate(Null_Line_Writer :: field_energies)
         end if
-        call field%construct(selector, filename)
+        call field_energies%construct(selector, filename)
     end subroutine create_field
 
     subroutine create_line(line, selector, filename)

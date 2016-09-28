@@ -25,7 +25,8 @@ private
         class(Abstract_Min_Distance), allocatable :: wall_min_distance
         class(Abstract_Visitable_Walls), allocatable :: visitable_walls
         class(Abstract_Box_Size_Checker), allocatable :: box_size_checker
-        class(Abstract_Parallelepiped_Domain), allocatable :: accessible_domain !for a point particle
+        class(Abstract_Parallelepiped_Domain), allocatable :: accessible_domain
+            !!for a point particle
     end type Environment_Wrapper
 
 end module types_environment_wrapper
