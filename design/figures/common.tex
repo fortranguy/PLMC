@@ -10,9 +10,9 @@
 
         \begin{scope}
             \begin{abstractclass}[text width=\mediumTextWidth]{HeteroCouples}{0, 0}
-                \operation[0]{\procedure{construct}{numComponents: \type{int}}}
+                \operation[0]{\procedure{construct}{numElements: \type{int}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getNumIndices}{}: \type{int}}
+                \operation{\procedure{getNum}{}: \type{int}}
                 \operation{\procedure{get}{index: \type{int}}: \type{int[2]}}
             \end{abstractclass}
         \end{scope}
@@ -25,7 +25,7 @@
                 \UMLattribute{delta: \type{real}}
             \end{class}
         \end{scope}
-        
+
     \end{tikzpicture}
 
 \end{document}

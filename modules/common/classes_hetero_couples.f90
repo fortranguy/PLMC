@@ -8,21 +8,21 @@ private
 
     type, abstract, public :: Abstract_Hetero_Couples
     private
-        integer :: num_indices = 0
-        integer, allocatable :: couple(:, :)
+        integer :: num_couples = 0
+        integer, allocatable :: couples(:, :)
     contains
         procedure(Abstract_construct), deferred :: construct
         procedure :: destroy => Abstract_destroy
-        procedure :: get_num_indices => Abstract_get_num_indices
+        procedure :: get_num => Abstract_get_num
         procedure :: get => Abstract_get
     end type Abstract_Hetero_Couples
 
     abstract interface
 
-        subroutine Abstract_construct(this, num_components)
+        subroutine Abstract_construct(this, num_elements)
         import :: Abstract_Hetero_Couples
             class(Abstract_Hetero_Couples), intent(out) :: this
-            integer, intent(in) :: num_components
+            integer, intent(in) :: num_elements
         end subroutine Abstract_construct
 
     end interface
@@ -41,7 +41,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: get_num_indices => Null_get_num_indices
+        procedure :: get_num => Null_get_num
         procedure :: get => Null_get
     end type Null_Hetero_Couples
 
@@ -52,42 +52,42 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Hetero_Couples), intent(inout) :: this
 
-        if (allocated(this%couple)) deallocate(this%couple)
+        if (allocated(this%couples)) deallocate(this%couples)
     end subroutine Abstract_destroy
 
-    pure integer function Abstract_get_num_indices(this) result(num_indices)
+    pure integer function Abstract_get_num(this) result(num_couples)
         class(Abstract_Hetero_Couples), intent(in) :: this
 
-        num_indices = this%num_indices
-    end function Abstract_get_num_indices
+        num_couples = this%num_couples
+    end function Abstract_get_num
 
-    pure function Abstract_get(this, index) result(couple)
+    pure function Abstract_get(this, i_couple) result(couple)
         class(Abstract_Hetero_Couples), intent(in) :: this
-        integer, intent(in) :: index
+        integer, intent(in) :: i_couple
         integer :: couple(2)
 
-        couple = this%couple(:, index)
+        couple = this%couples(:, i_couple)
     end function Abstract_get
 
 !implementation Abstract_Hetero_Couples
 
 !implementation Half_Hetero_Couples
 
-    subroutine Half_construct(this, num_components)
+    subroutine Half_construct(this, num_elements)
         class(Half_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_components
+        integer, intent(in) :: num_elements
 
-        integer :: index, i_component, j_component
+        integer :: i_couple, i_element, j_element
 
-        call check_positive("Half_Hetero_Couples: construct", "num_components", num_components)
-        this%num_indices = num_components * (num_components - 1) / 2
-        allocate(this%couple(2, this%num_indices))
-        this%couple = 0
-        index = 0
-        do j_component = 2, num_components
-            do i_component = 1, j_component - 1
-                index = index + 1
-                this%couple(:, index) = [j_component, i_component]
+        call check_positive("Half_Hetero_Couples: construct", "num_elements", num_elements)
+        this%num_couples = num_elements * (num_elements - 1) / 2
+        allocate(this%couples(2, this%num_couples))
+        this%couples = 0
+        i_couple = 0
+        do j_element = 2, num_elements
+            do i_element = 1, j_element - 1
+                i_couple = i_couple + 1
+                this%couples(:, i_couple) = [j_element, i_element]
             end do
         end do
     end subroutine Half_construct
@@ -96,21 +96,21 @@ contains
 
 !implementation Full_Hetero_Couples
 
-    subroutine Full_construct(this, num_components)
+    subroutine Full_construct(this, num_elements)
         class(Full_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_components
+        integer, intent(in) :: num_elements
 
-        integer :: index, i_component, j_component
-        call check_positive("Half_Hetero_Couples: construct", "num_components", num_components)
-        this%num_indices = num_components * (num_components - 1)
-        allocate(this%couple(2, this%num_indices))
-        this%couple = 0
-        index = 0
-        do j_component = 1, num_components
-            do i_component = 1, num_components
-                if (i_component /= j_component) then
-                    index = index + 1
-                    this%couple(:, index) = [j_component, i_component]
+        integer :: i_couple, i_element, j_element
+        call check_positive("Half_Hetero_Couples: construct", "num_elements", num_elements)
+        this%num_couples = num_elements * (num_elements - 1)
+        allocate(this%couples(2, this%num_couples))
+        this%couples = 0
+        i_couple = 0
+        do j_element = 1, num_elements
+            do i_element = 1, num_elements
+                if (i_element /= j_element) then
+                    i_couple = i_couple + 1
+                    this%couples(:, i_couple) = [j_element, i_element]
                 end if
             end do
         end do
@@ -120,23 +120,23 @@ contains
 
 !implementation Null_Hetero_Couples
 
-    subroutine Null_construct(this, num_components)
+    subroutine Null_construct(this, num_elements)
         class(Null_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_components
+        integer, intent(in) :: num_elements
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Hetero_Couples), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure integer function Null_get_num_indices(this) result(num_indices)
+    pure integer function Null_get_num(this) result(num_couples)
         class(Null_Hetero_Couples), intent(in) :: this
-        num_indices = 0
-    end function Null_get_num_indices
+        num_couples = 0
+    end function Null_get_num
 
-    pure function Null_get(this, index) result(couple)
+    pure function Null_get(this, i_couple) result(couple)
         class(Null_Hetero_Couples), intent(in) :: this
-        integer, intent(in) :: index
+        integer, intent(in) :: i_couple
         integer :: couple(2)
         couple = 0
     end function Null_get

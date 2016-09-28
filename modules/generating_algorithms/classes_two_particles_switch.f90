@@ -106,7 +106,7 @@ contains
     subroutine Abstract_set_selector(this)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
 
-        integer :: nums_candidates(this%couples%get_num_indices())
+        integer :: nums_candidates(this%couples%get_num())
         integer :: i_candidate, ij_couple(2)
 
         do i_candidate = 1, size(nums_candidates)
