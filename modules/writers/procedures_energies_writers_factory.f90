@@ -2,7 +2,7 @@ module procedures_energies_writers_factory
 
 use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_total_moment_factory, only: set_are_dipolar
+use procedures_mixture_total_moments_factory, only: set_are_dipolar
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy

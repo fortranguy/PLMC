@@ -103,10 +103,10 @@
 
         \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
             \begin{class}[text width=\largeTextWidth]{Mixture}{0, 0}
-                \UMLattribute{components: \type{Component[:]}}
+                \UMLattribute{components: \type{Component[:, :]}}
                 \UMLattribute{componentsMinDistances: \type{MinDistance[:.]}}
                 \UMLattribute{wallMinDistances: \type{MinDistance[:]}}
-                \UMLattribute{totalMoment: \type{MixtureTotalMoment}}
+                \UMLattribute{totalMoment: \type{MixtureTotalMoment[:]}}
             \end{class}
         \end{scope}
 

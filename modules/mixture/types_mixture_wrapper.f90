@@ -8,10 +8,15 @@ implicit none
 
 private
 
+    !> @todo
+    !> Remove gemc_ and the second part.
     type, public :: Mixture_Wrapper
-        type(Component_Wrapper), allocatable :: components(:)
+        type(Component_Wrapper), allocatable :: gemc_components(:, :)
         type(Min_Distances_Line), allocatable :: components_min_distances(:)
         type(Min_Distance_Wrapper), allocatable :: wall_min_distances(:)
+        class(Abstract_Mixture_Total_Moment), allocatable :: total_moments(:)
+
+        type(Component_Wrapper), allocatable :: components(:)
         class(Abstract_Mixture_Total_Moment), allocatable :: total_moment
     end type Mixture_Wrapper
 

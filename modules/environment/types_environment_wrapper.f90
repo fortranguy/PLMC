@@ -16,7 +16,7 @@ implicit none
 private
 
     !> @todo
-    !> Remove the second part.
+    !> Remove gemc_ and the second part.
     type, public :: Environment_Wrapper
         class(Abstract_Periodic_Box), allocatable :: periodic_boxes(:)
         class(Abstract_Beta_Pressure), allocatable :: beta_pressure

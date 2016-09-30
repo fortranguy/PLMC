@@ -604,7 +604,7 @@
 		<Unit filename="modules/mixture/procedures_mixture_inquirers.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/mixture/procedures_mixture_total_moment_factory.f90">
+		<Unit filename="modules/mixture/procedures_mixture_total_moments_factory.f90">
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/mixture/types_component_wrapper.f90">

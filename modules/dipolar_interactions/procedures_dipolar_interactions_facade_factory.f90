@@ -5,7 +5,7 @@ use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_inquirers, only: periodicity_is_xyz, box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_total_moment_factory, only: set_are_dipolar
+use procedures_mixture_total_moments_factory, only: set_are_dipolar
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade, &

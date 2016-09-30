@@ -9,8 +9,8 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_component_factory, only: component_create => create, component_destroy => destroy
 use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
-use procedures_mixture_total_moment_factory, only: mixture_total_moment_create => create, &
-    mixture_total_moment_destroy => destroy
+use procedures_mixture_total_moments_factory, only: mixture_total_moments_create => create, &
+    mixture_total_moments_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations, &
     property_num_components => num_components
@@ -33,38 +33,41 @@ end interface mixture_destroy
 
 contains
 
+    !> @todo
+    !> more rigorous components(:) input for components_min_distances and wall_min_distances?
     subroutine create_all(mixture, environment, generating_data, prefix)
         type(Mixture_Wrapper), intent(out) :: mixture
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call mixture_create(mixture%components, environment%periodic_box, environment%&
-            accessible_domain, generating_data, prefix)
-        call hard_core_create(mixture%components_min_distances, mixture%components, &
+        call mixture_create(mixture%gemc_components, environment%periodic_boxes, environment%&
+            accessible_domains, generating_data, prefix)
+        call hard_core_create(mixture%components_min_distances, mixture%gemc_components(:, 1), &
             generating_data, prefix)
         call hard_core_create(mixture%wall_min_distances, environment%wall_min_distance, mixture%&
-            components_min_distances, mixture%components, environment%visitable_walls)
-        call mixture_total_moment_create(mixture%total_moment, mixture%components)
+            components_min_distances, mixture%gemc_components(:, 1), environment%visitable_walls)
+        call mixture_total_moments_create(mixture%total_moments, mixture%gemc_components)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
         type(Mixture_Wrapper), intent(inout) :: mixture
 
-        call mixture_total_moment_destroy(mixture%total_moment)
+        call mixture_total_moments_destroy(mixture%total_moments)
         call hard_core_destroy(mixture%wall_min_distances)
         call hard_core_destroy(mixture%components_min_distances)
-        call mixture_destroy(mixture%components)
+        call mixture_destroy(mixture%gemc_components)
     end subroutine destroy_all
 
-    subroutine create_components(components, periodic_box, accessible_domain, generating_data, &
+    subroutine create_components(components, periodic_boxes, accessible_domains, generating_data, &
         prefix)
-        type(Component_Wrapper), allocatable, intent(out) :: components(:)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
+        type(Component_Wrapper), allocatable, intent(out) :: components(:, :)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domains(:)
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
+        integer :: i_box
         logical :: exists
         integer :: num_components, i_component
         type(Concrete_Number_to_String) :: string
@@ -77,21 +80,27 @@ contains
         else
             exists = .true.
         end if
-        allocate(components(num_components))
-        do i_component = 1, size(components)
-            call component_create(components(i_component), exists, periodic_box, accessible_domain,&
-                generating_data, prefix//"Component "//string%get(i_component)//".")
+        allocate(components(num_components, size(periodic_boxes)))
+
+        do i_box = 1, size(components, 2)
+            do i_component = 1, size(components, 1)
+                call component_create(components(i_component, i_box), exists, &
+                    periodic_boxes(i_box), accessible_domains(i_box), &
+                    generating_data, prefix//"Component "//string%get(i_component)//".")
+            end do
         end do
     end subroutine create_components
 
     subroutine destroy_components(components)
-        type(Component_Wrapper), allocatable, intent(inout) :: components(:)
+        type(Component_Wrapper), allocatable, intent(inout) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
         if (allocated(components)) then
-            do i_component = size(components), 1, -1
-                call component_destroy(components(i_component))
+            do i_box = size(components, 2), 1, -1
+                do i_component = size(components, 1), 1, -1
+                    call component_destroy(components(i_component, i_box))
+                end do
             end do
             deallocate(components)
         end if
