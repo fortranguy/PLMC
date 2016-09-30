@@ -6,7 +6,7 @@ use data_strings, only: max_line_length
 use procedures_checks, only: check_positive
 use procedures_elementary_statistics, only: average, standard_deviation
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_box_factory, only: box_destroy => destroy
+use procedures_boxes_factory, only: boxes_destroy => destroy
 
 implicit none
 
@@ -14,7 +14,7 @@ private
 
     type, abstract, public :: Abstract_Density_Explorer
     private
-        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domains(:)
     contains
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_fill), deferred :: fill
@@ -82,12 +82,12 @@ contains
 
 !implementation Plain_Density_Explorer
 
-    subroutine Plain_construct(this, parallelepiped_domain, num_snaps)
+    subroutine Plain_construct(this, parallelepiped_domains, num_snaps)
         class(Plain_Density_Explorer), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domains(:)
         integer, intent(in) :: num_snaps
 
-        allocate(this%parallelepiped_domain, source=parallelepiped_domain)
+        allocate(this%parallelepiped_domains, source=parallelepiped_domains)
         allocate(this%density(num_snaps))
         this%density = 0._DP
     end subroutine
@@ -96,7 +96,7 @@ contains
         class(Plain_Density_Explorer), intent(inout) :: this
 
         if (allocated(this%density)) deallocate(this%density)
-        call box_destroy(this%parallelepiped_domain)
+        call boxes_destroy(this%parallelepiped_domains)
     end subroutine Plain_destroy
 
     subroutine Plain_fill(this, i_snap, positions)
@@ -107,11 +107,12 @@ contains
         integer :: i_particle
 
         do i_particle = 1, size(positions, 2)
-            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
+            if (this%parallelepiped_domains(1)%is_inside(positions(:, i_particle))) then
                 this%density(i_snap) = this%density(i_snap) + 1._DP
             end if
         end do
-        this%density(i_snap) = this%density(i_snap) / product(this%parallelepiped_domain%get_size())
+        this%density(i_snap) = this%density(i_snap) / &
+            product(this%parallelepiped_domains(1)%get_size())
     end subroutine Plain_fill
 
     !> \[ \rho = \left\langle \frac{N}{V} \right\rangle \]
@@ -130,20 +131,20 @@ contains
 
 !implementation Z_Density_Explorer
 
-    subroutine Z_construct(this, parallelepiped_domain, delta_z, num_snaps, filename)
+    subroutine Z_construct(this, parallelepiped_domains, delta_z, num_snaps, filename)
         class(Z_Density_Explorer), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domains(:)
         real(DP), intent(in) :: delta_z
         integer, intent(in) :: num_snaps
         character(len=*), intent(in) :: filename
 
         real(DP), dimension(num_dimensions) :: domain_origin, domain_size
 
-        allocate(this%parallelepiped_domain, source=parallelepiped_domain)
+        allocate(this%parallelepiped_domains, source=parallelepiped_domains)
         call check_positive("Z_Density_Explorer: construct", "delta_z", delta_z)
         this%delta_z = delta_z
-        domain_origin = this%parallelepiped_domain%get_origin()
-        domain_size = this%parallelepiped_domain%get_size()
+        domain_origin = this%parallelepiped_domains(1)%get_origin()
+        domain_size = this%parallelepiped_domains(1)%get_size()
         this%i_z_min = nint((domain_origin(3) - domain_size(3)/2) / this%delta_z)
         this%i_z_max = nint((domain_origin(3) + domain_size(3)/2) / this%delta_z)
         allocate(this%density(this%i_z_min:this%i_z_max, num_snaps))
@@ -157,7 +158,7 @@ contains
 
         if (allocated(this%filename)) deallocate(this%filename)
         if (allocated(this%density)) deallocate(this%density)
-        call box_destroy(this%parallelepiped_domain)
+        call boxes_destroy(this%parallelepiped_domains)
     end subroutine Z_destroy
 
     subroutine Z_fill(this, i_snap, positions)
@@ -169,12 +170,12 @@ contains
         integer :: i_particle, i_z
 
         do i_particle = 1, size(positions, 2)
-            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
+            if (this%parallelepiped_domains(1)%is_inside(positions(:, i_particle))) then
                 i_z = nint(positions(3, i_particle) / this%delta_z)
                 this%density(i_z, i_snap) = this%density(i_z, i_snap) + 1._DP
             end if
         end do
-        domain_size = this%parallelepiped_domain%get_size()
+        domain_size = this%parallelepiped_domains(1)%get_size()
         this%density(:, i_snap) = this%density(:, i_snap) / product(domain_size(1:2)) / this%delta_z
     end subroutine Z_fill
 
@@ -205,22 +206,22 @@ contains
 
 !implementation XZ_Density_Explorer
 
-    subroutine XZ_construct(this, parallelepiped_domain, delta_xz, num_snaps, filename)
+    subroutine XZ_construct(this, parallelepiped_domains, delta_xz, num_snaps, filename)
         class(XZ_Density_Explorer), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domains(:)
         real(DP), intent(in) :: delta_xz
         integer, intent(in) :: num_snaps
         character(len=*), intent(in) :: filename
 
         real(DP), dimension(num_dimensions) :: domain_origin, domain_size
 
-        allocate(this%parallelepiped_domain, source=parallelepiped_domain)
+        allocate(this%parallelepiped_domains, source=parallelepiped_domains)
         call check_positive("XZ_Density_Explorer: construct", "delta_xz", delta_xz)
         this%delta_x = delta_xz
         this%delta_z = delta_xz
 
-        domain_origin = this%parallelepiped_domain%get_origin()
-        domain_size = this%parallelepiped_domain%get_size()
+        domain_origin = this%parallelepiped_domains(1)%get_origin()
+        domain_size = this%parallelepiped_domains(1)%get_size()
         this%i_x_min = nint((domain_origin(1) - domain_size(1)/2) / this%delta_x)
         this%i_x_max = nint((domain_origin(1) + domain_size(1)/2) / this%delta_x)
         this%i_z_min = nint((domain_origin(3) - domain_size(3)/2) / this%delta_z)
@@ -235,7 +236,7 @@ contains
 
         if (allocated(this%filename)) deallocate(this%filename)
         if (allocated(this%density)) deallocate(this%density)
-        call box_destroy(this%parallelepiped_domain)
+        call boxes_destroy(this%parallelepiped_domains)
     end subroutine XZ_destroy
 
     subroutine XZ_fill(this, i_snap, positions)
@@ -247,13 +248,13 @@ contains
         integer :: i_particle, i_x, i_z
 
         do i_particle = 1, size(positions, 2)
-            if (this%parallelepiped_domain%is_inside(positions(:, i_particle))) then
+            if (this%parallelepiped_domains(1)%is_inside(positions(:, i_particle))) then
                 i_x = nint(positions(1, i_particle) / this%delta_x)
                 i_z = nint(positions(3, i_particle) / this%delta_z)
                 this%density(i_x, i_z, i_snap) = this%density(i_x, i_z, i_snap) + 1._DP
             end if
         end do
-        domain_size = this%parallelepiped_domain%get_size()
+        domain_size = this%parallelepiped_domains(1)%get_size()
         this%density(:, :, i_snap) = this%density(:, :, i_snap) / domain_size(2) / &
             (this%delta_x * this%delta_z)
     end subroutine XZ_fill

@@ -8,7 +8,7 @@ use classes_number_to_string, only: Concrete_Number_to_String
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
 use procedures_environment_inquirers, only: periodicity_is_xy
 use classes_density_explorer, only: Abstract_Density_Explorer, Plain_Density_Explorer, &
     Z_Density_Explorer, XZ_Density_Explorer
@@ -20,11 +20,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(density_explorer, periodic_box, visitable_walls, i_component, num_snaps, &
+    subroutine create(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps, &
         exploring_data, prefix)
         class(Abstract_Density_Explorer), allocatable, intent(out) :: density_explorer
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
         integer, intent(in) :: i_component, num_snaps
         type(json_file) :: exploring_data
         character(len=*), intent(in) :: prefix
@@ -33,7 +33,7 @@ contains
 
         call set_density_type(density_type, exploring_data, prefix)
         call allocate(density_explorer, density_type)
-        call construct(density_explorer, periodic_box, visitable_walls, i_component, num_snaps, &
+        call construct(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps, &
             exploring_data, prefix)
     end subroutine create
 
@@ -67,16 +67,16 @@ contains
         end select
     end subroutine allocate
 
-    subroutine construct(density_explorer, periodic_box, visitable_walls, i_component, num_snaps, &
+    subroutine construct(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps, &
         exploring_data, prefix)
         class(Abstract_Density_Explorer), intent(inout) :: density_explorer
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
         integer, intent(in) :: i_component, num_snaps
         type(json_file) :: exploring_data
         character(len=*), intent(in) :: prefix
 
-        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domains(:)
         logical :: create_domain
         character(len=:), allocatable ::filename
         type(Concrete_Number_to_String) :: string
@@ -84,44 +84,44 @@ contains
         logical :: data_found
 
         create_domain = .true.
-        call box_create(parallelepiped_domain, periodic_box, visitable_walls, create_domain, &
+        call boxes_create(parallelepiped_domains, periodic_boxes, visitable_walls, create_domain, &
             exploring_data, prefix)
         select type (density_explorer)
             type is (Plain_Density_Explorer)
-                call density_explorer%construct(parallelepiped_domain, num_snaps)
+                call density_explorer%construct(parallelepiped_domains, num_snaps)
             type is (Z_Density_Explorer)
-                call check_periodicity_xy(periodic_box)
+                call check_periodicity_xy(periodic_boxes)
                 block
                     real(DP) :: delta_z
                     data_field = prefix//"delta"
                     call exploring_data%get(data_field, delta_z, data_found)
                     call check_data_found(data_field, data_found)
                     filename = "z_density_"//string%get(i_component)//".out"
-                    call density_explorer%construct(parallelepiped_domain, delta_z, num_snaps, &
+                    call density_explorer%construct(parallelepiped_domains, delta_z, num_snaps, &
                         filename)
                 end block
             type is (XZ_Density_Explorer)
-                call check_periodicity_xy(periodic_box)
+                call check_periodicity_xy(periodic_boxes)
                 block
                     real(DP) :: delta_xz
                     data_field = prefix//"delta"
                     call exploring_data%get(data_field, delta_xz, data_found)
                     call check_data_found(data_field, data_found)
                     filename = "xz_density_"//string%get(i_component)//".out"
-                    call density_explorer%construct(parallelepiped_domain, delta_xz, num_snaps, &
+                    call density_explorer%construct(parallelepiped_domains, delta_xz, num_snaps, &
                         filename)
                 end block
             class default
                 call error_exit("procedures_density_explorer_factory: construct: "//&
                     "density_explorer type unknown.")
         end select
-        call box_destroy(parallelepiped_domain)
+        call boxes_destroy(parallelepiped_domains)
     end subroutine construct
 
-    subroutine check_periodicity_xy(periodic_box)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+    subroutine check_periodicity_xy(periodic_boxes)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
 
-        if (.not.periodicity_is_xy(periodic_box)) then
+        if (all(.not.periodicity_is_xy(periodic_boxes))) then
             call warning_continue("Periodicity is not XY.")
         end if
     end subroutine check_periodicity_xy

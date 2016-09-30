@@ -14,11 +14,15 @@ private
     type, public :: Markov_Chain_Explorer_Wrapper
         class(Abstract_Maximum_Box_Compression_Explorer), allocatable :: &
             maximum_box_compression_explorer
-        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratios(:)
         class(Abstract_Volume_Change_Method), allocatable :: volume_change_method
-        class(Abstract_Parallelepiped_Domain), allocatable :: particle_insertion_domain
-        class(Abstract_Random_Coordinates), allocatable :: random_position, random_orientation
+        class(Abstract_Parallelepiped_Domain), allocatable :: particle_insertion_domains(:)
+        class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
         class(Abstract_Particle_Insertion_Method), allocatable :: particle_insertion_method
+
+        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
+        class(Abstract_Parallelepiped_Domain), allocatable :: particle_insertion_domain
+        class(Abstract_Random_Coordinates), allocatable :: random_position
     end type Markov_Chain_Explorer_Wrapper
 
 end module types_markov_chain_explorer_wrapper

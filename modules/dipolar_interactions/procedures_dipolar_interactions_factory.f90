@@ -3,7 +3,7 @@ module procedures_dipolar_interactions_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
-use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
 use classes_permittivity, only: Abstract_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
@@ -46,7 +46,7 @@ contains
         call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, any(are_dipolar),&
             generating_data, prefix)
 
-        call box_create(dipolar_interactions_static%box_size_memento_real, environment%&
+        call boxes_create(dipolar_interactions_static%box_size_memento_real, environment%&
             periodic_box, environment%beta_pressure, any(are_dipolar))
         call des_real_create(dipolar_interactions_static%real_pair, dipolar_interactions_static%&
             box_size_memento_real, environment%permittivity, mixture%components_min_distances, &
@@ -97,11 +97,11 @@ contains
         call des_reci_destroy(dipolar_interactions_dynamic%reci_visitor)
         call des_reci_destroy(dipolar_interactions_static%reci_structure)
         call des_reci_destroy(dipolar_interactions_static%reci_weight)
-        call box_destroy(dipolar_interactions_static%box_size_memento_reci)
+        call boxes_destroy(dipolar_interactions_static%box_size_memento_reci)
 
         call des_real_destroy(dipolar_interactions_dynamic%real_components)
         call des_real_destroy(dipolar_interactions_static%real_pair)
-        call box_destroy(dipolar_interactions_static%box_size_memento_real)
+        call boxes_destroy(dipolar_interactions_static%box_size_memento_real)
 
         call des_convergence_parameter_destroy(dipolar_interactions_dynamic%alpha)
     end subroutine dipolar_interactions_destroy

@@ -154,14 +154,8 @@
 		<Unit filename="modules/common/procedures_command_arguments.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/common/procedures_environment_inquirers.f90">
-			<Option weight="7" />
-		</Unit>
 		<Unit filename="modules/common/procedures_errors.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/common/procedures_exploration_inquirers.f90">
-			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/common/procedures_geometry.f90">
 			<Option weight="1" />
@@ -177,9 +171,6 @@
 		</Unit>
 		<Unit filename="modules/common/procedures_markov_chain_generator_factory.f90">
 			<Option weight="17" />
-		</Unit>
-		<Unit filename="modules/common/procedures_mixture_inquirers.f90">
-			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/common/procedures_observables_factory.f90">
 			<Option weight="8" />
@@ -211,14 +202,8 @@
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/common/procedures_short_interactions_inquirers.f90">
-			<Option weight="5" />
-		</Unit>
 		<Unit filename="modules/common/procedures_visit_condition.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/common/procedures_writers_inquirers.f90">
-			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/common/types_exploring_io.f90">
 			<Option weight="11" />
@@ -361,43 +346,43 @@
 		<Unit filename="modules/dipolar_interactions/types_dipolar_interactions_static_wrapper.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/environment/box/classes_box_size_checker.f90">
+		<Unit filename="modules/environment/boxes/classes_box_size_checker.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/environment/box/classes_box_size_memento.f90">
+		<Unit filename="modules/environment/boxes/classes_box_size_memento.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/environment/box/classes_parallelepiped_domain.f90">
+		<Unit filename="modules/environment/boxes/classes_parallelepiped_domain.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/environment/box/classes_periodic_box.f90">
+		<Unit filename="modules/environment/boxes/classes_periodic_box.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/environment/box/classes_reciprocal_lattice.f90">
+		<Unit filename="modules/environment/boxes/classes_reciprocal_lattice.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/environment/box/procedures_box_factory.f90">
+		<Unit filename="modules/environment/boxes/procedures_box_size_checkers_factory.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/environment/boxes/procedures_box_size_memento_factory.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/environment/boxes/procedures_boxes_factory.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/environment/box/procedures_box_size_checker_factory.f90">
-			<Option weight="8" />
-		</Unit>
-		<Unit filename="modules/environment/box/procedures_box_size_memento_factory.f90">
-			<Option weight="8" />
-		</Unit>
-		<Unit filename="modules/environment/box/procedures_parallelepiped_domain_factory.f90">
-			<Option weight="8" />
-		</Unit>
-		<Unit filename="modules/environment/box/procedures_parallelepiped_domain_macro.f90">
+		<Unit filename="modules/environment/boxes/procedures_parallelepiped_domain_macro.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/environment/box/procedures_parallelepiped_domain_micro.f90">
+		<Unit filename="modules/environment/boxes/procedures_parallelepiped_domain_micro.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/environment/box/procedures_periodic_box_factory.f90">
-			<Option weight="3" />
+		<Unit filename="modules/environment/boxes/procedures_parallelepiped_domains_factory.f90">
+			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/environment/box/procedures_reciprocal_lattice_factory.f90">
+		<Unit filename="modules/environment/boxes/procedures_periodic_boxes_factory.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/environment/boxes/procedures_reciprocal_lattices_factory.f90">
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/environment/classes_beta_pressure.f90">
@@ -412,22 +397,22 @@
 		<Unit filename="modules/environment/classes_temperature.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/environment/field/classes_external_field.f90">
+		<Unit filename="modules/environment/fields/classes_external_field.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/environment/field/classes_field_expression.f90">
+		<Unit filename="modules/environment/fields/classes_field_expression.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/environment/field/procedures_external_field_factory.f90">
+		<Unit filename="modules/environment/fields/procedures_external_fields_factory.f90">
 			<Option weight="7" />
 		</Unit>
-		<Unit filename="modules/environment/field/procedures_field_expression_factory.f90">
+		<Unit filename="modules/environment/fields/procedures_field_expression_factory.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/environment/field/procedures_field_expression_micro.f90">
+		<Unit filename="modules/environment/fields/procedures_field_expression_micro.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/environment/field/procedures_field_factory.f90">
+		<Unit filename="modules/environment/fields/procedures_fields_factory.f90">
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_beta_pressure_excess_factory.f90">
@@ -438,6 +423,9 @@
 		</Unit>
 		<Unit filename="modules/environment/procedures_environment_factory.f90">
 			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_environment_inquirers.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/environment/procedures_permittivity_factory.f90">
 			<Option weight="8" />
@@ -480,6 +468,9 @@
 		</Unit>
 		<Unit filename="modules/exploration/procedures_elementary_statistics.f90">
 			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/exploration/procedures_exploration_inquirers.f90">
+			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/classes_exploring_algorithm.f90">
 			<Option weight="3" />
@@ -609,6 +600,9 @@
 		</Unit>
 		<Unit filename="modules/mixture/procedures_mixture_factory.f90">
 			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_mixture_inquirers.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/mixture/procedures_mixture_total_moment_factory.f90">
 			<Option weight="9" />
@@ -784,6 +778,9 @@
 		<Unit filename="modules/short_interactions/procedures_short_interactions_factory.f90">
 			<Option weight="15" />
 		</Unit>
+		<Unit filename="modules/short_interactions/procedures_short_interactions_inquirers.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="modules/short_interactions/procedures_short_interactions_resetter.f90">
 			<Option weight="8" />
 		</Unit>
@@ -852,6 +849,9 @@
 		</Unit>
 		<Unit filename="modules/writers/procedures_triangle_writer_factory.f90">
 			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/writers/procedures_writers_inquirers.f90">
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/writers/types_changes_success_writer_wrapper.f90">
 			<Option weight="3" />

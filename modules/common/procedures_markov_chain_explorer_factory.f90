@@ -3,7 +3,7 @@ module procedures_markov_chain_explorer_factory
 use data_input_prefixes, only: particle_insertion_prefix, volume_change_prefix
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
-use procedures_box_factory, only: box_create => create, box_destroy => destroy
+use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_random_coordinates_factory, only: random_coordinates_create => create, &
@@ -62,9 +62,9 @@ contains
             particle_insertion_prefix)
         can_exchange = measure_inv_pow_activities ! as if exchange
         call set_have_positions(have_positions, physical_model%mixture%components)
-        call box_create(markov_chain_explorer%particle_insertion_domain, physical_model%&
-            environment%periodic_box, physical_model%environment%visitable_walls, any(can_exchange)&
-            .and. any(have_positions), exploring_data, particle_insertion_prefix)
+        call boxes_create(markov_chain_explorer%particle_insertion_domains, physical_model%&
+            environment%periodic_boxes, physical_model%environment%gemc_visitable_walls, &
+            any(can_exchange) .and. any(have_positions), exploring_data, particle_insertion_prefix)
         call random_coordinates_create(markov_chain_explorer%random_position, &
             markov_chain_explorer%particle_insertion_domain, can_exchange, have_positions)
         call set_have_orientations(have_orientations, physical_model%mixture%components)
@@ -82,7 +82,7 @@ contains
         call particle_insertion_method_destroy(markov_chain_explorer%particle_insertion_method)
         call random_coordinates_destroy(markov_chain_explorer%random_orientation)
         call random_coordinates_destroy(markov_chain_explorer%random_position)
-        call box_destroy(markov_chain_explorer%particle_insertion_domain)
+        call boxes_destroy(markov_chain_explorer%particle_insertion_domains)
         call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
         call changed_box_size_ratio_destroy(markov_chain_explorer%changed_box_size_ratio)
         call maximum_box_compression_explorer_destroy(markov_chain_explorer%&

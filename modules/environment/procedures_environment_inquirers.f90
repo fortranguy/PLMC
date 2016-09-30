@@ -1,6 +1,7 @@
 module procedures_environment_inquirers
 
 use json_module, only: json_file
+use procedures_checks, only: check_data_found
 use procedures_property_inquirers, only: logical_from_json
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
@@ -14,8 +15,12 @@ use classes_changed_box_size, only: Abstract_Changed_Box_Size, Null_Changed_Box_
 implicit none
 
 private
-public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permittivity, &
+public :: num_boxes, periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permittivity,&
     use_reciprocal_lattice, use_walls, box_size_can_change
+
+interface num_boxes
+    module procedure :: num_boxes_from_json
+end interface num_boxes
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -46,7 +51,19 @@ end interface box_size_can_change
 
 contains
 
-    pure logical function periodicity_is_xyz(periodic_box)
+    integer function num_boxes_from_json(generating_data, prefix) result(num_boxes)
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"Boxes.number"
+        call generating_data%get(data_field, num_boxes, data_found)
+        call check_data_found(data_field, data_found)
+    end function num_boxes_from_json
+
+    elemental logical function periodicity_is_xyz(periodic_box)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         select type (periodic_box)
@@ -57,7 +74,7 @@ contains
         end select
     end function periodicity_is_xyz
 
-    pure logical function periodicity_is_xy(periodic_box)
+    elemental logical function periodicity_is_xy(periodic_box)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         select type (periodic_box)
@@ -114,7 +131,7 @@ contains
             prefix//"Reciprocal Lattice.use")
     end function use_reciprocal_lattice_from_json
 
-    pure logical function use_reciprocal_lattice_from(reciprocal_lattice) &
+    elemental logical function use_reciprocal_lattice_from(reciprocal_lattice) &
         result(use_reciprocal_lattice)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
 
@@ -144,7 +161,7 @@ contains
         end select
     end function use_walls_from_floor_penetration
 
-    pure logical function use_walls_from_walls(visitable_walls) result(use_walls)
+    elemental logical function use_walls_from_walls(visitable_walls) result(use_walls)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls
 
         select type (visitable_walls)

@@ -142,15 +142,16 @@
 
         \begin{scope}[shift={($(ReciprocalLattice.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{Environment}{0, 0}
-                \UMLattribute{periodicBox: \type{PeriodicBox}}
+                \UMLattribute{periodicBoxes: \type{PeriodicBox[:]}}
+                \UMLattribute{betaPressure: \type{BetaPressure}}
                 \UMLattribute{temperature: \type{Temperature}}
                 \UMLattribute{permittivity: \type{Permittivity}}
-                \UMLattribute{externalField: \type{ExternalField}}
-                \UMLattribute{reciprocalLattice: \type{ReciprocalLattice}}
+                \UMLattribute{externalFields: \type{ExternalField[:]}}
+                \UMLattribute{reciprocalLattices: \type{ReciprocalLattice[:]}}
                 \UMLattribute{wallMinDistance: \type{MinDistance}}
-                \UMLattribute{visitableWalls: \type{VisitableWalls}}
-                \UMLattribute{boxSizeChecker: \type{BoxSizeChecker}}
-                \UMLattribute{accessibleDomain: \type{ParallelepipedDomain}}
+                \UMLattribute{visitableWalls: \type{VisitableWalls[:]}}
+                \UMLattribute{boxSizeCheckers: \type{BoxSizeChecker[:]}}
+                \UMLattribute{accessibleDomains: \type{ParallelepipedDomain[:]}}
             \end{class}
         \end{scope}
 

@@ -3,7 +3,7 @@ module classes_dipolar_interactions_facade
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
-use procedures_box_factory, box_destroy => destroy
+use procedures_boxes_factory, boxes_destroy => destroy
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use procedures_des_reci_factory, only: des_reci_destroy => destroy
 use procedures_dlc_factory, only: dlc_destroy => destroy
@@ -154,7 +154,7 @@ contains
 
         if (this%reset_real_pair) then
             call des_real_destroy(des_real_pair_target)
-            call box_destroy(box_size_memento_target)
+            call boxes_destroy(box_size_memento_target)
             allocate(box_size_memento_target, source=box_size_memento_source)
             allocate(des_real_pair_target, source=des_real_pair_source)
         end if
@@ -319,7 +319,7 @@ contains
         call this%clone_real(dipolar_interactions_static_target%box_size_memento_real, &
             dipolar_interactions_static_target%real_pair, dipolar_interactions_static_source%&
             box_size_memento_real, dipolar_interactions_static_source%real_pair)
-        call box_destroy(dipolar_interactions_static_target%box_size_memento_reci)
+        call boxes_destroy(dipolar_interactions_static_target%box_size_memento_reci)
         allocate(dipolar_interactions_static_target%box_size_memento_reci, &
             source=dipolar_interactions_static_source%box_size_memento_reci)
         call des_reci_destroy(dipolar_interactions_static_target%reci_weight)

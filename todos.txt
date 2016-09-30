@@ -9,3 +9,6 @@
 - doc: \epsilon -> \varepsilon
 - VolumeChange: + or - in observable?
 - Generalise ParticleInsertionMethod (Widom), cf. FS02
+- PeriodicBox: remove getMaxDistance() ?
+- Convert all explorations for multiples boxes & components
+- GEMC conversion: array by default: bad idea?
