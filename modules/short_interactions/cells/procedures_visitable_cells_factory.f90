@@ -16,13 +16,13 @@ public :: create, destroy
 
 contains
 
-    subroutine create(cells, periodic_box, components, hard_contact, pairs, neighbour_cells, &
-        list_mold, interact)
+    subroutine create(cells, periodic_box, components, hard_contact, components_pairs, &
+        neighbour_cells, list_mold, interact)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
-        type(Pair_Potentials_Line), intent(in) :: pairs(:)
+        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
         class(Abstract_Visitable_List), intent(in) :: list_mold
         logical, intent(in) :: interact
@@ -31,16 +31,17 @@ contains
         integer :: i_pair, j_pair
 
         if (interact) then
-            allocate(Concrete_Visitable_Cells :: cells(size(pairs), size(pairs)))
+            allocate(Concrete_Visitable_Cells :: cells(size(components_pairs), &
+                size(components_pairs)))
         else
-            allocate(Null_Visitable_Cells :: cells(size(pairs), size(pairs)))
+            allocate(Null_Visitable_Cells :: cells(size(components_pairs), size(components_pairs)))
         end if
 
         do j_component = 1, size(cells, 2)
             do i_component = 1, size(cells, 1)
                 j_pair = maxval([i_component, j_component])
                 i_pair = minval([i_component, j_component])
-                associate (pair_ij => pairs(j_pair)%line(i_pair)%potential, &
+                associate (pair_ij => components_pairs(j_pair)%line(i_pair)%potential, &
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &
                         components(i_component)%positions, hard_contact, pair_ij, neighbours_ij, &

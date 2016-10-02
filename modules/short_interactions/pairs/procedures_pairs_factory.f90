@@ -9,8 +9,8 @@ use procedures_potential_expression_factory, only: potential_expression_create =
 use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use procedures_pair_potential_factory, only: pair_potential_create => create, &
     pair_potential_destroy => destroy
-use procedures_short_pairs_visitor_factory, only: short_pairs_visitor_create => create, &
-    short_pairs_visitor_destroy => destroy
+use procedures_short_pairs_visitors_factory, only: short_pairs_visitors_create => create, &
+    short_pairs_visitors_destroy => destroy
 use procedures_short_interactions_inquirers, only: components_interact
 
 implicit none
@@ -21,7 +21,7 @@ public :: create, destroy
 interface create
     module procedure :: create_wall
     module procedure :: create_components
-    module procedure :: short_pairs_visitor_create
+    module procedure :: short_pairs_visitors_create
     module procedure :: pair_potential_create
     module procedure :: potential_expression_create
 end interface create
@@ -29,7 +29,7 @@ end interface create
 interface destroy
     module procedure :: potential_expression_destroy
     module procedure :: pair_potential_destroy
-    module procedure :: short_pairs_visitor_destroy
+    module procedure :: short_pairs_visitors_destroy
     module procedure :: destroy_components
     module procedure :: destroy_pairs
 end interface

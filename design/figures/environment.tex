@@ -47,27 +47,36 @@
                 \namespace{ShortInteractions} :: PairPotential};
         \end{scope}
 
-        \begin{scope}[shift={($(Import.south) - (0 cm, 3 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{FieldExpression}{0, 0}
+        \begin{scope}[shift={($(ExternalField.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{FieldExpression}{0, 0}
                 \operation{\procedure{get}{position: \type{real[3]}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(FieldExpression.south) - (0 cm, 1 cm)$)}]
+        \begin{scope}[shift={($(Import.south) - (0 cm, 3 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{Permittivity}{0, 0}
                 \operation{\procedure{set}{permittivity: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox.north -| Permittivity)$)}]
+        \begin{scope}[shift={($(Permittivity.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{Temperature}{0, 0}
                 \operation{\procedure{set}{temperature: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Temperature.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(FieldExpression.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{WallsVisitor}{0, 0}
+                \operation{\procedure{construct}{visitableWalls: \type{VisitableWalls}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
+                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PeriodicBox.north -| Permittivity)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BoxSizeMemento}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{destroy}{}}
@@ -79,36 +88,23 @@
         \end{scope}
 
         \begin{scope}[shift={($(BoxSizeMemento.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
+                \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
+                    numbers: \type{int[3]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{isSparseInZ}{}: \type{bool}}
+                \operation{\procedure{getNumbers}{}: \type{int[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ReciprocalLattice.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{BetaPressure}{0, 0}
                 \operation{\procedure{set}{density \type{real}, excess: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(BetaPressure.south) - (0 cm, 1 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{BetaPressureExcess}{0, 0}
-                \operation[0]{\procedure{get}{contacts: \type{real}}: \type{real}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ExternalField.north) - (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{WallsVisitor}{0, 0}
-                \operation{\procedure{construct}{visitableWalls: \type{VisitableWalls}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
-                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(WallsVisitor.south |- ParallelepipedDomain.north)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{FloorPenetration}{0, 0}
-                \operation{\procedure{getHeight}{}: \type{real}}
-                \operation{\procedure{meet}{overlap: \type{bool},
-                    shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(FloorPenetration.south |- PeriodicBox.north)$)}]
+        \begin{scope}[shift={($(WallsVisitor.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableWalls}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}, gap: \type{real},
                     floorPenetration: \type{FloorPenetration}}}
@@ -122,6 +118,14 @@
         \end{scope}
 
         \begin{scope}[shift={($(VisitableWalls.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{FloorPenetration}{0, 0}
+                \operation{\procedure{getHeight}{}: \type{real}}
+                \operation{\procedure{meet}{overlap: \type{bool},
+                    shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PeriodicBox |- ReciprocalLattice.north) - (0 cm, 0.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
                 \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
                     visitableWalls: \type{VisitableWalls}}}
@@ -130,17 +134,13 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox |- BoxSizeChecker.north)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{ReciprocalLattice}{0, 0}
-                \operation{\procedure{contruct}{periodicBox: \type{PeriodicBox},
-                    numbers: \type{int[3]}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{isSparseInZ}{}: \type{bool}}
-                \operation{\procedure{getNumbers}{}: \type{int[3]}}
+        \begin{scope}[shift={($(BoxSizeChecker.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{BetaPressureExcess}{0, 0}
+                \operation[0]{\procedure{get}{contacts: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ReciprocalLattice.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(FloorPenetration.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{Environment}{0, 0}
                 \UMLattribute{periodicBoxes: \type{PeriodicBox[:]}}
                 \UMLattribute{betaPressure: \type{BetaPressure}}
@@ -161,6 +161,7 @@
             \composition{ExternalField}{\refName{parallelepipedDomain}}{\numRef{1}}
                 {ParallelepipedDomain}
             \composition{ExternalField}{\refName{fieldExpression}}{\numRef{1}}{FieldExpression}
+            \aggregation{WallsVisitor}{\refName{visitableWalls}}{\numRef{1}}{VisitableWalls}
             \aggregation{VisitableWalls}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \composition{VisitableWalls}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
             \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}

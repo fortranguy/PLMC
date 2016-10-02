@@ -39,7 +39,29 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (-9 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 7 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{HardContact}{0, 0}
+                \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
+                    diracPlus: \type{DiracDistributionPlus}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getWidth}{}: \type{real}}
+                \operation[0]{\procedure{meetContact}{overlap: \type{bool}, contact: \type{real},
+                    minDistance: \type{real}, vector: \type{real[3]}}}
+                \operation[0]{\procedure{meetMinDistance}{canOverlap: \type{bool},
+                    overlap: \type{bool}, ratio: \type{real}, minDistance: \type{real},
+                    vector: \type{real[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(HardContact.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DiracDistributionPlus}{0, 0}
+                \operation[0]{\procedure{set}{\ldots}}
+                \operation[0]{\procedure{getWidth}{}: \type{real}}
+                \operation[0]{\procedure{get}{distance: \type{real}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DiracDistributionPlus.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     positions: \type{ComponentCoordinates}, hardContact: \type{HardContact}}}
@@ -80,36 +102,13 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 7 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{HardContact}{0, 0}
-                \operation{\procedure{construct}{accessibleDomain: \type{ParallelepipedDomain},
-                    diracPlus: \type{DiracDistributionPlus}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{getWidth}{}: \type{real}}
-                \operation[0]{\procedure{meetContact}{overlap: \type{bool}, contact: \type{real},
-                    minDistance: \type{real}, vector: \type{real[3]}}}
-                \operation[0]{\procedure{meetMinDistance}{canOverlap: \type{bool},
-                    overlap: \type{bool}, ratio: \type{real}, minDistance: \type{real},
-                    vector: \type{real[3]}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(VisitableList.north |- HardContact.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{DiracDistributionPlus}{0, 0}
-                \operation[0]{\procedure{set}{\ldots}}
-                \operation[0]{\procedure{getWidth}{}: \type{real}}
-                \operation[0]{\procedure{get}{distance: \type{real}}: \type{real}}
-            \end{abstractclass}
-        \end{scope}
-
         \begin{scope}[shift={($(HardContact.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth] {\import{}: \\
                 \namespace{Common} :: PotentialDomain \\
                 \namespace{Environment} :: PeriodicBox, ParallelepipedDomain, WallsVisitor,
                     BetaPressureExcess \\
-                \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle \\
-                \namespace{Changes} :: MaximumBoxCompression};
+                \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
         \end{scope}
 
         \begin{scope}[shift={($(VisitableList.south) - (0 cm, 1.5 cm)$)}]
@@ -131,22 +130,27 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north -| Import) + (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(Import) - (0 cm, 4 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
-                \UMLattribute{maximumBoxCompression: \type{MaximumBoxCompression}}
-                \UMLattribute{betaPressureExcess: \type{BetaPressureExcess}}
+                \UMLattribute{betaPressuresExcess: \type{BetaPressureExcess[:]}}
                 \UMLattribute{hardContact: \type{HardContact}}
-                \UMLattribute{wallsVisitor: \type{WallsVisitor}}
+                \UMLattribute{wallsVisitors: \type{WallsVisitor[:]}}
                 \UMLattribute{wallPairs: \type{PairPotential[:]}}
-                \UMLattribute{componentsVisitor: \type{ShortPairsVisitor}}
+                \UMLattribute{componentsVisitors: \type{ShortPairsVisitor[:]}}
                 \UMLattribute{componentsPairs: \type{PairPotential[:.]}}
-                \UMLattribute{neighbourCells: \type{NeighbourCells[:.]}}
-                \UMLattribute{visitableCells: \type{VisitableCells[::]}}
+                \UMLattribute{cells: \type{Cells}[:]}
                 \UMLattribute{visitableCellsMemento: \type{VisitableCellsMemento}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ShortInteractions.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{Cells}{0, 0}
+                \UMLattribute{neighbourCells: \type{NeighbourCells[:.]}}
+                \UMLattribute{visitableCells: \type{VisitableCells[::]}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(Cells.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{destroy}{}}
