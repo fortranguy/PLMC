@@ -29,18 +29,16 @@ contains
             call check_data_found(data_field, data_found)
             allocate(Concrete_DES_Convergence_Parameter :: alpha)
         else
+            alpha_x_box_edge = 0._DP
             allocate(Null_DES_Convergence_Parameter :: alpha)
         end if
-        call alpha%construct(alpha_x_box_edge)
+        call alpha%set(alpha_x_box_edge)
     end subroutine create
 
     subroutine destroy(alpha)
         class(Abstract_DES_Convergence_Parameter), allocatable, intent(inout) :: alpha
 
-        if (allocated(alpha)) then
-            call alpha%destroy()
-            deallocate(alpha)
-        end if
+        if (allocated(alpha)) deallocate(alpha)
     end subroutine destroy
 
 end module procedures_des_convergence_parameter_factory

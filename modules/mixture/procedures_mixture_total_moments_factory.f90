@@ -29,6 +29,7 @@ contains
         else
             allocate(Null_Mixture_Total_Moment :: total_moments(size(components, 2)))
         end if
+
         do i_box = 1, size(total_moments)
             call total_moments(i_box)%construct(components(:, i_box), are_dipolar(:, i_box))
         end do

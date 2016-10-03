@@ -1,7 +1,8 @@
 module procedures_des_reci_structure_factory
 
+use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
-use types_environment_wrapper, only: Environment_Wrapper
+use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_component_wrapper, only: Component_Wrapper
 use classes_des_reci_structure, only: Abstract_DES_Reci_Structure, Concrete_DES_Reci_Structure, &
     Null_DES_Reci_Structure
@@ -13,10 +14,12 @@ public :: create, destroy
 
 contains
 
-    subroutine create(structure, environment, box_size_memento, components, are_dipolar)
+    subroutine create(structure, periodic_box, box_size_memento, reciprocal_lattice, components, &
+        are_dipolar)
         class(Abstract_DES_Reci_Structure), allocatable, intent(out) :: structure
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Box_Size_Memento), intent(in) ::box_size_memento
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
 
@@ -25,8 +28,8 @@ contains
         else
             allocate(Null_DES_Reci_Structure :: structure)
         end if
-        call structure%construct(environment%periodic_box, box_size_memento, environment%&
-            reciprocal_lattice, components, are_dipolar)
+        call structure%construct(periodic_box, box_size_memento, reciprocal_lattice, components, &
+            are_dipolar)
     end subroutine create
 
     subroutine destroy(structure)

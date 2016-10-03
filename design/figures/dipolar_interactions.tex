@@ -58,9 +58,8 @@
 
         \begin{scope}[shift={($(DESrealPair.north -| DESselfComponent)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESconvergenceParameter}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                \operation{\procedure{set}{periodicBox: \type{PeriodicBox},
                     alphaXboxEdge: \type{real}}}
-                \operation{\procedure{destroy}{}}
                 \operation{\procedure{getTimesBoxEdge}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
@@ -145,11 +144,11 @@
         \begin{scope}[shift={($(DESreciStructure.south)!0.5!(StructureFactor) + (-1.5 cm, -1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{DipolarInteractionsDynamic}{0, 0}
                 \UMLattribute{alpha: \type{DESconvergenceParameter}}
-                \UMLattribute{realComponents: \type{DESrealComponent[::]}}
-                \UMLattribute{reciVisitor: \type{DESreciVisitor}}
-                \UMLattribute{selfComponents: \type{DESselfComponent[:]}}
-                \UMLattribute{surfMixture: \type{DESsurfMixture}}
-                \UMLattribute{dlcVisitor: \type{DLCvisitor}}
+                \UMLattribute{realComponents: \type{DESrealComponent[::, :]}}
+                \UMLattribute{reciVisitor: \type{DESreciVisitor[:]}}
+                \UMLattribute{selfComponents: \type{DESselfComponent[:, :]}}
+                \UMLattribute{surfMixture: \type{DESsurfMixture[:]}}
+                \UMLattribute{dlcVisitor: \type{DLCvisitor[:]}}
             \end{class}
         \end{scope}
 
@@ -167,7 +166,7 @@
 
         \begin{scope}[on background layer]
             \aggregation{DESrealComponent}{\refName{desRealPair}}{\numRef{1}}{DESrealPair}
-            
+
             \aggregation{DESreciVisitor}{\refName{weight}}{\numRef{1}}{DESreciWeight}
             \aggregation{DESreciVisitor}{\refName{structure}}{\numRef{1}}{DESreciStructure}
 

@@ -13,6 +13,12 @@ private
 
     type, public :: Dipolar_Interactions_Dynamic_Wrapper
         class(Abstract_DES_Convergence_Parameter), allocatable :: alpha
+        type(DES_Real_Component_Wrapper), allocatable :: gemc_real_components(:, :, :)
+        class(Abstract_DES_Reci_Visitor), allocatable :: reci_visitors(:)
+        type(DES_Self_Component_Wrapper), allocatable :: gemc_self_components(:, :)
+        class(Abstract_DES_Surf_Mixture), allocatable :: gemc_surf_mixture(:)
+        class(Abstract_DLC_Visitor), allocatable :: dlc_visitors(:)
+
         type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
         class(Abstract_DES_Reci_Visitor), allocatable :: reci_visitor
         type(DES_Self_Component_Wrapper), allocatable :: self_components(:)

@@ -20,6 +20,8 @@ implicit none
 
 private
 
+    !> @todo
+    !> use of dipolar_interactions_dynamic: to update
     type, abstract, public :: Abstract_Dipolar_Interactions_Facade
     private
         type(Component_Wrapper), pointer :: components(:) => null()

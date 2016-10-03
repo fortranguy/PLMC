@@ -17,7 +17,7 @@ end interface components_interact
 
 contains
 
-        pure logical function components_interact_from_min_distance(min_distance) &
+    pure logical function components_interact_from_min_distance(min_distance) &
         result(components_interact)
         class(Abstract_Min_Distance), intent(in) :: min_distance
 
