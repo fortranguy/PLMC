@@ -192,7 +192,7 @@ contains
         end select
     end function box_size_can_change_from_beta_pressure
 
-    pure logical function box_size_can_change_from_changed_box_size(changed_box_size) &
+    elemental logical function box_size_can_change_from_changed_box_size(changed_box_size) &
         result(box_size_can_change)
         class(Abstract_Changed_Box_Size), intent(in) :: changed_box_size
 

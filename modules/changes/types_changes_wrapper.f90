@@ -11,10 +11,16 @@ implicit none
 private
 
     type, public :: Changes_Wrapper
+        class(Abstract_Changed_Box_Size), allocatable :: changed_boxes_size(:)
+        class(Abstract_Move_Tuner), allocatable :: boxes_size_change_tuner(:)
+        class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
+        class(Abstract_Coordinates_Copier), allocatable :: position_copiers(:), orientation_copier
+        type(Changes_Component_Wrapper), allocatable :: gemc_components(:, :)
+
         class(Abstract_Changed_Box_Size), allocatable :: changed_box_size
         class(Abstract_Move_Tuner), allocatable :: box_size_change_tuner
-        class(Abstract_Random_Coordinates), allocatable :: random_position, random_orientation
-        class(Abstract_Coordinates_Copier), allocatable :: position_copier, orientation_copier
+        class(Abstract_Random_Coordinates), allocatable :: random_position
+        class(Abstract_Coordinates_Copier), allocatable :: position_copier
         type(Changes_Component_Wrapper), allocatable :: components(:)
     end type Changes_Wrapper
 

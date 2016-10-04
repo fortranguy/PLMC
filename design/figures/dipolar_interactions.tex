@@ -43,7 +43,7 @@
                     ComponentDipoleMoments, TemporaryParticle};
         \end{scope}
 
-        \begin{scope}[shift={($(DESrealComponent.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(DESselfComponent.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESrealPair}{0, 0}
                 \operation[0]{\procedure{construct}{boxSizeMemento: \type{BoxSizeMemento},
                     permittivity: \type{Permittivity}, alpha: \type{DESconvergenceParameter},
@@ -56,15 +56,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESrealPair.north -| DESselfComponent)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{DESconvergenceParameter}{0, 0}
-                \operation{\procedure{set}{periodicBox: \type{PeriodicBox},
-                    alphaXboxEdge: \type{real}}}
-                \operation{\procedure{getTimesBoxEdge}{}: \type{real}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(DESrealPair.south) - (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(DESrealComponent.south) - (0 cm, 2 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESsurfMixture}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     permittivity: \type{Permittivity}, totalMoment: \type{MixtureTotalMoment}}}
@@ -90,13 +82,15 @@
                 \operation{\procedure{restore}{dipolarInteractionsStatic:
                     \type{DipolarInteractionsStatic}}}
                 \operation{\procedure{reset}{}}
-                \operation{\procedure{visit}{newEnergies: \type{real[:.]},
+                \operation{\procedure{visit}{newEnergies:
+                    \type{real[\numComponents, \numComponents]\textsubscript{\sym}},
                     newSharedEnergy: \type{real}, boxVolumeRatio: \type{real},
-                    energies: \type{real[:.]}, sharedEnergy: \type{real}}}
+                    energies: \type{real[\numComponents, \numComponents]\textsubscript{\sym}},
+                    sharedEnergy: \type{real}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.south)!0.5!(DipolarInteractionsFacade.south)
+        \begin{scope}[shift={($(DESrealPair.south)!0.5!(DipolarInteractionsFacade.south)
             - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{StructureVisitor}{0, 0}
             \end{abstractclass}
@@ -141,18 +135,19 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESreciStructure.south)!0.5!(StructureFactor) + (-1.5 cm, -1.5 cm)$)}]
+        \begin{scope}[shift={($(DESsurfMixture.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{DipolarInteractionsDynamic}{0, 0}
                 \UMLattribute{alpha: \type{DESconvergenceParameter}}
-                \UMLattribute{realComponents: \type{DESrealComponent[::, :]}}
-                \UMLattribute{reciVisitor: \type{DESreciVisitor[:]}}
-                \UMLattribute{selfComponents: \type{DESselfComponent[:, :]}}
-                \UMLattribute{surfMixture: \type{DESsurfMixture[:]}}
-                \UMLattribute{dlcVisitor: \type{DLCvisitor[:]}}
+                \UMLattribute{realComponents:
+                    \type{DESrealComponent[\numComponents, \numComponents, \numBoxes]}}
+                \UMLattribute{reciVisitor: \type{DESreciVisitor[\numBoxes]}}
+                \UMLattribute{selfComponents: \type{DESselfComponent[\numComponents, \numBoxes]}}
+                \UMLattribute{surfMixture: \type{DESsurfMixture[\numBoxes]}}
+                \UMLattribute{dlcVisitor: \type{DLCvisitor[\numBoxes]}}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(StructureFactor.south)!0.5!(DLCstructures) + (1.5 cm, -1.5 cm)$)}]
+        \begin{scope}[shift={($(DESreciStructure.south)!0.5!(StructureFactor) - (1.5 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{DipolarInteractionsStatic}{0, 0}
                 \UMLattribute{boxSizeMementoReal: \type{BoxSizeMemento}}
                 \UMLattribute{realPair: \type{DESrealPair}}
@@ -162,6 +157,14 @@
                 \UMLattribute{dlcWeight: \type{DLCweight}}
                 \UMLattribute{dlcStructures: \type{DLCstructures}}
             \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureFactor.south)!0.5!(DLCstructures) + (1.5 cm, -1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESconvergenceParameter}{0, 0}
+                \operation{\procedure{set}{periodicBox: \type{PeriodicBox},
+                    alphaXboxEdge: \type{real}}}
+                \operation{\procedure{getTimesBoxEdge}{}: \type{real}}
+            \end{abstractclass}
         \end{scope}
 
         \begin{scope}[on background layer]

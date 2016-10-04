@@ -43,13 +43,10 @@
         the program. And it will be the key to switch between local alternatives.
     \end{abstract}
 
-    Notations:
-    \begin{itemize}
-        \item \type{type[:]}: vector
-        \item \type{type[:.]}: triangular matrix
-        \item \type{type[::]}: square matrix
-        \item \type{type[:, :]}: rectangular matrix
-    \end{itemize}
+    Notation:
+    \type{type[:, ..., :]} is an array of type \type{type}.
+    The special case \type{type[:, :]\textsubscript{\sym}} means the array is symmetric.
+    As a result, only the triangular values need to be stored.
 
     \newpage
     \tableofcontents

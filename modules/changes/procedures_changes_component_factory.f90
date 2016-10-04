@@ -14,12 +14,12 @@ use types_changes_component_wrapper, only: Changes_Component_Wrapper
 implicit none
 
 private
-public :: changes_component_create, changes_component_destroy
+public :: create, destroy
 
 contains
 
-    subroutine changes_component_create(component, periodic_box, mixture_component, &
-        tuning_parameters, tuner_parameters, num_tuning_steps, generating_data, prefix)
+    subroutine create(component, periodic_box, mixture_component, tuning_parameters, &
+        tuner_parameters, num_tuning_steps, generating_data, prefix)
         type(Changes_Component_Wrapper), intent(out) :: component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: mixture_component
@@ -37,15 +37,15 @@ contains
             orientations, tuning_parameters, generating_data, prefix)
         call move_tuner_create_rotation(component%rotation_tuner, component%&
             rotated_orientations, tuner_parameters, num_tuning_steps)
-    end subroutine changes_component_create
+    end subroutine create
 
-    subroutine changes_component_destroy(component)
+    subroutine destroy(component)
         type(Changes_Component_Wrapper), intent(inout) :: component
 
         call move_tuner_destroy(component%rotation_tuner)
         call moved_component_coordinates_destroy(component%rotated_orientations)
         call move_tuner_destroy(component%translation_tuner)
         call moved_component_coordinates_destroy(component%translated_positions)
-    end subroutine changes_component_destroy
+    end subroutine destroy
 
 end module procedures_changes_component_factory

@@ -1,4 +1,4 @@
-module procedures_box_size_checkers_factory
+module procedures_boxes_size_checker_factory
 
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use classes_visitable_walls, only: Abstract_Visitable_Walls
@@ -47,4 +47,4 @@ contains
         end if
     end subroutine destroy
 
-end module procedures_box_size_checkers_factory
+end module procedures_boxes_size_checker_factory

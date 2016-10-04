@@ -13,3 +13,5 @@
 - Convert all explorations for multiples boxes & components
 - GEMC conversion: array by default: bad idea?
 - PeriodicBox: add Null or throw error when numBoxes == 0
+- ExploringAlgorithms: warning if unexpected ensemble
+- Multiple Boxes: ChangedBoxSizeRatio interdependance

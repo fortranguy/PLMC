@@ -32,7 +32,7 @@
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
-                \operation{\procedure{translate}{toPosition: \type{real[3]},
+                \operation{\procedure{translate}{toPosition: \type{real[\numDimensions]},
                     from: \type{TemporaryParticle}}}
                 \operation{\procedure{add}{particle: \type{TemporaryParticle}}}
                 \operation{\procedure{remove}{particle: \type{TemporaryParticle}}}
@@ -46,10 +46,10 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getWidth}{}: \type{real}}
                 \operation[0]{\procedure{meetContact}{overlap: \type{bool}, contact: \type{real},
-                    minDistance: \type{real}, vector: \type{real[3]}}}
+                    minDistance: \type{real}, vector: \type{real[\numDimensions]}}}
                 \operation[0]{\procedure{meetMinDistance}{canOverlap: \type{bool},
                     overlap: \type{bool}, ratio: \type{real}, minDistance: \type{real},
-                    vector: \type{real[3]}}}
+                    vector: \type{real[\numDimensions]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -118,35 +118,44 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{resizeOnly}{}: \type{bool}}
                 \operation{\procedure{reset}{}}
-                \operation{\procedure{getGlobalLbounds}{}: \type{int[3]}}
-                \operation{\procedure{getGlobalUbounds}{}: \type{int[3]}}
+                \operation{\procedure{getGlobalLbounds}{}: \type{int[\numDimensions]}}
+                \operation{\procedure{getGlobalUbounds}{}: \type{int[\numDimensions]}}
                 \operation{\procedure{get}{localI1: \type{int}, localI2: \type{int},
                     localI3: \type{int}, globalI1: \type{int}, globalI2: \type{int},
-                    globalI3: \type{int}}: \type{int[3]}}
+                    globalI3: \type{int}}: \type{int[\numDimensions]}}
                 \operation{\procedure{skip}{atBottomLayer: \type{bool},
                     atTopLayer: \type{bool}, localI3: \type{int}}: \type{bool}}
-                \operation{\procedure{isInside}{position: \type{real[3]}}: \type{bool}}
-                \operation{\procedure{index}{position: \type{real[3]}}: \type{int[3]}}
+                \operation{\procedure{isInside}{position: \type{real[\numDimensions]}}: \type{bool}}
+                \operation{\procedure{index}{position: \type{real[\numDimensions]}}:
+                    \type{int[\numDimensions]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(NeighbourCells.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
+                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Import) - (0 cm, 4 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
-                \UMLattribute{betaPressuresExcess: \type{BetaPressureExcess[:]}}
+                \UMLattribute{betaPressuresExcess: \type{BetaPressureExcess[\numBoxes]}}
                 \UMLattribute{hardContact: \type{HardContact}}
-                \UMLattribute{wallsVisitors: \type{WallsVisitor[:]}}
-                \UMLattribute{wallPairs: \type{PairPotential[:]}}
-                \UMLattribute{componentsVisitors: \type{ShortPairsVisitor[:]}}
-                \UMLattribute{componentsPairs: \type{PairPotential[:.]}}
-                \UMLattribute{cells: \type{Cells}[:]}
+                \UMLattribute{wallsVisitors: \type{WallsVisitor[\numBoxes]}}
+                \UMLattribute{wallPairs: \type{PairPotential[\numComponents]}}
+                \UMLattribute{componentsVisitors: \type{ShortPairsVisitor[\numBoxes]}}
+                \UMLattribute{componentsPairs:
+                    \type{PairPotential[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{cells: \type{Cells}[\numBoxes]}
                 \UMLattribute{visitableCellsMemento: \type{VisitableCellsMemento}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ShortInteractions.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{Cells}{0, 0}
-                \UMLattribute{neighbourCells: \type{NeighbourCells[:.]}}
-                \UMLattribute{visitableCells: \type{VisitableCells[::]}}
+                \UMLattribute{neighbourCells:
+                    \type{NeighbourCells[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{visitableCells: \type{VisitableCells[\numComponents, \numComponents]}}
             \end{class}
         \end{scope}
 
@@ -170,12 +179,6 @@
                 \operation[0]{\procedure{restore}{visitableCellsTarget: \type{VisitableCells},
                     neighbourCells: \type{NeighbourCells},
                     visitableCellsSource: \type{VisitableCells}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(VisitableCellsMemento.south) - (0 cm, 1.5 cm)$)}]
-        \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
-                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 

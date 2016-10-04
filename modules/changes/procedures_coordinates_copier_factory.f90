@@ -10,34 +10,47 @@ implicit none
 private
 public :: create_position, create_orientation, destroy
 
+interface destroy
+    module procedure :: destroy_line
+    module procedure :: destroy_element
+end interface destroy
+
 contains
 
-    subroutine create_position(position_copier, random_position, have_positions)
-        class(Abstract_Coordinates_Copier), allocatable, intent(out) :: position_copier
-        class(Abstract_Random_Coordinates), intent(in) :: random_position
-        logical, intent(in) :: have_positions(:)
+    subroutine create_position(position_copiers, random_positions, have_positions, can_exchange)
+        class(Abstract_Coordinates_Copier), allocatable, intent(out) :: position_copiers(:)
+        class(Abstract_Random_Coordinates), intent(in) :: random_positions(:)
+        logical, intent(in) :: have_positions(:, :)
+        logical, intent(in) :: can_exchange(:)
 
-        if (any(have_positions)) then
-            allocate(Random_Filling_Coordinates_Copier :: position_copier)
+        integer :: i_box
+
+        if (any(have_positions) .and. any(can_exchange)) then
+            allocate(Random_Filling_Coordinates_Copier :: position_copiers(size(random_positions)))
         else
-            allocate(Null_Coordinates_Copier :: position_copier)
+            allocate(Null_Coordinates_Copier :: position_copiers(size(random_positions)))
         end if
-        select type (position_copier)
+        select type (position_copiers)
             type is (Random_Filling_Coordinates_Copier)
-                call position_copier%construct(random_position, have_positions)
+                do i_box = 1, size(position_copiers)
+                    call position_copiers(i_box)%construct(random_positions(i_box), &
+                        have_positions(:, i_box))
+                end do
             type is (Null_Coordinates_Copier)
             class default
                 call error_exit("procedures_coordinates_copier_factory: create_position: "//&
-                    "position_copier type unknown.")
+                    "position_copiers type unknown.")
         end select
     end subroutine create_position
 
-    subroutine create_orientation(orientation_copier, random_orientation, have_orientations)
+    subroutine create_orientation(orientation_copier, random_orientation, have_orientations, &
+        can_exchange)
         class(Abstract_Coordinates_Copier), allocatable, intent(out) :: orientation_copier
         class(Abstract_Random_Coordinates), intent(in) :: random_orientation
         logical, intent(in) :: have_orientations(:)
+        logical, intent(in) :: can_exchange(:)
 
-        if (any(have_orientations)) then
+        if (any(have_orientations) .and. any(can_exchange)) then
             allocate(Random_Filling_Coordinates_Copier :: orientation_copier)
         else
             allocate(Null_Coordinates_Copier :: orientation_copier)
@@ -52,13 +65,26 @@ contains
         end select
     end subroutine create_orientation
 
-    subroutine destroy(position_copier)
-        class(Abstract_Coordinates_Copier), allocatable, intent(inout) :: position_copier
+    subroutine destroy_line(coordinates_copiers)
+        class(Abstract_Coordinates_Copier), allocatable, intent(inout) :: coordinates_copiers(:)
 
-        if (allocated(position_copier)) then
-            call position_copier%destroy()
-            deallocate(position_copier)
+        integer :: i_box
+
+        if (allocated(coordinates_copiers)) then
+            do i_box = size(coordinates_copiers), 1, -1
+                call coordinates_copiers(i_box)%destroy()
+            end do
+            deallocate(coordinates_copiers)
         end if
-    end subroutine destroy
+    end subroutine destroy_line
+
+    subroutine destroy_element(coordinates_copier)
+        class(Abstract_Coordinates_Copier), allocatable, intent(inout) :: coordinates_copier
+
+        if (allocated(coordinates_copier)) then
+            call coordinates_copier%destroy()
+            deallocate(coordinates_copier)
+        end if
+    end subroutine destroy_element
 
 end module procedures_coordinates_copier_factory

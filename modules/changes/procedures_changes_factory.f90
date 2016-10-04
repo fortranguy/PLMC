@@ -1,10 +1,10 @@
 module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_input_prefixes, only: environment_prefix
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
+use classes_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
@@ -13,10 +13,10 @@ use procedures_mixture_inquirers, only: component_can_translate, component_can_r
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
-use procedures_changed_box_size_ratio_factory, only: changed_box_size_ratio_create => create, &
-    changed_box_size_ratio_destroy => destroy
-use procedures_changed_box_size_factory, only: changed_box_size_create => create, &
-    changed_box_size_destroy => destroy
+use procedures_changed_boxes_size_ratio_factory, only: changed_boxes_size_ratio_create => create, &
+    changed_boxes_size_ratio_destroy => destroy
+use procedures_changed_boxes_size_factory, only: changed_boxes_size_create => create, &
+    changed_boxes_size_destroy => destroy
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
 use procedures_move_tuner_factory, only: move_tuner_create_box_size_change => &
     create_box_size_change, move_tuner_destroy => destroy
@@ -26,7 +26,8 @@ use procedures_coordinates_copier_factory, only: coordinates_copier_create_posit
     create_position, coordinates_copier_create_orientation => create_orientation, &
     coordinates_copier_destroy => destroy
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use procedures_changes_component_factory, only: changes_component_create, changes_component_destroy
+use procedures_changes_component_factory, only: changes_component_create => create, &
+    changes_component_destroy => destroy
 use types_changes_wrapper, only: Changes_Wrapper
 
 implicit none
@@ -34,65 +35,102 @@ implicit none
 private
 public :: changes_create, changes_destroy, set_can_translate, set_can_rotate, set_can_exchange
 
+interface changes_create
+    module procedure :: create_all
+    module procedure :: create_components
+end interface changes_create
+
+interface changes_destroy
+    module procedure :: destroy_components
+    module procedure :: destroy_all
+end interface changes_destroy
+
 contains
 
-    subroutine changes_create(changes, environment, components, num_tuning_steps, generating_data, &
+    subroutine create_all(changes, environment, components, num_tuning_steps, generating_data, &
         prefix)
         type(Changes_Wrapper), intent(out) :: changes
         type(Environment_Wrapper), intent(in) :: environment
-        type(Component_Wrapper), intent(in) :: components(:)
+        type(Component_Wrapper), intent(in) :: components(:, :)
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_boxes_size_ratio(:)
+        integer :: i_box
         type(Concrete_Move_Tuning_Parameters) :: box_size_tuning_parameters, &
             components_tuning_parameters
         type(Concrete_Move_Tuner_Parameters) :: box_size_tuner_parameters, &
             components_tuner_parameters
-        logical :: can_exchange(size(components))
-        logical :: have_positions(size(components)), have_orientations(size(can_exchange))
+        logical :: have_positions(size(components, 1), size(components, 2))
+        logical :: have_orientations(size(components, 1))
+        logical :: can_exchange(size(components, 1))
         logical :: volume_can_change, some_components_have_coordinates
-        type(Concrete_Number_to_String) :: string
-        integer :: i_component
 
         volume_can_change = box_size_can_change(environment%beta_pressure)
         call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, volume_can_change,&
             generating_data, prefix//"Box Size.")
-        call changed_box_size_ratio_create(changed_box_size_ratio, environment%periodic_box, &
+        call changed_boxes_size_ratio_create(changed_boxes_size_ratio, environment%periodic_boxes, &
             volume_can_change, generating_data, prefix//"Box Size.")
-        call changed_box_size_create(changes%changed_box_size, changed_box_size_ratio, &
+        call changed_boxes_size_create(changes%changed_boxes_size, changed_boxes_size_ratio, &
             box_size_tuning_parameters, volume_can_change, generating_data, prefix//"Box Size.")
-        call changed_box_size_ratio_destroy(changed_box_size_ratio)
+        call changed_boxes_size_ratio_destroy(changed_boxes_size_ratio)
         call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, volume_can_change, &
             generating_data, prefix//"Box Size.")
-        call move_tuner_create_box_size_change(changes%box_size_change_tuner, changes%&
-            changed_box_size, box_size_tuner_parameters, num_tuning_steps)
+        call move_tuner_create_box_size_change(changes%boxes_size_change_tuner, changes%&
+            changed_boxes_size, box_size_tuner_parameters, num_tuning_steps)
 
-        call set_have_positions(have_positions, components)
-        call set_have_orientations(have_orientations, components)
+        do i_box = 1, size(have_positions, 2)
+            call set_have_positions(have_positions(:, i_box), components(:, i_box))
+        end do
+        call set_have_orientations(have_orientations, components(:, 1))
+
         some_components_have_coordinates = any(have_positions) .or. any(have_orientations)
         call set_tuning_parameters(components_tuning_parameters, num_tuning_steps, &
             some_components_have_coordinates, generating_data, prefix//"Components.")
         call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
             some_components_have_coordinates, generating_data, prefix//"Components.")
-        allocate(changes%components(size(components)))
-        do i_component = 1, size(changes%components)
-            call changes_component_create(changes%components(i_component), environment%&
-                periodic_box, components(i_component), components_tuning_parameters, &
-                components_tuner_parameters, num_tuning_steps, generating_data, prefix//&
-                "Component "//string%get(i_component)//".")
-        end do
 
-        call set_can_exchange(can_exchange, components)
-        call random_coordinates_create(changes%random_position, environment%accessible_domain, &
-            can_exchange, have_positions)
-        call random_coordinates_create(changes%random_orientation, can_exchange, have_orientations)
-        call coordinates_copier_create_position(changes%position_copier, changes%random_position, &
-            have_positions)
+        call create_components(changes%gemc_components, environment%periodic_boxes, components, &
+            components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
+            generating_data, prefix)
+
+        call set_can_exchange(can_exchange, components(:, 1))
+        call random_coordinates_create(changes%random_positions, environment%accessible_domains, &
+            have_positions, can_exchange)
+        call random_coordinates_create(changes%random_orientation, have_orientations, can_exchange)
+
+        call coordinates_copier_create_position(changes%position_copiers, changes%random_positions,&
+            have_positions, can_exchange)
         call coordinates_copier_create_orientation(changes%orientation_copier, changes%&
-            random_orientation, have_orientations)
-    end subroutine changes_create
+            random_orientation, have_orientations, can_exchange)
+    end subroutine create_all
+
+    subroutine create_components(components, periodic_boxes, mixture_components, &
+        components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
+        generating_data, prefix)
+        type(Changes_Component_Wrapper), allocatable, intent(out) :: components(:, :)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        type(Component_Wrapper), intent(in) :: mixture_components(:, :)
+        type(Concrete_Move_Tuning_Parameters) :: components_tuning_parameters
+        type(Concrete_Move_Tuner_Parameters) :: components_tuner_parameters
+        integer, intent(in) :: num_tuning_steps
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        integer :: i_box, i_component
+        type(Concrete_Number_to_String) :: string
+
+        allocate(components(size(mixture_components, 1), size(mixture_components, 2)))
+        do i_box = 1, size(components, 2)
+            do i_component = 1, size(components, 1)
+                call changes_component_create(components(i_component, i_box), &
+                    periodic_boxes(i_box), mixture_components(i_component, i_box), &
+                    components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
+                    generating_data, prefix//"Component "//string%get(i_component)//".")
+            end do
+        end do
+    end subroutine create_components
 
     subroutine set_tuning_parameters(parameters, num_tuning_steps, needed, generating_data, prefix)
         type(Concrete_Move_Tuning_Parameters), intent(out) :: parameters
@@ -180,23 +218,32 @@ contains
         end do
     end subroutine set_can_exchange
 
-    subroutine changes_destroy(changes)
+    subroutine destroy_all(changes)
         type(Changes_Wrapper), intent(inout) :: changes
 
+        call coordinates_copier_destroy(changes%orientation_copier)
+        call coordinates_copier_destroy(changes%position_copiers)
+        call random_coordinates_destroy(changes%random_orientation)
+        call random_coordinates_destroy(changes%random_positions)
+        call destroy_components(changes%gemc_components)
+        call move_tuner_destroy(changes%boxes_size_change_tuner)
+        call changed_boxes_size_destroy(changes%changed_boxes_size)
+    end subroutine destroy_all
+
+    subroutine destroy_components(components)
+        type(Changes_Component_Wrapper), allocatable, intent(inout) :: components(:, :)
+
+        integer :: i_box
         integer :: i_component
 
-        call coordinates_copier_destroy(changes%orientation_copier)
-        call coordinates_copier_destroy(changes%position_copier)
-        call random_coordinates_destroy(changes%random_orientation)
-        call random_coordinates_destroy(changes%random_position)
-        if (allocated(changes%components)) then
-            do i_component = size(changes%components), 1, -1
-                call changes_component_destroy(changes%components(i_component))
+        if (allocated(components)) then
+            do i_box = size(components, 2), 1, -1
+                do i_component = size(components, 1), 1, -1
+                    call changes_component_destroy(components(i_component, i_box))
+                end do
             end do
-            deallocate(changes%components)
+            deallocate(components)
         end if
-        call move_tuner_destroy(changes%box_size_change_tuner)
-        call changed_box_size_destroy(changes%changed_box_size)
-    end subroutine changes_destroy
+    end subroutine destroy_components
 
 end module procedures_changes_factory

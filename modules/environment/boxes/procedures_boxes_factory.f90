@@ -10,8 +10,8 @@ use procedures_parallelepiped_domains_factory, only: parallelepiped_domains_crea
     destroy
 use procedures_reciprocal_lattices_factory, only: reciprocal_lattices_create => create, &
     reciprocal_lattices_destroy => destroy
-use procedures_box_size_checkers_factory, only: box_size_checkers_create => create, &
-    box_size_checkers_destroy => destroy
+use procedures_boxes_size_checker_factory, only: boxes_size_checker_create => create, &
+    boxes_size_checker_destroy => destroy
 
 implicit none
 
@@ -25,11 +25,11 @@ interface create
     module procedure :: parallelepiped_domains_create_from_boxes
     module procedure :: parallelepiped_domains_create_from_walls
     module procedure :: reciprocal_lattices_create
-    module procedure :: box_size_checkers_create
+    module procedure :: boxes_size_checker_create
 end interface create
 
 interface destroy
-    module procedure :: box_size_checkers_destroy
+    module procedure :: boxes_size_checker_destroy
     module procedure :: reciprocal_lattices_destroy
     module procedure :: parallelepiped_domains_destroy
     module procedure :: box_size_memento_destroy

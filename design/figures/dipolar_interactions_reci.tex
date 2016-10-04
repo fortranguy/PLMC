@@ -87,12 +87,13 @@
                 \inherit{StructureFactor}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     boxSizeMemento: \type{BoxSizeMemento},
-                    reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
-                    areDipolar: \type{bool[:]}}}
+                    reciprocalLattice: \type{ReciprocalLattice},
+                    components: \type{Component[\numComponents]},
+                    areDipolar: \type{bool[\numComponents]}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox},
                     boxSizeMemento: \type{BoxSizeMemento},
-                    components: \type{Component[:]}}}
+                    components: \type{Component[\numComponents]}}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{get}{n1: \type{int}, n2: \type{int}, n3: \type{int}}:
                     \type{complex}}
@@ -115,11 +116,12 @@
             \begin{abstractclass}[text width=\largeTextWidth]{DLCstructures}{0, 0}
                 \inherit{StructureFactor}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
-                    areDipolar: \type{bool[:]}}}
+                    reciprocalLattice: \type{ReciprocalLattice},
+                    components: \type{Component[\numComponents]},
+                    areDipolar: \type{bool[\numComponents]}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox},
-                    components: \type{Component[:]}}}
+                    components: \type{Component[\numComponents]}}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{getPlus}{n1: \type{int}, n2: \type{int}}: \type{complex}}
                 \operation{\procedure{getMinus}{n1: \type{int}, n2: \type{int}}: \type{complex}}

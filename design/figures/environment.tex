@@ -142,16 +142,16 @@
 
         \begin{scope}[shift={($(FloorPenetration.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{Environment}{0, 0}
-                \UMLattribute{periodicBoxes: \type{PeriodicBox[:]}}
+                \UMLattribute{periodicBoxes: \type{PeriodicBox[\numBoxes]}}
                 \UMLattribute{betaPressure: \type{BetaPressure}}
                 \UMLattribute{temperature: \type{Temperature}}
                 \UMLattribute{permittivity: \type{Permittivity}}
-                \UMLattribute{externalFields: \type{ExternalField[:]}}
-                \UMLattribute{reciprocalLattices: \type{ReciprocalLattice[:]}}
+                \UMLattribute{externalFields: \type{ExternalField[\numBoxes]}}
+                \UMLattribute{reciprocalLattices: \type{ReciprocalLattice[\numBoxes]}}
                 \UMLattribute{wallMinDistance: \type{MinDistance}}
-                \UMLattribute{visitableWalls: \type{VisitableWalls[:]}}
-                \UMLattribute{boxSizeCheckers: \type{BoxSizeChecker[:]}}
-                \UMLattribute{accessibleDomains: \type{ParallelepipedDomain[:]}}
+                \UMLattribute{visitableWalls: \type{VisitableWalls[\numBoxes]}}
+                \UMLattribute{boxesSizeChecker: \type{BoxSizeChecker[\numBoxes]}}
+                \UMLattribute{accessibleDomains: \type{ParallelepipedDomain[\numBoxes]}}
             \end{class}
         \end{scope}
 

@@ -19,7 +19,7 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_wall
+    module procedure :: create_walls
     module procedure :: create_components
     module procedure :: short_pairs_visitors_create
     module procedure :: pair_potential_create
@@ -36,7 +36,7 @@ end interface
 
 contains
 
-    subroutine create_wall(pairs, interact, min_distances, generating_data, prefix)
+    subroutine create_walls(pairs, interact, min_distances, generating_data, prefix)
         type(Pair_Potential_Wrapper), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
         type(Min_Distance_Wrapper), intent(in) :: min_distances(:)
@@ -61,7 +61,7 @@ contains
             end associate
             call destroy(expression)
         end do
-    end subroutine create_wall
+    end subroutine create_walls
 
     subroutine create_components(pairs, interact, min_distances, generating_data, prefix)
         type(Pair_Potentials_Line), allocatable, intent(out) :: pairs(:)
