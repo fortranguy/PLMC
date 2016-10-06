@@ -12,9 +12,9 @@ public :: create, destroy
 
 contains
 
-    subroutine create(beta_pressure, box_size_can_change, generating_data, prefix)
+    subroutine create(beta_pressure, total_volume_can_change, generating_data, prefix)
         class(Abstract_Beta_Pressure), allocatable, intent(out) :: beta_pressure
-        logical, intent(in) :: box_size_can_change
+        logical, intent(in) :: total_volume_can_change
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
@@ -22,7 +22,7 @@ contains
         logical :: data_found
         real(DP) :: density, excess
 
-        if (box_size_can_change) then
+        if (total_volume_can_change) then
             data_field = prefix//"Beta Pressure.density"
             call generating_data%get(data_field, density, data_found)
             call check_data_found(data_field, data_found)
@@ -31,6 +31,7 @@ contains
             call check_data_found(data_field, data_found)
             allocate(Concrete_Beta_Pressure :: beta_pressure)
         else
+            density = 0._DP; excess = 0._DP
             allocate(Null_Beta_Pressure :: beta_pressure)
         end if
         call beta_pressure%set(density, excess)

@@ -14,28 +14,25 @@ implicit none
 private
 public :: create, destroy
 
+interface create
+    module procedure :: create_line
+    module procedure :: create_element
+end interface create
+
+interface destroy
+    module procedure :: destroy_element
+    module procedure :: destroy_line
+end interface destroy
+
 contains
 
-    subroutine create(changed_boxes_size_ratio, periodic_boxes, volume_can_change, input_data, &
-        prefix)
+    subroutine create_line(changed_boxes_size_ratio, periodic_boxes, boxes_size_can_change)
         class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: &
             changed_boxes_size_ratio(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
-        logical, intent(in) :: volume_can_change
-        type(json_file), optional, intent(inout) :: input_data
-        character(len=*), optional, intent(in) :: prefix
+        logical, intent(in) :: boxes_size_can_change(:)
 
-        call allocate(changed_boxes_size_ratio, periodic_boxes, volume_can_change)
-        call construct(changed_boxes_size_ratio, input_data, prefix)
-    end subroutine create
-
-    subroutine allocate(changed_boxes_size_ratio, periodic_boxes, volume_can_change)
-        class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: &
-            changed_boxes_size_ratio(:)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
-        logical, intent(in) :: volume_can_change
-
-        if (volume_can_change) then
+        if (all(boxes_size_can_change)) then
             if (all(periodicity_is_xyz(periodic_boxes))) then
                 allocate(XYZ_Changed_Box_Size_Ratio :: &
                     changed_boxes_size_ratio(size(periodic_boxes)))
@@ -43,26 +40,63 @@ contains
                 allocate(XY_Changed_Box_Size_Ratio :: &
                     changed_boxes_size_ratio(size(periodic_boxes)))
             else
-                call error_exit("procedures_changed_boxes_size_ratio_factory: allocate: "//&
+                call error_exit("procedures_changed_box_size_ratio_factory: allocate: "//&
                         "box periodicity is unknown.")
             end if
         else
             allocate(Null_Changed_Box_Size_Ratio :: changed_boxes_size_ratio(size(periodic_boxes)))
         end if
+    end subroutine create_line
+
+    subroutine destroy_line(changed_boxes_size_ratio)
+        class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(inout) :: &
+            changed_boxes_size_ratio(:)
+
+        if (allocated(changed_boxes_size_ratio)) deallocate(changed_boxes_size_ratio)
+    end subroutine destroy_line
+
+    subroutine create_element(changed_box_size_ratio, periodic_boxes, box_size_can_change, &
+        generating_data, prefix)
+        class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: changed_box_size_ratio
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        logical, intent(in) :: box_size_can_change
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        call allocate(changed_box_size_ratio, periodic_boxes, box_size_can_change)
+        call construct(changed_box_size_ratio, generating_data, prefix)
+    end subroutine create_element
+
+    subroutine allocate(changed_box_size_ratio, periodic_boxes, box_size_can_change)
+        class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: changed_box_size_ratio
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        logical, intent(in) :: box_size_can_change
+
+        if (box_size_can_change) then
+            if (all(periodicity_is_xyz(periodic_boxes))) then
+                allocate(XYZ_Changed_Box_Size_Ratio :: changed_box_size_ratio)
+            else if (all(periodicity_is_xy(periodic_boxes))) then
+                allocate(XY_Changed_Box_Size_Ratio :: changed_box_size_ratio)
+            else
+                call error_exit("procedures_changed_box_size_ratio_factory: allocate: "//&
+                        "box periodicity is unknown.")
+            end if
+        else
+            allocate(Null_Changed_Box_Size_Ratio :: changed_box_size_ratio)
+        end if
     end subroutine allocate
 
-    subroutine construct(changed_boxes_size_ratio, input_data, prefix)
-        class(Abstract_Changed_Box_Size_Ratio), intent(inout) :: changed_boxes_size_ratio(:)
-        type(json_file), optional, intent(inout) :: input_data
-        character(len=*), optional, intent(in) :: prefix
+    subroutine construct(changed_box_size_ratio, generating_data, prefix)
+        class(Abstract_Changed_Box_Size_Ratio), intent(inout) :: changed_box_size_ratio
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
 
-        integer :: i_box
         real(DP) :: initial_delta
         logical :: is_xyz_or_xy
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        select type (changed_boxes_size_ratio)
+        select type (changed_box_size_ratio)
             type is (XYZ_Changed_Box_Size_Ratio)
                 is_xyz_or_xy = .true.
             type is (XY_Changed_Box_Size_Ratio)
@@ -70,27 +104,21 @@ contains
             type is (Null_Changed_Box_Size_Ratio)
                 is_xyz_or_xy = .false.
             class default
-                call error_exit("procedures_changed_boxes_size_ratio_factory: construct: "//&
+                call error_exit("procedures_changed_box_size_ratio_factory: construct: "//&
                     "changed_box_size: type unknown.")
         end select
-        if (present(input_data) .and. present(prefix) .and. is_xyz_or_xy) then
-            data_field = prefix//"Small Change.initial delta"
-            call input_data%get(data_field, initial_delta, data_found)
+        if (is_xyz_or_xy) then
+            data_field = prefix//"initial delta"
+            call generating_data%get(data_field, initial_delta, data_found)
             call check_data_found(data_field, data_found)
-        else
-            initial_delta = 1._DP
+            call changed_box_size_ratio%set(initial_delta)
         end if
-
-        do i_box = 1, size(changed_boxes_size_ratio)
-            call changed_boxes_size_ratio(i_box)%set(initial_delta)
-        end do
     end subroutine construct
 
-    subroutine destroy(changed_boxes_size_ratio)
-        class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(inout) :: &
-            changed_boxes_size_ratio(:)
+    subroutine destroy_element(changed_box_size_ratio)
+        class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(inout) :: changed_box_size_ratio
 
-        if (allocated(changed_boxes_size_ratio)) deallocate(changed_boxes_size_ratio)
-    end subroutine destroy
+        if (allocated(changed_box_size_ratio)) deallocate(changed_box_size_ratio)
+    end subroutine destroy_element
 
 end module procedures_changed_boxes_size_ratio_factory

@@ -19,7 +19,7 @@ use classes_visitable_walls, only: Abstract_Visitable_Walls
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
-    box_size_can_change, apply_external_field, use_walls
+    total_volume_can_change, apply_external_field, use_walls
 use procedures_hard_core_factory, only: hard_core_create => create, hard_core_destroy => destroy
 
 implicit none
@@ -40,8 +40,8 @@ contains
         logical :: field_applied
 
         call boxes_create(environment%periodic_boxes, generating_data, prefix)
-        call beta_pressure_create(environment%beta_pressure, box_size_can_change(generating_data, &
-            prefix), generating_data, prefix)
+        call beta_pressure_create(environment%beta_pressure, &
+            total_volume_can_change(generating_data, prefix), generating_data, prefix)
         call temperature_create(environment%temperature, generating_data, prefix)
         field_applied = apply_external_field(generating_data, prefix)
         call permittivity_create(environment%permittivity, generating_data, prefix)

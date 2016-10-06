@@ -6,20 +6,18 @@ use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_inquirers, only: box_size_can_change
+use procedures_environment_inquirers, only: property_total_volume_can_change => &
+    total_volume_can_change
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only: component_can_translate, component_can_rotate, &
     component_can_exchange
 use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
-use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
-use procedures_changed_boxes_size_ratio_factory, only: changed_boxes_size_ratio_create => create, &
-    changed_boxes_size_ratio_destroy => destroy
 use procedures_changed_boxes_size_factory, only: changed_boxes_size_create => create, &
     changed_boxes_size_destroy => destroy
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
-use procedures_move_tuner_factory, only: move_tuner_create_box_size_change => &
-    create_box_size_change, move_tuner_destroy => destroy
+use procedures_move_tuner_factory, only: move_tuner_create_boxes_size_change => &
+    create_boxes_size_change, move_tuner_destroy => destroy
 use procedures_random_coordinates_factory, only: random_coordinates_create => create, &
     random_coordinates_destroy => destroy
 use procedures_coordinates_copier_factory, only: coordinates_copier_create_position => &
@@ -56,7 +54,6 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_boxes_size_ratio(:)
         integer :: i_box
         type(Concrete_Move_Tuning_Parameters) :: box_size_tuning_parameters, &
             components_tuning_parameters
@@ -65,19 +62,19 @@ contains
         logical :: have_positions(size(components, 1), size(components, 2))
         logical :: have_orientations(size(components, 1))
         logical :: can_exchange(size(components, 1))
-        logical :: volume_can_change, some_components_have_coordinates
+        logical :: total_volume_can_change
+        logical :: some_boxes_size_can_change, some_components_have_coordinates
 
-        volume_can_change = box_size_can_change(environment%beta_pressure)
-        call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, volume_can_change,&
-            generating_data, prefix//"Box Size.")
-        call changed_boxes_size_ratio_create(changed_boxes_size_ratio, environment%periodic_boxes, &
-            volume_can_change, generating_data, prefix//"Box Size.")
-        call changed_boxes_size_create(changes%changed_boxes_size, changed_boxes_size_ratio, &
-            box_size_tuning_parameters, volume_can_change, generating_data, prefix//"Box Size.")
-        call changed_boxes_size_ratio_destroy(changed_boxes_size_ratio)
-        call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, volume_can_change, &
-            generating_data, prefix//"Box Size.")
-        call move_tuner_create_box_size_change(changes%boxes_size_change_tuner, changes%&
+        total_volume_can_change = property_total_volume_can_change(environment%beta_pressure)
+        some_boxes_size_can_change = total_volume_can_change .or. &
+            size(environment%periodic_boxes) > 1
+        call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, &
+            some_boxes_size_can_change, generating_data, prefix//"Boxes.")
+        call changed_boxes_size_create(changes%changed_boxes_size, environment%periodic_boxes, &
+            box_size_tuning_parameters, total_volume_can_change, generating_data, prefix//"Boxes.")
+        call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, &
+            some_boxes_size_can_change, generating_data, prefix//"Boxes.")
+        call move_tuner_create_boxes_size_change(changes%boxes_size_change_tuner, changes%&
             changed_boxes_size, box_size_tuner_parameters, num_tuning_steps)
 
         do i_box = 1, size(have_positions, 2)

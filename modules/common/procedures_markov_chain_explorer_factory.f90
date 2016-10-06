@@ -39,6 +39,7 @@ contains
 
         integer :: i_box
         class(Abstract_Maximum_Box_Compression), allocatable :: maximum_box_compression
+        logical :: boxes_size_can_change(size(physical_model%environment%periodic_boxes))
         logical :: measure_pressure_excess, measure_inv_pow_activities
         logical :: have_positions(size(physical_model%mixture%gemc_components, 1), &
             size(physical_model%mixture%gemc_components, 2))
@@ -56,8 +57,9 @@ contains
             maximum_box_compression_explorer, physical_model, maximum_box_compression, &
             measure_pressure_excess)
         call maximum_box_compression_destroy(maximum_box_compression)
+        boxes_size_can_change = measure_pressure_excess
         call changed_boxes_size_ratio_create(markov_chain_explorer%changed_boxes_size_ratio, &
-            physical_model%environment%periodic_boxes, measure_pressure_excess)
+            physical_model%environment%periodic_boxes, boxes_size_can_change)
         call volume_change_method_create(markov_chain_explorer%volume_change_method, &
             physical_model, markov_chain_explorer%changed_box_size_ratio, measure_pressure_excess, &
             exploring_data, volume_change_prefix)

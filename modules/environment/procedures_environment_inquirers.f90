@@ -10,17 +10,30 @@ use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reci
 use classes_external_field, only: Abstract_External_Field, Null_External_Field
 use classes_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
 use classes_visitable_walls, only: Abstract_Visitable_Walls, Concrete_Visitable_Walls
-use classes_changed_box_size, only: Abstract_Changed_Box_Size, Null_Changed_Box_Size
+use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio, &
+    Null_Changed_Box_Size_Ratio
+use classes_changed_box_size, only: Abstract_Changed_Box_Size, Concrete_Changed_Box_Size
 
 implicit none
 
 private
-public :: num_boxes, periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permittivity,&
-    use_reciprocal_lattice, use_walls, box_size_can_change
+public :: num_boxes, periodicity_is_xyz, periodicity_is_xy, gemc_box_size_can_change, &
+    total_volume_can_change, apply_external_field, use_permittivity, use_reciprocal_lattice, &
+    use_walls, box_size_can_change
 
 interface num_boxes
     module procedure :: num_boxes_from_json
 end interface num_boxes
+
+interface gemc_box_size_can_change
+    module procedure :: box_size_can_change_from_ratio
+    module procedure :: box_size_can_change_from_changed
+end interface gemc_box_size_can_change
+
+interface total_volume_can_change
+    module procedure :: total_volume_can_change_from_json
+    module procedure :: total_volume_can_change_from_beta_pressure
+end interface total_volume_can_change
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -44,9 +57,8 @@ interface use_walls
 end interface use_walls
 
 interface box_size_can_change
-    module procedure :: box_size_can_change_from_json
     module procedure :: box_size_can_change_from_beta_pressure
-    module procedure :: box_size_can_change_from_changed_box_size
+    module procedure :: box_size_can_change_from_changed
 end interface box_size_can_change
 
 contains
@@ -84,6 +96,39 @@ contains
                 periodicity_is_xy = .false.
         end select
     end function periodicity_is_xy
+
+    logical function total_volume_can_change_from_json(generating_data, prefix) &
+        result(total_volume_can_change)
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        total_volume_can_change = logical_from_json(generating_data, prefix//&
+            "Boxes.total volume can change")
+    end function total_volume_can_change_from_json
+
+    pure logical function total_volume_can_change_from_beta_pressure(beta_pressure) &
+        result(total_volume_can_change)
+        class(Abstract_Beta_Pressure), intent(in) :: beta_pressure
+
+        select type (beta_pressure)
+            type is (Concrete_Beta_Pressure)
+                total_volume_can_change = .true.
+            class default
+                total_volume_can_change = .false.
+        end select
+    end function total_volume_can_change_from_beta_pressure
+
+    pure logical function box_size_can_change_from_ratio(changed_box_size_ratio) &
+        result(box_size_can_change)
+        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
+
+        select type (changed_box_size_ratio)
+            type is (Null_Changed_Box_Size_Ratio)
+                box_size_can_change = .false.
+            class default
+                box_size_can_change = .true.
+        end select
+    end function box_size_can_change_from_ratio
 
     logical function apply_external_field_from_json(generating_data, prefix) &
         result(apply_external_field)
@@ -172,14 +217,7 @@ contains
         end select
     end function use_walls_from_walls
 
-    logical function box_size_can_change_from_json(generating_data, prefix) &
-        result(box_size_can_change)
-        type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
-
-        box_size_can_change = logical_from_json(generating_data, prefix//"Box.size can change")
-    end function box_size_can_change_from_json
-
+    !> @warning deprecated
     pure logical function box_size_can_change_from_beta_pressure(beta_pressure) &
         result(box_size_can_change)
         class(Abstract_Beta_Pressure), intent(in) :: beta_pressure
@@ -192,16 +230,16 @@ contains
         end select
     end function box_size_can_change_from_beta_pressure
 
-    elemental logical function box_size_can_change_from_changed_box_size(changed_box_size) &
+    pure logical function box_size_can_change_from_changed(changed_box_size) &
         result(box_size_can_change)
         class(Abstract_Changed_Box_Size), intent(in) :: changed_box_size
 
         select type (changed_box_size)
-            type is (Null_Changed_Box_Size)
-                box_size_can_change = .false.
-            class default
+            type is (Concrete_Changed_Box_Size)
                 box_size_can_change = .true.
+            class default
+                box_size_can_change = .false.
         end select
-    end function box_size_can_change_from_changed_box_size
+    end function box_size_can_change_from_changed
 
 end module procedures_environment_inquirers

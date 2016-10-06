@@ -1,9 +1,10 @@
 {
     "Environment": {
-        "Box": {
+        "Boxes": {
+            "number": 3,
             "periodicity": "XYZ",
-            "initial size": [12.0, 12.0, 12.0],
-            "size can change": false
+            "initial size": [[18.0, 18.0, 18.0], [18.0, 18.0, 18.0], [18.0, 18.0, 18.0]],
+            "total volume can change": false
         },
         "Thermostat": {
             "temperature": 2.0
@@ -25,29 +26,23 @@
     },
     "Mixture": {
         "number of components": 3,
-        "can exchange with reservoir": true,
+        "can exchange with reservoir": false,
         "Component 1": {
-            "initial number": 0,
+            "initial number": 200,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
-            "density": 0.11574074074074074,
-            "inverse powered activity": 0.01709282149021121
+            "moment norm": 1.0
         },
         "Component 2": {
-            "initial number": 0,
+            "initial number": 1000,
             "minimum distance": 0.8,
-            "is dipolar": false,
-            "density": 0.57870370370370372,
-            "inverse powered activity": 0.0053906735029344306
+            "is dipolar": false
         },
         "Component 3": {
-            "initial number": 0,
+            "initial number": 300,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 0.25,
-            "density": 0.17361111111111110,
-            "inverse powered activity": 0.01173618627535419
+            "moment norm": 0.25
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -119,33 +114,42 @@
     },
     "Changes": {
         "number of tuning steps": 1000,
-        "Components": {
+        "Boxes": {
+            "number": 10,
+            "initial delta": 0.01,
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
             "wanted success ratio": 0.75,
             "tolerance": 0.01
         },
-        "Component 1": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+        "Mixture": {
+            "Component 1": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
-            }
-        },
-        "Component 2": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
-            }
-        },
-        "Component 3": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "Component 2": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
-            }
+            "Component 3": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
+            },
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 100,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01
         }
     },
     "Monte Carlo": {

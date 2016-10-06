@@ -30,6 +30,8 @@ contains
 
 !implementation Abstract_Number_to_String
 
+    !> @bug
+    !> elemental: works with gfortran 4.9 / doesn't work with ifort 13
     function Abstract_get_real_scalar(number) result(string)
         character(len=:), allocatable :: string
         real(DP), intent(in) :: number
@@ -39,7 +41,6 @@ contains
         write(big_string, *) number
         string = trim(big_string)
     end function Abstract_get_real_scalar
-    !elemental: works with gfortran 4.9 / doesn't work with ifort 13
 
     function Abstract_get_real_array(number) result(string)
         character(len=:), allocatable :: string

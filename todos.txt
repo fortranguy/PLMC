@@ -14,4 +14,9 @@
 - GEMC conversion: array by default: bad idea?
 - PeriodicBox: add Null or throw error when numBoxes == 0
 - ExploringAlgorithms: warning if unexpected ensemble
-- Multiple Boxes: ChangedBoxSizeRatio interdependance
++ Multiple Boxes: ChangedBoxSizeRatio interdependance:
+    - I choose to use a unique delta for boxes i and j. It seems reasonable
+    since the same delta appears in the volume change acceptance probability.
+- There are at least two versions of GEMC: ``Canonical'' & ``Isobaric''. I will
+    implement the first one.
+- [Data] Fortran code to update, cf. json
