@@ -195,7 +195,7 @@ contains
 
         num_particles = 0._DP
         do i_component = 1, size(this%mixture%components)
-            num_particles = num_particles + this%mixture%components(i_component)%number%get()
+            num_particles = num_particles + this%mixture%components(i_component)%num_particles%get()
         end do
         volume_ratio = product(box_size_ratio)
 

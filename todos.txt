@@ -20,3 +20,4 @@
 - There are at least two versions of GEMC: ``Canonical'' & ``Isobaric''. I will
     implement the first one.
 - [Data] Fortran code to update, cf. json
+- ComponentAverageNumber: with actual average counting

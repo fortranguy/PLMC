@@ -2,7 +2,7 @@ module procedures_component_coordinates_factory
 
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_component_number, only: Abstract_Component_Number
+use classes_num_particles, only: Abstract_Num_Particles
 use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations, Null_Component_Coordinates
 
@@ -13,11 +13,11 @@ public :: create_positions, create_orientations, destroy
 
 contains
 
-    subroutine create_positions(positions, exists, periodic_box, number)
+    subroutine create_positions(positions, exists, periodic_box, num_particles)
         class(Abstract_Component_Coordinates), allocatable, intent(out) :: positions
         logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Number), intent(in) :: number
+        class(Abstract_Num_Particles), intent(in) :: num_particles
 
         if (exists) then
             allocate(Concrete_Component_Positions :: positions)
@@ -26,7 +26,7 @@ contains
         end if
         select type (positions)
             type is (Concrete_Component_Positions)
-                call positions%construct(periodic_box, number)
+                call positions%construct(periodic_box, num_particles)
             type is (Null_Component_Coordinates)
                 call positions%construct()
             class default
@@ -35,9 +35,9 @@ contains
         end select
     end subroutine create_positions
 
-    subroutine create_orientations(orientations, number, is_dipolar)
+    subroutine create_orientations(orientations, num_particles, is_dipolar)
         class(Abstract_Component_Coordinates), allocatable, intent(out) :: orientations
-        class(Abstract_Component_Number), intent(in) :: number
+        class(Abstract_Num_Particles), intent(in) :: num_particles
         logical, intent(in) :: is_dipolar
 
         if (is_dipolar) then
@@ -47,7 +47,7 @@ contains
         end if
         select type (orientations)
             type is (Concrete_Component_Orientations)
-                call orientations%construct(number)
+                call orientations%construct(num_particles)
             type is (Null_Component_Coordinates)
                 call orientations%destroy()
             class default

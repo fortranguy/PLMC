@@ -2,7 +2,7 @@ module procedures_component_average_number_factory
 
 use procedures_errors, only: error_exit
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use classes_component_number, only: Abstract_Component_Number
+use classes_num_particles, only: Abstract_Num_Particles
 use classes_component_chemical_potential, only : Abstract_Component_Chemical_Potential
 use classes_component_average_number, only: Abstract_Component_Average_Number, &
     Constant_Component_Average_Number, Variable_Component_Average_Number, &
@@ -16,10 +16,10 @@ public :: create, destroy
 
 contains
 
-    subroutine create(average_number, accessible_domain, number, chemical_potential)
+    subroutine create(average_number, accessible_domain, num_particles, chemical_potential)
         class(Abstract_Component_Average_Number), allocatable, intent(out) :: average_number
         class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
-        class(Abstract_Component_Number), intent(in) :: number
+        class(Abstract_Num_Particles), intent(in) :: num_particles
         class(Abstract_Component_Chemical_Potential), intent(in) :: chemical_potential
 
         if (component_can_exchange(chemical_potential)) then
@@ -30,7 +30,7 @@ contains
 
         select type (average_number)
             type is (Constant_Component_Average_Number)
-                call average_number%construct(number)
+                call average_number%construct(num_particles)
             type is (Variable_Component_Average_Number)
                 call average_number%construct(accessible_domain, chemical_potential)
             type is (Null_Component_Average_Number)

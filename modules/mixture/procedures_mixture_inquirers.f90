@@ -3,7 +3,7 @@ module procedures_mixture_inquirers
 use json_module, only: json_file
 use procedures_property_inquirers, only: logical_from_json
 use procedures_checks, only: check_data_found, check_array_size
-use classes_component_number, only: Abstract_Component_Number, Concrete_Component_Number
+use classes_num_particles, only: Abstract_Num_Particles, Concrete_Num_Particles
 use classes_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
 use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments, &
@@ -19,10 +19,10 @@ implicit none
 private
 public :: component_exists, component_is_dipolar, component_has_positions, &
     component_has_orientations, component_can_translate, component_can_rotate, &
-    component_can_exchange, num_components, i_component, ij_components
+    mixture_can_exchange, component_can_exchange, num_components, i_component, ij_components
 
 interface component_exists
-    module procedure :: component_exists_from_number
+    module procedure :: component_exists_from_num
 end interface component_exists
 
 interface component_is_dipolar
@@ -30,8 +30,11 @@ interface component_is_dipolar
     module procedure :: component_is_dipolar_from_dipole_moments
 end interface component_is_dipolar
 
+interface mixture_can_exchange
+    module procedure :: mixture_can_exchange_from_json
+end interface mixture_can_exchange
+
 interface component_can_exchange
-    module procedure :: component_can_exchange_from_json
     module procedure :: component_can_exchange_from_chemical_potential
 end interface component_can_exchange
 
@@ -49,16 +52,16 @@ end interface ij_components
 
 contains
 
-    pure logical function component_exists_from_number(component_number) result(component_exists)
-        class(Abstract_Component_Number), intent(in) :: component_number
+    pure logical function component_exists_from_num(num_particles) result(component_exists)
+        class(Abstract_Num_Particles), intent(in) :: num_particles
 
-        select type (component_number)
-            type is (Concrete_Component_Number)
+        select type (num_particles)
+            type is (Concrete_Num_Particles)
                 component_exists = .true.
             class default
                 component_exists = .false.
         end select
-    end function component_exists_from_number
+    end function component_exists_from_num
 
     pure logical function component_has_positions(partcles_positions)
         class(Abstract_Component_Coordinates), intent(in) :: partcles_positions
@@ -123,6 +126,15 @@ contains
                 component_is_dipolar = .false.
         end select
     end function component_is_dipolar_from_dipole_moments
+
+    logical function mixture_can_exchange_from_json(generating_data, prefix) &
+        result(mixture_can_exchange)
+        type(json_file), intent(inout) :: generating_data
+        character(len=*), intent(in) :: prefix
+
+        mixture_can_exchange = logical_from_json(generating_data, &
+            prefix//"can exchange with reservoir")
+    end function mixture_can_exchange_from_json
 
     logical function component_can_exchange_from_json(generating_data, prefix) &
         result(component_can_exchange)

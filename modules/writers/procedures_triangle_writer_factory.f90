@@ -91,8 +91,8 @@ contains
             allocate(selectors(j_component)%line(j_component))
             do i_component = 1, size(selectors(j_component)%line)
                 exist_ij = &
-                    component_exists(components(i_component)%number) .and. &
-                    component_exists(components(j_component)%number) .and. &
+                    component_exists(components(i_component)%num_particles) .and. &
+                    component_exists(components(j_component)%num_particles) .and. &
                     i_component /= j_component
                 some_couples_exist = some_couples_exist .or. exist_ij
                 selectors(j_component)%line(i_component) = exist_ij

@@ -246,7 +246,7 @@ contains
         allocate(deltas%dipolar_energies(size(observables%energies%dipolar_energies)))
         call this%metropolis_algorithm(success, deltas, i_actor)
         if (success) then
-            observables%nums_particles(i_actor) = this%mixture%components(i_actor)%number%get()
+            observables%nums_particles(i_actor) = this%mixture%components(i_actor)%num_particles%get()
             call observables_energies_set(observables%energies, deltas, i_actor)
             call this%increment_success(observables%changes_counters(i_actor))
         end if
@@ -291,7 +291,7 @@ contains
         integer, intent(in) :: i_actor
 
         abort = .false.
-        particle%i = this%mixture%components(i_actor)%number%get() + 1
+        particle%i = this%mixture%components(i_actor)%num_particles%get() + 1
         particle%position = this%changes%random_position%get(i_actor)
         particle%orientation = this%changes%random_orientation%get(i_actor)
         particle%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get_norm() * &
@@ -312,7 +312,7 @@ contains
             component => this%mixture%components(i_actor))
             probability = &
                 product(this%environment%accessible_domain%get_size()) * component%&
-                    chemical_potential%get_density() / (real(component%number%get() + 1, DP)) * &
+                    chemical_potential%get_density() / (real(component%num_particles%get() + 1, DP)) * &
                 exp(-delta_energy/temperature) / component%chemical_potential%get_inv_pow_activity()
         end associate
         probability = min(1._DP, probability)
@@ -385,7 +385,7 @@ contains
 
         integer :: i_component
 
-        call this%mixture%components(i_actor)%number%set(this%mixture%components(i_actor)%number%&
+        call this%mixture%components(i_actor)%num_particles%set(this%mixture%components(i_actor)%num_particles%&
             get() + 1)
         call this%mixture%components(i_actor)%positions%add(particle%position)
         call this%mixture%components(i_actor)%orientations%add(particle%orientation)
@@ -419,13 +419,13 @@ contains
         logical, intent(out) :: abort
         integer, intent(in) :: i_actor
 
-        if (this%mixture%components(i_actor)%number%get() == 0) then
+        if (this%mixture%components(i_actor)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
-        particle%i = random_integer(this%mixture%components(i_actor)%number%get())
+        particle%i = random_integer(this%mixture%components(i_actor)%num_particles%get())
         particle%position = this%mixture%components(i_actor)%positions%get(particle%i)
         particle%orientation = this%mixture%components(i_actor)%orientations%get(particle%i)
         particle%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get(particle%i)
@@ -444,7 +444,7 @@ contains
         associate(temperature => this%environment%temperature%get(), &
             component => this%mixture%components(i_actor))
             probability = &
-                real(component%number%get(), DP) / product(this%environment%accessible_domain%&
+                real(component%num_particles%get(), DP) / product(this%environment%accessible_domain%&
                 get_size()) / component%chemical_potential%get_density() * &
                 exp(-delta_energy/temperature) * component%chemical_potential%get_inv_pow_activity()
         end associate
@@ -528,7 +528,7 @@ contains
         call this%mixture%total_moment%remove(i_actor, particle%dipole_moment)
         call this%mixture%components(i_actor)%orientations%remove(particle%i)
         call this%mixture%components(i_actor)%positions%remove(particle%i)
-        call this%mixture%components(i_actor)%number%set(this%mixture%components(i_actor)%number%&
+        call this%mixture%components(i_actor)%num_particles%set(this%mixture%components(i_actor)%num_particles%&
             get() - 1)
     end subroutine Remove_update_actor
 

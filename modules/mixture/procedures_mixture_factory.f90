@@ -13,7 +13,7 @@ use procedures_mixture_total_moments_factory, only: mixture_total_moments_create
     mixture_total_moments_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations, &
-    property_num_components => num_components
+    property_num_components => num_components, mixture_can_exchange
 
 implicit none
 
@@ -68,7 +68,7 @@ contains
         character(len=*), intent(in) :: prefix
 
         integer :: i_box
-        logical :: exists
+        logical :: exists, can_exchange
         integer :: num_components, i_component
         type(Concrete_Number_to_String) :: string
 
@@ -77,16 +77,18 @@ contains
         if (num_components == 0) then
             exists = .false.
             num_components = 1 !null component
+            can_exchange = .false.
         else
             exists = .true.
+            can_exchange = mixture_can_exchange(generating_data, prefix)
         end if
         allocate(components(num_components, size(periodic_boxes)))
 
         do i_box = 1, size(components, 2)
             do i_component = 1, size(components, 1)
-                call component_create(components(i_component, i_box), exists, &
-                    periodic_boxes(i_box), accessible_domains(i_box), &
-                    generating_data, prefix//"Component "//string%get(i_component)//".")
+                call component_create(components(i_component, i_box), periodic_boxes(i_box), &
+                    accessible_domains(i_box), exists, can_exchange, generating_data, &
+                    prefix//"Component "//string%get(i_component)//".")
             end do
         end do
     end subroutine create_components
@@ -113,7 +115,7 @@ contains
         integer :: i_component
 
         do i_component = 1, size(nums_particles)
-            nums_particles(i_component) = components(i_component)%number%get()
+            nums_particles(i_component) = components(i_component)%num_particles%get()
         end do
     end subroutine set_nums_particles
 

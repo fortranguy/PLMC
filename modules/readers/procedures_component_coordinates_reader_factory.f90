@@ -1,7 +1,7 @@
 module procedures_component_coordinates_reader_factory
 
 use procedures_errors, only: error_exit
-use classes_component_number, only: Abstract_Component_Number
+use classes_num_particles, only: Abstract_Num_Particles
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations
@@ -38,12 +38,12 @@ contains
 
         allocate(components_coordinates(size(components)))
         do i_component = 1, size(components_coordinates)
-            associate(number_i => components(i_component)%number, &
+            associate(num_particles_i => components(i_component)%num_particles, &
                 positions_i => components(i_component)%positions, &
                 orientations_i => components(i_component)%orientations)
                 selector_i%read_positions = component_has_positions(positions_i)
                 selector_i%read_orientations = component_has_orientations(orientations_i)
-                call create(components_coordinates(i_component)%reader, number_i, positions_i, &
+                call create(components_coordinates(i_component)%reader, num_particles_i, positions_i, &
                     orientations_i, selector_i)
             end associate
         end do
@@ -63,14 +63,14 @@ contains
         end if
     end subroutine destroy_line
 
-    subroutine create_element(coordinates, number, positions, orientations, selector)
+    subroutine create_element(coordinates, num_particles, positions, orientations, selector)
         class(Abstract_Component_Coordinates_Reader), allocatable, intent(out) :: coordinates
-        class(Abstract_Component_Number), intent(in) :: number
+        class(Abstract_Num_Particles), intent(in) :: num_particles
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
         type(Component_Coordinates_Reader_Selector), intent(in) :: selector
 
         call allocate_element(coordinates, selector)
-        call construct_element(coordinates, number, positions, orientations)
+        call construct_element(coordinates, num_particles, positions, orientations)
     end subroutine create_element
 
     subroutine allocate_element(coordinates, selector)
@@ -88,20 +88,20 @@ contains
         end if
     end subroutine allocate_element
 
-    subroutine construct_element(coordinates, number, positions, orientations)
+    subroutine construct_element(coordinates, num_particles, positions, orientations)
         class(Abstract_Component_Coordinates_Reader), intent(inout) :: coordinates
-        class(Abstract_Component_Number), intent(in) :: number
+        class(Abstract_Num_Particles), intent(in) :: num_particles
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
 
         select type (coordinates)
             type is (Concrete_Component_Coordinates_Reader)
-                call coordinates%construct(number, positions, orientations)
+                call coordinates%construct(num_particles, positions, orientations)
             type is (Concrete_Component_Positions_Reader)
-                call coordinates%construct(number, positions)
+                call coordinates%construct(num_particles, positions)
             type is (Concrete_Component_Orientations_Reader)
-                call coordinates%construct(number, orientations)
+                call coordinates%construct(num_particles, orientations)
             type is (Null_Component_Coordinates_Reader)
-                call coordinates%destroy()
+                call coordinates%construct()
             class default
                 call error_exit("procedures_component_coordinates_reader_factory: construct: "//&
                     "coordinates type unknown.")

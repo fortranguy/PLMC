@@ -182,8 +182,8 @@ contains
 
         integer :: i
 
-        if (this%components(ij_actors(1))%number%get() == 0 .or. &
-            this%components(ij_actors(2))%number%get() == 0) then
+        if (this%components(ij_actors(1))%num_particles%get() == 0 .or. &
+            this%components(ij_actors(2))%num_particles%get() == 0) then
             abort = .true.
             return
         else
@@ -191,7 +191,7 @@ contains
         end if
 
         do i = 1, size(old)
-            old(i)%i = random_integer(this%components(ij_actors(i))%number%get())
+            old(i)%i = random_integer(this%components(ij_actors(i))%num_particles%get())
             old(i)%position = this%components(ij_actors(i))%positions%get(old(i)%i)
             old(i)%orientation = this%components(ij_actors(i))%orientations%get(old(i)%i)
             old(i)%dipole_moment = this%components(ij_actors(i))%dipole_moments%get(old(i)%i)

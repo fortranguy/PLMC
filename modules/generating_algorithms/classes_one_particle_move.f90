@@ -281,13 +281,13 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: new, old
         integer, intent(in) :: i_actor
 
-        if (this%mixture%components(i_actor)%number%get() == 0) then
+        if (this%mixture%components(i_actor)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
-        old%i = random_integer(this%mixture%components(i_actor)%number%get())
+        old%i = random_integer(this%mixture%components(i_actor)%num_particles%get())
         old%position = this%mixture%components(i_actor)%positions%get(old%i)
         old%orientation = this%mixture%components(i_actor)%orientations%get(old%i)
         old%dipole_moment = this%mixture%components(i_actor)%dipole_moments%get(old%i)
@@ -413,7 +413,7 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: new, old
         integer, intent(in) :: i_actor
 
-        if (this%mixture%components(i_actor)%number%get() == 0) then
+        if (this%mixture%components(i_actor)%num_particles%get() == 0) then
             abort = .true.
             return
         else

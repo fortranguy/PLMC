@@ -17,25 +17,25 @@ public :: create, destroy
 
 contains
 
-    subroutine create(component, exists, periodic_box, accessible_domain, generating_data, prefix)
+    subroutine create(component, periodic_box, accessible_domain, exists, can_exchange, &
+        generating_data, prefix)
         type(Component_Wrapper), intent(out) :: component
-        logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
+        logical, intent(in) :: exists, can_exchange
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        logical :: is_dipolar, can_exchange
+        logical :: is_dipolar
 
-        call composition_create(component%number, exists)
-        call coordinates_create(component%positions, exists, periodic_box, component%number)
+        call composition_create(component%num_particles, exists)
+        call coordinates_create(component%positions, exists, periodic_box, component%num_particles)
         is_dipolar = exists .and. component_is_dipolar(generating_data, prefix)
-        call coordinates_create(component%orientations, component%number, is_dipolar)
+        call coordinates_create(component%orientations, component%num_particles, is_dipolar)
         call coordinates_create(component%dipole_moments, component%orientations, is_dipolar, &
             generating_data, prefix)
-        can_exchange = exists .and. component_can_exchange(generating_data, prefix)
         call composition_create(component%chemical_potential, can_exchange, generating_data, prefix)
-        call composition_create(component%average_number, accessible_domain, component%number, &
+        call composition_create(component%average_number, accessible_domain, component%num_particles, &
             component%chemical_potential)
     end subroutine create
 
@@ -47,7 +47,7 @@ contains
         call coordinates_destroy(component%dipole_moments)
         call coordinates_destroy(component%orientations)
         call coordinates_destroy(component%positions)
-        call composition_destroy(component%number)
+        call composition_destroy(component%num_particles)
     end subroutine destroy
 
 end module procedures_component_factory

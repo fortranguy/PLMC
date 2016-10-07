@@ -2,7 +2,7 @@ module classes_component_coordinates_reader
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use classes_component_number, only: Abstract_Component_Number
+use classes_num_particles, only: Abstract_Num_Particles
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 
 implicit none
@@ -35,7 +35,7 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Concrete_Component_Coordinates_Reader
     private
-        class(Abstract_Component_Number), pointer :: number => null()
+        class(Abstract_Num_Particles), pointer :: num_particles => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
     contains
@@ -47,7 +47,7 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Concrete_Component_Positions_Reader
     private
-        class(Abstract_Component_Number), pointer :: number => null()
+        class(Abstract_Num_Particles), pointer :: num_particles => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
     contains
         procedure :: construct => Positions_construct
@@ -58,7 +58,7 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Concrete_Component_Orientations_Reader
     private
-        class(Abstract_Component_Number), pointer :: number => null()
+        class(Abstract_Num_Particles), pointer :: num_particles => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
     contains
         procedure :: construct => Orientations_construct
@@ -78,12 +78,12 @@ contains
 
 !implementation Concrete_Component_Coordinates_Reader
 
-    subroutine Coordinates_construct(this, number, positions, orientations)
+    subroutine Coordinates_construct(this, num_particles, positions, orientations)
         class(Concrete_Component_Coordinates_Reader), intent(out) :: this
-        class(Abstract_Component_Number), target, intent(in) :: number
+        class(Abstract_Num_Particles), target, intent(in) :: num_particles
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
 
-        this%number => number
+        this%num_particles => num_particles
         this%positions => positions
         this%orientations => orientations
     end subroutine Coordinates_construct
@@ -93,7 +93,7 @@ contains
 
         this%orientations => null()
         this%positions => null()
-        this%number => null()
+        this%num_particles => null()
     end subroutine Coordinates_destroy
 
     subroutine Coordinates_read(this, coordinates_unit, num_particles)
@@ -104,9 +104,9 @@ contains
         real(DP), dimension(:, :), allocatable :: positions, orientations
         integer :: i_component, i_particle
 
-        call this%number%set(num_particles)
-        allocate(positions(num_dimensions, this%number%get()))
-        allocate(orientations(num_dimensions, this%number%get()))
+        call this%num_particles%set(num_particles)
+        allocate(positions(num_dimensions, this%num_particles%get()))
+        allocate(orientations(num_dimensions, this%num_particles%get()))
         do i_particle = 1, size(positions, 2)
             read(coordinates_unit, *) i_component, positions(:, i_particle), &
                 orientations(:, i_particle)
@@ -119,12 +119,12 @@ contains
 
 !implementation Concrete_Component_Positions_Reader
 
-    subroutine Positions_construct(this, number, positions)
+    subroutine Positions_construct(this, num_particles, positions)
         class(Concrete_Component_Positions_Reader), intent(out) :: this
-        class(Abstract_Component_Number), target, intent(in) :: number
+        class(Abstract_Num_Particles), target, intent(in) :: num_particles
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
 
-        this%number => number
+        this%num_particles => num_particles
         this%positions => positions
     end subroutine Positions_construct
 
@@ -132,7 +132,7 @@ contains
         class(Concrete_Component_Positions_Reader), intent(inout) :: this
 
         this%positions => null()
-        this%number => null()
+        this%num_particles => null()
     end subroutine Positions_destroy
 
     subroutine Positions_read(this, coordinates_unit, num_particles)
@@ -143,8 +143,8 @@ contains
         real(DP), dimension(:, :), allocatable :: positions
         integer :: i_component, i_particle
 
-        call this%number%set(num_particles)
-        allocate(positions(num_dimensions, this%number%get()))
+        call this%num_particles%set(num_particles)
+        allocate(positions(num_dimensions, this%num_particles%get()))
         do i_particle = 1, size(positions, 2)
             read(coordinates_unit, *) i_component, positions(:, i_particle)
         end do
@@ -155,12 +155,12 @@ contains
 
 !implementation Concrete_Component_Orientations_Reader
 
-    subroutine Orientations_construct(this, number, orientations)
+    subroutine Orientations_construct(this, num_particles, orientations)
         class(Concrete_Component_Orientations_Reader), intent(out) :: this
-        class(Abstract_Component_Number), target, intent(in) :: number
+        class(Abstract_Num_Particles), target, intent(in) :: num_particles
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
 
-        this%number => number
+        this%num_particles => num_particles
         this%orientations => orientations
     end subroutine Orientations_construct
 
@@ -168,7 +168,7 @@ contains
         class(Concrete_Component_Orientations_Reader), intent(inout) :: this
 
         this%orientations => null()
-        this%number => null()
+        this%num_particles => null()
     end subroutine Orientations_destroy
 
     subroutine Orientations_read(this, coordinates_unit, num_particles)
@@ -179,8 +179,8 @@ contains
         real(DP), dimension(:, :), allocatable :: orientations
         integer :: i_component, i_particle
 
-        call this%number%set(num_particles)
-        allocate(orientations(num_dimensions, this%number%get()))
+        call this%num_particles%set(num_particles)
+        allocate(orientations(num_dimensions, this%num_particles%get()))
         do i_particle = 1, size(orientations, 2)
             read(coordinates_unit, *) i_component, orientations(:, i_particle)
         end do

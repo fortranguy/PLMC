@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range, check_array_size, check_positive, check_norm
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_component_number, only: Abstract_Component_Number
+use classes_num_particles, only: Abstract_Num_Particles
 use classes_coordinates, only: Abstract_Coordinates
 use procedures_coordinates_micro, only: increase_coordinates_size
 
@@ -15,7 +15,7 @@ private
 
     type, extends(Abstract_Coordinates), abstract, public :: Abstract_Component_Coordinates
     private
-        class(Abstract_Component_Number), pointer :: number => null()
+        class(Abstract_Num_Particles), pointer :: num_particles => null()
         real(DP), allocatable :: coordinates(:, :)
     contains
         procedure(Abstract_destroy), deferred :: destroy
@@ -92,15 +92,15 @@ contains
 
         integer :: i_particle
 
-        if (this%number%get() /= size(coordinates, 2)) then
+        if (this%num_particles%get() /= size(coordinates, 2)) then
             call error_exit("Abstract_Component_Coordinates: set_all: numbers do not match.")
         end if
-        if (size(this%coordinates, 2) < this%number%get()) then
+        if (size(this%coordinates, 2) < this%num_particles%get()) then
             deallocate(this%coordinates)
-            allocate(this%coordinates(num_dimensions, this%number%get()))
+            allocate(this%coordinates(num_dimensions, this%num_particles%get()))
         end if
 
-        do i_particle = 1, this%number%get()
+        do i_particle = 1, this%num_particles%get()
             call this%set(i_particle, coordinates(:, i_particle))
         end do
     end subroutine Abstract_set_all
@@ -108,17 +108,17 @@ contains
     subroutine Abstract_allocate_coordinates(this)
         class(Abstract_Component_Coordinates), intent(inout) :: this
 
-        if (this%number%get() == 0) then
+        if (this%num_particles%get() == 0) then
             allocate(this%coordinates(num_dimensions, 1))
         else
-            allocate(this%coordinates(num_dimensions, this%number%get()))
+            allocate(this%coordinates(num_dimensions, this%num_particles%get()))
         end if
     end subroutine Abstract_allocate_coordinates
 
     pure integer function Abstract_get_num(this) result(num_coordinates)
         class(Abstract_Component_Coordinates), intent(in) :: this
 
-        num_coordinates = this%number%get()
+        num_coordinates = this%num_particles%get()
     end function Abstract_get_num
 
     pure function Abstract_get(this, i_particle) result(vector)
@@ -133,19 +133,19 @@ contains
         class(Abstract_Component_Coordinates), intent(inout) :: this
         real(DP), intent(in) :: vector(:)
 
-        if (size(this%coordinates, 2) < this%number%get()) then
+        if (size(this%coordinates, 2) < this%num_particles%get()) then
             call increase_coordinates_size(this%coordinates)
         end if
-        call this%set(this%number%get(), vector)
+        call this%set(this%num_particles%get(), vector)
     end subroutine Abstract_add
 
     subroutine Abstract_remove(this, i_particle)
         class(Abstract_Component_Coordinates), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Abstract_remove", this%number%get(), "i_particle", i_particle)
-        if (i_particle < this%number%get()) then
-            call this%set(i_particle, this%get(this%number%get()))
+        call check_in_range("Abstract_remove", this%num_particles%get(), "i_particle", i_particle)
+        if (i_particle < this%num_particles%get()) then
+            call this%set(i_particle, this%get(this%num_particles%get()))
         end if
     end subroutine Abstract_remove
 
@@ -153,13 +153,13 @@ contains
 
 !implementation Concrete_Component_Positions
 
-    subroutine Positions_construct(this, periodic_box, number)
+    subroutine Positions_construct(this, periodic_box, num_particles)
         class(Concrete_Component_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Number), target, intent(in) :: number
+        class(Abstract_Num_Particles), target, intent(in) :: num_particles
 
         this%periodic_box => periodic_box
-        this%number => number
+        this%num_particles => num_particles
         call this%allocate_coordinates()
     end subroutine Positions_construct
 
@@ -167,7 +167,7 @@ contains
         class(Concrete_Component_Positions), intent(inout) :: this
 
         if (allocated(this%coordinates)) deallocate(this%coordinates)
-        this%number => null()
+        this%num_particles => null()
         this%periodic_box => null()
     end subroutine Positions_destroy
 
@@ -178,7 +178,7 @@ contains
         integer :: i_particle
 
         call check_positive("Concrete_Component_Positions: rescale_all", "ratio", ratio)
-        do i_particle = 1, this%number%get()
+        do i_particle = 1, this%num_particles%get()
             this%coordinates(:, i_particle) = ratio * this%coordinates(:, i_particle)
         end do
     end subroutine Positions_rescale_all
@@ -188,7 +188,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: vector(:)
 
-        call check_in_range("Concrete_Component_Positions: set", this%number%get(), "i_particle", &
+        call check_in_range("Concrete_Component_Positions: set", this%num_particles%get(), "i_particle", &
             i_particle)
         call check_array_size("Concrete_Component_Positions: set", "vector", vector, num_dimensions)
         this%coordinates(:, i_particle) = this%periodic_box%folded(vector)
@@ -198,11 +198,11 @@ contains
 
 !implementation Concrete_Component_Orientations
 
-    subroutine Orientations_construct(this, number)
+    subroutine Orientations_construct(this, num_particles)
         class(Concrete_Component_Orientations), intent(out) :: this
-        class(Abstract_Component_Number), target, intent(in) :: number
+        class(Abstract_Num_Particles), target, intent(in) :: num_particles
 
-        this%number => number
+        this%num_particles => num_particles
         call this%allocate_coordinates()
     end subroutine Orientations_construct
 
@@ -210,7 +210,7 @@ contains
         class(Concrete_Component_Orientations), intent(inout) :: this
 
         if (allocated(this%coordinates)) deallocate(this%coordinates)
-        this%number => null()
+        this%num_particles => null()
     end subroutine Orientations_destroy
 
     subroutine Orientations_rescale_all(this, ratio)
@@ -223,7 +223,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: vector(:)
 
-        call check_in_range("Concrete_Component_Orientations: set", this%number%get(), &
+        call check_in_range("Concrete_Component_Orientations: set", this%num_particles%get(), &
             "i_particle", i_particle)
         call check_array_size("Concrete_Component_Orientations: set", "vector", vector, &
             num_dimensions)

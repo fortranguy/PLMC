@@ -197,19 +197,19 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: particles(:)
         integer, intent(in) :: ij_actors(:)
 
-        if (this%mixture%components(ij_actors(1))%number%get() == 0) then
+        if (this%mixture%components(ij_actors(1))%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
-        particles(1)%i = random_integer(this%mixture%components(ij_actors(1))%number%get())
+        particles(1)%i = random_integer(this%mixture%components(ij_actors(1))%num_particles%get())
         particles(1)%position = this%mixture%components(ij_actors(1))%positions%get(particles(1)%i)
         particles(1)%orientation = this%mixture%components(ij_actors(1))%orientations%&
             get(particles(1)%i)
         particles(1)%dipole_moment = this%mixture%components(ij_actors(1))%dipole_moments%&
             get(particles(1)%i)
-        particles(2)%i = this%mixture%components(ij_actors(2))%number%get() + 1
+        particles(2)%i = this%mixture%components(ij_actors(2))%num_particles%get() + 1
         call this%changes%position_copier%copy(particles(2)%position, particles(1)%position, &
             ij_actors)
         call this%changes%orientation_copier%copy(particles(2)%orientation, particles(1)%&
@@ -232,7 +232,7 @@ contains
             component_i => this%mixture%components(ij_actors(1)), &
             component_j => this%mixture%components(ij_actors(2)))
             probability = &
-                real(component_i%number%get(), DP) / real(component_j%number%get() + 1, DP) * &
+                real(component_i%num_particles%get(), DP) / real(component_j%num_particles%get() + 1, DP) * &
                 component_j%chemical_potential%get_density() / component_i%chemical_potential%&
                     get_density() * &
                 exp(-delta_energy/temperature) * component_i%chemical_potential%&
@@ -353,10 +353,10 @@ contains
         call this%mixture%total_moment%remove(ij_actors(1), particles(1)%dipole_moment)
         call this%mixture%components(ij_actors(1))%orientations%remove(particles(1)%i)
         call this%mixture%components(ij_actors(1))%positions%remove(particles(1)%i)
-        call this%mixture%components(ij_actors(1))%number%set(this%mixture%&
-            components(ij_actors(1))%number%get() - 1)
-        call this%mixture%components(ij_actors(2))%number%set(this%mixture%&
-            components(ij_actors(2))%number%get() + 1)
+        call this%mixture%components(ij_actors(1))%num_particles%set(this%mixture%&
+            components(ij_actors(1))%num_particles%get() - 1)
+        call this%mixture%components(ij_actors(2))%num_particles%set(this%mixture%&
+            components(ij_actors(2))%num_particles%get() + 1)
         call this%mixture%components(ij_actors(2))%positions%add(particles(2)%position)
         call this%mixture%components(ij_actors(2))%orientations%add(particles(2)%orientation)
         call this%mixture%total_moment%add(ij_actors(2), particles(2)%dipole_moment)

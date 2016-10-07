@@ -46,7 +46,7 @@ contains
         allocate(min_distances(size(components)))
         do i_component = 1, size(min_distances)
             exists = use_walls(visitable_walls) .and. component_exists(components(i_component)%&
-                number)
+                num_particles)
             min_distance_i = (wall_min_distance%get() + components_min_distances(i_component)%&
             line(i_component)%distance%get()) / 2._DP
             call create(min_distances(i_component)%distance, exists, min_distance_i)
@@ -81,8 +81,8 @@ contains
         do j_component = 1, size(min_distances)
             allocate(min_distances(j_component)%line(j_component))
             do i_component = 1, size(min_distances(j_component)%line)
-                exists = component_exists(components(j_component)%number) .and. &
-                    component_exists(components(i_component)%number)
+                exists = component_exists(components(j_component)%num_particles) .and. &
+                    component_exists(components(i_component)%num_particles)
                 if (i_component == j_component) then
                     min_distance_prefix = prefix//"Component "//string%get(i_component)//"."
                 else
