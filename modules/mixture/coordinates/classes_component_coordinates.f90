@@ -188,8 +188,8 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: vector(:)
 
-        call check_in_range("Concrete_Component_Positions: set", this%num_particles%get(), "i_particle", &
-            i_particle)
+        call check_in_range("Concrete_Component_Positions: set", this%num_particles%get(), &
+            "i_particle", i_particle)
         call check_array_size("Concrete_Component_Positions: set", "vector", vector, num_dimensions)
         this%coordinates(:, i_particle) = this%periodic_box%folded(vector)
     end subroutine Positions_set

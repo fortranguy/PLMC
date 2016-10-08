@@ -67,7 +67,7 @@ contains
         end select
     end subroutine allocate
 
-    subroutine construct(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps, &
+    subroutine construct(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps,&
         exploring_data, prefix)
         class(Abstract_Density_Explorer), intent(inout) :: density_explorer
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)

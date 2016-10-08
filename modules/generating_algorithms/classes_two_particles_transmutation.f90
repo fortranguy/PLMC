@@ -231,8 +231,8 @@ contains
         associate(temperature => this%environment%temperature%get(), &
             component_i => this%mixture%components(ij_actors(1)), &
             component_j => this%mixture%components(ij_actors(2)))
-            probability = &
-                real(component_i%num_particles%get(), DP) / real(component_j%num_particles%get() + 1, DP) * &
+            probability = real(component_i%num_particles%get(), DP) / &
+                real(component_j%num_particles%get() + 1, DP) * &
                 component_j%chemical_potential%get_density() / component_i%chemical_potential%&
                     get_density() * &
                 exp(-delta_energy/temperature) * component_i%chemical_potential%&

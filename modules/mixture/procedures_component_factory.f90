@@ -35,8 +35,8 @@ contains
         call coordinates_create(component%dipole_moments, component%orientations, is_dipolar, &
             generating_data, prefix)
         call composition_create(component%chemical_potential, can_exchange, generating_data, prefix)
-        call composition_create(component%average_number, accessible_domain, component%num_particles, &
-            component%chemical_potential)
+        call composition_create(component%average_number, accessible_domain, component%&
+            num_particles, component%chemical_potential)
     end subroutine create
 
     subroutine destroy(component)

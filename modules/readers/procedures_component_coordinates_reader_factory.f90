@@ -43,8 +43,8 @@ contains
                 orientations_i => components(i_component)%orientations)
                 selector_i%read_positions = component_has_positions(positions_i)
                 selector_i%read_orientations = component_has_orientations(orientations_i)
-                call create(components_coordinates(i_component)%reader, num_particles_i, positions_i, &
-                    orientations_i, selector_i)
+                call create(components_coordinates(i_component)%reader, num_particles_i, &
+                    positions_i, orientations_i, selector_i)
             end associate
         end do
     end subroutine create_line

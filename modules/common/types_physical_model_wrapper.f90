@@ -19,7 +19,6 @@ private
         type(Dipolar_Interactions_Static_Wrapper), allocatable :: gemc_dipolar_interactions_static(:)
         class(Abstract_Dipolar_Interactions_Facade), allocatable :: dipolar_interactions_facades(:)
 
-
         type(Dipolar_Interactions_Static_Wrapper) :: dipolar_interactions_static
         class(Abstract_Dipolar_Interactions_Facade), allocatable :: dipolar_interactions_facade
     end type Physical_Model_Wrapper

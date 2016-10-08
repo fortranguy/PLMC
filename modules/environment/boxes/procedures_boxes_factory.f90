@@ -6,8 +6,8 @@ use procedures_box_size_memento_factory, only: box_size_memento_create => create
     box_size_memento_destroy => destroy
 use procedures_parallelepiped_domains_factory, only: parallelepiped_domains_create_from_json => &
     create_from_json, parallelepiped_domains_create_from_boxes => create_from_boxes, &
-    parallelepiped_domains_create_from_walls => create_from_walls, parallelepiped_domains_destroy => &
-    destroy
+    parallelepiped_domains_create_from_walls => create_from_walls, &
+    parallelepiped_domains_destroy => destroy
 use procedures_reciprocal_lattices_factory, only: reciprocal_lattices_create => create, &
     reciprocal_lattices_destroy => destroy
 use procedures_boxes_size_checker_factory, only: boxes_size_checker_create => create, &

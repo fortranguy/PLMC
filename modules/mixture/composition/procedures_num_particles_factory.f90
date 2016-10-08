@@ -10,7 +10,8 @@ public :: create, destroy
 
 contains
 
-    !> num_particles will be set with coordinates, cf. [[Abstract_Component_Coordinates_Reader]].
+    !> num_particles will be set with coordinates, cf.
+    !> [[classes_component_coordinates_reader:Abstract_Component_Coordinates_Reader]].
     !> @warning Is it too fragile?
     subroutine create(num_particles, exists)
         class(Abstract_Num_Particles), allocatable, intent(out) :: num_particles

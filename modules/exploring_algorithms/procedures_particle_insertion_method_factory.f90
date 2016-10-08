@@ -36,7 +36,8 @@ contains
 
         if (measure_inv_pow_activities) then
             allocate(Concrete_Particle_Insertion_Method :: particle_insertion_method)
-            allocate(Concrete_Num_Particles :: nums_particles(size(physical_model%mixture%components)))
+            allocate(Concrete_Num_Particles :: nums_particles(size(physical_model%mixture%&
+                components)))
             do i_component = 1, size(nums_particles)
                 data_field = prefix//"Component "//string%get(i_component)//".number of particles"
                 call exploring_data%get(data_field, num_particles, data_found)
