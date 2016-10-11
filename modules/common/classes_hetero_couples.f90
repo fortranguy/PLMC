@@ -19,10 +19,10 @@ private
 
     abstract interface
 
-        subroutine Abstract_construct(this, num_elements)
+        subroutine Abstract_construct(this, num_partners)
         import :: Abstract_Hetero_Couples
             class(Abstract_Hetero_Couples), intent(out) :: this
-            integer, intent(in) :: num_elements
+            integer, intent(in) :: num_partners
         end subroutine Abstract_construct
 
     end interface
@@ -73,18 +73,18 @@ contains
 
 !implementation Half_Hetero_Couples
 
-    subroutine Half_construct(this, num_elements)
+    subroutine Half_construct(this, num_partners)
         class(Half_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_elements
+        integer, intent(in) :: num_partners
 
         integer :: i_couple, i_element, j_element
 
-        call check_positive("Half_Hetero_Couples: construct", "num_elements", num_elements)
-        this%num_couples = num_elements * (num_elements - 1) / 2
+        call check_positive("Half_Hetero_Couples: construct", "num_partners", num_partners)
+        this%num_couples = num_partners * (num_partners - 1) / 2
         allocate(this%couples(2, this%num_couples))
         this%couples = 0
         i_couple = 0
-        do j_element = 2, num_elements
+        do j_element = 2, num_partners
             do i_element = 1, j_element - 1
                 i_couple = i_couple + 1
                 this%couples(:, i_couple) = [j_element, i_element]
@@ -96,18 +96,18 @@ contains
 
 !implementation Full_Hetero_Couples
 
-    subroutine Full_construct(this, num_elements)
+    subroutine Full_construct(this, num_partners)
         class(Full_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_elements
+        integer, intent(in) :: num_partners
 
         integer :: i_couple, i_element, j_element
-        call check_positive("Half_Hetero_Couples: construct", "num_elements", num_elements)
-        this%num_couples = num_elements * (num_elements - 1)
+        call check_positive("Half_Hetero_Couples: construct", "num_partners", num_partners)
+        this%num_couples = num_partners * (num_partners - 1)
         allocate(this%couples(2, this%num_couples))
         this%couples = 0
         i_couple = 0
-        do j_element = 1, num_elements
-            do i_element = 1, num_elements
+        do j_element = 1, num_partners
+            do i_element = 1, num_partners
                 if (i_element /= j_element) then
                     i_couple = i_couple + 1
                     this%couples(:, i_couple) = [j_element, i_element]
@@ -120,9 +120,9 @@ contains
 
 !implementation Null_Hetero_Couples
 
-    subroutine Null_construct(this, num_elements)
+    subroutine Null_construct(this, num_partners)
         class(Null_Hetero_Couples), intent(out) :: this
-        integer, intent(in) :: num_elements
+        integer, intent(in) :: num_partners
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

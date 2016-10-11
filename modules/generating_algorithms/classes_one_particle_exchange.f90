@@ -2,6 +2,8 @@ module classes_one_particle_exchange
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_random_number, only: random_integer
+use classes_tower_sampler, only: Abstract_Tower_Sampler
+use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -11,7 +13,6 @@ use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynam
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add, &
     dipoles_field_visit_remove => visit_remove
-use classes_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_changes_wrapper, only: Changes_Wrapper
 use types_observables_energies, only: Concrete_Single_Energies
@@ -39,7 +40,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: try => Abstract_try
-        procedure :: set_selector => Abstract_set_selector
+        procedure :: reset_selector => Abstract_reset_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_exchange), private, deferred :: define_exchange
@@ -155,7 +156,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: try => Null_try
-        procedure :: set_selector => Null_set_selector
+        procedure :: reset_selector => Null_reset_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure, private :: define_exchange => Null_define_exchange
         procedure, private :: acceptation_probability => Null_acceptation_probability
@@ -174,7 +175,7 @@ contains
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, &
-        selector_mold)
+        selector)
         class(Abstract_One_Particle_Exchange), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -184,7 +185,7 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         type(Changes_Wrapper), target, intent(in) :: changes
         logical, intent(in) :: can_exchange(:)
-        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
+        class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
         this%mixture => mixture
@@ -193,18 +194,14 @@ contains
         this%dipolar_interactions_static => dipolar_interactions_static
         this%changes => changes
         allocate(this%can_exchange, source=can_exchange)
-        allocate(this%selector, mold=selector_mold)
-        !this%selector: delayed construction in [[Abstract_set_selector]]
+        allocate(this%selector, source=selector)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_One_Particle_Exchange), intent(inout) :: this
 
-        if (allocated(this%selector)) then
-            call this%selector%destroy()
-            deallocate(this%selector)
-        end if
-        !this%can_exchange: early deallocation in [[Abstract_set_selector]]
+        call tower_sampler_destroy(this%selector)
+        if (allocated(this%can_exchange)) deallocate(this%can_exchange)
         this%changes => null()
         this%dipolar_interactions_static => null()
         this%dipolar_interactions_dynamic => null()
@@ -213,18 +210,17 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_set_selector(this)
+    subroutine Abstract_reset_selector(this)
         class(Abstract_One_Particle_Exchange), intent(inout) :: this
 
         integer :: nums_candidates(size(this%can_exchange)), i_component
 
         do i_component = 1, size(nums_candidates)
             nums_candidates(i_component) = merge(this%mixture%components(i_component)%&
-                average_number%get(), 0, this%can_exchange(i_component))
+                average_num_particles%get(), 0, this%can_exchange(i_component))
         end do
-        if (allocated(this%can_exchange)) deallocate(this%can_exchange)
-        call this%selector%construct(nums_candidates)
-    end subroutine Abstract_set_selector
+        call this%selector%reset(nums_candidates)
+    end subroutine Abstract_reset_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_One_Particle_Exchange), intent(in) :: this
@@ -551,7 +547,7 @@ contains
 
     subroutine Null_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, &
-        selector_mold)
+        selector)
         class(Null_One_Particle_Exchange), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -561,16 +557,16 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         type(Changes_Wrapper), target, intent(in) :: changes
         logical, intent(in) :: can_exchange(:)
-        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
+        class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_One_Particle_Exchange), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_set_selector(this)
+    subroutine Null_reset_selector(this)
         class(Null_One_Particle_Exchange), intent(inout) :: this
-    end subroutine Null_set_selector
+    end subroutine Null_reset_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_One_Particle_Exchange), intent(in) :: this

@@ -14,6 +14,7 @@ use procedures_changed_boxes_size_ratio_factory, only: changed_boxes_size_ratio_
 use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
 use procedures_maximum_box_compression_factory, only: maximum_box_compression_create => create, &
     maximum_box_compression_destroy => destroy
+use classes_random_coordinates, only: Abstract_Random_Coordinates
 use procedures_maximum_box_compression_explorer_factory, only: &
     maximum_box_compression_explorer_create => create, &
     maximum_box_compression_explorer_destroy => destroy
@@ -31,6 +32,8 @@ public :: create, destroy
 
 contains
 
+    !> @todo
+    !> multiple boxes generalisation
     subroutine create(markov_chain_explorer, physical_model, visit_energies, exploring_data)
         type(Markov_Chain_Explorer_Wrapper), intent(out) :: markov_chain_explorer
         type(Physical_Model_Wrapper), intent(in) :: physical_model
@@ -44,6 +47,7 @@ contains
         logical :: have_positions(size(physical_model%mixture%gemc_components, 1), &
             size(physical_model%mixture%gemc_components, 2))
         logical :: have_orientations(size(physical_model%mixture%gemc_components, 1))
+        class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
         logical :: can_exchange(size(physical_model%mixture%gemc_components, 1))
 
         measure_pressure_excess = measure_pressure(exploring_data, volume_change_prefix)
@@ -75,23 +79,22 @@ contains
         call boxes_create(markov_chain_explorer%particle_insertion_domains, physical_model%&
             environment%periodic_boxes, physical_model%environment%gemc_visitable_walls, &
             any(can_exchange) .and. any(have_positions), exploring_data, particle_insertion_prefix)
-        call random_coordinates_create(markov_chain_explorer%random_positions, &
-            markov_chain_explorer%particle_insertion_domains, have_positions, can_exchange)
+        call random_coordinates_create(random_positions, markov_chain_explorer%&
+            particle_insertion_domains, have_positions, can_exchange)
         call set_have_orientations(have_orientations, physical_model%mixture%gemc_components(:, 1))
-        call random_coordinates_create(markov_chain_explorer%random_orientation, have_orientations,&
+        call random_coordinates_create(random_orientation, have_orientations,&
             can_exchange)
         call particle_insertion_method_create(markov_chain_explorer%particle_insertion_method, &
-            physical_model, markov_chain_explorer%random_position, markov_chain_explorer%&
-            random_orientation, measure_inv_pow_activities, exploring_data, &
-            particle_insertion_prefix)
+            physical_model, random_positions(1), random_orientation, measure_inv_pow_activities, &
+            exploring_data, particle_insertion_prefix)
+        call random_coordinates_destroy(random_orientation)
+        call random_coordinates_destroy(random_positions)
     end subroutine create
 
     subroutine destroy(markov_chain_explorer)
         type(Markov_Chain_Explorer_Wrapper), intent(inout) :: markov_chain_explorer
 
         call particle_insertion_method_destroy(markov_chain_explorer%particle_insertion_method)
-        call random_coordinates_destroy(markov_chain_explorer%random_orientation)
-        call random_coordinates_destroy(markov_chain_explorer%random_positions)
         call boxes_destroy(markov_chain_explorer%particle_insertion_domains)
         call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
         call changed_boxes_size_ratio_destroy(markov_chain_explorer%changed_boxes_size_ratio)

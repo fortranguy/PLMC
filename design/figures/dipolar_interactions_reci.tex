@@ -29,9 +29,9 @@
 
         \begin{scope}[shift={($(StructureVisitor.north) - (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciWeight}{0, 0}
-                \operation{\procedure{construct}{boxSizeMemento: \type{BoxSizeMemento},
-                    reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity},
-                    alpha: \type{DESconvergenceParameter}}}
+                \operation{\procedure{construct}{$\mathAggregation$ boxSizeMemento:
+                    \type{BoxSizeMemento}, reciprocalLattice: \type{ReciprocalLattice},
+                    permittivity: \type{Permittivity}, alpha: \type{DESconvergenceParameter}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{boxSizeMemento: \type{BoxSizeMemento}}}
                 \operation{\procedure{reset}{}}
@@ -42,7 +42,7 @@
 
         \begin{scope}[shift={($(StructureVisitor.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DLCweight}{0, 0}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox}}}
@@ -72,8 +72,8 @@
         \begin{scope}[shift={($(DESreciWeight.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciVisitor}{0, 0}
                 \inherit{StructureVisitor}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    boxSizeMemento: \type{BoxSizeMemento},
+                \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
+                    $\mathAggregation$ boxSizeMemento: \type{BoxSizeMemento},
                     reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DESreciWeight},
                     structure: \type{DESreciStructure}}}
                 \operation{\procedure{destroy}{}}
@@ -85,10 +85,10 @@
         \begin{scope}[shift={($(DESreciVisitor.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESreciStructure}{0, 0}
                 \inherit{StructureFactor}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    boxSizeMemento: \type{BoxSizeMemento},
+                \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
+                    $\mathAggregation$ boxSizeMemento: \type{BoxSizeMemento},
                     reciprocalLattice: \type{ReciprocalLattice},
-                    components: \type{Component[\numComponents]},
+                    $\mathAggregation$ components: \type{Component[\numComponents]},
                     areDipolar: \type{bool[\numComponents]}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox},
@@ -103,7 +103,7 @@
         \begin{scope}[shift={($(DLCweight.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DLCvisitor}{0, 0}
                 \inherit{StructureVisitor}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DLCweight},
                     structures: \type{DLCstructures}}}
                 \operation{\procedure{destroy}{}}
@@ -115,9 +115,9 @@
         \begin{scope}[shift={($(DLCvisitor.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DLCstructures}{0, 0}
                 \inherit{StructureFactor}
-                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     reciprocalLattice: \type{ReciprocalLattice},
-                    components: \type{Component[\numComponents]},
+                    $\mathAggregation$ components: \type{Component[\numComponents]},
                     areDipolar: \type{bool[\numComponents]}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox},

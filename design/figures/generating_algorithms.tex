@@ -15,26 +15,33 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(GeneratingAlgorithm.north) + (0 cm, 6 cm)$)}]
+        \begin{scope}[shift={($(GeneratingAlgorithm.north) + (0 cm, 7 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{OneParticleMove}{0, 0}
                 \inherit{GeneratingAlgorithm}
-                \operation{\procedure{construct}{environment: \type{Environment},
-                    mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
-                    dipolarInteractions: \type{DipolarInteractions},
-                    changesComponents: \type{ChangesComponent[:]}, canChange: \type{bool[:]},
-                    selectorMold: \type{TowerSampler}}}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                    $\mathAggregation$ mixture: \type{Mixture},
+                    $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                    $\mathAggregation$ dipolarInteractionsDynamic:
+                        \type{DipolarInteractionsDynamic},
+                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                    $\mathAggregation$ changesComponents: \type{ChangesComponent[:]},
+                    canChange: \type{bool[\numComponents]},
+                    $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setSelector}{}}
+                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(OneParticleMove.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth]{\import{}:\\
+                \namespace{Common} :: HeteroCouples \\
+                \namespace{Random} :: TowerSampler \\
                 \namespace{Environment} :: Environment \\
                 \namespace{Mixture} :: Mixture, Component \\
                 \namespace{ShortInteractions} :: ShortInteractions \\
-                \namespace{DipolarInteractions} :: DipolarInteractions \\
+                \namespace{DipolarInteractions} :: DipolarInteractionsDynamic,
+                    DipolarInteractionsStatic, DipolarInteractionsFacade \\
                 \namespace{Changes} :: ChangesComponent, Changes, ChangedBoxSize \\
                 \namespace{Observables} :: Observables};
         \end{scope}
@@ -42,46 +49,64 @@
         \begin{scope}[shift={($(GeneratingAlgorithm.north -| Import)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{TwoParticlesSwitch}{0, 0}
                 \inherit{GeneratingAlgorithm}
-                \operation{\procedure{construct}{environment: \type{Environment},
-                    components: \type{Component[:]}, shortInteractions: \type{ShortInteractions},
-                    dipolarInteractions: \type{DipolarInteractions},
-                    couples: \type{HeteroCouples}, selectorMold: \type{TowerSampler}}}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                    $\mathAggregation$ components: \type{Component[:]},
+                    $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                    $\mathAggregation$ dipolarInteractionsDynamic:
+                        \type{DipolarInteractionsDynamic},
+                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                    $\mathComposition$ couples: \type{HeteroCouples},
+                    $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setSelector}{}}
+                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(OneParticleMove.north) - (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{OneParticleExchange}{0, 0}
                 \inherit{GeneratingAlgorithm}
-                \operation{\procedure{construct}{environment: \type{Environment},
-                    mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
-                    dipolarInteractions: \type{DipolarInteractions}, changes: \type{Changes},
-                    canExchange: \type{bool[:]}, selectorMold: \type{TowerSampler}}}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                    $\mathAggregation$ mixture: \type{Mixture},
+                    $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                    $\mathAggregation$ dipolarInteractionsDynamic:
+                        \type{DipolarInteractionsDynamic},
+                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                    $\mathAggregation$ changes: \type{Changes},
+                    canExchange: \type{bool[\numComponents]},
+                    $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setSelector}{}}
+                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(OneParticleExchange |- GeneratingAlgorithm.north)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{TwoParticlesTransmutation}{0, 0}
                 \inherit{GeneratingAlgorithm}
-                \operation{\procedure{construct}{environment: \type{Environment},
-                    mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
-                    dipolarInteractions: \type{DipolarInteractions}, changes: \type{Changes},
-                    canExchange: \type{bool[:]}, couples: \type{HeteroCouples},
-                    selectorMold: \type{TowerSampler}}}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                    $\mathAggregation$ mixture: \type{Mixture},
+                    $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                    $\mathAggregation$ dipolarInteractionsDynamic:
+                        \type{DipolarInteractionsDynamic},
+                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                    $\mathAggregation$ changes: \type{Changes},
+                    canExchange: \type{bool[\numComponents]},
+                    $\mathComposition$ couples: \type{HeteroCouples},
+                    $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{setSelector}{}}
+                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(TwoParticlesSwitch.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxVolumeChange}{0, 0}
                 \inherit{GeneratingAlgorithm}
-                \operation{\procedure{construct}{environment: \type{Environment},
-                    mixture: \type{Mixture}, shortInteractions: \type{ShortInteractions},
-                    changedBoxSize: \type{ChangedBoxSize}}}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                    $\mathAggregation$ mixture: \type{Mixture},
+                    $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                    $\mathAggregation$ dipolarInteractionsFacade: \type{DipolarInteractionsFacade},
+                    $\mathAggregation$ changedBoxSize: \type{ChangedBoxSize},
+                    havePositions: \type{bool[\numComponents]},
+                    $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
             \end{abstractclass}
         \end{scope}

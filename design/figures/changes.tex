@@ -100,6 +100,12 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(CoordinatesCopier.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{MaximumBoxCompression}{0, 0}
+                \operation[0]{\procedure{getDelta}{minDistanceRatio: \type{real}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[on background layer]
             \composition{ChangedBoxSize}{\refName{changedBoxSizeRatio}}{\numRef{1}}
                 {ChangedBoxSizeRatio}

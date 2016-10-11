@@ -8,7 +8,6 @@ implicit none
 private
 
     type, abstract, public :: Abstract_Coordinates_Copier
-    private
     contains
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_copy), deferred :: copy

@@ -18,8 +18,8 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
-        type(Concrete_Linkable_Node), pointer :: beginning => null()
         class(Abstract_Hard_Contact), pointer :: hard_contact => null()
+        type(Concrete_Linkable_Node), pointer :: beginning => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

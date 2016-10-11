@@ -87,8 +87,8 @@ contains
         do i_box = 1, size(components, 2)
             do i_component = 1, size(components, 1)
                 call component_create(components(i_component, i_box), periodic_boxes(i_box), &
-                    accessible_domains(i_box), exists, can_exchange, generating_data, &
-                    prefix//"Component "//string%get(i_component)//".")
+                    size(periodic_boxes) == 1, accessible_domains(i_box), exists, can_exchange, &
+                    generating_data, prefix//"Component "//string%get(i_component)//".")
             end do
         end do
     end subroutine create_components

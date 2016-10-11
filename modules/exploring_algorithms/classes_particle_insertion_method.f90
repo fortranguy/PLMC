@@ -3,6 +3,7 @@ module classes_particle_insertion_method
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_environment_wrapper, only: Environment_Wrapper
 use classes_num_particles, only: Abstract_Num_Particles
+use procedures_composition_factory, only: composition_destroy => destroy
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
@@ -10,6 +11,7 @@ use procedures_visit_condition, only: visit_different
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add
 use classes_random_coordinates, only: Abstract_Random_Coordinates
+use procedures_random_coordinates_factory, only: random_coordinates_destroy => destroy
 use types_observables_energies, only: Concrete_Single_Energies
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
@@ -22,13 +24,12 @@ private
         Abstract_Particle_Insertion_Method
     private
         type(Environment_Wrapper), pointer :: environment => null()
+        class(Abstract_Num_Particles), allocatable :: nums_particles(:)
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
             null()
-        class(Abstract_Random_Coordinates), pointer :: random_position => null(), &
-            random_orientation => null()
-        class(Abstract_Num_Particles), allocatable :: nums_particles(:)
+        class(Abstract_Random_Coordinates), allocatable :: random_position, random_orientation
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -54,33 +55,32 @@ contains
 
 !implementation Abstract_Particle_Insertion_Method
 
-    subroutine Abstract_construct(this, environment, components, short_interactions, &
-        dipolar_interactions_dynamic, nums_particles, random_position, random_orientation)
+    subroutine Abstract_construct(this, environment, nums_particles, components, &
+        short_interactions, dipolar_interactions_dynamic, random_position, random_orientation)
         class(Abstract_Particle_Insertion_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
+        class(Abstract_Num_Particles), intent(in) :: nums_particles(:)
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
             dipolar_interactions_dynamic
-        class(Abstract_Num_Particles), intent(in) :: nums_particles(:)
-        class(Abstract_Random_Coordinates), target, intent(in) :: random_position, &
-            random_orientation
+        class(Abstract_Random_Coordinates), intent(in) :: random_position, random_orientation
 
         this%environment => environment
+        allocate(this%nums_particles, source=nums_particles)
         this%components => components
         this%short_interactions => short_interactions
         this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
-        allocate(this%nums_particles, source=nums_particles)
-        this%random_position => random_position
-        this%random_orientation => random_orientation
+        allocate(this%random_position, source=random_position)
+        allocate(this%random_orientation, source=random_orientation)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Particle_Insertion_Method), intent(inout) :: this
 
-        this%random_orientation => null()
-        this%random_position => null()
-        if (allocated(this%nums_particles)) deallocate(this%nums_particles)
+        call random_coordinates_destroy(this%random_orientation)
+        call random_coordinates_destroy(this%random_position)
+        call composition_destroy(this%nums_particles)
         this%dipolar_interactions_dynamic => null()
         this%short_interactions => null()
         this%components => null()
@@ -196,17 +196,16 @@ contains
 
 !implementation Null_Particle_Insertion_Method
 
-    subroutine Null_construct(this, environment, components, short_interactions, &
-        dipolar_interactions_dynamic, nums_particles, random_position, random_orientation)
+    subroutine Null_construct(this, environment, nums_particles, components, short_interactions, &
+        dipolar_interactions_dynamic, random_position, random_orientation)
         class(Null_Particle_Insertion_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
+        class(Abstract_Num_Particles), intent(in) :: nums_particles(:)
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
             dipolar_interactions_dynamic
-        class(Abstract_Num_Particles), intent(in) :: nums_particles(:)
-        class(Abstract_Random_Coordinates), target, intent(in) :: random_position, &
-            random_orientation
+        class(Abstract_Random_Coordinates), intent(in) :: random_position, random_orientation
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

@@ -1,6 +1,7 @@
 module classes_plmc_propagator
 
-use classes_tower_sampler, only: Concrete_Tower_Sampler
+use classes_tower_sampler, only: Abstract_Tower_Sampler
+use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_generating_algorithms_wrapper, only: Generating_Algorithm_Pointer, &
     Generating_Algorithms_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
@@ -12,7 +13,7 @@ private
     type, abstract, public :: Abstract_PLMC_Propagator
     private
         type(Generating_Algorithm_Pointer), allocatable :: generating_algorithms(:)
-        type(Concrete_Tower_Sampler) :: selector
+        class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -36,6 +37,8 @@ contains
 
 !implementation Abstract_PLMC_Propagator
 
+    !> @todo
+    !> copy selector
     subroutine Abstract_construct(this, generating_algorithms)
         class(Abstract_PLMC_Propagator), intent(out) :: this
         type(Generating_Algorithm_Pointer), target, intent(in) :: generating_algorithms(:)
@@ -46,7 +49,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
 
-        call this%selector%destroy()
+        call tower_sampler_destroy(this%selector)
         if (allocated(this%generating_algorithms)) then
             deallocate(this%generating_algorithms)
         end if
@@ -61,7 +64,7 @@ contains
             nums_choices(i_choice) = this%generating_algorithms(i_choice)%algorithm%&
                 get_num_choices()
         end do
-        call this%selector%construct(nums_choices)
+        call this%selector%reset(nums_choices)
     end subroutine Abstract_set_selector
 
     subroutine Abstract_try(this, observables)

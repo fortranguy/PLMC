@@ -10,8 +10,9 @@
 
         \begin{scope}
             \begin{abstractclass}[text width=\largeTextWidth]{TowerSampler}{0, 0}
-                \operation{\procedure{construct}{numsCandidates: \type{int[:]}}}
+                \operation{\procedure{construct}{numCandidates: \type{int}}}
                 \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{numsCandidates: \type{int[:]}}}
                 \operation{\procedure{getNumChoices}{}: \type{int}}
                 \operation{\procedure{get}{}: \type{int}}
             \end{abstractclass}

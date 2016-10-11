@@ -57,12 +57,12 @@ contains
     subroutine generating_algorithms_set(generating_algorithms)
         type(Generating_Algorithms_Wrapper), intent(inout) :: generating_algorithms
 
-        call generating_algorithms%one_particle_translation%set_selector()
-        call generating_algorithms%one_particle_rotation%set_selector()
-        call generating_algorithms%two_particles_switch%set_selector()
-        call generating_algorithms%one_particle_add%set_selector()
-        call generating_algorithms%one_particle_remove%set_selector()
-        call generating_algorithms%two_particles_transmutation%set_selector()
+        call generating_algorithms%one_particle_translation%reset_selector()
+        call generating_algorithms%one_particle_rotation%reset_selector()
+        call generating_algorithms%two_particles_switch%reset_selector()
+        call generating_algorithms%one_particle_add%reset_selector()
+        call generating_algorithms%one_particle_remove%reset_selector()
+        call generating_algorithms%two_particles_transmutation%reset_selector()
     end subroutine generating_algorithms_set
 
 end module procedures_generating_algorithms_factory

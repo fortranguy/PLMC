@@ -147,6 +147,26 @@ contains
         call random_seed_set(input_data, random_number_generator_prefix)
     end subroutine set_random_seed
 
+    !> @todo
+    !> [[types_generating_observables_wrapper:Generating_Observables_Wrapper]] to update for
+    !> multiple boxes.
+    subroutine tune_generating_algorithms(i_step, components, markov_chain_generator, observables)
+        integer, intent(in) :: i_step
+        type(Component_Wrapper), intent(inout) :: components(:, :)
+        type(Markov_Chain_Explorer_Wrapper), intent(inout) :: markov_chain_generator
+        type(Generating_Observables_Wrapper), intent(in) :: observables
+
+        integer :: i_box
+        integer :: i_component
+
+        do i_box = 1, size(components, 2)
+            do i_component = 1, size(components, 1)
+                call components(i_component, i_box)%average_num_particles%accumulate(i_step, &
+                    observables%nums_particles(i_component))
+            end do
+        end do
+    end subroutine tune_generating_algorithms
+
     !> @note Beware of inertia
     subroutine tune_moved_coordinates(tuned, i_step, changes, observables)
         logical, intent(out) :: tuned

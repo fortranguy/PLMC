@@ -17,7 +17,6 @@ private
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_boxes_size_ratio(:)
         class(Abstract_Volume_Change_Method), allocatable :: volume_change_method
         class(Abstract_Parallelepiped_Domain), allocatable :: particle_insertion_domains(:)
-        class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
         class(Abstract_Particle_Insertion_Method), allocatable :: particle_insertion_method
 
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_box_size_ratio

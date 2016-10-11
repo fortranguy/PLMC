@@ -6,9 +6,9 @@
 - HardContact: NeighbourCells size must be increased: drawback
 - DipolarVisitor: Self is scalable (instead of O(N)): is it worth it?
 - In DESreciStructure & DESreciVisitor, document the role of boxVolumeMemento
-- doc: \epsilon -> \varepsilon
+- doc: permittivity: \epsilon -> \varepsilon
 - VolumeChange: + or - in observable?
-- Generalise ParticleInsertionMethod (Widom), cf. FS02
+- Generalise ParticleInsertionMethod (Widom) for other ensembles, cf. FS02
 - PeriodicBox: remove getMaxDistance() ?
 - Convert all explorations for multiples boxes & components
 - GEMC conversion: array by default: bad idea?
@@ -20,4 +20,10 @@
 - There are at least two versions of GEMC: ``Canonical'' & ``Isobaric''. I will
     implement the first one.
 - [Data] Fortran code to update, cf. json
-- ComponentAverageNumber: with actual average counting
+- ComponentAverageNumber: with actual average counting for GEMC
+- docUML: reference (& notation) for aggregation (if a class is imported)?
+- NeighbourCells: HS shortcut
++ GeneratingAlgorithms:
+    - promote resetSelectors() in base class
+    - locally: this%selector promote to this%selectors(numBoxes)?
+- docUML: overloaded methods: same name (generic in Fortran)

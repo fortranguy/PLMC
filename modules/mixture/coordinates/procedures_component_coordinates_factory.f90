@@ -13,11 +13,11 @@ public :: create_positions, create_orientations, destroy
 
 contains
 
-    subroutine create_positions(positions, exists, periodic_box, num_particles)
+    subroutine create_positions(positions, periodic_box, num_particles, exists)
         class(Abstract_Component_Coordinates), allocatable, intent(out) :: positions
-        logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Num_Particles), intent(in) :: num_particles
+        logical, intent(in) :: exists
 
         if (exists) then
             allocate(Concrete_Component_Positions :: positions)

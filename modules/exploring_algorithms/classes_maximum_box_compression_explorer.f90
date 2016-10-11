@@ -7,6 +7,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_visitor, only: short_interactions_visit_cells => visit_cells
 use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
+use procedures_maximum_box_compression_factory, only: maximum_box_compression_destroy => destroy
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
 
@@ -79,7 +80,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Maximum_Box_Compression_Explorer), intent(inout) :: this
 
-        if (allocated(this%maximum_box_compression)) deallocate(this%maximum_box_compression)
+        call maximum_box_compression_destroy(this%maximum_box_compression)
         this%short_interactions => null()
         this%components => null()
         this%environment => null()

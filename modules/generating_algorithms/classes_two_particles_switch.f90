@@ -1,7 +1,11 @@
 module classes_two_particles_switch
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use classes_hetero_couples, only: Abstract_Hetero_Couples
+use procedures_hetero_couples_factory, only: hetero_couples_destroy => destroy
 use procedures_random_number, only: random_integer
+use classes_tower_sampler, only: Abstract_Tower_Sampler
+use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -10,8 +14,6 @@ use procedures_visit_condition, only: visit_different
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_translation => visit_translation
-use classes_tower_sampler, only: Abstract_Tower_Sampler
-use classes_hetero_couples, only: Abstract_Hetero_Couples
 use types_observables_energies, only: Concrete_Double_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
@@ -35,7 +37,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: set_selector => Abstract_set_selector
+        procedure :: reset_selector => Abstract_reset_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
@@ -55,7 +57,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: set_selector => Null_set_selector
+        procedure :: reset_selector => Null_reset_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
     end type Null_Two_Particles_Switch
@@ -65,7 +67,7 @@ contains
 !implementation Abstract_Two_Particles_Switch
 
     subroutine Abstract_construct(this, environment, components, short_interactions, &
-        dipolar_interactions_dynamic, dipolar_interactions_static, couples, selector_mold)
+        dipolar_interactions_dynamic, dipolar_interactions_static, couples, selector)
         class(Abstract_Two_Particles_Switch), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
@@ -74,7 +76,7 @@ contains
             dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
+        class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
         this%components => components
@@ -82,20 +84,14 @@ contains
         this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
         this%dipolar_interactions_static => dipolar_interactions_static
         allocate(this%couples, source=couples)
-        allocate(this%selector, mold=selector_mold)
+        allocate(this%selector, source=selector)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
 
-        if (allocated(this%selector)) then
-            call this%selector%destroy()
-            deallocate(this%selector)
-        end if
-        if (allocated(this%couples)) then
-            call this%couples%destroy()
-            deallocate(this%couples)
-        end if
+        call tower_sampler_destroy(this%selector)
+        call hetero_couples_destroy(this%couples)
         this%dipolar_interactions_static => null()
         this%dipolar_interactions_dynamic => null()
         this%short_interactions => null()
@@ -103,7 +99,10 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_set_selector(this)
+    !> @todo
+    !> What is the best compromise: minval(), maxval() or average()?
+    !> cf. [[classes_two_particles_transmutation:Abstract_reset_selector]] also.
+    subroutine Abstract_reset_selector(this)
         class(Abstract_Two_Particles_Switch), intent(inout) :: this
 
         integer :: nums_candidates(this%couples%get_num())
@@ -111,12 +110,11 @@ contains
 
         do i_candidate = 1, size(nums_candidates)
             ij_couple = this%couples%get(i_candidate)
-            nums_candidates(i_candidate) = minval([this%components(ij_couple(1))%average_number%&
-                get(), this%components(ij_couple(2))%average_number%get()])
-                !What is the best compromise: minval(), maxval() or average()?
+            nums_candidates(i_candidate) = minval([this%components(ij_couple(1))%average_num_particles%&
+                get(), this%components(ij_couple(2))%average_num_particles%get()])
         end do
-        call this%selector%construct(nums_candidates)
-    end subroutine Abstract_set_selector
+        call this%selector%reset(nums_candidates)
+    end subroutine Abstract_reset_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Two_Particles_Switch), intent(in) :: this
@@ -338,7 +336,7 @@ contains
 !implementation Null_Two_Particles_Switch
 
     subroutine Null_construct(this, environment, components, short_interactions, &
-        dipolar_interactions_dynamic, dipolar_interactions_static, couples, selector_mold)
+        dipolar_interactions_dynamic, dipolar_interactions_static, couples, selector)
         class(Null_Two_Particles_Switch), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Component_Wrapper), target, intent(in) :: components(:)
@@ -347,16 +345,16 @@ contains
             dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
         class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
+        class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Two_Particles_Switch), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_set_selector(this)
+    subroutine Null_reset_selector(this)
         class(Null_Two_Particles_Switch), intent(inout) :: this
-    end subroutine Null_set_selector
+    end subroutine Null_reset_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Two_Particles_Switch), intent(in) :: this

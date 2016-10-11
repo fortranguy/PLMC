@@ -43,10 +43,16 @@
         the program. And it will be the key to switch between local alternatives.
     \end{abstract}
 
-    Notation:
-    \type{Type[:, ..., :]} is an array of \type{Type}.
-    The special case \type{Type[:, :]\textsubscript{\sym}} means it's symmetric.
-    As a result, only the triangular values need to be stored.
+    Notations:
+    \begin{itemize}
+        \item \type{Type[:, ..., :]} is an array of \type{Type}.
+            The special case \type{Type[:, :]\textsubscript{\sym}} means it's a 2D symmetric array.
+            Hence, only the (upper or lower) triangular values need to be stored.
+        \item $\mathAggregation$ \textsf{object}: \type{Class} and
+            $\mathComposition$ \textsf{object}: \type{Class} are shorthands for aggregation and
+            composition respectively. They are used when \type{Class} is defined outside the current
+            namespace, cf. \textsf{\import{}}.
+    \end{itemize}
 
     \newpage
     \tableofcontents

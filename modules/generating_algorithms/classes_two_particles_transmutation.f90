@@ -2,6 +2,10 @@ module classes_two_particles_transmutation
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_random_number, only: random_integer
+use classes_hetero_couples, only: Abstract_Hetero_Couples
+use procedures_hetero_couples_factory, only: hetero_couples_destroy => destroy
+use classes_tower_sampler, only: Abstract_Tower_Sampler
+use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
@@ -11,8 +15,6 @@ use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynam
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_add => visit_add, &
     dipoles_field_visit_remove => visit_remove
-use classes_tower_sampler, only: Abstract_Tower_Sampler
-use classes_hetero_couples, only: Abstract_Hetero_Couples
 use types_changes_wrapper, only: Changes_Wrapper
 use types_observables_energies, only: Concrete_Double_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
@@ -40,7 +42,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: set_selector => Abstract_set_selector
+        procedure :: reset_selector => Abstract_reset_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
@@ -62,7 +64,7 @@ private
     contains
     procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: set_selector => Null_set_selector
+        procedure :: reset_selector => Null_reset_selector
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
     end type Null_Two_Particles_Transmutation
@@ -73,7 +75,7 @@ contains
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, couples, &
-        selector_mold)
+        selector)
         class(Abstract_Two_Particles_Transmutation), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -84,7 +86,7 @@ contains
         type(Changes_Wrapper), target, intent(in) :: changes
         logical, intent(in) :: can_exchange(:)
         class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
+        class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
         this%mixture => mixture
@@ -94,22 +96,15 @@ contains
         this%changes => changes
         allocate(this%can_exchange, source=can_exchange)
         allocate(this%couples, source=couples)
-        allocate(this%selector, mold=selector_mold)
-        !this%selector: delayed construction in [[Abstract_set_selector]]
+        allocate(this%selector, source=selector)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Two_Particles_Transmutation), intent(inout) :: this
 
-        if (allocated(this%selector)) then
-            call this%selector%destroy()
-            deallocate(this%selector)
-        end if
-        if (allocated(this%couples)) then
-            call this%couples%destroy()
-            deallocate(this%couples)
-        end if
-        !this%can_exchange: early deallocation in [[Abstract_set_selector]]
+        call tower_sampler_destroy(this%selector)
+        call hetero_couples_destroy(this%couples)
+        if (allocated(this%can_exchange)) deallocate(this%can_exchange)
         this%changes => null()
         this%dipolar_interactions_static => null()
         this%dipolar_interactions_dynamic => null()
@@ -118,7 +113,9 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_set_selector(this)
+    !> @todo
+    !> cf. [[classes_two_particles_switch:Abstract_reset_selector]]
+    subroutine Abstract_reset_selector(this)
         class(Abstract_Two_Particles_Transmutation), intent(inout) :: this
 
         integer :: nums_candidates(this%couples%get_num())
@@ -127,14 +124,12 @@ contains
         do i_candidate = 1, size(nums_candidates)
             ij_couple = this%couples%get(i_candidate)
             nums_candidates(i_candidate) = &
-                merge(minval([this%mixture%components(ij_couple(1))%average_number%get(), &
-                    this%mixture%components(ij_couple(2))%average_number%get()]), &
+                merge(minval([this%mixture%components(ij_couple(1))%average_num_particles%get(), &
+                    this%mixture%components(ij_couple(2))%average_num_particles%get()]), &
                 0, this%can_exchange(ij_couple(1)) .and. this%can_exchange(ij_couple(2)))
-                !What is the best compromise: minval(), maxval() or average()?
         end do
-        if (allocated(this%can_exchange)) deallocate(this%can_exchange)
-        call this%selector%construct(nums_candidates)
-    end subroutine Abstract_set_selector
+        call this%selector%reset(nums_candidates)
+    end subroutine Abstract_reset_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Two_Particles_Transmutation), intent(in) :: this
@@ -377,7 +372,7 @@ contains
 
     subroutine Null_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, couples, &
-        selector_mold)
+        selector)
         class(Null_Two_Particles_Transmutation), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -388,16 +383,16 @@ contains
         type(Changes_Wrapper), target, intent(in) :: changes
         logical, intent(in) :: can_exchange(:)
         class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Tower_Sampler), intent(in) :: selector_mold
+        class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Two_Particles_Transmutation), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_set_selector(this)
+    subroutine Null_reset_selector(this)
         class(Null_Two_Particles_Transmutation), intent(inout) :: this
-    end subroutine Null_set_selector
+    end subroutine Null_reset_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Two_Particles_Transmutation), intent(in) :: this

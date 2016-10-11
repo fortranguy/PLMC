@@ -14,9 +14,9 @@ private
     type, abstract, public :: Abstract_DES_Self_Component
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Component_Dipole_Moments), pointer :: dipole_moments => null()
         real(DP) :: factor_denominator = 0._DP
         real(DP) :: alpha_x_box_edge = 0._DP
-        class(Abstract_Component_Dipole_Moments), pointer :: dipole_moments => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

@@ -3,6 +3,7 @@
 \usepackage{fontspec}
 \usepackage{csquotes}
 
+\usepackage{amssymb}
 \usepackage{verbatim}
 \usepackage{xcolor}
 \newcommand{\type}[1]{\texttt{#1}}
@@ -19,6 +20,8 @@
 \restoresymbol{UML}{attribute}
 \usetikzlibrary{calc, backgrounds}
 \def\scale{0.7}
+\def\mathAggregation{\ensuremath{\textcolor{\umldrawcolor}{\lozenge}}}
+\def\mathComposition{\ensuremath{\textcolor{\umldrawcolor}{\blacklozenge}}}
 \pgfmathsetmacro{\smallTextWidth}{3.75 cm}
 \pgfmathsetmacro{\mediumTextWidth}{5 cm}
 \pgfmathsetmacro{\largeTextWidth}{7 cm}

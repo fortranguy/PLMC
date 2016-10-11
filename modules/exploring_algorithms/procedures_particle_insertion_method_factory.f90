@@ -3,8 +3,9 @@ module procedures_particle_insertion_method_factory
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
-use classes_num_particles, only: Abstract_Num_Particles, Concrete_Num_Particles, &
-    Null_Num_Particles
+use classes_num_particles, only: Abstract_Num_Particles
+use procedures_composition_factory, only: composition_create => create, composition_destroy => &
+    destroy
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_random_coordinates, only: Abstract_Random_Coordinates
 use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method, &
@@ -34,10 +35,10 @@ contains
         logical :: data_found
         integer :: i_component
 
+        call composition_create(nums_particles, size(physical_model%mixture%components), &
+            measure_inv_pow_activities)
         if (measure_inv_pow_activities) then
             allocate(Concrete_Particle_Insertion_Method :: particle_insertion_method)
-            allocate(Concrete_Num_Particles :: nums_particles(size(physical_model%mixture%&
-                components)))
             do i_component = 1, size(nums_particles)
                 data_field = prefix//"Component "//string%get(i_component)//".number of particles"
                 call exploring_data%get(data_field, num_particles, data_found)
@@ -46,11 +47,12 @@ contains
             end do
         else
             allocate(Null_Particle_Insertion_Method :: particle_insertion_method)
-            allocate(Null_Num_Particles :: nums_particles(1))
         end if
-        call particle_insertion_method%construct(physical_model%environment, physical_model%&
-            mixture%components, physical_model%short_interactions, physical_model%&
-            dipolar_interactions_dynamic, nums_particles, random_position, random_orientation)
+
+        call particle_insertion_method%construct(physical_model%environment, nums_particles, &
+            physical_model%mixture%components, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_dynamic, random_position, random_orientation)
+        call composition_destroy(nums_particles)
     end subroutine create
 
     subroutine destroy(particle_insertion_method)

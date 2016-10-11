@@ -4,6 +4,8 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use types_logical_line, only: Concrete_Logical_Line
 use procedures_logical_factory, only: logical_create => create
+use classes_tower_sampler, only: Abstract_Tower_Sampler
+use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
@@ -39,6 +41,8 @@ private
         class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facade => &
             null()
         class(Abstract_Changed_Box_Size), pointer :: changed_box_size => null()
+        logical, allocatable :: have_positions(:)
+        class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -68,7 +72,7 @@ contains
 !implementation Abstract_Box_Volume_Change
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions_facade, changed_box_size)
+        dipolar_interactions_facade, changed_box_size, have_positions, selector)
         class(Abstract_Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -76,17 +80,23 @@ contains
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facade
         class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
+        logical, intent(in) :: have_positions(:)
+        class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
         this%mixture => mixture
         this%short_interactions => short_interactions
         this%dipolar_interactions_facade => dipolar_interactions_facade
         this%changed_box_size => changed_box_size
+        allocate(this%have_positions, source=have_positions)
+        allocate(this%selector, source=selector)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_Box_Volume_Change), intent(inout) :: this
 
+        call tower_sampler_destroy(this%selector)
+        if (allocated(this%have_positions)) deallocate(this%have_positions)
         this%changed_box_size => null()
         this%dipolar_interactions_facade => null()
         this%short_interactions => null()
@@ -286,7 +296,7 @@ contains
 !implementation Null_Box_Volume_Change
 
     subroutine Null_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions_facade, changed_box_size)
+        dipolar_interactions_facade, changed_box_size, have_positions, selector)
         class(Null_Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -294,6 +304,8 @@ contains
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facade
         class(Abstract_Changed_Box_Size), target, intent(in) :: changed_box_size
+        logical, intent(in) :: have_positions(:)
+        class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
