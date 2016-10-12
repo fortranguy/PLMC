@@ -21,7 +21,7 @@ use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit =>
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use procedures_triangle_observables, only: operator(-)
-use types_observables_energies, only: Concrete_Energies
+use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
@@ -151,9 +151,9 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
         real(DP), intent(in) :: box_size_ratio(:)
-        type(Concrete_Energies), intent(in) :: energies
+        type(Concrete_Observables_Energies), intent(in) :: energies
 
-        type(Concrete_Energies) :: deltas, new_energies
+        type(Concrete_Observables_Energies) :: deltas, new_energies
 
         call observables_energies_create(deltas, size(this%components))
         call observables_energies_create(new_energies, size(this%components))

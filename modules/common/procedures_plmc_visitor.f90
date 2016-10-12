@@ -6,7 +6,7 @@ use procedures_short_interactions_visitor, only: short_interactions_visit => vis
     short_interactions_visit_cells => visit_cells
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
-use types_observables_energies, only: Concrete_Energies
+use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_property_inquirers, only: logical_from_json
 
 implicit none
@@ -33,7 +33,7 @@ contains
     end subroutine set_visit_energies
 
     subroutine visit_generating(energies, physical_model)
-        type(Concrete_Energies), intent(inout) :: energies
+        type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
 
         logical :: overlap
@@ -53,7 +53,7 @@ contains
     end subroutine visit_generating
 
     subroutine visit_exploring(energies, physical_model, visit_energies)
-        type(Concrete_Energies), intent(inout) :: energies
+        type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         logical, intent(in) :: visit_energies
 

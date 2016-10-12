@@ -10,7 +10,7 @@ use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
 use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_reals_line, only: Reals_Line
-use procedures_observables_factory_micro, only: create_triangle_nodes, destroy_triangle_nodes
+use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 use procedures_triangle_observables, only: triangle_observables_init, triangle_observables_add
 
 implicit none
@@ -45,15 +45,15 @@ contains
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
 
-        type(Reals_Line) :: real_energies(size(components))
+        type(Reals_Line), allocatable :: real_energies(:)
         real(DP) :: self_energies(size(components))
 
         call triangle_observables_init(energies)
 
-        call create_triangle_nodes(real_energies)
+        call reals_create(real_energies, size(components))
         call visit_des_real(real_energies, components, dipolar_interactions_dynamic%real_components)
         call triangle_observables_add(energies, real_energies)
-        call destroy_triangle_nodes(real_energies)
+        call reals_destroy(real_energies)
 
         call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
         call triangle_observables_add(energies, -self_energies)

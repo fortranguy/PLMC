@@ -3,7 +3,7 @@ module procedures_plmc_writer
 use data_output_objects, only: random_number_generator_object
 use json_module, only: json_core, json_value
 use procedures_random_seed_factory, only: random_seed_write => write
-use types_observables_energies, only: Concrete_Energies
+use types_observables_energies, only: Concrete_Observables_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use types_energies_writers, only: Concrete_Energies_Writers
@@ -70,7 +70,7 @@ contains
 
     subroutine write_energies(writers, energies, i_step)
         type(Concrete_Energies_Writers), intent(in) :: writers
-        type(Concrete_Energies), intent(in) :: energies
+        type(Concrete_Observables_Energies), intent(in) :: energies
         integer, intent(in) :: i_step
 
         call writers%field_energies%write(i_step, energies%field_energies)

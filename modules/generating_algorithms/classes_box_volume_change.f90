@@ -21,7 +21,7 @@ use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit =>
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use procedures_triangle_observables, only: operator(-)
-use types_observables_energies, only: Concrete_Energies
+use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
@@ -115,7 +115,7 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        type(Concrete_Energies) :: new_energies
+        type(Concrete_Observables_Energies) :: new_energies
         real(DP), dimension(num_dimensions) :: new_box_size, box_size, box_size_ratio
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
         type(Concrete_Logical_Line), allocatable :: only_resized_triangle(:)
@@ -154,12 +154,12 @@ contains
     subroutine Abstract_metropolis_algorithm(this, success, new_energies, box_size_ratio, energies)
         class(Abstract_Box_Volume_Change), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Energies), intent(inout) :: new_energies
+        type(Concrete_Observables_Energies), intent(inout) :: new_energies
         real(DP), intent(in) :: box_size_ratio(:)
-        type(Concrete_Energies), intent(in) :: energies
+        type(Concrete_Observables_Energies), intent(in) :: energies
 
         real(DP) :: delta_energy
-        type(Concrete_Energies) :: deltas
+        type(Concrete_Observables_Energies) :: deltas
 
         logical :: overlap
 

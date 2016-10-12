@@ -28,7 +28,8 @@ implicit none
     call plmc_set(io%generating_data)
     call plmc_set(num_tuning_steps, num_steps, io%generating_data)
     call plmc_create(markov_chain_generator, physical_model, num_tuning_steps, io%generating_data)
-    call plmc_create(observables, physical_model%mixture%components)
+    call plmc_create(observables, physical_model%environment%periodic_boxes, &
+        physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_generator%changes, &
         io%generating_data)
     call plmc_set(io%readers, io%generating_data)

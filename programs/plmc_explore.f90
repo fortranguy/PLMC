@@ -33,7 +33,8 @@ implicit none
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, visit_energies, io%&
         exploring_data)
         !! @bug [[markov_chain_explorer_create]] must be in [[plmc_create]]: ifort bug?
-    call plmc_create(observables, physical_model%mixture%components)
+    call plmc_create(observables, physical_model%environment%periodic_boxes, &
+        physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_explorer, visit_energies)
     call plmc_destroy(io%generating_data, io%exploring_data)
     call plmc_create(io%json, io%report_data)

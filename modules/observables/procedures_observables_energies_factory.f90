@@ -3,9 +3,8 @@ module procedures_observables_energies_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_reals_line, only: Reals_Line
 use types_observables_energies, only: Concrete_Single_Energies, Concrete_Double_Energies, &
-    Concrete_Energies
-use procedures_observables_factory_micro, only: create_reals, create_triangle_reals, destroy_reals,&
-    destroy_triangle_reals
+    Concrete_Observables_Energies
+use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 
 implicit none
 
@@ -13,14 +12,14 @@ private
 public :: create, destroy, set
 
 interface create
-    module procedure :: create_all
-    module procedure :: create_reals
-    module procedure :: create_triangle_reals
+    module procedure :: create_line
+    module procedure :: create_element
 end interface create
 
 interface destroy
-    module procedure :: destroy_all
-end interface destroy
+    module procedure :: destroy_element
+    module procedure :: destroy_line
+end interface
 
 interface set
     module procedure :: set_energies
@@ -30,27 +29,54 @@ end interface set
 
 contains
 
-    pure subroutine create_all(energies, num_components)
-        type(Concrete_Energies), intent(out) :: energies
+    pure subroutine create_line(energies, num_boxes, num_components)
+        type(Concrete_Observables_Energies), allocatable, intent(out) :: energies(:)
+        integer, intent(in) :: num_boxes, num_components
+
+        integer :: i_box
+
+        allocate(energies(num_boxes))
+        do i_box = 1, size(energies)
+            call create(energies(i_box), num_components)
+        end do
+    end subroutine create_line
+
+    pure subroutine destroy_line(energies)
+        type(Concrete_Observables_Energies), allocatable, intent(inout) :: energies(:)
+
+        integer :: i_box
+
+        if (allocated(energies)) then
+            do i_box = size(energies), 1, -1
+                call destroy(energies(i_box))
+            end do
+            deallocate(energies)
+        end if
+    end subroutine destroy_line
+
+    pure subroutine create_element(energies, num_components)
+        type(Concrete_Observables_Energies), intent(out) :: energies
         integer, intent(in) :: num_components
 
-        call create(energies%walls_energies, num_components)
-        call create(energies%short_energies, num_components)
-        call create(energies%field_energies, num_components)
-        call create(energies%dipolar_energies, num_components)
-    end subroutine create_all
+        allocate(energies%walls_energies(num_components))
+        energies%walls_energies = 0._DP
+        call reals_create(energies%short_energies, num_components)
+        allocate(energies%field_energies(num_components))
+        energies%field_energies = 0._DP
+        call reals_create(energies%dipolar_energies, num_components)
+    end subroutine create_element
 
-    pure subroutine destroy_all(energies)
-        type(Concrete_Energies), intent(inout) :: energies
+    pure subroutine destroy_element(energies)
+        type(Concrete_Observables_Energies), intent(inout) :: energies
 
-        call destroy_triangle_reals(energies%dipolar_energies)
-        call destroy_reals(energies%field_energies)
-        call destroy_triangle_reals(energies%short_energies)
-        call destroy_reals(energies%walls_energies)
-    end subroutine destroy_all
+        call reals_destroy(energies%dipolar_energies)
+        if (allocated(energies%field_energies)) deallocate(energies%field_energies)
+        call reals_destroy(energies%short_energies)
+        if (allocated(energies%walls_energies)) deallocate(energies%walls_energies)
+    end subroutine destroy_element
 
     pure subroutine add_single(energies, deltas, i_actor)
-        type(Concrete_Energies), intent(inout) :: energies
+        type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Concrete_Single_Energies), intent(in) :: deltas
         integer, intent(in) :: i_actor
 
@@ -63,7 +89,7 @@ contains
     end subroutine add_single
 
     pure subroutine add_double(energies, deltas, ij_actors)
-        type(Concrete_Energies), intent(inout) :: energies
+        type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Concrete_Double_Energies), intent(in) :: deltas
         integer, intent(in) :: ij_actors(:)
 
@@ -98,8 +124,8 @@ contains
     end subroutine add_energies
 
     pure subroutine set_energies(target_energies, source_energies)
-        type(Concrete_Energies), intent(inout) :: target_energies
-        type(Concrete_Energies), intent(in) :: source_energies
+        type(Concrete_Observables_Energies), intent(inout) :: target_energies
+        type(Concrete_Observables_Energies), intent(in) :: source_energies
 
         target_energies%walls_energies = source_energies%walls_energies
         call set_energies_triangle(target_energies%short_energies, source_energies%short_energies)

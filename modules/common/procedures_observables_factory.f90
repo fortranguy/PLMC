@@ -1,5 +1,6 @@
 module procedures_observables_factory
 
+use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_generating_observables_factory, only: generating_create => create, &
@@ -16,11 +17,12 @@ public :: observables_create_generating, observables_create_exploring, &
 
 contains
 
-    subroutine observables_create_generating(observables, components)
+    subroutine observables_create_generating(observables, periodic_boxes, components)
         type(Generating_Observables_Wrapper), intent(out) :: observables
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call generating_create(observables, size(components))
+        call generating_create(observables, size(periodic_boxes), size(components))
     end subroutine observables_create_generating
 
     subroutine observables_destroy_generating(observables)
@@ -29,11 +31,12 @@ contains
         call generating_destroy(observables)
     end subroutine observables_destroy_generating
 
-    subroutine observables_create_exploring(observables, components)
+    subroutine observables_create_exploring(observables, periodic_boxes, components)
         type(Exploring_Observables_Wrapper), intent(out) :: observables
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
-        call exploring_create(observables, size(components))
+        call exploring_create(observables, size(components), size(periodic_boxes))
     end subroutine observables_create_exploring
 
     subroutine observables_destroy_exploring(observables)

@@ -166,7 +166,9 @@
 		<Unit filename="modules/common/procedures_geometry.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/common/procedures_hetero_couples_factory.f90" />
+		<Unit filename="modules/common/procedures_hetero_couples_factory.f90">
+			<Option weight="3" />
+		</Unit>
 		<Unit filename="modules/common/procedures_json_data_factory.f90">
 			<Option weight="3" />
 		</Unit>
@@ -209,6 +211,9 @@
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/common/procedures_reals_factory.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="modules/common/procedures_visit_condition.f90">
 			<Option weight="0" />
 		</Unit>
@@ -234,6 +239,9 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/common/types_potential_domain_selector.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/common/types_reals_line.f90">
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_des_convergence_parameter.f90">
@@ -504,7 +512,7 @@
 			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_generating_algorithm.f90">
-			<Option weight="3" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_one_particle_exchange.f90">
 			<Option weight="11" />
@@ -633,13 +641,13 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/observables/procedures_generating_observables_factory.f90">
-			<Option weight="3" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/observables/procedures_observables_changes_factory.f90">
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/observables/procedures_observables_energies_factory.f90">
 			<Option weight="2" />
-		</Unit>
-		<Unit filename="modules/observables/procedures_observables_factory_micro.f90">
-			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/observables/procedures_triangle_observables.f90">
 			<Option weight="1" />
@@ -648,13 +656,13 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/observables/types_generating_observables_wrapper.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/observables/types_observables_changes.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/observables/types_observables_energies.f90">
 			<Option weight="1" />
-		</Unit>
-		<Unit filename="modules/observables/types_reals_line.f90">
-			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/random/classes_random_coordinates.f90">
 			<Option weight="1" />

@@ -19,10 +19,10 @@ private
         real(DP) :: dipolar_shared_energy = 0._DP
     end type Concrete_Double_Energies
 
-    type, public :: Concrete_Energies
+    type, public :: Concrete_Observables_Energies
         real(DP), allocatable :: walls_energies(:), field_energies(:)
         type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_shared_energy = 0._DP
-    end type Concrete_Energies
+    end type Concrete_Observables_Energies
 
 end module types_observables_energies
