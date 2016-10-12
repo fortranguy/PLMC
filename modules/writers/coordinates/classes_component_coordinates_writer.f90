@@ -44,23 +44,23 @@ contains
 
 !implementation Abstract_Component_Coordinates_Writer
 
-    subroutine Abstract_construct(this, i_component, positions, orientations, coordinates_selector)
+    subroutine Abstract_construct(this, i_component, positions, orientations, selector)
         class(Abstract_Component_Coordinates_Writer), intent(out) :: this
         integer, intent(in) :: i_component
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        type(Component_Coordinates_Writer_Selector), intent(in) :: selector
 
         call check_positive("Abstract_Component_Coordinates_Writer: construct", "i_component", &
             i_component)
         this%i_component = i_component
         this%positions => positions
         this%orientations => orientations
-        if (coordinates_selector%write_positions) then
+        if (selector%write_positions) then
             allocate(Concrete_Number_to_String :: this%string_positions)
         else
             allocate(Null_Number_to_String :: this%string_positions)
         end if
-        if (coordinates_selector%write_orientations) then
+        if (selector%write_orientations) then
             allocate(Concrete_Number_to_String :: this%string_orientations)
         else
             allocate(Null_Number_to_String :: this%string_orientations)
@@ -99,11 +99,11 @@ contains
 
 !implementation Null_Component_Coordinates_Writer
 
-    subroutine Null_construct(this, i_component, positions, orientations, coordinates_selector)
+    subroutine Null_construct(this, i_component, positions, orientations, selector)
         class(Null_Component_Coordinates_Writer), intent(out) :: this
         integer, intent(in) :: i_component
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
+        type(Component_Coordinates_Writer_Selector), intent(in) :: selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

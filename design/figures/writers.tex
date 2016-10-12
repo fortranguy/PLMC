@@ -13,7 +13,7 @@
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
                     componentsCoordinates: \type{ComponentCoordinatesWriter[:]},
                     componentsSelectors: \type{ComponentCoordinatesWriterSelector[:]},
-                    basename: \type{char[:]}, period: \type{int}}}
+                    basename: \type{String}, period: \type{int}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{write}{iStep: \type{int}}}
             \end{abstractclass}
@@ -33,8 +33,8 @@
 
         \begin{scope}[shift={($(ComponentCoordinatesWriter.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{ChangesSuccessWriter}{0, 0}
-                \operation{\procedure{construct}{selector: \type{ChangesSelector},
-                    filename: \type{char[:]}}}
+                \operation{\procedure{construct}{selector: \type{ChangesSuccessWriterSelector},
+                    filename: \type{String}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{write}{iStep: \type{int},
                     changesSuccess: \type{ChangesSuccess}}}
@@ -52,20 +52,31 @@
         \end{scope}
 
         \begin{scope}[shift={($(EnergiesWriters.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{SquareWriter}{0, 0}
-                \operation{\procedure{construct}{selector: \type{bool[::]},
-                    filename: \type{char[:]}}}
+            \begin{abstractclass}[text width=\largeTextWidth]{RectangleWriter}{0, 0}
+                \operation{\procedure{construct}{selector: \type{bool[:, :]},
+                    filename: \type{String}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real[::]}}}
+                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real[:, :]}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(SquareWriter.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(RectangleWriter.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{TriangleWriter}{0, 0}
-                \operation{\procedure{construct}{selector: \type{bool[:.]},
-                    filename: \type{char[:]}}}
+                \operation{\procedure{construct}{selector: \type{bool[:, :]\textsubscript{\sym}},
+                    filename: \type{String}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real[:.]}}}
+                \operation{\procedure{write}{iStep: \type{int},
+                    observable: \type{real[:, :]\textsubscript{\sym}}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(TriangleWriter.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{LineWriter}{0, 0}
+                \operation{\procedure{construct}{selector: \type{bool[:]},
+                    filename: \type{String}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real[:]}}}
+                \operation{\procedure{write}{iStep: \type{int}, observable: \type{int[:]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -77,23 +88,28 @@
                 \namespace{Observables} :: ChangesSuccess};
         \end{scope}
 
-        \begin{scope}[shift={($(SquareWriter.north -| Import) + (0 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(RectangleWriter.north -| Import) + (0 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{RealWriter}{0, 0}
-                \operation{\procedure{construct}{filename: \type{char[:]}}}
+                \operation{\procedure{construct}{filename: \type{String}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{writeScalar}{iStep: \type{int}, observable: \type{real}}}
-                \operation{\procedure{writeArray}{iStep: \type{int}, observable: \type{real[:]}}}
+                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real}}}
+                \operation{\procedure{write}{iStep: \type{int}, observable: \type{real[:]}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(TriangleWriter.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{LineWriter}{0, 0}
-                \operation{\procedure{construct}{selector: \type{bool[:]},
-                    filename: \type{char[:]}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{writeReals}{iStep: \type{int}, observable: \type{real[:]}}}
-                \operation{\procedure{writeIntegers}{iStep: \type{int}, observable: \type{int[:]}}}
-            \end{abstractclass}
+        \begin{scope}[shift={($(RealWriter.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ComponentCoordinatesWriterSelector}{0, 0}
+                \UMLattribute{writePositions: \type{bool}}
+                \UMLattribute{writeOrientations: \type{bool}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(LineWriter.north -| ComponentCoordinatesWriterSelector)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ChangesSuccessWriterSelector}{0, 0}
+                \UMLattribute{writeTranslations: \type{bool}}
+                \UMLattribute{writeRotations: \type{bool}}
+                \UMLattribute{writeExchanges: \type{bool}}
+            \end{class}
         \end{scope}
 
         \begin{scope}[on background layer]

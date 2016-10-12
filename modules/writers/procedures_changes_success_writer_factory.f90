@@ -5,8 +5,9 @@ use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only:  component_can_translate, component_can_rotate, &
     component_can_exchange
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use classes_changes_success_writer, only: Concrete_Changes_Selector, &
-    Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
+use types_changes_success_writer_selector, only: Changes_Success_Writer_Selector
+use classes_changes_success_writer, only: Abstract_Changes_Success_Writer, &
+    Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
 use types_changes_success_writer_wrapper, only: Changes_Success_Writer_Wrapper
 
 implicit none
@@ -31,7 +32,7 @@ contains
         type(Changes_Component_Wrapper), intent(in) :: changes_components(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
-        type(Concrete_Changes_Selector) :: selector_i
+        type(Changes_Success_Writer_Selector) :: selector_i
         type(Concrete_Number_to_String) :: string
         integer :: i_component
 
@@ -63,7 +64,7 @@ contains
 
     subroutine create_element(changes, selector, filename)
         class(Abstract_Changes_Success_Writer), allocatable, intent(out) :: changes
-        type(Concrete_Changes_Selector), intent(in) :: selector
+        type(Changes_Success_Writer_Selector), intent(in) :: selector
         character(len=*), intent(in) :: filename
 
         if (selector%write_translations) then

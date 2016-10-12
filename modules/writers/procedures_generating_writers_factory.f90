@@ -16,8 +16,8 @@ use procedures_line_writer_factory, only: line_writer_create => create, &
     line_writer_destroy => destroy
 use procedures_triangle_writer_factory, only: triangle_writer_create => create, &
     triangle_writer_destroy => destroy
-use procedures_square_writer_factory, only: square_writer_create => create_transmutations, &
-    square_writer_destroy => destroy
+use procedures_rectangle_writer_factory, only: rectangle_writer_create => create_transmutations, &
+    rectangle_writer_destroy => destroy
 use procedures_changes_success_writer_factory, only: changes_success_writer_create => create, &
     changes_success_writer_destroy => destroy
 use procedures_energies_writers_factory, only: energies_writers_create => create, &
@@ -61,14 +61,14 @@ contains
             components)
         call triangle_writer_create(writers%switches_successes, components, &
             "switches_successes.out")
-        call square_writer_create(writers%transmutations_successes, components, &
+        call rectangle_writer_create(writers%transmutations_successes, components, &
             "transmutations_successes.out")
     end subroutine create
 
     subroutine destroy(writers)
         type(Generating_Writers_Wrapper), intent(inout) :: writers
 
-        call square_writer_destroy(writers%transmutations_successes)
+        call rectangle_writer_destroy(writers%transmutations_successes)
         call triangle_writer_destroy(writers%switches_successes)
         call changes_success_writer_destroy(writers%components_changes)
         call energies_writers_destroy(writers%energies)

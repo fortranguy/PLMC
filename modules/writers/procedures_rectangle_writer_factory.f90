@@ -1,8 +1,9 @@
-module procedures_square_writer_factory
+module procedures_rectangle_writer_factory
 
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only: component_can_exchange
-use classes_square_writer, only: Abstract_Square_Writer, Concrete_Square_Writer, Null_Square_Writer
+use classes_rectangle_writer, only: Abstract_Rectangle_Writer, Concrete_Rectangle_Writer, &
+    Null_Rectangle_Writer
 
 implicit none
 
@@ -12,7 +13,7 @@ public :: create_transmutations, destroy
 contains
 
     subroutine create_transmutations(transmutations, components, filename)
-        class(Abstract_Square_Writer), allocatable, intent(out) :: transmutations
+        class(Abstract_Rectangle_Writer), allocatable, intent(out) :: transmutations
         type(Component_Wrapper), intent(in) :: components(:)
         character(len=*), intent(in) :: filename
 
@@ -32,20 +33,20 @@ contains
             end do
         end do
         if (some_couples_can_exchange) then
-            allocate(Concrete_Square_Writer :: transmutations)
+            allocate(Concrete_Rectangle_Writer :: transmutations)
         else
-            allocate(Null_Square_Writer :: transmutations)
+            allocate(Null_Rectangle_Writer :: transmutations)
         end if
         call transmutations%construct(selectors, filename)
     end subroutine create_transmutations
 
-    subroutine destroy(square)
-        class(Abstract_Square_Writer), allocatable, intent(out) :: square
+    subroutine destroy(rectangle)
+        class(Abstract_Rectangle_Writer), allocatable, intent(out) :: rectangle
 
-        if (allocated(square)) then
-            call square%destroy()
-            deallocate(square)
+        if (allocated(rectangle)) then
+            call rectangle%destroy()
+            deallocate(rectangle)
         end if
     end subroutine destroy
 
-end module procedures_square_writer_factory
+end module procedures_rectangle_writer_factory

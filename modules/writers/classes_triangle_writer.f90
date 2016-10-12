@@ -59,18 +59,18 @@ contains
         type(Concrete_Logical_Line), intent(in) :: selectors(:)
 
         type(Concrete_Number_to_String) :: string
-        integer :: i_component, j_component
+        integer :: i_element, j_element
 
         allocate(this%strings(size(selectors)))
-        do j_component = 1, size(this%strings)
-            allocate(this%strings(j_component)%line(j_component))
-            do i_component = 1, size(this%strings(j_component)%line)
-                if (selectors(j_component)%line(i_component)) then
-                    allocate(Concrete_Number_to_String :: this%strings(j_component)%&
-                        line(i_component)%string)
-                    legend = legend//"    "//string%get(i_component)//"<->"//string%get(j_component)
+        do j_element = 1, size(this%strings)
+            allocate(this%strings(j_element)%line(j_element))
+            do i_element = 1, size(this%strings(j_element)%line)
+                if (selectors(j_element)%line(i_element)) then
+                    allocate(Concrete_Number_to_String :: this%strings(j_element)%&
+                        line(i_element)%string)
+                    legend = legend//"    "//string%get(i_element)//"<->"//string%get(j_element)
                 else
-                    allocate(Null_Number_to_String :: this%strings(j_component)%line(i_component)%&
+                    allocate(Null_Number_to_String :: this%strings(j_element)%line(i_element)%&
                         string)
                 end if
             end do
@@ -80,11 +80,11 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Triangle_Writer), intent(inout) :: this
 
-        integer :: i_component
+        integer :: i_element
 
         if (allocated(this%strings)) then
-            do i_component = size(this%strings), 1, -1
-                call strings_wrapper_destroy(this%strings(i_component)%line)
+            do i_element = size(this%strings), 1, -1
+                call strings_wrapper_destroy(this%strings(i_element)%line)
             end do
             deallocate(this%strings)
         end if
@@ -97,13 +97,13 @@ contains
         type(Reals_Line), intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
-        integer :: i_component, j_component
+        integer :: i_element, j_element
 
         string = ""
-        do j_component = 1, size(this%strings)
-            do i_component = 1, size(this%strings(j_component)%line)
-                associate(string_ij => this%strings(j_component)%line(i_component)%string, &
-                    real_ij => observables(j_component)%line(i_component))
+        do j_element = 1, size(this%strings)
+            do i_element = 1, size(this%strings(j_element)%line)
+                associate(string_ij => this%strings(j_element)%line(i_element)%string, &
+                    real_ij => observables(j_element)%line(i_element))
                     string = string//string_ij%get(real_ij)
                 end associate
             end do

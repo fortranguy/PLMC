@@ -61,15 +61,15 @@ contains
         logical, intent(in) :: selector(:)
 
         type(Concrete_Number_to_String) :: string
-        integer :: i_component
+        integer :: i_element
 
         allocate(this%strings(size(selector)))
-        do i_component = 1, size(this%strings)
-            if (selector(i_component)) then
-                allocate(Concrete_Number_to_String :: this%strings(i_component)%string)
-                legend = legend//"    "//string%get(i_component)
+        do i_element = 1, size(this%strings)
+            if (selector(i_element)) then
+                allocate(Concrete_Number_to_String :: this%strings(i_element)%string)
+                legend = legend//"    "//string%get(i_element)
             else
-                allocate(Null_Number_to_String :: this%strings(i_component)%string)
+                allocate(Null_Number_to_String :: this%strings(i_element)%string)
             end if
         end do
     end subroutine Abstract_allocate_strings
@@ -87,11 +87,11 @@ contains
         real(DP), intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
-        integer :: i_component
+        integer :: i_element
 
         string = ""
-        do i_component = 1, size(this%strings)
-            string = string//this%strings(i_component)%string%get(observables(i_component))
+        do i_element = 1, size(this%strings)
+            string = string//this%strings(i_element)%string%get(observables(i_element))
         end do
         write(this%file_unit, *) i_step, string
     end subroutine Abstract_write_reals
@@ -102,11 +102,11 @@ contains
         integer, intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
-        integer :: i_component
+        integer :: i_element
 
         string = ""
-        do i_component = 1, size(this%strings)
-            string = string//"    "//this%strings(i_component)%string%get(observables(i_component))
+        do i_element = 1, size(this%strings)
+            string = string//"    "//this%strings(i_element)%string%get(observables(i_element))
         end do
         write(this%file_unit, *) i_step, string
     end subroutine Abstract_write_integers

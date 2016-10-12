@@ -63,6 +63,9 @@ contains
         write(this%file_unit, *) i_step, observable
     end subroutine Abstract_write_scalar
 
+    !> This subroutine differs from [[classes_line_writer:Abstract_write_reals]]:
+    !> there is no local selection (filter).
+    !> @todo Merge them?
     subroutine Abstract_write_array(this, i_step, observable)
         class(Abstract_Real_Writer), intent(in) :: this
         integer, intent(in) :: i_step

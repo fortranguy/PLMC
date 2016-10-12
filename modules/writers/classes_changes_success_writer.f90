@@ -5,16 +5,11 @@ use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Abstract_Number_to_String, Concrete_Number_to_String, &
     Null_Number_to_String
 use module_changes_success, only: Concrete_Changes_Success
+use types_changes_success_writer_selector, only: Changes_Success_Writer_Selector
 
 implicit none
 
 private
-
-    type, public :: Concrete_Changes_Selector
-        logical :: write_translations = .false.
-        logical :: write_rotations = .false.
-        logical :: write_exchanges = .false.
-    end type Concrete_Changes_Selector
 
     type, abstract, public :: Abstract_Changes_Success_Writer
     private
@@ -45,7 +40,7 @@ contains
 
     subroutine Abstract_construct(this, changes_selector, filename)
         class(Abstract_Changes_Success_Writer), intent(out) :: this
-        type(Concrete_Changes_Selector), intent(in) :: changes_selector
+        type(Changes_Success_Writer_Selector), intent(in) :: changes_selector
         character(len=*), intent(in) :: filename
 
         character(len=:), allocatable :: legend
@@ -100,7 +95,7 @@ contains
 
     subroutine Null_construct(this, changes_selector, filename)
         class(Null_Changes_Success_Writer), intent(out) :: this
-        type(Concrete_Changes_Selector), intent(in) :: changes_selector
+        type(Changes_Success_Writer_Selector), intent(in) :: changes_selector
         character(len=*), intent(in) :: filename
     end subroutine Null_construct
 
