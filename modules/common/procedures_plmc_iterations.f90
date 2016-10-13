@@ -1,5 +1,6 @@
 module procedures_plmc_iterations
 
+use data_arguments, only: num_json_arguments
 use json_module, only: json_file
 use data_input_prefixes, only: changes_prefix, writers_prefix
 use procedures_errors, only: error_exit
@@ -37,7 +38,7 @@ contains
         if (.not.write_coordinates(generating_data, writers_prefix)) then
             call error_exit("Coordinates weren't written.")
         end if
-        num_snaps = command_argument_count() - 2
+        num_snaps = command_argument_count() - num_json_arguments
         if (num_snaps == 0) call error_exit("No snaps given.")
     end subroutine plmc_set_num_snaps
 

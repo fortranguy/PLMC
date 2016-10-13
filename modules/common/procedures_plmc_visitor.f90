@@ -19,7 +19,7 @@ interface plmc_visit_set
 end interface plmc_visit_set
 
 interface plmc_visit
-    module procedure :: visit_generating, visit_exploring
+    module procedure :: visit
 end interface plmc_visit
 
 contains
@@ -32,11 +32,16 @@ contains
         visit_energies = logical_from_json(exploring_data, prefix//"visit energies")
     end subroutine set_visit_energies
 
-    subroutine visit_generating(energies, physical_model)
+    subroutine visit(energies, physical_model, visit_energies)
         type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
+        logical, optional, intent(in) :: visit_energies
 
         logical :: overlap
+
+        if (present(visit_energies)) then
+            if (.not.visit_energies) return
+        end if
 
         call short_interactions_visit(overlap, energies%walls_energies, physical_model%&
             mixture%components, physical_model%short_interactions)
@@ -50,28 +55,6 @@ contains
             external_field, physical_model%mixture%components)
         call dipolar_interactions_visit(energies%dipolar_energies, energies%dipolar_shared_energy, &
             physical_model%mixture%components, physical_model%dipolar_interactions_dynamic)
-    end subroutine visit_generating
-
-    subroutine visit_exploring(energies, physical_model, visit_energies)
-        type(Concrete_Observables_Energies), intent(inout) :: energies
-        type(Physical_Model_Wrapper), intent(in) :: physical_model
-        logical, intent(in) :: visit_energies
-
-        logical :: overlap
-
-        if (.not.visit_energies) return
-        call short_interactions_visit(overlap, energies%walls_energies, physical_model%&
-            mixture%components, physical_model%short_interactions)
-        if (overlap) call error_exit("procedures_plmc_visitor: visit_exploring: "//&
-            "short_interactions_visit: walls: overlap.")
-        call short_interactions_visit_cells(overlap, energies%short_energies, physical_model%&
-            mixture%components,physical_model%short_interactions)
-        if (overlap) call error_exit("procedures_plmc_visitor: visit_exploring: "//&
-            "short_interactions_visit_cells: overlap.")
-        call dipolar_interactions_visit(energies%field_energies, physical_model%environment%&
-            external_field, physical_model%mixture%components)
-        call dipolar_interactions_visit(energies%dipolar_energies, energies%dipolar_shared_energy, &
-            physical_model%mixture%components, physical_model%dipolar_interactions_dynamic)
-    end subroutine visit_exploring
+    end subroutine visit
 
 end module procedures_plmc_visitor

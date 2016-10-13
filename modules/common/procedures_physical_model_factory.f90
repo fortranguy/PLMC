@@ -1,7 +1,5 @@
 module procedures_physical_model_factory
 
-use data_input_prefixes, only: environment_prefix, mixture_prefix, short_interactions_prefix, &
-    dipolar_interactions_prefix, volume_change_prefix
 use json_module, only: json_file
 use procedures_environment_factory, only: environment_create, environment_destroy
 use procedures_mixture_factory, only: mixture_create, mixture_destroy
@@ -24,36 +22,34 @@ contains
         type(Physical_Model_Wrapper), intent(out) :: physical_model
         type(json_file), intent(inout) :: generating_data
 
-        call environment_create(physical_model%environment, generating_data, environment_prefix)
-        call mixture_create(physical_model%mixture, physical_model%environment, generating_data, &
-            mixture_prefix)
+        call environment_create(physical_model%environment, generating_data)
+        call mixture_create(physical_model%mixture, physical_model%environment, generating_data)
         call short_interactions_create(physical_model%short_interactions, physical_model%&
-            environment, physical_model%mixture, generating_data, short_interactions_prefix)
+            environment, physical_model%mixture, generating_data)
         call dipolar_interactions_create(physical_model%dipolar_interactions_dynamic, &
             physical_model%gemc_dipolar_interactions_static, physical_model%environment, physical_model%&
-            mixture, generating_data, dipolar_interactions_prefix)
+            mixture, generating_data)
         call dipolar_interactions_facades_create(physical_model%dipolar_interactions_facades, &
             physical_model%environment, physical_model%mixture%gemc_components, physical_model%&
             dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static)
     end subroutine create_generating
 
-    subroutine create_exploring(physical_model, generating_data, exploring_data)
+    subroutine create_exploring(physical_model, generating_data, exploring_data, unique_box)
         type(Physical_Model_Wrapper), intent(out) :: physical_model
         type(json_file), intent(inout) :: generating_data, exploring_data
+        logical, optional, intent(in) :: unique_box
 
-        call environment_create(physical_model%environment, generating_data, environment_prefix)
-        call mixture_create(physical_model%mixture, physical_model%environment, generating_data, &
-            mixture_prefix)
+        call environment_create(physical_model%environment, generating_data, unique_box)
+        call mixture_create(physical_model%mixture, physical_model%environment, generating_data)
         call short_interactions_create(physical_model%short_interactions, physical_model%&
-            environment, physical_model%mixture, generating_data, short_interactions_prefix, &
-            exploring_data, volume_change_prefix)
+            environment, physical_model%mixture, generating_data, exploring_data)
         call dipolar_interactions_create(physical_model%dipolar_interactions_dynamic, &
             physical_model%gemc_dipolar_interactions_static, physical_model%environment, physical_model%&
-            mixture, generating_data, dipolar_interactions_prefix)
+            mixture, generating_data)
         call dipolar_interactions_facades_create(physical_model%dipolar_interactions_facades, &
             physical_model%environment, physical_model%mixture%gemc_components, physical_model%&
             dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
-            exploring_data, volume_change_prefix)
+            exploring_data)
     end subroutine create_exploring
 
     subroutine destroy(physical_model)

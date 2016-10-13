@@ -55,7 +55,7 @@ contains
 !implementation Abstract_Periodic_Box
 
     subroutine Abstract_set(this, size)
-        class(Abstract_Periodic_Box), intent(out) :: this
+        class(Abstract_Periodic_Box), intent(inout) :: this
         real(DP), intent(in) :: size(:)
 
         call check_array_size("Abstract_Periodic_Box", "size", size, num_dimensions)

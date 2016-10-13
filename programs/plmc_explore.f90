@@ -1,3 +1,8 @@
+!> @note While [[plmc_generate]] accepts an arbitrary number of boxes,
+!> [[plmc_explore]] overrides it to 1. Hence each box can be explored separately.
+!>
+!> @bug [[procedures_markov_chain_explorer_factory:create]] must be in
+!> [[procedures_plmc_factory:plmc_create]] but it doesn't work. Is it an ifort bug?
 program plmc_explore
 
 use, intrinsic :: iso_fortran_env, only: output_unit
@@ -26,13 +31,12 @@ implicit none
     call plmc_catch_exploring_help()
 
     call plmc_create(io%generating_data, io%exploring_data)
-    call plmc_create(physical_model, io%generating_data, io%exploring_data)
+    call plmc_create(physical_model, io%generating_data, io%exploring_data, unique_box=.true.)
     call plmc_set(io%generating_data)
     call plmc_set(num_snaps, io%generating_data)
     call plmc_visit_set(visit_energies, io%exploring_data, "Check.")
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, visit_energies, io%&
         exploring_data)
-        !! @bug [[markov_chain_explorer_create]] must be in [[plmc_create]]: ifort bug?
     call plmc_create(observables, physical_model%environment%periodic_boxes, &
         physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_explorer, visit_energies)

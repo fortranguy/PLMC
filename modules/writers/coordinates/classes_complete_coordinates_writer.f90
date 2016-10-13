@@ -88,8 +88,7 @@ contains
         integer, intent(in) :: i_step
 
         integer :: i_box, i_component
-        integer :: nums_particles(size(this%components_coordinates, 1), &
-            size(this%components_coordinates, 2))
+        integer :: nums_particles(size(this%components_coordinates, 1))
         integer :: coordinates_unit
         type(Concrete_Number_to_String) :: string
 
@@ -97,14 +96,14 @@ contains
 
         do i_box = 1, size(this%components_coordinates, 2)
             do i_component = 1, size(this%components_coordinates, 1)
-                nums_particles(i_component, i_box) = this%&
-                    components_coordinates(i_component, i_box)%writer%get_num()
+                nums_particles(i_component) = this%components_coordinates(i_component, i_box)%&
+                    writer%get_num()
             end do
 
             open(newunit=coordinates_unit, recl=max_line_length, file=this%paths(i_box)%string//&
                 this%basename//"_"//string%get(i_step)//".xyz", action="write")
             write(coordinates_unit, *) "# box_size:", this%periodic_boxes(i_box)%get_size()
-            write(coordinates_unit, *) "# nums_particles:", nums_particles(:, i_box)
+            write(coordinates_unit, *) "# nums_particles:", nums_particles
             write(coordinates_unit, *) this%components_legend
             do i_component = 1, size(this%components_coordinates, 1)
                 call this%components_coordinates(i_component, i_box)%writer%write(coordinates_unit)

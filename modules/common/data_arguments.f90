@@ -7,6 +7,6 @@ public :: i_generating, i_exploring, num_json_arguments
 
     integer, parameter :: i_generating = 1
     integer, parameter :: i_exploring = 2
-    integer, parameter :: num_json_arguments = 2
+    integer, parameter :: num_json_arguments = 2 !> When exploring
 
 end module data_arguments

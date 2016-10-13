@@ -1,5 +1,6 @@
 module procedures_environment_factory
 
+use data_input_prefixes, only: environment_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use classes_periodic_box, only: Abstract_Periodic_Box
@@ -29,39 +30,41 @@ public :: environment_create, environment_destroy
 
 contains
 
-    subroutine environment_create(environment, generating_data, prefix)
+    subroutine environment_create(environment, generating_data, unique_box)
         type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
+        logical, optional, intent(in) :: unique_box
 
         class(Abstract_Field_Expression), allocatable :: field_expression
         class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domains(:)
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
         logical :: field_applied
 
-        call boxes_create(environment%periodic_boxes, generating_data, prefix)
+        call boxes_create(environment%periodic_boxes, generating_data, environment_prefix, unique_box)
         call beta_pressure_create(environment%beta_pressure, &
-            total_volume_can_change(generating_data, prefix), generating_data, prefix)
-        call temperature_create(environment%temperature, generating_data, prefix)
-        field_applied = apply_external_field(generating_data, prefix)
-        call permittivity_create(environment%permittivity, generating_data, prefix)
-        call walls_create(floor_penetration, generating_data, prefix)
+            total_volume_can_change(generating_data, environment_prefix), generating_data, &
+                environment_prefix)
+        call temperature_create(environment%temperature, generating_data, environment_prefix)
+        field_applied = apply_external_field(generating_data, environment_prefix)
+        call permittivity_create(environment%permittivity, generating_data, environment_prefix)
+        call walls_create(floor_penetration, generating_data, environment_prefix)
         call hard_core_create(environment%wall_min_distance, use_walls(floor_penetration), &
-            generating_data, prefix//"Walls.")
+            generating_data, environment_prefix//"Walls.")
         call walls_create(environment%gemc_visitable_walls, environment%periodic_boxes, &
-            floor_penetration,environment%wall_min_distance, generating_data, prefix)
+            floor_penetration,environment%wall_min_distance, generating_data, environment_prefix)
         call walls_destroy(floor_penetration)
         call fields_create(field_expression, environment%permittivity, field_applied, &
-            generating_data, prefix)
+            generating_data, environment_prefix)
         call boxes_create(parallelepiped_domains, environment%periodic_boxes, environment%&
-            gemc_visitable_walls, field_applied, generating_data, prefix//"External Field.")
+            gemc_visitable_walls, field_applied, generating_data, environment_prefix//&
+            "External Field.")
         call fields_create(environment%external_fields, parallelepiped_domains, field_expression, &
             field_applied)
         call fields_destroy(field_expression)
         call boxes_destroy(parallelepiped_domains)
         call boxes_create(environment%reciprocal_lattices, environment%periodic_boxes, &
-            generating_data, prefix)
-        call boxes_create(environment%box_size_checkers, environment%reciprocal_lattices, &
+            generating_data, environment_prefix)
+        call boxes_create(environment%boxes_size_checker, environment%reciprocal_lattices, &
             environment%gemc_visitable_walls)
         if (all(periodicity_is_xyz(environment%periodic_boxes))) then
             call boxes_create(environment%accessible_domains, environment%periodic_boxes, &
@@ -75,13 +78,13 @@ contains
         end if
 
         call check(environment%periodic_boxes, environment%gemc_visitable_walls, environment%&
-            box_size_checkers)
+            boxes_size_checker)
     end subroutine environment_create
 
-    subroutine check(periodic_boxes, visitable_walls, box_size_checkers)
+    subroutine check(periodic_boxes, visitable_walls, boxes_size_checker)
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
-        class(Abstract_Box_Size_Checker), intent(in) :: box_size_checkers(:)
+        class(Abstract_Box_Size_Checker), intent(in) :: boxes_size_checker(:)
 
         integer :: i_box
 
@@ -94,8 +97,8 @@ contains
                 "periodicity is XY but walls are not used.")
         end if
 
-        do i_box = 1, size(box_size_checkers)
-            call box_size_checkers(i_box)%check()
+        do i_box = 1, size(boxes_size_checker)
+            call boxes_size_checker(i_box)%check()
         end do
     end subroutine check
 
@@ -103,7 +106,7 @@ contains
         type(Environment_Wrapper), intent(inout) :: environment
 
         call boxes_destroy(environment%accessible_domains)
-        call boxes_destroy(environment%box_size_checkers)
+        call boxes_destroy(environment%boxes_size_checker)
         call boxes_destroy(environment%reciprocal_lattices)
         call fields_destroy(environment%external_fields)
         call walls_destroy(environment%gemc_visitable_walls)

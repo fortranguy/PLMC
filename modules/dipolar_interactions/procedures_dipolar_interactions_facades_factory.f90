@@ -1,5 +1,6 @@
 module procedures_dipolar_interactions_facades_factory
 
+use data_input_prefixes, only: volume_change_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
@@ -21,19 +22,18 @@ public :: create, destroy
 contains
 
     subroutine create(facades, environment, components, dipolar_interactions_dynamic, &
-        dipolar_interactions_static, exploring_data, volume_change_prefix)
+        dipolar_interactions_static, exploring_data)
         class(Abstract_Dipolar_Interactions_Facade), allocatable, intent(out) :: facades(:)
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:, :)
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static(:)
         type(json_file), optional, intent(inout) :: exploring_data
-        character(len=*), optional, intent(in) :: volume_change_prefix
 
         integer :: i_box
         logical :: are_dipolar(size(components, 1), size(components, 2)), measure_pressure
 
-        if (present(exploring_data) .and. present(volume_change_prefix)) then
+        if (present(exploring_data)) then
             measure_pressure = property_measure_pressure(exploring_data, volume_change_prefix)
         else
             measure_pressure = .false.

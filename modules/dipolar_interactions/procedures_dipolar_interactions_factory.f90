@@ -1,5 +1,6 @@
 module procedures_dipolar_interactions_factory
 
+use data_input_prefixes, only: dipolar_interactions_prefix
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
 use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
@@ -28,14 +29,13 @@ public :: dipolar_interactions_create, dipolar_interactions_destroy
 contains
 
     subroutine dipolar_interactions_create(dipolar_interactions_dynamic, &
-        dipolar_interactions_static, environment, mixture, generating_data, prefix)
+        dipolar_interactions_static, environment, mixture, generating_data)
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(out) :: dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), allocatable, intent(out) :: &
             dipolar_interactions_static(:)
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
 
         integer :: i_box
         logical :: are_dipolar(size(mixture%gemc_components, 1), size(mixture%gemc_components, 2))
@@ -47,7 +47,7 @@ contains
         end do
 
         call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, any(are_dipolar),&
-            generating_data, prefix)
+            generating_data, dipolar_interactions_prefix)
 
         allocate(dipolar_interactions_static(size(mixture%gemc_components, 2)))
 
@@ -58,7 +58,8 @@ contains
             call des_real_create(dipolar_interactions_static(i_box)%real_pair, &
                 dipolar_interactions_static(i_box)%box_size_memento_real, environment%permittivity,&
                 mixture%components_min_distances, any(are_dipolar(:, i_box)), &
-                dipolar_interactions_dynamic%alpha, generating_data, prefix//"Real.")
+                dipolar_interactions_dynamic%alpha, generating_data, dipolar_interactions_prefix//&
+                "Real.")
         end do
         call des_real_create(dipolar_interactions_dynamic%gemc_real_components, environment%&
             periodic_boxes, mixture%gemc_components, are_dipolar, dipolar_interactions_static)

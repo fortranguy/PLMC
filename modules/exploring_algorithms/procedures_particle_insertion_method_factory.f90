@@ -1,5 +1,7 @@
 module procedures_particle_insertion_method_factory
 
+
+use data_input_prefixes, only: particle_insertion_prefix
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
@@ -19,14 +21,13 @@ public :: create, destroy
 contains
 
     subroutine create(particle_insertion_method, physical_model, random_position, &
-        random_orientation, measure_inv_pow_activities, exploring_data, prefix)
+        random_orientation, measure_inv_pow_activities, exploring_data)
         class(Abstract_Particle_Insertion_Method), allocatable, intent(out) :: &
             particle_insertion_method
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         class(Abstract_Random_Coordinates), intent(in) :: random_position, random_orientation
         logical, intent(in) :: measure_inv_pow_activities
         type(json_file), intent(inout) :: exploring_data
-        character(len=*), intent(in) :: prefix
 
         class(Abstract_Num_Particles), allocatable :: nums_particles(:)
         integer :: num_particles
@@ -40,7 +41,8 @@ contains
         if (measure_inv_pow_activities) then
             allocate(Concrete_Particle_Insertion_Method :: particle_insertion_method)
             do i_component = 1, size(nums_particles)
-                data_field = prefix//"Component "//string%get(i_component)//".number of particles"
+                data_field = particle_insertion_prefix//"Component "//string%get(i_component)//&
+                    ".number of particles"
                 call exploring_data%get(data_field, num_particles, data_found)
                 call check_data_found(data_field, data_found)
                 call nums_particles(i_component)%set(num_particles)

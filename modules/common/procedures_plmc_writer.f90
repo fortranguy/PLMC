@@ -36,23 +36,34 @@ contains
         type(Generating_Writers_Wrapper), intent(in) :: writers
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        call writers%accessible_domain_size%write(i_step, observables%accessible_domain_size)
-        call writers%volume_change_success%write(i_step, observables%volume_change_success)
-        call writers%nums_particles%write(i_step, observables%nums_particles)
+        call writers%volumes_change_success%write(i_box, observables%volumes_change_success)
+        do i_box = 1, size(observables%accessible_domains_size, 2)
+            call writers%accessible_domains_size(i_box)%write(i_step, observables%&
+                accessible_domains_size(:, i_box))
+            call writers%gemc_nums_particles(i_box)%write(i_step, observables%&
+                gemc_nums_particles(:, i_box))
+            call write_energies(writers%gemc_energies(i_box), i_step, observables%&
+                gemc_energies(i_box))
+        end do
+
+        if (-num_tuning_steps < i_step .and. i_step < num_steps) then
+            do i_box = 1, size(writers%gemc_components_changes, 2)
+                do i_component = 1, size(writers%gemc_components_changes, 1)
+                    call writers%gemc_components_changes(i_component, i_box)%writer%write(i_step, &
+                        observables%changes(i_box)%changes_sucesses(i_component))
+                end do
+                call writers%gemc_switches_successes(i_box)%write(i_step, observables%&
+                    changes(i_box)%switches_successes)
+                call writers%gemc_transmutations_successes(i_box)%write(i_step, observables%&
+                    changes(i_box)%transmutations_successes)
+            end do
+        end if
+
         if (0 <= i_step) then
             call writers%complete_coordinates%write(i_step)
         end if
-        call write_energies(writers%energies, observables%energies, i_step)
-        if (-num_tuning_steps < i_step .and. i_step < num_steps) then
-            do i_component = 1, size(writers%components_changes)
-                call writers%components_changes(i_component)%writer%write(i_step, observables%&
-                    changes_sucesses(i_component))
-            end do
-        end if
-        call writers%switches_successes%write(i_step, observables%switches_successes)
-        call writers%transmutations_successes%write(i_step, observables%transmutations_successes)
     end subroutine write_generating_observables
 
     subroutine write_exploring_observables(writers, observables, i_snap)
@@ -63,15 +74,15 @@ contains
         call writers%maximum_box_compression_delta%write(i_snap, observables%&
             maximum_box_compression_delta)
         call writers%beta_pressure_excess%write(i_snap, observables%beta_pressure_excess)
-        call write_energies(writers%energies, observables%energies, i_snap)
+        call write_energies(writers%energies, i_snap, observables%energies)
         call writers%inv_pow_activities%write(i_snap, observables%inv_pow_activities)
         call writers%insertion_successes%write(i_snap, observables%insertion_successes)
     end subroutine write_exploring_observables
 
-    subroutine write_energies(writers, energies, i_step)
+    subroutine write_energies(writers, i_step, energies)
         type(Concrete_Energies_Writers), intent(in) :: writers
-        type(Concrete_Observables_Energies), intent(in) :: energies
         integer, intent(in) :: i_step
+        type(Concrete_Observables_Energies), intent(in) :: energies
 
         call writers%field_energies%write(i_step, energies%field_energies)
         call writers%walls_energies%write(i_step, energies%walls_energies)

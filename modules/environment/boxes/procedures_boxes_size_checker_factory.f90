@@ -15,8 +15,8 @@ contains
 
     !> @todo
     !> Replace all() by any()?
-    subroutine create(box_size_checkers, reciprocal_lattices, visitable_walls)
-        class(Abstract_Box_Size_Checker), allocatable, intent(out) :: box_size_checkers(:)
+    subroutine create(boxes_size_checker, reciprocal_lattices, visitable_walls)
+        class(Abstract_Box_Size_Checker), allocatable, intent(out) :: boxes_size_checker(:)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattices(:)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
 
@@ -24,26 +24,26 @@ contains
 
         if (all(use_reciprocal_lattice(reciprocal_lattices)) .or. all(use_walls(visitable_walls))) &
             then
-            allocate(Concrete_Box_Size_Checker :: box_size_checkers(size(visitable_walls)))
+            allocate(Concrete_Box_Size_Checker :: boxes_size_checker(size(visitable_walls)))
         else
-            allocate(Null_Box_Size_Checker :: box_size_checkers(size(visitable_walls)))
+            allocate(Null_Box_Size_Checker :: boxes_size_checker(size(visitable_walls)))
         end if
-        do i_box = 1, size(box_size_checkers)
-            call box_size_checkers(i_box)%construct(reciprocal_lattices(i_box), &
+        do i_box = 1, size(boxes_size_checker)
+            call boxes_size_checker(i_box)%construct(reciprocal_lattices(i_box), &
                 visitable_walls(i_box))
         end do
     end subroutine create
 
-    subroutine destroy(box_size_checkers)
-        class(Abstract_Box_Size_Checker), allocatable, intent(inout) :: box_size_checkers(:)
+    subroutine destroy(boxes_size_checker)
+        class(Abstract_Box_Size_Checker), allocatable, intent(inout) :: boxes_size_checker(:)
 
         integer :: i_box
 
-        if (allocated(box_size_checkers)) then
-            do i_box = 1, size(box_size_checkers), -1
-                call box_size_checkers(i_box)%destroy()
+        if (allocated(boxes_size_checker)) then
+            do i_box = size(boxes_size_checker), 1, -1
+                call boxes_size_checker(i_box)%destroy()
             end do
-            deallocate(box_size_checkers)
+            deallocate(boxes_size_checker)
         end if
     end subroutine destroy
 

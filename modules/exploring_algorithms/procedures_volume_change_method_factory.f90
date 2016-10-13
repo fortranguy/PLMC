@@ -1,5 +1,7 @@
 module procedures_volume_change_method_factory
 
+
+use data_input_prefixes, only: volume_change_prefix
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
@@ -15,13 +17,12 @@ public :: create, destroy
 contains
 
     subroutine create(volume_change_method, physical_model, changed_box_size_ratio, &
-        measure_pressure_excess, exploring_data, prefix)
+        measure_pressure_excess, exploring_data)
         class(Abstract_Volume_Change_Method), allocatable, intent(out) :: volume_change_method
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
         logical, intent(in) :: measure_pressure_excess
         type(json_file), intent(inout) :: exploring_data
-        character(len=*), intent(in) :: prefix
 
         integer :: num_changes
         character(len=:), allocatable :: data_field
@@ -29,7 +30,7 @@ contains
 
         if (measure_pressure_excess) then
             allocate(Concrete_Volume_Change_Method :: volume_change_method)
-            data_field = prefix//"number"
+            data_field = volume_change_prefix//"number"
             call exploring_data%get(data_field, num_changes, data_found)
             call check_data_found(data_field, data_found)
         else

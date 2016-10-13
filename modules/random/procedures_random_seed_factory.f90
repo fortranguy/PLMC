@@ -1,5 +1,6 @@
 module procedures_random_seed_factory
 
+use data_input_prefixes, only: random_number_generator_prefix
 use json_module, only: json_core, json_file, json_value
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_array_size, check_data_found
@@ -11,15 +12,14 @@ public :: set, write
 
 contains
 
-    subroutine set(input_data, prefix)
+    subroutine set(input_data)
         type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: seed_name, data_field
         integer, allocatable :: custom_seed(:)
         logical :: data_found
 
-        data_field = prefix//"name"
+        data_field = random_number_generator_prefix//"name"
         call input_data%get(data_field, seed_name, data_found)
         call check_data_found(data_field, data_found)
         select case (seed_name)
@@ -28,7 +28,7 @@ contains
             case ("urandom")
                 call set_from_urandom()
             case ("custom")
-                data_field = prefix//"seed"
+                data_field = random_number_generator_prefix//"seed"
                 call input_data%get(data_field, custom_seed, data_found)
                 call check_data_found(data_field, data_found)
                 call set_from_seed(custom_seed)

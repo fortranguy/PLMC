@@ -1,6 +1,5 @@
 module procedures_markov_chain_generator_factory
 
-use data_input_prefixes, only: changes_prefix
 use json_module, only: json_file
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
@@ -24,7 +23,7 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         call changes_create(markov_chain_generator%changes, physical_model%environment, &
-            physical_model%mixture%gemc_components, num_tuning_steps, generating_data, changes_prefix)
+            physical_model%mixture%gemc_components, num_tuning_steps, generating_data)
         call generating_algorithms_create(markov_chain_generator%generating_algorithms, &
             physical_model, markov_chain_generator%changes)
         call plmc_propagator_create(markov_chain_generator%plmc_propagator, markov_chain_generator%&

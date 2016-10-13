@@ -1,5 +1,6 @@
 module procedures_mixture_factory
 
+use data_input_prefixes, only: mixture_prefix
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found, check_positive
@@ -33,18 +34,16 @@ end interface mixture_destroy
 
 contains
 
-    !> @todo
-    !> more rigorous components(:) input for components_min_distances and wall_min_distances?
-    subroutine create_all(mixture, environment, generating_data, prefix)
+    !> @todo more rigorous components(:) input for components_min_distances and wall_min_distances?
+    subroutine create_all(mixture, environment, generating_data)
         type(Mixture_Wrapper), intent(out) :: mixture
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
 
         call mixture_create(mixture%gemc_components, environment%periodic_boxes, environment%&
-            accessible_domains, generating_data, prefix)
+            accessible_domains, generating_data, mixture_prefix)
         call hard_core_create(mixture%components_min_distances, mixture%gemc_components(:, 1), &
-            generating_data, prefix)
+            generating_data, mixture_prefix)
         call hard_core_create(mixture%wall_min_distances, environment%wall_min_distance, mixture%&
             components_min_distances, mixture%gemc_components(:, 1), environment%visitable_walls)
         call mixture_total_moments_create(mixture%total_moments, mixture%gemc_components)

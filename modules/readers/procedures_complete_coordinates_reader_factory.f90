@@ -16,18 +16,19 @@ public :: create, destroy
 
 contains
 
-    subroutine create(coordinates, periodic_box, box_size_checker, components)
+    subroutine create(coordinates, periodic_boxes, boxes_size_checker, components)
         class(Abstract_Complete_Coordinates_Reader), allocatable, intent(out) :: coordinates
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Box_Size_Checker), intent(in) :: box_size_checker
-        type(Component_Wrapper), intent(in) :: components(:)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        class(Abstract_Box_Size_Checker), intent(in) :: boxes_size_checker(:)
+        type(Component_Wrapper), intent(in) :: components(:, :)
 
-        type(Component_Coordinates_Reader_wrapper), allocatable :: components_coordinates(:)
+        type(Component_Coordinates_Reader_wrapper) :: &
+            components_coordinates(size(components, 1), size(components, 2))
 
         allocate(Concrete_Complete_Coordinates_Reader :: coordinates)
 
         call component_coordinates_reader_create(components_coordinates, components)
-        call coordinates%construct(periodic_box, box_size_checker, components_coordinates)
+        call coordinates%construct(periodic_boxes, boxes_size_checker, components_coordinates)
         call component_coordinates_reader_destroy(components_coordinates)
     end subroutine create
 

@@ -17,51 +17,49 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_line
+    module procedure :: create_rectangle
     module procedure :: create_element
 end interface create
 
 interface destroy
     module procedure :: destroy_element
-    module procedure :: destroy_line
+    module procedure :: destroy_rectangle
 end interface destroy
 
 contains
 
-    subroutine create_line(components_coordinates, components)
-        type(Component_Coordinates_Reader_wrapper), allocatable, intent(out) :: &
-            components_coordinates(:)
-        type(Component_Wrapper), intent(in) :: components(:)
+    subroutine create_rectangle(components_coordinates, components)
+        type(Component_Coordinates_Reader_wrapper), intent(out) :: components_coordinates(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
 
         type(Component_Coordinates_Reader_Selector) :: selector_i
-        integer :: i_component
+        integer :: i_box, i_component
 
-        allocate(components_coordinates(size(components)))
-        do i_component = 1, size(components_coordinates)
-            associate(num_particles_i => components(i_component)%num_particles, &
-                positions_i => components(i_component)%positions, &
-                orientations_i => components(i_component)%orientations)
-                selector_i%read_positions = component_has_positions(positions_i)
-                selector_i%read_orientations = component_has_orientations(orientations_i)
-                call create(components_coordinates(i_component)%reader, num_particles_i, &
-                    positions_i, orientations_i, selector_i)
-            end associate
-        end do
-    end subroutine create_line
-
-    subroutine destroy_line(components_coordinates)
-        type(Component_Coordinates_Reader_wrapper), allocatable, intent(inout) :: &
-            components_coordinates(:)
-
-        integer :: i_component
-
-        if (allocated(components_coordinates)) then
-            do i_component = size(components_coordinates), 1, -1
-                call destroy(components_coordinates(i_component)%reader)
+        do i_box = 1, size(components_coordinates, 2)
+            do i_component = 1, size(components_coordinates, 1)
+                associate(num_particles_i => components(i_component, i_box)%num_particles, &
+                    positions_i => components(i_component, i_box)%positions, &
+                    orientations_i => components(i_component, i_box)%orientations)
+                    selector_i%read_positions = component_has_positions(positions_i)
+                    selector_i%read_orientations = component_has_orientations(orientations_i)
+                    call create(components_coordinates(i_component, i_box)%reader, num_particles_i,&
+                        positions_i, orientations_i, selector_i)
+                end associate
             end do
-            deallocate(components_coordinates)
-        end if
-    end subroutine destroy_line
+        end do
+    end subroutine create_rectangle
+
+    subroutine destroy_rectangle(components_coordinates)
+        type(Component_Coordinates_Reader_wrapper), intent(inout) :: components_coordinates(:, :)
+
+        integer :: i_box, i_component
+
+        do i_box = size(components_coordinates, 2), 1, -1
+            do i_component = size(components_coordinates, 1), 1, -1
+                call destroy(components_coordinates(i_component, i_box)%reader)
+            end do
+        end do
+    end subroutine destroy_rectangle
 
     subroutine create_element(coordinates, num_particles, positions, orientations, selector)
         class(Abstract_Component_Coordinates_Reader), allocatable, intent(out) :: coordinates

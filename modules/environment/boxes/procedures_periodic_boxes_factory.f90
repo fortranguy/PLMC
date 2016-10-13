@@ -13,10 +13,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(periodic_boxes, generating_data, prefix)
+    subroutine create(periodic_boxes, generating_data, prefix, unique)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_boxes(:)
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
+        logical, optional, intent(in) :: unique
 
         integer :: num_boxes
         character(len=:), allocatable :: boxes_periodicity
@@ -24,6 +25,10 @@ contains
         logical :: data_found
 
         num_boxes = property_num_boxes(generating_data, prefix)
+        if (present(unique)) then
+            if (unique) num_boxes = 1
+        end if
+
         data_field = prefix//"Boxes.periodicity"
         call generating_data%get(data_field, boxes_periodicity, data_found)
         call check_data_found(data_field, data_found)

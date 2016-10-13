@@ -1,5 +1,6 @@
 module procedures_generating_writers_factory
 
+use data_input_prefixes, only: writers_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
@@ -37,7 +38,7 @@ contains
 
     !> @todo make folders for boxes
     subroutine create(writers, environment, wall_pairs, components, short_pairs, &
-        changes_components, changed_boxes_size, generating_data, prefix)
+        changes_components, changed_boxes_size, generating_data)
         type(Generating_Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
@@ -46,7 +47,6 @@ contains
         type(Changes_Component_Wrapper), intent(in) :: changes_components(:, :)
         type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
         type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
 
         type(String_Wrapper), dimension(size(environment%periodic_boxes)) :: boxes_path, &
             coordinates_path
@@ -58,11 +58,11 @@ contains
         type(Concrete_Number_to_String) :: string
         integer :: i_box, box_stat_i
 
-        write_coordinates = property_write_coordinates(generating_data, prefix)
-        data_field = prefix//"path separator"
+        write_coordinates = property_write_coordinates(generating_data, writers_prefix)
+        data_field = writers_prefix//"path separator"
         call generating_data%get(data_field, separator, data_found)
         call check_data_found(data_field, data_found)
-        data_field = prefix//"make directory command"
+        data_field = writers_prefix//"make directory command"
         call generating_data%get(data_field, make_directory_cmd, data_found)
         call check_data_found(data_field, data_found)
         do i_box = 1, size(boxes_path)
@@ -88,7 +88,7 @@ contains
         call line_writer_create(writers%gemc_nums_particles, boxes_path, "nums_particles.out", &
             can_exchange)
         call complete_coordinates_writer_create(writers%complete_coordinates, coordinates_path, &
-            "coordinates", environment%periodic_boxes, components, generating_data, prefix)
+            "coordinates", environment%periodic_boxes, components, generating_data, writers_prefix)
 
         call energies_writers_create(writers%gemc_energies, boxes_path, environment%external_fields, &
             wall_pairs, components, short_pairs, visit_energies=.true.)

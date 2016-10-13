@@ -10,6 +10,7 @@ implicit none
 private
 
     type, abstract, public :: Abstract_Component_Coordinates_Reader
+        class(Abstract_Num_Particles), pointer :: num_particles => null()
     contains
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_read), deferred :: read
@@ -35,7 +36,6 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Concrete_Component_Coordinates_Reader
     private
-        class(Abstract_Num_Particles), pointer :: num_particles => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
     contains
@@ -47,7 +47,6 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Concrete_Component_Positions_Reader
     private
-        class(Abstract_Num_Particles), pointer :: num_particles => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
     contains
         procedure :: construct => Positions_construct
@@ -58,7 +57,6 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Concrete_Component_Orientations_Reader
     private
-        class(Abstract_Num_Particles), pointer :: num_particles => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
     contains
         procedure :: construct => Orientations_construct

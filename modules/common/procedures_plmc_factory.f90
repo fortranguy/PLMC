@@ -1,6 +1,5 @@
 module procedures_plmc_factory
 
-use data_input_prefixes, only: readers_prefix, random_number_generator_prefix, writers_prefix
 use data_arguments, only: i_generating, i_exploring, num_json_arguments
 use json_module, only: json_file
 use procedures_json_data_factory, only: json_data_create_input => create_input, &
@@ -61,7 +60,7 @@ interface plmc_destroy
 end interface plmc_destroy
 
 interface plmc_set
-    module procedure :: set_random_seed
+    module procedure :: random_seed_set
     module procedure :: plmc_set_num_steps, plmc_set_num_snaps
     module procedure :: set_initial_observables
     module procedure :: set_coordinates_from_json, set_coordinates_from_snap
@@ -82,11 +81,11 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         call readers_create(readers, physical_model%environment, physical_model%mixture%&
-            components)
+            gemc_components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%gemc_components, physical_model%&
             short_interactions%components_pairs, changes%gemc_components, changes%changed_boxes_size, &
-            generating_data, writers_prefix)
+            generating_data)
     end subroutine create_generating_readers_writers
 
     subroutine destroy_generating_readers_writers(readers, writers)
@@ -106,7 +105,7 @@ contains
         logical, intent(in) :: visit_energies
 
         call readers_create(readers, physical_model%environment, physical_model%mixture%&
-            components)
+            gemc_components)
         call exploring_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
             short_interactions%components_pairs, markov_chain_explorer%volume_change_method, &
@@ -140,12 +139,6 @@ contains
         call json_data_destroy_input(exploring_data)
         call json_data_destroy_input(generating_data)
     end subroutine destroy_exploring_data
-
-    subroutine set_random_seed(input_data)
-        type(json_file), intent(inout) :: input_data
-
-        call random_seed_set(input_data, random_number_generator_prefix)
-    end subroutine set_random_seed
 
     !> @todo
     !> [[types_generating_observables_wrapper:Generating_Observables_Wrapper]] to update for
@@ -218,14 +211,14 @@ contains
     end subroutine set_initial_observables
 
     subroutine set_coordinates_from_json(readers, generating_data)
-        type(Readers_Wrapper), intent(in) :: readers
+        type(Readers_Wrapper), intent(inout) :: readers
         type(json_file), intent(inout) :: generating_data
 
-        call readers_set(readers, generating_data, readers_prefix)
+        call readers_set(readers, generating_data)
     end subroutine set_coordinates_from_json
 
     subroutine set_coordinates_from_snap(readers, i_snap)
-        type(Readers_Wrapper), intent(in) :: readers
+        type(Readers_Wrapper), intent(inout) :: readers
         integer, intent(in) :: i_snap
 
         call readers_set(readers, num_json_arguments + i_snap)

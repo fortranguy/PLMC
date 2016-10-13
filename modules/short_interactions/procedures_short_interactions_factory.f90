@@ -1,5 +1,6 @@
 module procedures_short_interactions_factory
 
+use data_input_prefixes, only: short_interactions_prefix, volume_change_prefix
 use json_module, only: json_file
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use procedures_beta_pressures_excess_factory, only: beta_pressures_excess_create => create, &
@@ -27,23 +28,19 @@ public :: short_interactions_create, short_interactions_destroy
 
 contains
 
-    !> @todo
-    !> prefix to remove
     subroutine short_interactions_create(short_interactions, environment, mixture, generating_data,&
-        prefix, exploring_data, volume_change_prefix)
+        exploring_data)
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
         type(json_file), optional, intent(inout) :: exploring_data
-        character(len=*), optional, intent(in) :: volume_change_prefix
 
         logical :: interact_with_walls, interact, measure_pressure
         class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
         class(Abstract_Visitable_List), allocatable :: list_mold
 
-        if (present(exploring_data) .and. present(volume_change_prefix)) then
+        if (present(exploring_data)) then
             measure_pressure = property_measure_pressure(exploring_data, volume_change_prefix)
         else
             measure_pressure = .false.
@@ -57,14 +54,15 @@ contains
             dirac_plus, measure_pressure)
         call dirac_distribution_plus_destroy(dirac_plus)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
-            wall_min_distances, generating_data, prefix)
+            wall_min_distances, generating_data, short_interactions_prefix)
         call walls_create(short_interactions%walls_visitors, environment%gemc_visitable_walls, &
             interact_with_walls)
         call pairs_create(short_interactions%components_pairs, interact, mixture%&
-            components_min_distances, generating_data, prefix)
+            components_min_distances, generating_data, short_interactions_prefix)
         call pairs_create(short_interactions%components_visitors, environment%periodic_boxes, &
             interact)
-        call visitable_list_allocate(list_mold, interact, generating_data, prefix)
+        call visitable_list_allocate(list_mold, interact, generating_data, &
+            short_interactions_prefix)
         call cells_create(short_interactions%cells, environment%periodic_boxes, environment%&
             accessible_domains, mixture%gemc_components, short_interactions%hard_contact, &
             short_interactions%components_pairs, list_mold, interact)

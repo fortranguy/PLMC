@@ -1,6 +1,7 @@
 module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_input_prefixes, only: changes_prefix
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_checks, only: check_data_found
@@ -50,14 +51,12 @@ end interface set_can_exchange
 
 contains
 
-    subroutine create_all(changes, environment, components, num_tuning_steps, generating_data, &
-        prefix)
+    subroutine create_all(changes, environment, components, num_tuning_steps, generating_data)
         type(Changes_Wrapper), intent(out) :: changes
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:, :)
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
 
         integer :: i_box
         type(Concrete_Move_Tuning_Parameters) :: box_size_tuning_parameters, &
@@ -74,11 +73,12 @@ contains
         some_boxes_size_can_change = total_volume_can_change .or. &
             size(environment%periodic_boxes) > 1
         call set_tuning_parameters(box_size_tuning_parameters, num_tuning_steps, &
-            some_boxes_size_can_change, generating_data, prefix//"Boxes.")
+            some_boxes_size_can_change, generating_data, changes_prefix//"Boxes.")
         call changed_boxes_size_create(changes%changed_boxes_size, environment%periodic_boxes, &
-            box_size_tuning_parameters, total_volume_can_change, generating_data, prefix//"Boxes.")
+            box_size_tuning_parameters, total_volume_can_change, generating_data, changes_prefix//&
+            "Boxes.")
         call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, &
-            some_boxes_size_can_change, generating_data, prefix//"Boxes.")
+            some_boxes_size_can_change, generating_data, changes_prefix//"Boxes.")
         call move_tuner_create_boxes_size_change(changes%boxes_size_change_tuner, changes%&
             changed_boxes_size, box_size_tuner_parameters, num_tuning_steps)
 
@@ -89,13 +89,13 @@ contains
 
         some_components_have_coordinates = any(have_positions) .or. any(have_orientations)
         call set_tuning_parameters(components_tuning_parameters, num_tuning_steps, &
-            some_components_have_coordinates, generating_data, prefix//"Components.")
+            some_components_have_coordinates, generating_data, changes_prefix//"Components.")
         call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
-            some_components_have_coordinates, generating_data, prefix//"Components.")
+            some_components_have_coordinates, generating_data, changes_prefix//"Components.")
 
-        call create_components(changes%gemc_components, environment%periodic_boxes, components, &
+        call changes_create(changes%gemc_components, environment%periodic_boxes, components, &
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
-            generating_data, prefix)
+            generating_data, changes_prefix)
 
         call set_can_exchange(can_exchange, components(:, 1))
         call random_coordinates_create(changes%random_positions, environment%accessible_domains, &
