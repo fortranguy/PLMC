@@ -57,7 +57,7 @@ contains
                     data_field = changes_prefix//"Mixture.accumulation period"
                     call generating_data%get(data_field, accumulation_period, data_found)
                     call check_data_found(data_field, data_found)
-                    call average_num_particles%construct(accumulation_period)
+                    call average_num_particles%construct(num_particles, accumulation_period)
                 end block
             type is (Null_Average_Num_Particles)
                 call average_num_particles%construct()

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
-use module_string_wrapper, only: String_Wrapper, strings_wrapper_destroy
+use types_string_wrapper, only: Number_to_String_Wrapper
 
 implicit none
 
@@ -12,7 +12,7 @@ private
 
     type, abstract, public :: Abstract_Rectangle_Writer
     private
-        type(String_Wrapper), allocatable :: strings(:, :)
+        type(Number_to_String_Wrapper), allocatable :: strings(:, :)
         integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
@@ -36,10 +36,10 @@ contains
 
 !implementation Abstract_Rectangle_Writer
 
-    subroutine Abstract_construct(this, selectors, filename)
+    subroutine Abstract_construct(this, filename, selectors)
         class(Abstract_Rectangle_Writer), intent(out) :: this
-        logical, intent(in) :: selectors(:, :)
         character(len=*), intent(in) :: filename
+        logical, intent(in) :: selectors(:, :)
 
         character(len=:), allocatable :: legend
         integer :: file_unit
@@ -103,10 +103,10 @@ contains
 
 !implementation Null_Rectangle_Writer
 
-    subroutine Null_construct(this, selectors, filename)
+    subroutine Null_construct(this, filename, selectors)
         class(Null_Rectangle_Writer), intent(out) :: this
-        logical, intent(in) :: selectors(:, :)
         character(len=*), intent(in) :: filename
+        logical, intent(in) :: selectors(:, :)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

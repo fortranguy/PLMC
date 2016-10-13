@@ -4,7 +4,8 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
-use module_string_wrapper, only: String_Wrapper, strings_wrapper_destroy
+use types_string_wrapper, only: Number_to_String_Wrapper
+use procedures_string_factory, only: string_destroy => destroy
 
 implicit none
 
@@ -12,7 +13,7 @@ private
 
     type, abstract, public :: Abstract_Line_Writer
     private
-        type(String_Wrapper), allocatable :: strings(:)
+        type(Number_to_String_Wrapper), allocatable :: strings(:)
         integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
@@ -39,10 +40,10 @@ contains
 
 !implementation Abstract_Line_Writer
 
-    subroutine Abstract_construct(this, selector, filename)
+    subroutine Abstract_construct(this, filename, selector)
         class(Abstract_Line_Writer), intent(out) :: this
-        logical, intent(in) :: selector(:)
         character(len=*), intent(in) :: filename
+        logical, intent(in) :: selector(:)
 
         character(len=:), allocatable :: legend
         integer :: file_unit
@@ -77,7 +78,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Line_Writer), intent(inout) :: this
 
-        call strings_wrapper_destroy(this%strings)
+        call string_destroy(this%strings)
         close(this%file_unit)
     end subroutine Abstract_destroy
 
@@ -115,10 +116,10 @@ contains
 
 !implementation Null_Line_Writer
 
-    subroutine Null_construct(this, selector, filename)
+    subroutine Null_construct(this, filename, selector)
         class(Null_Line_Writer), intent(out) :: this
-        logical, intent(in) :: selector(:)
         character(len=*), intent(in) :: filename
+        logical, intent(in) :: selector(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

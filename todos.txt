@@ -26,5 +26,4 @@
 + GeneratingAlgorithms:
     - promote resetSelectors() in base class
     - locally: this%selector promote to this%selectors(numBoxes)?
-- docUML: overloaded methods: same name (generic in Fortran)
 - realZero: relative if possible

@@ -45,13 +45,14 @@
 
     Notations:
     \begin{itemize}
-        \item \type{Type[:, ..., :]} is an array of \type{Type}.
+        \item \type{Type[:, \ldots, :]} is an array of \type{Type}.
             The special case \type{Type[:, :]\textsubscript{\sym}} means it's a 2D symmetric array.
             Hence, only the (upper or lower) triangular values need to be stored.
-        \item $\mathAggregation$ \textsf{object}: \type{Class} and
-            $\mathComposition$ \textsf{object}: \type{Class} are shorthands for aggregation and
-            composition respectively. They are used when \type{Class} is defined outside the current
-            namespace, cf. \textsf{\import{}}.
+        \item Among the arguments of a \type{ClassA} :: \textsf{\procedure{construct}{\ldots}},
+            $\mathAggregation$ \textsf{object}: \type{ClassB} and
+            $\mathComposition$ \textsf{object}: \type{ClassB} are shorthands for aggregation and
+            composition respectively. They are used when \type{ClassB} is defined outside
+            the namespace of \type{ClassA}, cf. \textsf{\import{}}.
     \end{itemize}
 
     \newpage

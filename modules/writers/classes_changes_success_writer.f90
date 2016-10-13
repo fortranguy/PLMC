@@ -38,10 +38,10 @@ contains
 
 !implementation Abstract_Changes_Success_Writer
 
-    subroutine Abstract_construct(this, changes_selector, filename)
+    subroutine Abstract_construct(this, filename, changes_selector)
         class(Abstract_Changes_Success_Writer), intent(out) :: this
-        type(Changes_Success_Writer_Selector), intent(in) :: changes_selector
         character(len=*), intent(in) :: filename
+        type(Changes_Success_Writer_Selector), intent(in) :: changes_selector
 
         character(len=:), allocatable :: legend
 
@@ -93,10 +93,10 @@ contains
 
 !implementation Null_Changes_Success_Writer
 
-    subroutine Null_construct(this, changes_selector, filename)
+    subroutine Null_construct(this, filename, changes_selector)
         class(Null_Changes_Success_Writer), intent(out) :: this
-        type(Changes_Success_Writer_Selector), intent(in) :: changes_selector
         character(len=*), intent(in) :: filename
+        type(Changes_Success_Writer_Selector), intent(in) :: changes_selector
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

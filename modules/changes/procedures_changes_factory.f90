@@ -43,6 +43,11 @@ interface changes_destroy
     module procedure :: destroy_all
 end interface changes_destroy
 
+interface set_can_exchange
+    module procedure :: set_can_exchange_boxes
+    module procedure :: set_can_exchange_box
+end interface set_can_exchange
+
 contains
 
     subroutine create_all(changes, environment, components, num_tuning_steps, generating_data, &
@@ -203,7 +208,22 @@ contains
         end do
     end subroutine set_can_rotate
 
-    subroutine set_can_exchange(can_exchange, components)
+    subroutine set_can_exchange_boxes(can_exchange, components)
+        logical, intent(out) :: can_exchange(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
+
+        integer :: i_box, i_component
+
+        do i_box = 1, size(can_exchange, 2)
+            do i_component = 1, size(can_exchange, 1)
+                can_exchange(i_component, i_box) = &
+                    component_can_exchange(components(i_component, i_box)%chemical_potential)
+            end do
+        end do
+    end subroutine set_can_exchange_boxes
+
+    !> @warning deprecated
+    subroutine set_can_exchange_box(can_exchange, components)
         logical, intent(out) :: can_exchange(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
@@ -213,7 +233,7 @@ contains
             can_exchange(i_component) = component_can_exchange(components(i_component)%&
                 chemical_potential)
         end do
-    end subroutine set_can_exchange
+    end subroutine set_can_exchange_box
 
     subroutine destroy_all(changes)
         type(Changes_Wrapper), intent(inout) :: changes

@@ -36,15 +36,15 @@ contains
         logical :: selector(size(components)), measure_pressure
 
         measure_pressure = property_measure_pressure(volume_change_method)
-        call real_writer_create(writers%maximum_box_compression_delta, measure_pressure, &
-            "maximum_box_compression_delta.out")
-        call real_writer_create(writers%beta_pressure_excess, measure_pressure, &
-            "beta_pressure_excess.out")
-        call energies_writers_create(writers%energies, environment%external_field, wall_pairs, &
+        call real_writer_create(writers%maximum_box_compression_delta, &
+            "maximum_box_compression_delta.out", measure_pressure)
+        call real_writer_create(writers%beta_pressure_excess, "beta_pressure_excess.out", &
+            measure_pressure)
+        call energies_writers_create(writers%energies, "", environment%external_field, wall_pairs, &
             components, short_pairs, visit_energies)
         selector = measure_chemical_potentials(particle_insertion_method)
-        call line_writer_create(writers%insertion_successes, selector, "insertion_successes.out")
-        call line_writer_create(writers%inv_pow_activities, selector, "inv_pow_activities.out")
+        call line_writer_create(writers%insertion_successes, "insertion_successes.out", selector)
+        call line_writer_create(writers%inv_pow_activities, "inv_pow_activities.out", selector)
     end subroutine create
 
     subroutine destroy(writers)

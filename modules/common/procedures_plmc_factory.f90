@@ -84,8 +84,8 @@ contains
         call readers_create(readers, physical_model%environment, physical_model%mixture%&
             components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
-            short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
-            short_interactions%components_pairs, changes%components, changes%changed_box_size, &
+            short_interactions%wall_pairs, physical_model%mixture%gemc_components, physical_model%&
+            short_interactions%components_pairs, changes%gemc_components, changes%changed_boxes_size, &
             generating_data, writers_prefix)
     end subroutine create_generating_readers_writers
 
@@ -150,19 +150,17 @@ contains
     !> @todo
     !> [[types_generating_observables_wrapper:Generating_Observables_Wrapper]] to update for
     !> multiple boxes.
-    subroutine tune_generating_algorithms(i_step, components, markov_chain_generator, observables)
+    subroutine tune_generating_algorithms(i_step, components, markov_chain_generator)
         integer, intent(in) :: i_step
         type(Component_Wrapper), intent(inout) :: components(:, :)
         type(Markov_Chain_Explorer_Wrapper), intent(inout) :: markov_chain_generator
-        type(Generating_Observables_Wrapper), intent(in) :: observables
 
         integer :: i_box
         integer :: i_component
 
         do i_box = 1, size(components, 2)
             do i_component = 1, size(components, 1)
-                call components(i_component, i_box)%average_num_particles%accumulate(i_step, &
-                    observables%nums_particles(i_component))
+                call components(i_component, i_box)%average_num_particles%accumulate(i_step)
             end do
         end do
     end subroutine tune_generating_algorithms

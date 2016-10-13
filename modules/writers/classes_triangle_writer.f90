@@ -5,7 +5,8 @@ use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
 use types_reals_line, only: Reals_Line
 use types_logical_line, only: Concrete_Logical_Line
-use module_string_wrapper, only: Strings_Line, strings_wrapper_destroy
+use types_string_wrapper, only: Number_to_String_Line
+use procedures_string_factory, only: string_destroy => destroy
 
 implicit none
 
@@ -13,7 +14,7 @@ private
 
     type, abstract, public :: Abstract_Triangle_Writer
     private
-        type(Strings_Line), allocatable :: strings(:)
+        type(Number_to_String_Line), allocatable :: strings(:)
         integer :: file_unit = 0
     contains
         procedure :: construct => Abstract_construct
@@ -37,10 +38,10 @@ contains
 
 !implementation Abstract_Triangle_Writer
 
-    subroutine Abstract_construct(this, selectors, filename)
+    subroutine Abstract_construct(this, filename, selectors)
         class(Abstract_Triangle_Writer), intent(out) :: this
-        type(Concrete_Logical_Line), intent(in) :: selectors(:)
         character(len=*), intent(in) :: filename
+        type(Concrete_Logical_Line), intent(in) :: selectors(:)
 
         character(len=:), allocatable :: legend
         integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
@@ -80,14 +81,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Triangle_Writer), intent(inout) :: this
 
-        integer :: i_element
-
-        if (allocated(this%strings)) then
-            do i_element = size(this%strings), 1, -1
-                call strings_wrapper_destroy(this%strings(i_element)%line)
-            end do
-            deallocate(this%strings)
-        end if
+        call string_destroy(this%strings)
         close(this%file_unit)
     end subroutine Abstract_destroy
 
@@ -115,10 +109,10 @@ contains
 
 !implementation Null_Triangle_Writer
 
-    subroutine Null_construct(this, selectors, filename)
+    subroutine Null_construct(this, filename, selectors)
         class(Null_Triangle_Writer), intent(out) :: this
-        type(Concrete_Logical_Line), intent(in) :: selectors(:)
         character(len=*), intent(in) :: filename
+        type(Concrete_Logical_Line), intent(in) :: selectors(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
