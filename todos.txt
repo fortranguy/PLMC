@@ -1,4 +1,6 @@
-- Exploration: more decoupling?
++ Exploration:
+    - more decoupling?
+    - multiple boxes configurations: merged or separate?
 - Radial: to factorise
 - BoxVolumeChange -> BoxSizeChange?
 - ExploringAlgorithms: no Abstract?

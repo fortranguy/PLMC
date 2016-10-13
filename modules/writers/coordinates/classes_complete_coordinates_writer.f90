@@ -3,6 +3,8 @@ module classes_complete_coordinates_writer
 use data_strings, only: max_line_length
 use procedures_checks, only: check_positive, check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String
+use types_string_wrapper, only: String_Wrapper
+use procedures_string_factory, only: string_destroy => destroy
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
 use types_component_coordinates_writer_wrapper, only: Component_Coordinates_Writer_Wrapper
@@ -15,9 +17,10 @@ private
 
     type, abstract, public :: Abstract_Complete_Coordinates_Writer
     private
-        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        type(Component_Coordinates_Writer_Wrapper), allocatable :: components_coordinates(:)
+        class(Abstract_Periodic_Box), pointer :: periodic_boxes(:) => null()
+        type(Component_Coordinates_Writer_Wrapper), allocatable :: components_coordinates(:, :)
         character(len=:), allocatable :: components_legend
+        type(String_Wrapper), allocatable :: paths(:)
         character(len=:), allocatable :: basename
         integer :: period = 0
     contains
@@ -42,28 +45,30 @@ contains
 
 !implementation Abstract_Complete_Coordinates_Writer
 
-    subroutine Abstract_construct(this, periodic_box, components_coordinates, components_selector,&
-        basename, period)
+    subroutine Abstract_construct(this, paths, basename, periodic_boxes, components_coordinates, &
+        coordinates_selector, period)
         class(Abstract_Complete_Coordinates_Writer), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        type(Component_Coordinates_Writer_Wrapper), intent(in) :: components_coordinates(:)
-        type(Component_Coordinates_Writer_Selector), intent(in) :: components_selector
+        type(String_Wrapper), intent(in) :: paths(:)
         character(len=*), intent(in) :: basename
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_boxes(:)
+        type(Component_Coordinates_Writer_Wrapper), intent(in) :: components_coordinates(:, :)
+        type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
         integer, intent(in) :: period
 
-        this%periodic_box => periodic_box
+        allocate(this%paths, source=paths)
+        call check_string_not_empty("Abstract_Complete_Coordinates_Writer: basename", basename)
+        this%basename = basename
+        this%periodic_boxes => periodic_boxes
         allocate(this%components_coordinates, source=components_coordinates)
         this%components_legend = "# i_component"
-        if (components_selector%write_positions) then
+        if (coordinates_selector%write_positions) then
             this%components_legend = this%components_legend//&
                 "    position_x    position_y    position_z"
         end if
-        if (components_selector%write_orientations) then
+        if (coordinates_selector%write_orientations) then
             this%components_legend = this%components_legend//&
                 "    orientation_x    orientation_y    orientation_z"
         end if
-        call check_string_not_empty("Abstract_Complete_Coordinates_Writer: basename", basename)
-        this%basename = basename
         call check_positive("Abstract_Complete_Coordinates_Writer: construct", "period", period)
         this%period = period
     end subroutine Abstract_construct
@@ -71,48 +76,55 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Complete_Coordinates_Writer), intent(inout) :: this
 
-        if (allocated(this%basename)) deallocate(this%basename)
         if (allocated(this%components_legend)) deallocate(this%components_legend)
         call component_coordinates_writer_destroy(this%components_coordinates)
-        this%periodic_box => null()
+        this%periodic_boxes => null()
+        if (allocated(this%basename)) deallocate(this%basename)
+        call string_destroy(this%paths)
     end subroutine Abstract_destroy
 
     subroutine Abstract_write(this, i_step)
         class(Abstract_Complete_Coordinates_Writer), intent(in) :: this
         integer, intent(in) :: i_step
 
-        integer :: nums_particles(size(this%components_coordinates)), i_component
+        integer :: i_box, i_component
+        integer :: nums_particles(size(this%components_coordinates, 1), &
+            size(this%components_coordinates, 2))
         integer :: coordinates_unit
         type(Concrete_Number_to_String) :: string
 
         if (mod(i_step, this%period) /= 0) return
 
-        do i_component = 1, size(this%components_coordinates)
-            nums_particles(i_component) = this%components_coordinates(i_component)%writer%get_num()
-        end do
+        do i_box = 1, size(this%components_coordinates, 2)
+            do i_component = 1, size(this%components_coordinates, 1)
+                nums_particles(i_component, i_box) = this%&
+                    components_coordinates(i_component, i_box)%writer%get_num()
+            end do
 
-        open(newunit=coordinates_unit, recl=max_line_length, file=this%basename//"_"//string%&
-            get(i_step)//".xyz", action="write")
-        write(coordinates_unit, *) "# box_size:", this%periodic_box%get_size()
-        write(coordinates_unit, *) "# nums_particles:", nums_particles
-        write(coordinates_unit, *) this%components_legend
-        do i_component = 1, size(this%components_coordinates)
-            call this%components_coordinates(i_component)%writer%write(coordinates_unit)
+            open(newunit=coordinates_unit, recl=max_line_length, file=this%paths(i_box)%string//&
+                this%basename//"_"//string%get(i_step)//".xyz", action="write")
+            write(coordinates_unit, *) "# box_size:", this%periodic_boxes(i_box)%get_size()
+            write(coordinates_unit, *) "# nums_particles:", nums_particles(:, i_box)
+            write(coordinates_unit, *) this%components_legend
+            do i_component = 1, size(this%components_coordinates, 1)
+                call this%components_coordinates(i_component, i_box)%writer%write(coordinates_unit)
+            end do
+            close(coordinates_unit)
         end do
-        close(coordinates_unit)
     end subroutine Abstract_write
 
 !end implementation Abstract_Complete_Coordinates_Writer
 
 !implementation Null_Complete_Coordinates_Writer
 
-    subroutine Null_construct(this, periodic_box, components_coordinates, components_selector, &
-        basename, period)
+    subroutine Null_construct(this, paths, basename, periodic_boxes, components_coordinates, &
+        coordinates_selector, period)
         class(Null_Complete_Coordinates_Writer), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        type(Component_Coordinates_Writer_Wrapper), intent(in) :: components_coordinates(:)
-        type(Component_Coordinates_Writer_Selector), intent(in) :: components_selector
+        type(String_Wrapper), intent(in) :: paths(:)
         character(len=*), intent(in) :: basename
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_boxes(:)
+        type(Component_Coordinates_Writer_Wrapper), intent(in) :: components_coordinates(:, :)
+        type(Component_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
         integer, intent(in) :: period
     end subroutine Null_construct
 

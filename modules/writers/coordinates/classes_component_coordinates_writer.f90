@@ -1,9 +1,8 @@
 module classes_component_coordinates_writer
 
-use data_strings, only: max_line_length
-use procedures_checks, only: check_string_not_empty, check_positive
-use classes_number_to_string, only: Abstract_Number_to_String, &
-    Concrete_Number_to_String, Null_Number_to_String
+use procedures_checks, only: check_positive
+use classes_number_to_string, only: Abstract_Number_to_String, Concrete_Number_to_String, &
+    Null_Number_to_String
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
 
@@ -15,10 +14,9 @@ private
     private
         integer :: i_component = 0
         class(Abstract_Component_Coordinates), pointer :: positions => null()
+        class(Abstract_Component_Coordinates), pointer :: orientations => null()
         class(Abstract_Number_to_String), allocatable :: string_positions
         class(Abstract_Number_to_String), allocatable :: string_orientations
-        class(Abstract_Component_Coordinates), pointer :: orientations => null()
-        type(Concrete_Number_to_String) :: string_step
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy

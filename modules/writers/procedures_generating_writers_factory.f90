@@ -25,6 +25,7 @@ use procedures_changes_success_writer_factory, only: changes_success_writer_crea
     changes_success_writer_destroy => destroy
 use procedures_energies_writers_factory, only: energies_writers_create => create, &
     energies_writers_destroy => destroy
+use procedures_writers_inquirers, only: property_write_coordinates => write_coordinates
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 
 implicit none
@@ -47,7 +48,9 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        type(String_Wrapper) :: boxes_path(size(environment%periodic_boxes))
+        type(String_Wrapper), dimension(size(environment%periodic_boxes)) :: boxes_path, &
+            coordinates_path
+        logical :: write_coordinates
         logical :: can_exchange(size(components, 1), size(components, 2))
         character(len=:), allocatable :: make_directory_cmd, separator
         logical :: data_found
@@ -55,6 +58,7 @@ contains
         type(Concrete_Number_to_String) :: string
         integer :: i_box, box_stat_i
 
+        write_coordinates = property_write_coordinates(generating_data, prefix)
         data_field = prefix//"path separator"
         call generating_data%get(data_field, separator, data_found)
         call check_data_found(data_field, data_found)
@@ -64,6 +68,12 @@ contains
         do i_box = 1, size(boxes_path)
             boxes_path(i_box)%string = "box_"//string%get(i_box)//separator
             call execute_command_line(make_directory_cmd//" "//boxes_path(i_box)%string, &
+                exitstat=box_stat_i)
+            if (box_stat_i /= 0) call error_exit("procedures_generating_writers_factory: create:"//&
+                " directory can't be created.")
+            if (.not. write_coordinates) cycle
+            coordinates_path(i_box)%string = boxes_path(i_box)%string//"coordinates"//separator
+            call execute_command_line(make_directory_cmd//" "//coordinates_path(i_box)%string, &
                 exitstat=box_stat_i)
             if (box_stat_i /= 0) call error_exit("procedures_generating_writers_factory: create:"//&
                 " directory can't be created.")
@@ -77,9 +87,8 @@ contains
         call set_can_exchange(can_exchange, components)
         call line_writer_create(writers%gemc_nums_particles, boxes_path, "nums_particles.out", &
             can_exchange)
-
-        call complete_coordinates_writer_create(writers%complete_coordinates, environment%&
-            periodic_box, components(:, 1), "coordinates", generating_data, prefix)
+        call complete_coordinates_writer_create(writers%complete_coordinates, coordinates_path, &
+            "coordinates", environment%periodic_boxes, components, generating_data, prefix)
 
         call energies_writers_create(writers%gemc_energies, boxes_path, environment%external_fields, &
             wall_pairs, components, short_pairs, visit_energies=.true.)

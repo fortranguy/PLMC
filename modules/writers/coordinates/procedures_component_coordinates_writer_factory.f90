@@ -14,57 +14,50 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_line
+    module procedure :: create_rectangle
     module procedure :: create_element
 end interface create
 
 interface destroy
     module procedure :: destroy_element
-    module procedure :: destroy_line
+    module procedure :: destroy_rectangle
 end interface destroy
 
 contains
 
 
-    subroutine create_line(components_coordinates, components_selectors, components, &
-        write_coordinates)
-        type(Component_Coordinates_Writer_Wrapper), allocatable, intent(out) :: &
-            components_coordinates(:)
-        type(Component_Coordinates_Writer_Selector), allocatable, intent(out) :: &
-            components_selectors(:)
-        type(Component_Wrapper), intent(in) :: components(:)
+    subroutine create_rectangle(components_coordinates, components, write_coordinates)
+        type(Component_Coordinates_Writer_Wrapper), intent(inout) :: components_coordinates(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
         logical, intent(in) :: write_coordinates
 
-        integer :: i_component
+        type(Component_Coordinates_Writer_Selector) :: selector_i
+        integer :: i_box, i_component
 
-        allocate(components_coordinates(size(components)))
-        allocate(components_selectors(size(components_coordinates)))
-        do i_component = 1, size(components_coordinates)
-            associate(positions_i => components(i_component)%positions, &
-                orientations_i => components(i_component)%orientations)
-                components_selectors(i_component)%write_positions = &
-                    component_has_positions(positions_i)
-                components_selectors(i_component)%write_orientations = &
-                    component_has_orientations(orientations_i)
-                call create(components_coordinates(i_component)%writer, i_component, positions_i, &
-                    orientations_i, components_selectors(i_component), write_coordinates)
-            end associate
-        end do
-    end subroutine create_line
-
-    subroutine destroy_line(components_coordinates)
-        type(Component_Coordinates_Writer_Wrapper), allocatable, intent(inout) :: &
-            components_coordinates(:)
-
-        integer :: i_component
-
-        if (allocated(components_coordinates)) then
-            do i_component = size(components_coordinates), 1, -1
-                call destroy(components_coordinates(i_component)%writer)
+        do i_box = 1, size(components_coordinates, 2)
+            do i_component = 1, size(components_coordinates, 1)
+                associate(positions_i => components(i_component, i_box)%positions, &
+                    orientations_i => components(i_component, i_box)%orientations)
+                    selector_i%write_positions = component_has_positions(positions_i)
+                    selector_i%write_orientations = component_has_orientations(orientations_i)
+                    call create(components_coordinates(i_component, i_box)%writer, i_component, &
+                        positions_i, orientations_i, selector_i, write_coordinates)
+                end associate
             end do
-            deallocate(components_coordinates)
-        end if
-    end subroutine destroy_line
+        end do
+    end subroutine create_rectangle
+
+    subroutine destroy_rectangle(components_coordinates)
+        type(Component_Coordinates_Writer_Wrapper), intent(inout) :: components_coordinates(:, :)
+
+        integer :: i_box, i_component
+
+        do i_box = size(components_coordinates, 2), 1, -1
+            do i_component = size(components_coordinates, 1), 1, -1
+                call destroy(components_coordinates(i_component, i_box)%writer)
+            end do
+        end do
+    end subroutine destroy_rectangle
 
     subroutine create_element(coordinates, i_component, positions, orientations, selector, &
         write_coordinates)
