@@ -18,7 +18,7 @@ use types_generating_algorithms_wrapper, only: Generating_Algorithms_Wrapper
 implicit none
 
 private
-public :: generating_algorithms_create, generating_algorithms_destroy, generating_algorithms_set
+public :: generating_algorithms_create, generating_algorithms_destroy
 
 contains
 
@@ -53,16 +53,5 @@ contains
         call one_particle_move_destroy(generating_algorithms%one_particle_translation)
         call box_volume_change_destroy(generating_algorithms%box_volume_change)
     end subroutine generating_algorithms_destroy
-
-    subroutine generating_algorithms_set(generating_algorithms)
-        type(Generating_Algorithms_Wrapper), intent(inout) :: generating_algorithms
-
-        call generating_algorithms%one_particle_translation%reset_selector()
-        call generating_algorithms%one_particle_rotation%reset_selector()
-        call generating_algorithms%two_particles_switch%reset_selector()
-        call generating_algorithms%one_particle_add%reset_selector()
-        call generating_algorithms%one_particle_remove%reset_selector()
-        call generating_algorithms%two_particles_transmutation%reset_selector()
-    end subroutine generating_algorithms_set
 
 end module procedures_generating_algorithms_factory

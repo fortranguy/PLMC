@@ -13,15 +13,15 @@ private
 
     type, extends(Abstract_Moved_Coordinates), abstract, public :: Abstract_Changed_Box_Size
     private
+        real(DP) :: frequency_ratio = 0._DP
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: ratio
-        integer :: num_changes = 0
         type(Concrete_Move_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor = 1._DP
         logical :: max_factor_reached = .false.
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: get_num => Abstract_get_num
+        procedure :: get_frequency_ratio => Abstract_get_frequency_ratio
         procedure :: get_ratio => Abstract_get_ratio
         procedure :: increase_delta => Abstract_increase_delta
         procedure :: decrease_delta => Abstract_decrease_delta
@@ -35,7 +35,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: get_num => Null_get_num
+        procedure :: get_frequency_ratio => Null_get_frequency_ratio
         procedure :: get_ratio => Null_get_ratio
         procedure :: increase_delta => Null_increase_delta
         procedure :: decrease_delta => Null_decrease_delta
@@ -45,15 +45,16 @@ contains
 
 !implementation Abstract_Changed_Box_Size
 
-    subroutine Abstract_construct(this, ratio, num_changes, tuning_parameters)
+    subroutine Abstract_construct(this, ratio, frequency_ratio, tuning_parameters)
         class(Abstract_Changed_Box_Size), intent(out) :: this
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
-        integer, intent(in) :: num_changes
+        real(DP), intent(in) :: frequency_ratio
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
 
         allocate(this%ratio, source=ratio)
-        call check_positive("Abstract_Changed_Box_Size: construct", "num_changes", num_changes)
-        this%num_changes = num_changes
+        call check_positive("Abstract_Changed_Box_Size: construct", "frequency_ratio", &
+            frequency_ratio)
+        this%frequency_ratio = frequency_ratio
         call check_increase_factor("Abstract_Changed_Box_Size: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
@@ -69,11 +70,11 @@ contains
         if (allocated(this%ratio)) deallocate(this%ratio)
     end subroutine Abstract_destroy
 
-    pure integer function Abstract_get_num(this) result(num_changes)
+    pure real(DP) function Abstract_get_frequency_ratio(this) result(frequency_ratio)
         class(Abstract_Changed_Box_Size), intent(in) :: this
 
-        num_changes = this%num_changes
-    end function Abstract_get_num
+        frequency_ratio = this%frequency_ratio
+    end function Abstract_get_frequency_ratio
 
     function Abstract_get_ratio(this) result(ratio)
         real(DP) :: ratio(num_dimensions)
@@ -101,10 +102,10 @@ contains
 
 !implementation Null_Changed_Box_Size
 
-    subroutine Null_construct(this, ratio, num_changes, tuning_parameters)
+    subroutine Null_construct(this, ratio, frequency_ratio, tuning_parameters)
         class(Null_Changed_Box_Size), intent(out) :: this
         class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
-        integer, intent(in) :: num_changes
+        real(DP), intent(in) :: frequency_ratio
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_construct
 
@@ -112,10 +113,10 @@ contains
         class(Null_Changed_Box_Size), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure integer function Null_get_num(this) result(num_changes)
+    pure real(DP) function Null_get_frequency_ratio(this) result(frequency_ratio)
         class(Null_Changed_Box_Size), intent(in) :: this
-        num_changes = 0
-    end function Null_get_num
+        frequency_ratio = 0._DP
+    end function Null_get_frequency_ratio
 
     function Null_get_ratio(this) result(ratio)
         real(DP) :: ratio(num_dimensions)

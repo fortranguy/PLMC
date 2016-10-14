@@ -46,6 +46,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
+        procedure :: reset_selector => Abstract_reset_selector
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
@@ -62,6 +63,7 @@ private
     type, extends(Abstract_Box_Volume_Change), public :: Null_Box_Volume_Change
     contains
         procedure :: construct => Null_construct
+        procedure :: reset_selector => Null_reset_selector
         procedure :: destroy => Null_destroy
         procedure :: get_num_choices => Null_get_num_choices
         procedure :: try => Null_try
@@ -104,10 +106,30 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
+    subroutine Abstract_reset_selector(this)
+        class(Abstract_Box_Volume_Change), intent(inout) :: this
+
+        integer :: nums_candidates(1), i_component, num_candidate
+
+        if (any(this%have_positions)) then
+            nums_candidates = 0
+            do i_component = 1, size(this%have_positions)
+                nums_candidates = nums_candidates + this%mixture%components(i_component)%&
+                    average_num_particles%get()
+            end do
+            nums_candidates = ceiling(this%changed_box_size%get_frequency_ratio() * &
+                real(nums_candidates, DP))
+            nums_candidates = merge(nums_candidates, 1, nums_candidates > 0)
+        else
+            nums_candidates = 0
+        end if
+        call this%selector%reset(nums_candidates)
+    end subroutine Abstract_reset_selector
+
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Box_Volume_Change), intent(in) :: this
 
-        num_choices = this%changed_box_size%get_num()
+        num_choices = this%selector%get_num_choices()
     end function Abstract_get_num_choices
 
     subroutine Abstract_try(this, observables)
@@ -311,6 +333,10 @@ contains
     subroutine Null_destroy(this)
         class(Null_Box_Volume_Change), intent(inout) :: this
     end subroutine Null_destroy
+
+    subroutine Null_reset_selector(this)
+        class(Null_Box_Volume_Change), intent(inout) :: this
+    end subroutine Null_reset_selector
 
     pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Box_Volume_Change), intent(in) :: this

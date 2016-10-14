@@ -22,10 +22,8 @@
 - There are at least two versions of GEMC: ``Canonical'' & ``Isobaric''. I will
     implement the first one.
 - [Data] Fortran code to update, cf. json
-- ComponentAverageNumber: with actual average counting for GEMC
-- docUML: reference (& notation) for aggregation (if a class is imported)?
 - NeighbourCells: HS shortcut
 + GeneratingAlgorithms:
-    - promote resetSelectors() in base class
     - locally: this%selector promote to this%selectors(numBoxes)?
 - realZero: relative if possible
+- PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?

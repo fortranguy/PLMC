@@ -10,6 +10,7 @@
 
         \begin{scope}
             \begin{abstractclass}[text width=\mediumTextWidth]{GeneratingAlgorithm}{0, 0}
+                \operation{\procedure{resetSelector}{}}
                 \operation[0]{\procedure{getNumChoices}{}: \type{int}}
                 \operation[0]{\procedure{try}{observables: \type{Observables}}}
             \end{abstractclass}
@@ -28,7 +29,6 @@
                     canChange: \type{bool[\numComponents]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
@@ -58,7 +58,6 @@
                     $\mathComposition$ couples: \type{HeteroCouples},
                     $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
@@ -75,7 +74,6 @@
                     canExchange: \type{bool[\numComponents]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 
@@ -93,7 +91,6 @@
                     $\mathComposition$ couples: \type{HeteroCouples},
                     $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{resetSelector}{}}
             \end{abstractclass}
         \end{scope}
 

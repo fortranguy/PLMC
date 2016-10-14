@@ -47,7 +47,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Coordinates.north) + (0 cm, 3.5 cm)$)}]
+        \begin{scope}[shift={($(Coordinates.north) + (0 cm, 3.75 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{TemporaryParticle}{0, 0}
                 \UMLattribute{i: \type{int}}
                 \UMLattribute{position: \type{real[\numDimensions]}}
@@ -56,11 +56,12 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(TemporaryParticle.north) + (0 cm, 4.5 cm)$)}]
+        \begin{scope}[shift={($(TemporaryParticle.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AverageNumParticles}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{set}{}}
+                \operation{\procedure{getAccumulationPeriod}{}: \type{int}}
                 \operation{\procedure{accumulate}{iStep: \type{int}}}
                 \operation{\procedure{get}{}: \type{int}}
             \end{abstractclass}
@@ -102,7 +103,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(NumParticles.south) - (0 cm, 1 cm)$)}]
+        \begin{scope}[shift={($(NumParticles.south) - (0 cm, 1.25 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MinDistance}{0, 0}
                 \operation{\procedure{set}{minDistance: \type{real}}}
                 \operation{\procedure{get}{}: \type{real}}

@@ -22,6 +22,7 @@ public :: create, destroy
 
 contains
 
+    !> @todo to update for multiple boxes
     subroutine create(writers, environment, wall_pairs, components, short_pairs, &
         volume_change_method, particle_insertion_method, visit_energies)
         type(Exploring_Writers_Wrapper), intent(out) :: writers

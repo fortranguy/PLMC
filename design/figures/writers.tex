@@ -44,6 +44,16 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(ChangesSuccessWriter.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{ExploringWriters}{0, 0}
+                \UMLattribute{maximumBoxesCompressionDelta: \type{RealWriter[\numBoxes]}}
+                \UMLattribute{betaPressuresExcess: \type{RealWriter[\numBoxes]}}
+                \UMLattribute{energies: \type{EnergiesWriters[\numBoxes]}}
+                \UMLattribute{invPowActivities: \type{LineWriter[\numBoxes]}}
+                \UMLattribute{insertionSuccesses: \type{LineWriter[\numBoxes]}}
+            \end{class}
+        \end{scope}
+
         \begin{scope}[shift={($(CompleteCoordinatesWriter.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{RectangleWriter}{0, 0}
                 \operation{\procedure{construct}{filename: \type{String},

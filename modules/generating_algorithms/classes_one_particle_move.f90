@@ -164,8 +164,8 @@ contains
 
 !implementation Abstract_One_Particle_Move
 
-    !> @note
-    !> this%selector: delayed construction in [[classes_one_particle_move:Abstract_reset_selector]]
+    !> @note this%selector construction is delayed in
+    !> [[classes_one_particle_move:Abstract_reset_selector]]
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
         selector)

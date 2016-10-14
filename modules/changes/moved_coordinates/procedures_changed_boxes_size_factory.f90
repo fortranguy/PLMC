@@ -1,5 +1,6 @@
 module procedures_changed_boxes_size_factory
 
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use classes_number_to_string, only: Concrete_Number_to_String
@@ -79,20 +80,20 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        integer :: num_changes
+        real(DP) :: frequency_ratio
         character(len=:), allocatable :: data_field
         logical :: data_found
 
         if (gemc_box_size_can_change(changed_box_size_ratio)) then
             allocate(Concrete_Changed_Box_Size :: changed_box_size)
-            data_field = prefix//"number"
-            call generating_data%get(data_field, num_changes, data_found)
+            data_field = prefix//"frequency ratio"
+            call generating_data%get(data_field, frequency_ratio, data_found)
             call check_data_found(data_field, data_found)
         else
             allocate(Null_Changed_Box_Size :: changed_box_size)
-            num_changes = 0
+            frequency_ratio = 0._DP
         end if
-        call changed_box_size%construct(changed_box_size_ratio, num_changes, tuning_parameters)
+        call changed_box_size%construct(changed_box_size_ratio, frequency_ratio, tuning_parameters)
     end subroutine create_element
 
     subroutine destroy_triangle(changed_boxes_size)

@@ -8,11 +8,17 @@ private
 
     type, abstract, public :: Abstract_Generating_Algorithm
     contains
+        procedure(Abstract_reset_selector), deferred :: reset_selector
         procedure(Abstract_get_num_choices), deferred :: get_num_choices
         procedure(Abstract_try), deferred :: try
     end type Abstract_Generating_Algorithm
 
     abstract interface
+
+        subroutine Abstract_reset_selector(this)
+        import :: Abstract_Generating_Algorithm
+            class(Abstract_Generating_Algorithm), intent(inout) :: this
+        end subroutine Abstract_reset_selector
 
         pure integer function Abstract_get_num_choices(this) result(num_choices)
         import :: Abstract_Generating_Algorithm

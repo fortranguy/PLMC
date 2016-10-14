@@ -120,7 +120,7 @@
     "Changes": {
         "number of tuning steps": 1000,
         "Box Size": {
-            "number": 10,
+            "frequency ratio": 0.01,
             "Small Change": {
                 "initial delta": 0.01
             },

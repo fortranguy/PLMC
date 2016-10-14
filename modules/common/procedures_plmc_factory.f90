@@ -12,7 +12,7 @@ use procedures_physical_model_factory, only: physical_model_create_generating =>
     physical_model_create_exploring => create_exploring, physical_model_destroy => destroy
 use procedures_random_seed_factory, only: random_seed_set => set
 use procedures_markov_chain_generator_factory, only: markov_chain_generator_create => create, &
-    markov_chain_generator_destroy => destroy, markov_chain_generator_set => set
+    markov_chain_generator_destroy => destroy
 use procedures_markov_chain_explorer_factory, only: markov_chain_explorer_create => create, &
     markov_chain_explorer_destroy => destroy
 use procedures_observables_factory, only: observables_create_generating, &
@@ -64,7 +64,6 @@ interface plmc_set
     module procedure :: plmc_set_num_steps, plmc_set_num_snaps
     module procedure :: set_initial_observables
     module procedure :: set_coordinates_from_json, set_coordinates_from_snap
-    module procedure :: markov_chain_generator_set
     module procedure :: tune_moved_coordinates
     module procedure :: set_success_and_reset_counter_generating, &
         set_success_and_reset_counter_exploring
@@ -139,24 +138,6 @@ contains
         call json_data_destroy_input(exploring_data)
         call json_data_destroy_input(generating_data)
     end subroutine destroy_exploring_data
-
-    !> @todo
-    !> [[types_generating_observables_wrapper:Generating_Observables_Wrapper]] to update for
-    !> multiple boxes.
-    subroutine tune_generating_algorithms(i_step, components, markov_chain_generator)
-        integer, intent(in) :: i_step
-        type(Component_Wrapper), intent(inout) :: components(:, :)
-        type(Markov_Chain_Explorer_Wrapper), intent(inout) :: markov_chain_generator
-
-        integer :: i_box
-        integer :: i_component
-
-        do i_box = 1, size(components, 2)
-            do i_component = 1, size(components, 1)
-                call components(i_component, i_box)%average_num_particles%accumulate(i_step)
-            end do
-        end do
-    end subroutine tune_generating_algorithms
 
     !> @note Beware of inertia
     subroutine tune_moved_coordinates(tuned, i_step, changes, observables)
