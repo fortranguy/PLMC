@@ -30,9 +30,9 @@ contains
         call box_volume_change_create(generating_algorithms%box_volume_change, physical_model, &
             changes%changed_box_size)
         call one_particle_translation_create(generating_algorithms%one_particle_translation, &
-            physical_model, changes%components)
+            physical_model, changes%gemc_components)
         call one_particle_rotation_create(generating_algorithms%one_particle_rotation, &
-            physical_model, changes%components)
+            physical_model, changes%gemc_components)
         call two_particles_switch_create(generating_algorithms%two_particles_switch, physical_model)
         call one_particle_add_create(generating_algorithms%one_particle_add, physical_model, &
             changes)

@@ -185,31 +185,35 @@ contains
     end subroutine set_tuner_parameters
 
     subroutine set_can_translate(can_translate, components)
-        logical, intent(out) :: can_translate(:)
-        type(Changes_Component_Wrapper), intent(in) :: components(:)
+        logical, intent(inout) :: can_translate(:, :)
+        type(Changes_Component_Wrapper), intent(in) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        do i_component = 1, size(can_translate)
-            can_translate(i_component) = component_can_translate(components(i_component)%&
-                translated_positions)
+        do i_box = 1, size(can_translate, 2)
+            do i_component = 1, size(can_translate, 1)
+                can_translate(i_component, i_box) = &
+                    component_can_translate(components(i_component, i_box)%translated_positions)
+            end do
         end do
     end subroutine set_can_translate
 
     subroutine set_can_rotate(can_rotate, components)
-        logical, intent(out) :: can_rotate(:)
-        type(Changes_Component_Wrapper), intent(in) :: components(:)
+        logical, intent(inout) :: can_rotate(:, :)
+        type(Changes_Component_Wrapper), intent(in) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        do i_component = 1, size(can_rotate)
-            can_rotate(i_component) = component_can_rotate(components(i_component)%&
-                rotated_orientations)
+        do i_box = 1, size(can_rotate, 2)
+            do i_component = 1, size(can_rotate, 1)
+                can_rotate(i_component, i_box) = &
+                    component_can_rotate(components(i_component, i_box)%rotated_orientations)
+            end do
         end do
     end subroutine set_can_rotate
 
     subroutine set_can_exchange_boxes(can_exchange, components)
-        logical, intent(out) :: can_exchange(:, :)
+        logical, intent(inout) :: can_exchange(:, :)
         type(Component_Wrapper), intent(in) :: components(:, :)
 
         integer :: i_box, i_component

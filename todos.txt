@@ -27,3 +27,4 @@
     - locally: this%selector promote to this%selectors(numBoxes)?
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
+- DiracDistributionPlus: gaussian -> halfGaussian

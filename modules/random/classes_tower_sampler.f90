@@ -55,7 +55,7 @@ contains
         class(Abstract_Tower_Sampler), intent(inout) :: this
         integer, intent(in) :: nums_candidates(:)
 
-        real(DP), allocatable :: cumulative_weight(:)
+        real(DP) :: cumulative_weight(this%num_candidates)
         integer :: i_candidate
 
         if (size(nums_candidates) /= this%num_candidates) then
@@ -70,7 +70,6 @@ contains
             this%i_unique_candidate = maxloc(nums_candidates, 1)
         else
             this%unique_candidate = .false.
-            allocate(cumulative_weight(this%num_candidates))
             do i_candidate = 1, this%num_candidates
                 cumulative_weight(i_candidate) = real(sum(nums_candidates(1:i_candidate)), DP) / &
                     real(this%num_choices, DP)

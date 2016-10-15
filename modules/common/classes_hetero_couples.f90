@@ -77,17 +77,17 @@ contains
         class(Half_Hetero_Couples), intent(out) :: this
         integer, intent(in) :: num_partners
 
-        integer :: i_couple, i_element, j_element
+        integer :: i_couple, i_partner, j_partner
 
         call check_positive("Half_Hetero_Couples: construct", "num_partners", num_partners)
         this%num_couples = num_partners * (num_partners - 1) / 2
         allocate(this%couples(2, this%num_couples))
         this%couples = 0
         i_couple = 0
-        do j_element = 2, num_partners
-            do i_element = 1, j_element - 1
+        do j_partner = 2, num_partners
+            do i_partner = 1, j_partner - 1
                 i_couple = i_couple + 1
-                this%couples(:, i_couple) = [j_element, i_element]
+                this%couples(:, i_couple) = [j_partner, i_partner]
             end do
         end do
     end subroutine Half_construct
@@ -100,17 +100,17 @@ contains
         class(Full_Hetero_Couples), intent(out) :: this
         integer, intent(in) :: num_partners
 
-        integer :: i_couple, i_element, j_element
+        integer :: i_couple, i_partner, j_partner
         call check_positive("Half_Hetero_Couples: construct", "num_partners", num_partners)
         this%num_couples = num_partners * (num_partners - 1)
         allocate(this%couples(2, this%num_couples))
         this%couples = 0
         i_couple = 0
-        do j_element = 1, num_partners
-            do i_element = 1, num_partners
-                if (i_element /= j_element) then
+        do j_partner = 1, num_partners
+            do i_partner = 1, num_partners
+                if (i_partner /= j_partner) then
                     i_couple = i_couple + 1
-                    this%couples(:, i_couple) = [j_element, i_element]
+                    this%couples(:, i_couple) = [j_partner, i_partner]
                 end if
             end do
         end do
