@@ -28,8 +28,7 @@ contains
         can_exchange)
         class(Abstract_Random_Coordinates), allocatable, intent(out) :: random_positions(:)
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domains(:)
-        logical, intent(in) :: have_positions(:, :)
-        logical, intent(in) :: can_exchange(:)
+        logical, dimension(:, :), intent(in) :: have_positions, can_exchange
 
         integer :: i_box
 
@@ -51,9 +50,10 @@ contains
         end select
     end subroutine create_random_positions
 
+    !> @warning The use of have_orientations may be deceptive.
     subroutine create_random_orientation(random_orientation, have_orientations, can_exchange)
         class(Abstract_Random_Coordinates), allocatable, intent(out) :: random_orientation
-        logical, dimension(:), intent(in) :: have_orientations, can_exchange
+        logical, dimension(:, :), intent(in) :: have_orientations, can_exchange
 
         if (any(have_orientations) .and. any(can_exchange)) then
             allocate(Concrete_Random_Orientation :: random_orientation)
@@ -62,7 +62,7 @@ contains
         end if
         select type(random_orientation)
             type is (Concrete_Random_Orientation)
-                call random_orientation%construct(have_orientations)
+                call random_orientation%construct(have_orientations(:, 1))
             type is (Null_Random_Coordinates)
             class default
                 call error_exit("procedures_random_coordinates_factory: create_random_orientation:"&

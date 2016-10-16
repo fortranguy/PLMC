@@ -21,21 +21,23 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
 
-        class(Abstract_Tower_Sampler), allocatable :: selector
-        logical :: can_exchange(size(physical_model%mixture%components))
+        class(Abstract_Tower_Sampler), allocatable :: selectors(:)
+        logical :: can_exchange(size(physical_model%mixture%gemc_components, 1), &
+            size(physical_model%mixture%gemc_components, 2))
 
-        call set_can_exchange(can_exchange, physical_model%mixture%components)
+        call set_can_exchange(can_exchange, physical_model%mixture%gemc_components)
         if (any(can_exchange)) then
             allocate(Concrete_One_Particle_Add :: one_particle_exchange)
         else
             allocate(Null_One_Particle_Exchange :: one_particle_exchange)
         end if
 
-        call tower_sampler_create(selector, size(can_exchange), any(can_exchange))
+        call tower_sampler_create(selectors, size(can_exchange, 2), size(can_exchange, 1), &
+            any(can_exchange))
         call one_particle_exchange%construct(physical_model%environment, physical_model%mixture, &
             physical_model%short_interactions, physical_model%dipolar_interactions_dynamic, &
-            physical_model%dipolar_interactions_static, changes, can_exchange, selector)
-        call tower_sampler_destroy(selector)
+            physical_model%gemc_dipolar_interactions_static, changes, can_exchange, selectors)
+        call tower_sampler_destroy(selectors)
     end subroutine create_add
 
     subroutine create_remove(one_particle_exchange, physical_model, changes)
@@ -43,21 +45,23 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
 
-        class(Abstract_Tower_Sampler), allocatable :: selector
-        logical :: can_exchange(size(physical_model%mixture%components))
+        class(Abstract_Tower_Sampler), allocatable :: selectors(:)
+        logical :: can_exchange(size(physical_model%mixture%gemc_components, 1), &
+            size(physical_model%mixture%gemc_components, 2))
 
-        call set_can_exchange(can_exchange, physical_model%mixture%components)
+        call set_can_exchange(can_exchange, physical_model%mixture%gemc_components)
         if (any(can_exchange)) then
             allocate(Concrete_One_Particle_Remove :: one_particle_exchange)
         else
             allocate(Null_One_Particle_Exchange :: one_particle_exchange)
         end if
 
-        call tower_sampler_create(selector, size(can_exchange), any(can_exchange))
+        call tower_sampler_create(selectors, size(can_exchange, 2), size(can_exchange, 1), &
+            any(can_exchange))
         call one_particle_exchange%construct(physical_model%environment, physical_model%mixture, &
             physical_model%short_interactions, physical_model%dipolar_interactions_dynamic, &
-            physical_model%dipolar_interactions_static, changes, can_exchange, selector)
-        call tower_sampler_destroy(selector)
+            physical_model%gemc_dipolar_interactions_static, changes, can_exchange, selectors)
+        call tower_sampler_destroy(selectors)
     end subroutine create_remove
 
     subroutine destroy(one_particle_exchange)

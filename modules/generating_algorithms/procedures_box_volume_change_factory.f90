@@ -27,10 +27,11 @@ contains
         class(Abstract_Tower_Sampler), allocatable :: selector
         integer :: num_candidates
         logical :: box_size_can_change
-        logical :: have_positions(size(physical_model%mixture%gemc_components, 1))
+        logical :: have_positions(size(physical_model%mixture%gemc_components, 1), &
+            size(physical_model%mixture%gemc_components, 2))
 
         box_size_can_change = property_box_size_can_change(changed_box_size)
-        call set_have_positions(have_positions, physical_model%mixture%components)
+        call set_have_positions(have_positions, physical_model%mixture%gemc_components)
         if (box_size_can_change) then
             allocate(Concrete_Box_Volume_Change :: box_volume_change)
         else
@@ -41,7 +42,7 @@ contains
         call tower_sampler_create(selector, num_candidates, box_size_can_change)
         call box_volume_change%construct(physical_model%environment, physical_model%mixture, &
             physical_model%short_interactions, physical_model%dipolar_interactions_facade, &
-            changed_box_size, have_positions, selector)
+            changed_box_size, have_positions(:, 1), selector)
         call tower_sampler_destroy(selector)
     end subroutine create
 

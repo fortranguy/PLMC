@@ -58,14 +58,13 @@ contains
         integer, intent(in) :: num_tuning_steps
         type(json_file), intent(inout) :: generating_data
 
-        integer :: i_box
         type(Concrete_Move_Tuning_Parameters) :: box_size_tuning_parameters, &
             components_tuning_parameters
         type(Concrete_Move_Tuner_Parameters) :: box_size_tuner_parameters, &
             components_tuner_parameters
         logical :: have_positions(size(components, 1), size(components, 2))
-        logical :: have_orientations(size(components, 1))
-        logical :: can_exchange(size(components, 1))
+        logical :: have_orientations(size(components, 1), size(components, 2))
+        logical :: can_exchange(size(components, 1), size(components, 2))
         logical :: total_volume_can_change
         logical :: some_boxes_size_can_change, some_components_have_coordinates
 
@@ -82,10 +81,8 @@ contains
         call move_tuner_create_boxes_size_change(changes%boxes_size_change_tuner, changes%&
             changed_boxes_size, box_size_tuner_parameters, num_tuning_steps)
 
-        do i_box = 1, size(have_positions, 2)
-            call set_have_positions(have_positions(:, i_box), components(:, i_box))
-        end do
-        call set_have_orientations(have_orientations, components(:, 1))
+        call set_have_positions(have_positions, components)
+        call set_have_orientations(have_orientations, components)
 
         some_components_have_coordinates = any(have_positions) .or. any(have_orientations)
         call set_tuning_parameters(components_tuning_parameters, num_tuning_steps, &
@@ -97,7 +94,7 @@ contains
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
             generating_data, changes_prefix)
 
-        call set_can_exchange(can_exchange, components(:, 1))
+        call set_can_exchange(can_exchange, components)
         call random_coordinates_create(changes%random_positions, environment%accessible_domains, &
             have_positions, can_exchange)
         call random_coordinates_create(changes%random_orientation, have_orientations, can_exchange)

@@ -119,25 +119,30 @@ contains
     end subroutine set_nums_particles
 
     subroutine set_have_positions(have_positions, components)
-        logical, intent(inout) :: have_positions(:)
-        type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(inout) :: have_positions(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        do i_component = 1, size(have_positions)
-            have_positions(i_component) = component_has_positions(components(i_component)%positions)
+        do i_box = 1, size(have_positions, 2)
+            do i_component = 1, size(have_positions, 1)
+                have_positions(i_component, i_box) = &
+                    component_has_positions(components(i_component, i_box)%positions)
+            end do
         end do
     end subroutine set_have_positions
 
     subroutine set_have_orientations(have_orientations, components)
-        logical, intent(inout) :: have_orientations(:)
-        type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(inout) :: have_orientations(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        do i_component = 1, size(have_orientations)
-            have_orientations(i_component) = component_has_orientations(components(i_component)%&
-                orientations)
+        do i_box = 1, size(have_orientations, 2)
+            do i_component = 1, size(have_orientations, 1)
+                have_orientations(i_component, i_box) = &
+                    component_has_orientations(components(i_component, i_box)%orientations)
+            end do
         end do
     end subroutine set_have_orientations
 

@@ -20,8 +20,7 @@ contains
     subroutine create_position(position_copiers, random_positions, have_positions, can_exchange)
         class(Abstract_Coordinates_Copier), allocatable, intent(out) :: position_copiers(:)
         class(Abstract_Random_Coordinates), intent(in) :: random_positions(:)
-        logical, intent(in) :: have_positions(:, :)
-        logical, intent(in) :: can_exchange(:)
+        logical, dimension(:, :), intent(in) :: have_positions, can_exchange
 
         integer :: i_box
 
@@ -43,12 +42,12 @@ contains
         end select
     end subroutine create_position
 
+    !> @warning cf. [[procedures_random_coordinates_factory:create_random_orientation]]
     subroutine create_orientation(orientation_copier, random_orientation, have_orientations, &
         can_exchange)
         class(Abstract_Coordinates_Copier), allocatable, intent(out) :: orientation_copier
         class(Abstract_Random_Coordinates), intent(in) :: random_orientation
-        logical, intent(in) :: have_orientations(:)
-        logical, intent(in) :: can_exchange(:)
+        logical, dimension(:, :), intent(in) :: have_orientations, can_exchange
 
         if (any(have_orientations) .and. any(can_exchange)) then
             allocate(Random_Filling_Coordinates_Copier :: orientation_copier)
@@ -57,7 +56,7 @@ contains
         end if
         select type (orientation_copier)
             type is (Random_Filling_Coordinates_Copier)
-                call orientation_copier%construct(random_orientation, have_orientations)
+                call orientation_copier%construct(random_orientation, have_orientations(:, 1))
             type is (Null_Coordinates_Copier)
             class default
                 call error_exit("procedures_coordinates_copier_factory: create_orientation: "//&

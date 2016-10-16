@@ -34,7 +34,8 @@ private
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
             null()
-        type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static(:) => null()
+        type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static(:) => &
+            null()
         type(Changes_Component_Wrapper), pointer :: changes_components(:, :) => null()
         logical, allocatable :: can_move(:, :)
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
