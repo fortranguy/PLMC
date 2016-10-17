@@ -25,7 +25,6 @@
 - NeighbourCells: HS shortcut
 + GeneratingAlgorithms:
     - locally: this%selector promote to this%selectors(numBoxes)?
-    - merge TwoParticlesSwitch and TwoParticlesTransmutation?
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
 - DiracDistributionPlus: gaussian -> halfGaussian
