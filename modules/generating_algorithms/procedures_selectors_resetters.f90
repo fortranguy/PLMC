@@ -35,22 +35,25 @@ contains
 
     !> @todo Multi boxes generalisation
     !> @todo What is the best compromise between minval(), maxval() and average()?
-    subroutine reset_two_particles(selector, couples, components, properties)
-        class(Abstract_Tower_Sampler), intent(inout) :: selector
-        class(Abstract_Hetero_Couples), intent(in) :: couples
-        type(Component_Wrapper), intent(in) :: components(:)
-        logical, intent(in) :: properties(:)
+    subroutine reset_two_particles(selectors, couples, components, properties)
+        class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
+        class(Abstract_Hetero_Couples), intent(in) :: couples(:)
+        type(Component_Wrapper), intent(in) :: components(:, :)
+        logical, intent(in) :: properties(:, :)
 
-        integer :: nums_candidates(couples%get_num())
-        integer :: i_couple, ij_couple(2)
+        integer :: i_box
+        integer :: nums_candidates(size(properties, 1)), i_couple, ij_couple(2)
 
-        do i_couple = 1, size(nums_candidates)
-            ij_couple = couples%get(i_couple)
-            nums_candidates(i_couple) = merge(minval([components(ij_couple(1))%&
-                average_num_particles%get(), components(ij_couple(2))%average_num_particles%&
-                get()]), 0, properties(ij_couple(1)) .and. properties(ij_couple(2)))
+        do i_box = 1, size(selectors)
+            do i_couple = 1, size(nums_candidates)
+                ij_couple = couples(i_box)%get(i_couple)
+                nums_candidates(i_couple) = merge(minval([components(ij_couple(1), i_box)%&
+                    average_num_particles%get(), &
+                    components(ij_couple(2), i_box)%average_num_particles%get()]), 0, &
+                    properties(ij_couple(1), i_box) .and. properties(ij_couple(2), i_box))
+            end do
+            call selectors(i_box)%reset(nums_candidates)
         end do
-        call selector%reset(nums_candidates)
     end subroutine reset_two_particles
 
 end module procedures_selectors_resetters

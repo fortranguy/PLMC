@@ -18,9 +18,8 @@ private
         class(Abstract_Box_Volume_Change), allocatable :: box_volume_change
         class(Abstract_Generating_Algorithm), allocatable :: one_particle_translation, &
             one_particle_rotation
-        class(Abstract_Box_Particles_Swap), allocatable :: two_particles_switch
         class(Abstract_Generating_Algorithm), allocatable :: one_particle_add, one_particle_remove
-        class(Abstract_Box_Particles_Swap), allocatable :: two_particles_transmutation
+        class(Abstract_Generating_Algorithm), allocatable :: two_particles_transmutation, two_particles_switch
     end type Generating_Algorithms_Wrapper
 
 end module types_generating_algorithms_wrapper

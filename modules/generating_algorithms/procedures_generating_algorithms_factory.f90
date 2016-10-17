@@ -10,8 +10,7 @@ use procedures_box_particle_move_factory, only: box_particle_translation_create 
 use procedures_box_particle_exchange_factory, only: box_particle_add_create => create_add, &
     box_particle_remove_create => create_remove
 use procedures_box_particles_swap_factory, only: box_particles_swap_identities_create => &
-    create_identities, box_particles_swap_positions_create => create_positions, &
-    box_particles_swap_destroy => destroy
+    create_identities, box_particles_swap_positions_create => create_positions
 use types_generating_algorithms_wrapper, only: Generating_Algorithms_Wrapper
 
 implicit none
@@ -32,23 +31,23 @@ contains
             physical_model, changes%gemc_components)
         call box_particle_rotation_create(generating_algorithms%one_particle_rotation, &
             physical_model, changes%gemc_components)
-        call box_particles_swap_positions_create(generating_algorithms%two_particles_switch, &
-            physical_model, changes)
         call box_particle_add_create(generating_algorithms%one_particle_add, physical_model, &
             changes)
         call box_particle_remove_create(generating_algorithms%one_particle_remove, physical_model, &
             changes)
         call box_particles_swap_identities_create(generating_algorithms%two_particles_transmutation, &
             physical_model, changes)
+        call box_particles_swap_positions_create(generating_algorithms%two_particles_switch, &
+            physical_model, changes)
     end subroutine generating_algorithms_create
 
     subroutine generating_algorithms_destroy(generating_algorithms)
         type(Generating_Algorithms_Wrapper), intent(inout) :: generating_algorithms
 
-        call box_particles_swap_destroy(generating_algorithms%two_particles_transmutation)
+        call destroy_element(generating_algorithms%two_particles_switch)
+        call destroy_element(generating_algorithms%two_particles_transmutation)
         call destroy_element(generating_algorithms%one_particle_remove)
         call destroy_element(generating_algorithms%one_particle_add)
-        call box_particles_swap_destroy(generating_algorithms%two_particles_switch)
         call destroy_element(generating_algorithms%one_particle_rotation)
         call destroy_element(generating_algorithms%one_particle_translation)
         call box_volume_change_destroy(generating_algorithms%box_volume_change)
