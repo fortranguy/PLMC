@@ -1,4 +1,4 @@
-module classes_one_particle_move
+module classes_box_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_random_number, only: random_integer
@@ -27,7 +27,7 @@ implicit none
 
 private
 
-    type, extends(Abstract_Generating_Algorithm), abstract, public :: Abstract_One_Particle_Move
+    type, extends(Abstract_Generating_Algorithm), abstract, public :: Abstract_Box_Particle_Move
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
@@ -54,21 +54,21 @@ private
         procedure(Abstract_update_actor), private, deferred :: update_actor
         procedure(Abstract_increment_hit), private, nopass, deferred :: increment_hit
         procedure(Abstract_increment_success), private, nopass, deferred :: increment_success
-    end type Abstract_One_Particle_Move
+    end type Abstract_Box_Particle_Move
 
     abstract interface
 
         subroutine Abstract_define_change(this, abort, new, old, i_box, i_component)
-        import :: Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
+        import :: Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+            class(Abstract_Box_Particle_Move), intent(in) :: this
             logical, intent(out) :: abort
             type(Concrete_Temporary_Particle), intent(out) :: new, old
             integer, intent(in) :: i_box, i_component
         end subroutine Abstract_define_change
 
         subroutine Abstract_visit_walls(this, overlap, delta_energy, i_box, i_component, new, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
+        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+            class(Abstract_Box_Particle_Move), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energy
             integer, intent(in) :: i_box, i_component
@@ -76,8 +76,8 @@ private
         end subroutine Abstract_visit_walls
 
         subroutine Abstract_visit_short(this, overlap, delta_energies, i_box, i_component, new, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
+        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+            class(Abstract_Box_Particle_Move), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energies(:)
             integer, intent(in) :: i_box, i_component
@@ -85,8 +85,8 @@ private
         end subroutine Abstract_visit_short
 
         subroutine Abstract_visit_field(this, delta_energy, i_box, new, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
+        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+            class(Abstract_Box_Particle_Move), intent(in) :: this
             real(DP), intent(out) :: delta_energy
             integer, intent(in) :: i_box
             type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -94,8 +94,8 @@ private
 
         subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
             i_component, new, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
+        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+            class(Abstract_Box_Particle_Move), intent(in) :: this
             real(DP), intent(out) :: delta_energies(:)
             real(DP), intent(out) :: delta_shared_energy
             integer, intent(in) :: i_box, i_component
@@ -103,8 +103,8 @@ private
         end subroutine Abstract_visit_dipolar
 
         subroutine Abstract_update_actor(this, i_box, i_component, new, old)
-        import :: Concrete_Temporary_Particle, Abstract_One_Particle_Move
-            class(Abstract_One_Particle_Move), intent(in) :: this
+        import :: Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+            class(Abstract_Box_Particle_Move), intent(in) :: this
             integer, intent(in) :: i_box, i_component
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_update_actor
@@ -121,7 +121,7 @@ private
 
     end interface
 
-    type, extends(Abstract_One_Particle_Move), public :: Concrete_One_Particle_Translation
+    type, extends(Abstract_Box_Particle_Move), public :: Box_Particle_Translation
     contains
         procedure, private :: define_change => Translation_define_change
         procedure, private :: visit_walls => Translation_visit_walls
@@ -131,9 +131,9 @@ private
         procedure, private :: update_actor => Translation_update_actor
         procedure, private, nopass :: increment_hit => Translation_increment_hit
         procedure, private, nopass :: increment_success => Translation_increment_success
-    end type Concrete_One_Particle_Translation
+    end type Box_Particle_Translation
 
-    type, extends(Abstract_One_Particle_Move), public :: Concrete_One_Particle_Rotation
+    type, extends(Abstract_Box_Particle_Move), public :: Box_Particle_Rotation
     contains
         procedure, private :: define_change => Rotation_define_change
         procedure, private :: visit_walls => Rotation_visit_walls
@@ -143,36 +143,18 @@ private
         procedure, private :: update_actor => Rotation_update_actor
         procedure, private, nopass :: increment_hit => Rotation_increment_hit
         procedure, private, nopass :: increment_success => Rotation_increment_success
-    end type Concrete_One_Particle_Rotation
-
-    type, extends(Abstract_One_Particle_Move), public :: Null_One_Particle_Move
-    contains
-        procedure :: construct => Null_construct
-        procedure :: destroy => Null_destroy
-        procedure :: reset_selector => Null_reset_selector
-        procedure :: get_num_choices => Null_get_num_choices
-        procedure :: try => Null_try
-        procedure, private :: metropolis_algorithm => Null_metropolis_algorithm
-        procedure, private :: define_change => Null_define_change
-        procedure, private :: visit_walls => Null_visit_walls
-        procedure, private :: visit_short => Null_visit_short
-        procedure, private :: visit_field => Null_visit_field
-        procedure, private :: visit_dipolar => Null_visit_dipolar
-        procedure, private :: update_actor => Null_update_actor
-        procedure, private, nopass :: increment_hit => Null_increment_hit
-        procedure, private, nopass :: increment_success => Null_increment_success
-    end type Null_One_Particle_Move
+    end type Box_Particle_Rotation
 
 contains
 
-!implementation Abstract_One_Particle_Move
+!implementation Abstract_Box_Particle_Move
 
     !> @note this%selectors construction is delayed in
-    !> [[classes_one_particle_move:Abstract_reset_selector]]
+    !> [[classes_box_particle_move:Abstract_reset_selector]]
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
         selectors)
-        class(Abstract_One_Particle_Move), intent(out) :: this
+        class(Abstract_Box_Particle_Move), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
@@ -195,7 +177,7 @@ contains
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
+        class(Abstract_Box_Particle_Move), intent(inout) :: this
 
         call tower_sampler_destroy(this%selectors)
         if (allocated(this%can_move)) deallocate(this%can_move)
@@ -208,13 +190,13 @@ contains
     end subroutine Abstract_destroy
 
     subroutine Abstract_reset_selector(this)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
+        class(Abstract_Box_Particle_Move), intent(inout) :: this
 
         call selectors_reset(this%selectors, this%mixture%gemc_components, this%can_move)
     end subroutine Abstract_reset_selector
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
-        class(Abstract_One_Particle_Move), intent(in) :: this
+        class(Abstract_Box_Particle_Move), intent(in) :: this
 
         integer :: i_box
 
@@ -225,7 +207,7 @@ contains
     end function Abstract_get_num_choices
 
     subroutine Abstract_try(this, observables)
-        class(Abstract_One_Particle_Move), intent(in) :: this
+        class(Abstract_Box_Particle_Move), intent(in) :: this
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
@@ -245,7 +227,7 @@ contains
     end subroutine Abstract_try
 
     subroutine Abstract_metropolis_algorithm(this, success, deltas, i_box, i_component)
-        class(Abstract_One_Particle_Move), intent(in) :: this
+        class(Abstract_Box_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Single_Energies), intent(inout) :: deltas
         integer, intent(in) :: i_box, i_component
@@ -273,12 +255,12 @@ contains
         if (success) call this%update_actor(i_box, i_component, new, old)
     end subroutine Abstract_metropolis_algorithm
 
-!end implementation Abstract_One_Particle_Move
+!end implementation Abstract_Box_Particle_Move
 
-!implementation Concrete_One_Particle_Translation
+!implementation Box_Particle_Translation
 
     subroutine Translation_define_change(this, abort, new, old, i_box, i_component)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
+        class(Box_Particle_Translation), intent(in) :: this
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: new, old
         integer, intent(in) :: i_box, i_component
@@ -300,7 +282,7 @@ contains
     end subroutine Translation_define_change
 
     subroutine Translation_visit_walls(this, overlap, delta_energy, i_box, i_component, new, old)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
+        class(Box_Particle_Translation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box, i_component
@@ -317,7 +299,7 @@ contains
     end subroutine Translation_visit_walls
 
     subroutine Translation_visit_short(this, overlap, delta_energies, i_box, i_component, new, old)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
+        class(Box_Particle_Translation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, i_component
@@ -341,7 +323,7 @@ contains
     end subroutine Translation_visit_short
 
     subroutine Translation_visit_field(this, delta_energy, i_box, new, old)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
+        class(Box_Particle_Translation), intent(in) :: this
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -352,7 +334,7 @@ contains
 
     subroutine Translation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component,&
         new, old)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
+        class(Box_Particle_Translation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, i_component
@@ -377,7 +359,7 @@ contains
     end subroutine Translation_visit_dipolar
 
     subroutine Translation_update_actor(this, i_box, i_component, new, old)
-        class(Concrete_One_Particle_Translation), intent(in) :: this
+        class(Box_Particle_Translation), intent(in) :: this
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
@@ -406,12 +388,12 @@ contains
         changes_counters%translation%num_successes = changes_counters%translation%num_successes + 1
     end subroutine Translation_increment_success
 
-!end implementation Concrete_One_Particle_Translation
+!end implementation Box_Particle_Translation
 
-!implementation Concrete_One_Particle_Rotation
+!implementation Box_Particle_Rotation
 
     subroutine Rotation_define_change(this, abort, new, old, i_box, i_component)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        class(Box_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: new, old
         integer, intent(in) :: i_box, i_component
@@ -434,7 +416,7 @@ contains
     end subroutine Rotation_define_change
 
     subroutine Rotation_visit_walls(this, overlap, delta_energy, i_box, i_component, new, old)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        class(Box_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box, i_component
@@ -444,7 +426,7 @@ contains
     end subroutine Rotation_visit_walls
 
     subroutine Rotation_visit_short(this, overlap, delta_energies, i_box, i_component, new, old)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        class(Box_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, i_component
@@ -454,7 +436,7 @@ contains
     end subroutine Rotation_visit_short
 
     subroutine Rotation_visit_field(this, delta_energy, i_box, new, old)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        class(Box_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -465,7 +447,7 @@ contains
 
     subroutine Rotation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, &
         new, old)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        class(Box_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, i_component
@@ -492,7 +474,7 @@ contains
     end subroutine Rotation_visit_dipolar
 
     subroutine Rotation_update_actor(this, i_box, i_component, new, old)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        class(Box_Particle_Rotation), intent(in) :: this
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
@@ -517,117 +499,6 @@ contains
         changes_counters%rotation%num_successes = changes_counters%rotation%num_successes + 1
     end subroutine Rotation_increment_success
 
-!end implementation Concrete_One_Particle_Rotation
+!end implementation Box_Particle_Rotation
 
-!implementation Null_One_Particle_Move
-
-    subroutine Null_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
-        selectors)
-        class(Null_One_Particle_Move), intent(out) :: this
-        type(Environment_Wrapper), target, intent(in) :: environment
-        type(Mixture_Wrapper), target, intent(in) :: mixture
-        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
-        type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
-            dipolar_interactions_dynamic
-        type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: &
-            dipolar_interactions_static(:)
-        type(Changes_Component_Wrapper), target, intent(in) :: changes_components(:, :)
-        logical, intent(in) :: can_move(:, :)
-        class(Abstract_Tower_Sampler), intent(in) :: selectors(:)
-    end subroutine Null_construct
-
-    subroutine Null_destroy(this)
-        class(Null_One_Particle_Move), intent(inout) :: this
-    end subroutine Null_destroy
-
-    subroutine Null_reset_selector(this)
-        class(Null_One_Particle_Move), intent(inout) :: this
-    end subroutine Null_reset_selector
-
-    pure integer function Null_get_num_choices(this) result(num_choices)
-        class(Null_One_Particle_Move), intent(in) :: this
-        num_choices = 0
-    end function Null_get_num_choices
-
-    subroutine Null_try(this, observables)
-        class(Null_One_Particle_Move), intent(in) :: this
-        type(Generating_Observables_Wrapper), intent(inout) :: observables
-    end subroutine Null_try
-
-    subroutine Null_metropolis_algorithm(this, success, deltas, i_box, i_component)
-        class(Null_One_Particle_Move), intent(in) :: this
-        logical, intent(out) :: success
-        type(Concrete_Single_Energies), intent(inout) :: deltas
-        integer, intent(in) :: i_box, i_component
-        success = .false.
-        deltas%field_energy = 0._DP; deltas%walls_energy = 0._DP
-        deltas%short_energies = 0._DP; deltas%dipolar_energies = 0._DP
-        deltas%dipolar_shared_energy = 0._DP
-    end subroutine Null_metropolis_algorithm
-
-    subroutine Null_define_change(this, abort, new, old, i_box, i_component)
-        class(Null_One_Particle_Move), intent(in) :: this
-        logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: new, old
-        integer, intent(in) :: i_box, i_component
-        abort = .true.
-        new%i = 0; new%position = 0._DP; new%orientation = 0._DP; new%dipole_moment = 0._DP
-        old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipole_moment = 0._DP
-    end subroutine Null_define_change
-
-    subroutine Null_visit_walls(this, overlap, delta_energy, i_box, i_component, new, old)
-        class(Null_One_Particle_Move), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: delta_energy
-        integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-        overlap = .false.
-        delta_energy = 0._DP
-    end subroutine Null_visit_walls
-
-    subroutine Null_visit_short(this, overlap, delta_energies, i_box, i_component, new, old)
-        class(Null_One_Particle_Move), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: delta_energies(:)
-        integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-        overlap = .false.
-        delta_energies = 0._DP
-    end subroutine Null_visit_short
-
-    subroutine Null_visit_field(this, delta_energy, i_box, new, old)
-        class(Null_One_Particle_Move), intent(in) :: this
-        real(DP), intent(out) :: delta_energy
-        integer, intent(in) :: i_box
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-        delta_energy = 0._DP
-    end subroutine Null_visit_field
-
-    subroutine Null_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, new, &
-        old)
-        class(Null_One_Particle_Move), intent(in) :: this
-        real(DP), intent(out) :: delta_energies(:)
-        real(DP), intent(out) :: delta_shared_energy
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-        integer, intent(in) :: i_box, i_component
-        delta_energies = 0._DP; delta_shared_energy = 0._DP
-    end subroutine Null_visit_dipolar
-
-    subroutine Null_update_actor(this, i_box, i_component, new, old)
-        class(Null_One_Particle_Move), intent(in) :: this
-        integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-    end subroutine Null_update_actor
-
-    subroutine Null_increment_hit(changes_counters)
-        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
-    end subroutine Null_increment_hit
-
-    subroutine Null_increment_success(changes_counters)
-        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
-    end subroutine Null_increment_success
-
-!end implementation Null_One_Particle_Move
-
-end module classes_one_particle_move
+end module classes_box_particle_move

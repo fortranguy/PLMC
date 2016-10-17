@@ -511,6 +511,12 @@
 		<Unit filename="modules/exploring_algorithms/procedures_volume_change_method_factory.f90">
 			<Option weight="14" />
 		</Unit>
+		<Unit filename="modules/generating_algorithms/classes_box_particle_exchange.f90">
+			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/generating_algorithms/classes_box_particle_move.f90">
+			<Option weight="11" />
+		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_box_particles_swap.f90">
 			<Option weight="11" />
 		</Unit>
@@ -520,11 +526,11 @@
 		<Unit filename="modules/generating_algorithms/classes_generating_algorithm.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/generating_algorithms/classes_one_particle_exchange.f90">
-			<Option weight="11" />
+		<Unit filename="modules/generating_algorithms/procedures_box_particle_exchange_factory.f90">
+			<Option weight="14" />
 		</Unit>
-		<Unit filename="modules/generating_algorithms/classes_one_particle_move.f90">
-			<Option weight="11" />
+		<Unit filename="modules/generating_algorithms/procedures_box_particle_move_factory.f90">
+			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_box_particles_swap_factory.f90">
 			<Option weight="14" />
@@ -537,12 +543,6 @@
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_metropolis_algorithm.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/generating_algorithms/procedures_one_particle_exchange_factory.f90">
-			<Option weight="14" />
-		</Unit>
-		<Unit filename="modules/generating_algorithms/procedures_one_particle_move_factory.f90">
-			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_selectors_resetters.f90">
 			<Option weight="8" />
