@@ -43,7 +43,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: try => Abstract_try
-        procedure :: reset_selector => Abstract_reset_selector
+        procedure :: reset_selectors => Abstract_reset_selectors
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_change), private, deferred :: define_change
@@ -150,7 +150,7 @@ contains
 !implementation Abstract_Box_Particle_Move
 
     !> @note this%selectors construction is delayed in
-    !> [[classes_box_particle_move:Abstract_reset_selector]]
+    !> [[classes_box_particle_move:Abstract_reset_selectors]]
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
         selectors)
@@ -189,11 +189,11 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset_selector(this)
+    subroutine Abstract_reset_selectors(this)
         class(Abstract_Box_Particle_Move), intent(inout) :: this
 
         call selectors_reset(this%selectors, this%mixture%gemc_components, this%can_move)
-    end subroutine Abstract_reset_selector
+    end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Box_Particle_Move), intent(in) :: this

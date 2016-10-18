@@ -38,7 +38,7 @@ implicit none
     call plmc_destroy(io%json, io%report_data)
 
     call plmc_reset(physical_model)
-    call markov_chain_generator%plmc_propagator%reset_selector()
+    call markov_chain_generator%plmc_propagator%reset()
     call plmc_set(observables, physical_model) !in exploring too?
     call plmc_visit(observables%gemc_energies, physical_model)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)

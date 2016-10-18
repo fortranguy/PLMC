@@ -46,7 +46,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: reset_selector => Abstract_reset_selector
+        procedure :: reset_selectors => Abstract_reset_selectors
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
@@ -136,31 +136,33 @@ private
 
     end interface
 
-    type, extends(Abstract_Box_Particles_Swap), public :: Box_Particles_Swap_Identities
+    !> Identities swap
+    type, extends(Abstract_Box_Particles_Swap), public :: Box_Particles_Transmutation
     contains
-        procedure, private :: define_swap => Identities_define_swap
-        procedure, private :: acceptation_probability => Identities_acceptation_probability
-        procedure, private :: visit_walls => Identities_visit_walls
-        procedure, private :: visit_short => Identities_visit_short
-        procedure, private :: visit_field => Identities_visit_field
-        procedure, private :: visit_dipolar => Identities_visit_dipolar
-        procedure, private :: update_actors => Identities_update_actors
-        procedure, private, nopass :: increment_hit => Identities_increment_hit
-        procedure, private, nopass :: increment_success => Identities_increment_success
-    end type Box_Particles_Swap_Identities
+        procedure, private :: define_swap => Transmutation_define_swap
+        procedure, private :: acceptation_probability => Transmutation_acceptation_probability
+        procedure, private :: visit_walls => Transmutation_visit_walls
+        procedure, private :: visit_short => Transmutation_visit_short
+        procedure, private :: visit_field => Transmutation_visit_field
+        procedure, private :: visit_dipolar => Transmutation_visit_dipolar
+        procedure, private :: update_actors => Transmutation_update_actors
+        procedure, private, nopass :: increment_hit => Transmutation_increment_hit
+        procedure, private, nopass :: increment_success => Transmutation_increment_success
+    end type Box_Particles_Transmutation
 
-    type, extends(Abstract_Box_Particles_Swap), public :: Box_Particles_Swap_Positions
+    !> Positions swap
+    type, extends(Abstract_Box_Particles_Swap), public :: Box_Particles_Switch
     contains
-        procedure, private :: define_swap => Positions_define_swap
-        procedure, private :: acceptation_probability => Positions_acceptation_probability
-        procedure, private :: visit_walls => Positions_visit_walls
-        procedure, private :: visit_short => Positions_visit_short
-        procedure, private :: visit_field => Positions_visit_field
-        procedure, private :: visit_dipolar => Positions_visit_dipolar
-        procedure, private :: update_actors => Positions_update_actors
-        procedure, private, nopass :: increment_hit => Positions_increment_hit
-        procedure, private, nopass :: increment_success => Positions_increment_success
-    end type Box_Particles_Swap_Positions
+        procedure, private :: define_swap => Switch_define_swap
+        procedure, private :: acceptation_probability => Switch_acceptation_probability
+        procedure, private :: visit_walls => Switch_visit_walls
+        procedure, private :: visit_short => Switch_visit_short
+        procedure, private :: visit_field => Switch_visit_field
+        procedure, private :: visit_dipolar => Switch_visit_dipolar
+        procedure, private :: update_actors => Switch_update_actors
+        procedure, private, nopass :: increment_hit => Switch_increment_hit
+        procedure, private, nopass :: increment_success => Switch_increment_success
+    end type Box_Particles_Switch
 
 contains
 
@@ -207,11 +209,11 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset_selector(this)
+    subroutine Abstract_reset_selectors(this)
         class(Abstract_Box_Particles_Swap), intent(inout) :: this
 
         call selectors_reset(this%selectors, this%couples, this%mixture%gemc_components, this%can_swap)
-    end subroutine Abstract_reset_selector
+    end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Box_Particles_Swap), intent(in) :: this
@@ -288,10 +290,10 @@ contains
 
 !end implementation Abstract_Box_Particles_Swap
 
-!implementation Box_Particles_Swap_Identities
+!implementation Box_Particles_Transmutation
 
-    subroutine Identities_define_swap(this, abort, particles, i_box, ij_actors)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+    subroutine Transmutation_define_swap(this, abort, particles, i_box, ij_actors)
+        class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, ij_actors(:)
@@ -319,15 +321,15 @@ contains
             orientation, ij_actors)
         particles(2)%dipole_moment = this%mixture%gemc_components(ij_actors(2), i_box)%dipole_moments%&
             get_norm() * particles(2)%orientation
-    end subroutine Identities_define_swap
+    end subroutine Transmutation_define_swap
 
     !> \[
     !>      P[i \in I \to j \in J] = min \left( 1, \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
     !>          e^{-\beta \Delta U_{i \to j}} \frac{a_I^{-N_I}}{a_J^{-N_J}} \right)
     !> \]
-    pure real(DP) function Identities_acceptation_probability(this, i_box, ij_actors, delta_energy)&
+    pure real(DP) function Transmutation_acceptation_probability(this, i_box, ij_actors, delta_energy)&
         result(probability)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+        class(Box_Particles_Transmutation), intent(in) :: this
         integer, intent(in) :: i_box, ij_actors(:)
         real(DP), intent(in) :: delta_energy
 
@@ -344,10 +346,10 @@ contains
         end associate
 
         probability = min(1._DP, probability)
-    end function Identities_acceptation_probability
+    end function Transmutation_acceptation_probability
 
-    subroutine Identities_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+    subroutine Transmutation_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
+        class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, ij_actors(:)
@@ -362,10 +364,10 @@ contains
             if (overlap) return
         end do
         delta_energies(1) = -delta_energies(1)
-    end subroutine Identities_visit_walls
+    end subroutine Transmutation_visit_walls
 
-    subroutine Identities_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+    subroutine Transmutation_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
+        class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
         integer, intent(in) :: i_box, ij_actors(:)
@@ -383,10 +385,10 @@ contains
             end do
         end do
         delta_energies(:, 1) = -delta_energies(:, 1)
-    end subroutine Identities_visit_short
+    end subroutine Transmutation_visit_short
 
-    subroutine Identities_visit_field(this, delta_energies, i_box, particles)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+    subroutine Transmutation_visit_field(this, delta_energies, i_box, particles)
+        class(Box_Particles_Transmutation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
@@ -394,11 +396,11 @@ contains
         delta_energies = &
             [dipoles_field_visit_remove(this%environment%external_fields(i_box), particles(1)), &
             dipoles_field_visit_add(this%environment%external_fields(i_box), particles(2))]
-    end subroutine Identities_visit_field
+    end subroutine Transmutation_visit_field
 
-    subroutine Identities_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+    subroutine Transmutation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
         ij_actors, particles)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+        class(Box_Particles_Transmutation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, ij_actors(:)
@@ -428,10 +430,10 @@ contains
                     dipole_moment) - &
             this%dipolar_interactions_dynamic(i_box)%dlc_visitor%&
                 visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
-    end subroutine Identities_visit_dipolar
+    end subroutine Transmutation_visit_dipolar
 
-    subroutine Identities_update_actors(this, i_box, ij_actors, particles)
-        class(Box_Particles_Swap_Identities), intent(in) :: this
+    subroutine Transmutation_update_actors(this, i_box, ij_actors, particles)
+        class(Box_Particles_Transmutation), intent(in) :: this
         integer, intent(in) :: i_box, ij_actors(:)
         type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
 
@@ -463,32 +465,32 @@ contains
             update_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
             update_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
-    end subroutine Identities_update_actors
+    end subroutine Transmutation_update_actors
 
-    subroutine Identities_increment_hit(changes, ij_actors)
+    subroutine Transmutation_increment_hit(changes, ij_actors)
         type(Concrete_Observables_Changes), intent(inout) :: changes
         integer, intent(in) :: ij_actors(:)
 
         changes%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits = changes%&
             transmutations_counters(ij_actors(1), ij_actors(2))%num_hits + 1
-    end subroutine Identities_increment_hit
+    end subroutine Transmutation_increment_hit
 
-    subroutine Identities_increment_success(changes, ij_actors)
+    subroutine Transmutation_increment_success(changes, ij_actors)
         type(Concrete_Observables_Changes), intent(inout) :: changes
         integer, intent(in) :: ij_actors(:)
 
         changes%transmutations_counters(ij_actors(1), ij_actors(2))%num_successes = changes%&
             transmutations_counters(ij_actors(1), ij_actors(2))%num_successes + 1
-    end subroutine Identities_increment_success
+    end subroutine Transmutation_increment_success
 
-!end implementation Box_Particles_Swap_Identities
+!end implementation Box_Particles_Transmutation
 
-!implementation Box_Particles_Swap_Positions
+!implementation Box_Particles_Switch
 
     !> @note The change is partially defined because the priority was to share the same interface
-    !> with Box_Particles_Swap_Identities, cf. visit_...() methods for completion.
-    subroutine Positions_define_swap(this, abort, particles, i_box, ij_actors)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+    !> with Box_Particles_Transmutation, cf. visit_...() methods for completion.
+    subroutine Switch_define_swap(this, abort, particles, i_box, ij_actors)
+        class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, ij_actors(:)
@@ -513,19 +515,19 @@ contains
             particles(i_partner)%dipole_moment = this%mixture%gemc_components(ij_actors(i_partner), i_box)%&
                 dipole_moments%get(particles(i_partner)%i)
         end do
-    end subroutine Positions_define_swap
+    end subroutine Switch_define_swap
 
-    pure real(DP) function Positions_acceptation_probability(this, i_box, ij_actors, delta_energy) &
+    pure real(DP) function Switch_acceptation_probability(this, i_box, ij_actors, delta_energy) &
         result(probability)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+        class(Box_Particles_Switch), intent(in) :: this
         integer, intent(in) :: i_box, ij_actors(:)
         real(DP), intent(in) :: delta_energy
 
         probability = min(1._DP, exp(-delta_energy / this%environment%temperature%get()))
-    end function Positions_acceptation_probability
+    end function Switch_acceptation_probability
 
-    subroutine Positions_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+    subroutine Switch_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
+        class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, ij_actors(:)
@@ -546,10 +548,10 @@ contains
                 wall_pairs(ij_actors(i_partner))%potential)
         end do
         delta_energies = energies_new - energies_old
-    end subroutine Positions_visit_walls
+    end subroutine Switch_visit_walls
 
-    subroutine Positions_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+    subroutine Switch_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
+        class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
         integer, intent(in) :: i_box, ij_actors(:)
@@ -582,10 +584,10 @@ contains
             end do
         end do
         delta_energies = energies_new - energies_old
-    end subroutine Positions_visit_short
+    end subroutine Switch_visit_short
 
-    subroutine Positions_visit_field(this, delta_energies, i_box, particles)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+    subroutine Switch_visit_field(this, delta_energies, i_box, particles)
+        class(Box_Particles_Switch), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
@@ -597,11 +599,11 @@ contains
                 external_fields(i_box), particles(size(delta_energies) + 1 - i_partner)%position, &
                 particles(i_partner))
         end do
-    end subroutine Positions_visit_field
+    end subroutine Switch_visit_field
 
-    subroutine Positions_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, ij_actors,&
+    subroutine Switch_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, ij_actors,&
         particles)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+        class(Box_Particles_Switch), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, ij_actors(:)
@@ -636,10 +638,10 @@ contains
             this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
                 visit_switch(ij_actors, particles) - &
             this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_switch(ij_actors, particles)
-    end subroutine Positions_visit_dipolar
+    end subroutine Switch_visit_dipolar
 
-    subroutine Positions_update_actors(this, i_box, ij_actors, particles)
-        class(Box_Particles_Swap_Positions), intent(in) :: this
+    subroutine Switch_update_actors(this, i_box, ij_actors, particles)
+        class(Box_Particles_Switch), intent(in) :: this
         integer, intent(in) :: i_box, ij_actors(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
@@ -660,24 +662,24 @@ contains
             update_switch(ij_actors, particles)
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
             update_switch(ij_actors, particles)
-    end subroutine Positions_update_actors
+    end subroutine Switch_update_actors
 
-    subroutine Positions_increment_hit(changes, ij_actors)
+    subroutine Switch_increment_hit(changes, ij_actors)
         type(Concrete_Observables_Changes), intent(inout) :: changes
         integer, intent(in) :: ij_actors(:)
 
         changes%switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits = changes%&
             switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits + 1
-    end subroutine Positions_increment_hit
+    end subroutine Switch_increment_hit
 
-    subroutine Positions_increment_success(changes, ij_actors)
+    subroutine Switch_increment_success(changes, ij_actors)
         type(Concrete_Observables_Changes), intent(inout) :: changes
         integer, intent(in) :: ij_actors(:)
 
         changes%switches_counters(ij_actors(1))%line(ij_actors(2))%num_successes = changes%&
             switches_counters(ij_actors(1))%line(ij_actors(2))%num_successes + 1
-    end subroutine Positions_increment_success
+    end subroutine Switch_increment_success
 
-!end implementation Box_Particles_Swap_Positions
+!end implementation Box_Particles_Switch
 
 end module classes_box_particles_swap

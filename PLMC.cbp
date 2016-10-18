@@ -535,9 +535,6 @@
 		<Unit filename="modules/generating_algorithms/procedures_selectors_resetters.f90">
 			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/generating_algorithms/types_generating_algorithms_wrapper.f90">
-			<Option weight="5" />
-		</Unit>
 		<Unit filename="modules/mixture/classes_mixture_total_moment.f90">
 			<Option weight="8" />
 		</Unit>

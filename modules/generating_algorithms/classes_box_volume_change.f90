@@ -48,7 +48,7 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: reset_selector => Abstract_reset_selector
+        procedure :: reset_selectors => Abstract_reset_selectors
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
@@ -93,12 +93,12 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset_selector(this)
+    subroutine Abstract_reset_selectors(this)
         class(Box_Volume_Change), intent(inout) :: this
 
         call selectors_reset(this%selectors, this%changed_boxes_size, this%mixture%gemc_components,&
             this%have_positions)
-    end subroutine Abstract_reset_selector
+    end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Box_Volume_Change), intent(in) :: this

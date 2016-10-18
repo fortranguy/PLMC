@@ -42,7 +42,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: try => Abstract_try
-        procedure :: reset_selector => Abstract_reset_selector
+        procedure :: reset_selectors => Abstract_reset_selectors
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_exchange), private, deferred :: define_exchange
@@ -159,8 +159,7 @@ contains
 !implementation Box_Particle_Exchange
 
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
-        dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, &
-        selectors)
+        dipolar_interactions_dynamic, dipolar_interactions_static, changes, can_exchange, selectors)
         class(Box_Particle_Exchange), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
         type(Mixture_Wrapper), target, intent(in) :: mixture
@@ -196,11 +195,11 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset_selector(this)
+    subroutine Abstract_reset_selectors(this)
         class(Box_Particle_Exchange), intent(inout) :: this
 
         call selectors_reset(this%selectors, this%mixture%gemc_components, this%can_exchange)
-    end subroutine Abstract_reset_selector
+    end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Box_Particle_Exchange), intent(in) :: this

@@ -23,8 +23,6 @@
     implement the first one.
 - [Data] Fortran code to update, cf. json
 - NeighbourCells: HS shortcut
-+ GeneratingAlgorithms:
-    - locally: this%selector promote to this%selectors(numBoxes)?
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
 - DiracDistributionPlus: gaussian -> halfGaussian

@@ -4,8 +4,7 @@ use procedures_checks, only: check_positive
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_component_wrapper, only: Component_Wrapper
-use types_generating_algorithms_wrapper, only: Generating_Algorithm_Pointer, &
-    Generating_Algorithms_Wrapper
+use classes_generating_algorithm, only: Generating_Algorithm_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 
 implicit none
@@ -15,13 +14,13 @@ private
     type, abstract, public :: Abstract_PLMC_Propagator
     private
         type(Component_Wrapper), pointer :: components(:, :) => null()
-        type(Generating_Algorithm_Pointer), allocatable :: generating_algorithms(:)
+        type(Generating_Algorithm_Wrapper), pointer :: generating_algorithms(:) => null()
         integer :: accumulation_period
         class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: reset_selector => Abstract_reset_selector
+        procedure :: reset => Abstract_reset
         procedure :: tune => Abstract_tune
         procedure :: try => Abstract_try
         procedure, private :: set_accumulation_period => Abstract_set_accumulation_period
@@ -35,7 +34,7 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: reset_selector => Null_reset_selector
+        procedure :: reset => Null_reset
         procedure :: tune => Null_tune
         procedure :: try => Null_try
     end type Null_PLMC_Propagator
@@ -47,12 +46,12 @@ contains
     subroutine Abstract_construct(this, components, generating_algorithms, selector)
         class(Abstract_PLMC_Propagator), intent(out) :: this
         type(Component_Wrapper), target, intent(in) :: components(:, :)
-        type(Generating_Algorithm_Pointer), target, intent(in) :: generating_algorithms(:)
+        type(Generating_Algorithm_Wrapper), target, intent(in) :: generating_algorithms(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%components => components
         call this%set_accumulation_period()
-        allocate(this%generating_algorithms, source=generating_algorithms)
+        this%generating_algorithms => generating_algorithms
         allocate(this%selector, source=selector)
     end subroutine Abstract_construct
 
@@ -78,24 +77,22 @@ contains
         class(Abstract_PLMC_Propagator), intent(inout) :: this
 
         call tower_sampler_destroy(this%selector)
-        if (allocated(this%generating_algorithms)) then
-            deallocate(this%generating_algorithms)
-        end if
+        this%generating_algorithms => null()
         this%components => null()
     end subroutine Abstract_destroy
 
-    subroutine Abstract_reset_selector(this)
+    subroutine Abstract_reset(this)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
 
         integer :: nums_algorithms(size(this%generating_algorithms)), i_algorithm
 
         do i_algorithm = 1, size(this%generating_algorithms)
-            call this%generating_algorithms(i_algorithm)%algorithm%reset_selector()
+            call this%generating_algorithms(i_algorithm)%algorithm%reset_selectors()
             nums_algorithms(i_algorithm) = this%generating_algorithms(i_algorithm)%algorithm%&
                 get_num_choices()
         end do
         call this%selector%reset(nums_algorithms)
-    end subroutine Abstract_reset_selector
+    end subroutine Abstract_reset
 
     subroutine Abstract_tune(this, i_step)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
@@ -110,7 +107,7 @@ contains
         end do
 
         if (mod(i_step, this%accumulation_period) == 0) then
-            call this%reset_selector()
+            call this%reset()
         end if
     end subroutine Abstract_tune
 
@@ -134,7 +131,7 @@ contains
     subroutine Null_construct(this, components, generating_algorithms, selector)
         class(Null_PLMC_Propagator), intent(out) :: this
         type(Component_Wrapper), target, intent(in) :: components(:, :)
-        type(Generating_Algorithm_Pointer), target, intent(in) :: generating_algorithms(:)
+        type(Generating_Algorithm_Wrapper), target, intent(in) :: generating_algorithms(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_construct
 
@@ -142,9 +139,9 @@ contains
         class(Null_PLMC_Propagator), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_reset_selector(this)
+    subroutine Null_reset(this)
         class(Null_PLMC_Propagator), intent(inout) :: this
-    end subroutine Null_reset_selector
+    end subroutine Null_reset
 
     subroutine Null_tune(this, i_step)
         class(Null_PLMC_Propagator), intent(inout) :: this
