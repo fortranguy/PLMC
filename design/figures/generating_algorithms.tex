@@ -25,8 +25,9 @@
                     $\mathAggregation$ mixture: \type{Mixture},
                     $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                     $\mathAggregation$ dipolarInteractionsDynamic:
-                        \type{DipolarInteractionsDynamic},
-                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                        \type{DipolarInteractionsDynamic[\numBoxes]},
+                    $\mathAggregation$ dipolarInteractionsStatic:
+                        \type{DipolarInteractionsStatic[\numBoxes]},
                     $\mathAggregation$ changesComponents: \type{ChangesComponent[:]},
                     canChange: \type{bool[\numComponents]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
@@ -53,7 +54,8 @@
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
                     $\mathAggregation$ mixture: \type{Mixture},
                     $\mathAggregation$ shortInteractions: \type{ShortInteractions},
-                    $\mathAggregation$ dipolarInteractionsFacade: \type{DipolarInteractionsFacade},
+                    $\mathAggregation$ dipolarInteractionsFacade:
+                        \type{DipolarInteractionsFacade[\numBoxes]},
                     $\mathAggregation$ changedBoxSize: \type{ChangedBoxSize},
                     havePositions: \type{bool[\numComponents]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
@@ -67,8 +69,9 @@
                     $\mathAggregation$ mixture: \type{Mixture},
                     $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                     $\mathAggregation$ dipolarInteractionsDynamic:
-                        \type{DipolarInteractionsDynamic},
-                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                        \type{DipolarInteractionsDynamic[\numBoxes]},
+                    $\mathAggregation$ dipolarInteractionsStatic:
+                        \type{DipolarInteractionsStatic[\numBoxes]},
                     $\mathAggregation$ changes: \type{Changes},
                     canExchange: \type{bool[\numComponents]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
@@ -82,8 +85,9 @@
                     $\mathAggregation$ mixture: \type{Mixture},
                     $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                     $\mathAggregation$ dipolarInteractionsDynamic:
-                        \type{DipolarInteractionsDynamic},
-                    $\mathAggregation$ dipolarInteractionsStatic: \type{DipolarInteractionsStatic},
+                        \type{DipolarInteractionsDynamic[\numBoxes]},
+                    $\mathAggregation$ dipolarInteractionsStatic:
+                        \type{DipolarInteractionsStatic[\numBoxes]},
                     $\mathAggregation$ changes: \type{Changes},
                     canSwap: \type{bool[\numComponents]},
                     $\mathComposition$ couples: \type{HeteroCouples},

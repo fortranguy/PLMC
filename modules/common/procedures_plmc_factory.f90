@@ -147,20 +147,29 @@ contains
         type(Changes_Wrapper), intent(inout) :: changes
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
-        logical :: box_size_tuned, translation_tuned(size(changes%components)), &
-            rotation_tuned(size(changes%components))
-        integer :: i_component
+        logical :: all_boxes_size_tuned,  box_size_tuned
+        logical, dimension(size(changes%gemc_components, 1), size(changes%gemc_components, 2)) :: &
+            translation_tuned, rotation_tuned
+        integer :: i_box, j_box, i_component
 
-        call changes%box_size_change_tuner%tune(box_size_tuned, i_step, observables%&
-            volume_change_success)
-        do i_component = 1, size(changes%components)
-            call changes%components(i_component)%translation_tuner%&
-                tune(translation_tuned(i_component), i_step, observables%&
-                changes_sucesses(i_component)%translation)
-            call changes%components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
-                i_step, observables%changes_sucesses(i_component)%rotation)
+        all_boxes_size_tuned = .true.
+        do j_box = 1, size(changes%boxes_size_change_tuner)
+            do i_box = 1, size(changes%boxes_size_change_tuner(j_box)%line)
+                call changes%boxes_size_change_tuner(j_box)%line(i_box)%tuner%&
+                    tune(box_size_tuned, i_step, observables%volume_change_success)
+                all_boxes_size_tuned = all_boxes_size_tuned .and. box_size_tuned
+            end do
+
+            do i_component = 1, size(changes%gemc_components, 1)
+                call changes%gemc_components(i_component, j_box)%translation_tuner%&
+                    tune(translation_tuned(i_component, j_box), i_step, observables%changes(i_box)%&
+                    changes_sucesses(i_component)%translation)
+                call changes%gemc_components(i_component, j_box)%rotation_tuner%&
+                    tune(rotation_tuned(i_component, j_box), i_step, observables%changes(i_box)%&
+                    changes_sucesses(i_component)%rotation)
+            end do
         end do
-        tuned = box_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
+        tuned = all_boxes_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
     end subroutine tune_moved_coordinates
 
     subroutine set_success_and_reset_counter_generating(observables)
