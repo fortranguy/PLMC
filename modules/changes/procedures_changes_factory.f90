@@ -84,7 +84,7 @@ contains
         call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
             some_components_have_coordinates, generating_data, changes_prefix//"Components.")
 
-        call create(changes%gemc_components, environment%periodic_boxes, components, &
+        call create(changes%components, environment%periodic_boxes, components, &
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
             generating_data, changes_prefix)
 
@@ -224,7 +224,7 @@ contains
         call coordinates_copier_destroy(changes%position_copiers)
         call random_coordinates_destroy(changes%random_orientation)
         call random_coordinates_destroy(changes%random_positions)
-        call destroy_components(changes%gemc_components)
+        call destroy_components(changes%components)
         call move_tuner_destroy(changes%boxes_size_change_tuner)
         call changed_boxes_size_destroy(changes%changed_boxes_size)
     end subroutine destroy_all

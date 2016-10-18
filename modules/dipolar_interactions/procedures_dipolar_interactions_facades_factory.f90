@@ -4,7 +4,7 @@ use data_input_prefixes, only: volume_change_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_inquirers, only: periodicity_is_xyz, box_size_can_change
+use procedures_environment_inquirers, only: periodicity_is_xyz, total_volume_can_change
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moments_factory, only: set_are_dipolar
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
@@ -31,7 +31,8 @@ contains
         type(json_file), optional, intent(inout) :: exploring_data
 
         integer :: i_box
-        logical :: are_dipolar(size(components, 1), size(components, 2)), measure_pressure
+        logical :: boxes_size_can_change, measure_pressure
+        logical :: are_dipolar(size(components, 1), size(components, 2))
 
         if (present(exploring_data)) then
             measure_pressure = property_measure_pressure(exploring_data, volume_change_prefix)
@@ -39,9 +40,10 @@ contains
             measure_pressure = .false.
         end if
 
+        boxes_size_can_change = total_volume_can_change(environment%beta_pressure) .or. &
+            size(environment%periodic_boxes) > 1
         call set_are_dipolar(are_dipolar, components)
-        if ((box_size_can_change(environment%beta_pressure) .or. measure_pressure) .and. &
-            any(are_dipolar)) then
+        if ((boxes_size_can_change .or. measure_pressure) .and. any(are_dipolar)) then
             if (all(periodicity_is_xyz(environment%periodic_boxes))) then
                 allocate(Scalable_Dipolar_Interactions_Facade :: &
                     facades(size(dipolar_interactions_static)))

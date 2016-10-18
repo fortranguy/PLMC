@@ -192,7 +192,7 @@ contains
     subroutine Abstract_reset_selectors(this)
         class(Abstract_Box_Particle_Move), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%mixture%gemc_components, this%can_move)
+        call selectors_reset(this%selectors, this%mixture%components, this%can_move)
     end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
@@ -217,11 +217,11 @@ contains
         i_box = random_integer(size(this%environment%periodic_boxes))
         i_component = this%selectors(i_box)%get()
         call this%increment_hit(observables%changes(i_box)%changes_counters(i_component))
-        allocate(deltas%short_energies(size(observables%gemc_energies(i_box)%short_energies)))
-        allocate(deltas%dipolar_energies(size(observables%gemc_energies(i_box)%dipolar_energies)))
+        allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies)))
+        allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies)))
         call this%metropolis_algorithm(success, deltas, i_box, i_component)
         if (success) then
-            call observables_energies_set(observables%gemc_energies(i_box), deltas, i_component)
+            call observables_energies_set(observables%energies(i_box), deltas, i_component)
             call this%increment_success(observables%changes(i_box)%changes_counters(i_component))
         end if
     end subroutine Abstract_try
@@ -265,16 +265,16 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: new, old
         integer, intent(in) :: i_box, i_component
 
-        if (this%mixture%gemc_components(i_component, i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(i_component, i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
-        old%i = random_integer(this%mixture%gemc_components(i_component, i_box)%num_particles%get())
-        old%position = this%mixture%gemc_components(i_component, i_box)%positions%get(old%i)
-        old%orientation = this%mixture%gemc_components(i_component, i_box)%orientations%get(old%i)
-        old%dipole_moment = this%mixture%gemc_components(i_component, i_box)%dipole_moments%get(old%i)
+        old%i = random_integer(this%mixture%components(i_component, i_box)%num_particles%get())
+        old%position = this%mixture%components(i_component, i_box)%positions%get(old%i)
+        old%orientation = this%mixture%components(i_component, i_box)%orientations%get(old%i)
+        old%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get(old%i)
         new%i = old%i
         new%position = this%changes_components(i_component, i_box)%translated_positions%get(new%i)
         new%orientation = old%orientation
@@ -290,10 +290,10 @@ contains
 
         real(DP) :: energy_new, energy_old
 
-        call this%environment%gemc_visitable_walls(i_box)%visit(overlap, energy_new, new%position, this%&
+        call this%environment%visitable_walls(i_box)%visit(overlap, energy_new, new%position, this%&
             short_interactions%wall_pairs(i_component)%potential)
         if (overlap) return
-        call this%environment%gemc_visitable_walls(i_box)%visit(overlap, energy_old, old%position, this%&
+        call this%environment%visitable_walls(i_box)%visit(overlap, energy_old, old%position, this%&
             short_interactions%wall_pairs(i_component)%potential)
         delta_energy = energy_new - energy_old
     end subroutine Translation_visit_walls
@@ -365,7 +365,7 @@ contains
 
         integer :: j_component
 
-        call this%mixture%gemc_components(i_component, i_box)%positions%set(new%i, new%position)
+        call this%mixture%components(i_component, i_box)%positions%set(new%i, new%position)
         do j_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
             call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%&
                 translate(new%position, old)
@@ -398,20 +398,20 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: new, old
         integer, intent(in) :: i_box, i_component
 
-        if (this%mixture%gemc_components(i_component, i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(i_component, i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
-        old%i = random_integer(this%mixture%gemc_components(i_component, i_box)%orientations%get_num())
-        old%position = this%mixture%gemc_components(i_component, i_box)%positions%get(old%i)
-        old%orientation = this%mixture%gemc_components(i_component, i_box)%orientations%get(old%i)
-        old%dipole_moment = this%mixture%gemc_components(i_component, i_box)%dipole_moments%get(old%i)
+        old%i = random_integer(this%mixture%components(i_component, i_box)%orientations%get_num())
+        old%position = this%mixture%components(i_component, i_box)%positions%get(old%i)
+        old%orientation = this%mixture%components(i_component, i_box)%orientations%get(old%i)
+        old%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get(old%i)
         new%i = old%i
         new%position = old%position
         new%orientation = this%changes_components(i_component, i_box)%rotated_orientations%get(new%i)
-        new%dipole_moment = this%mixture%gemc_components(i_component, i_box)%dipole_moments%get_norm() * &
+        new%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get_norm() * &
             new%orientation
     end subroutine Rotation_define_change
 
@@ -478,7 +478,7 @@ contains
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
-        call this%mixture%gemc_components(i_component, i_box)%orientations%set(new%i, new%orientation)
+        call this%mixture%components(i_component, i_box)%orientations%set(new%i, new%orientation)
         call this%mixture%total_moments(i_box)%remove(i_component, old%dipole_moment)
         call this%mixture%total_moments(i_box)%add(i_component, new%dipole_moment)
         call this%dipolar_interactions_static(i_box)%reci_structure%&

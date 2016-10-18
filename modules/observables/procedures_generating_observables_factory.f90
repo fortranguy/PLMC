@@ -24,9 +24,9 @@ contains
         observables%accessible_domains_size = 0._DP
         call observables_changes_create(observables%volumes_change_counter, num_boxes)
         call reals_create(observables%volumes_change_success, num_boxes)
-        allocate(observables%gemc_nums_particles(num_components, num_boxes))
-        observables%gemc_nums_particles = 0
-        call observables_energies_create(observables%gemc_energies, num_boxes, num_components)
+        allocate(observables%nums_particles(num_components, num_boxes))
+        observables%nums_particles = 0
+        call observables_energies_create(observables%energies, num_boxes, num_components)
         call observables_changes_create(observables%changes, num_boxes, num_components)
     end subroutine create
 
@@ -34,8 +34,8 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
         call observables_changes_destroy(observables%changes)
-        call observables_energies_destroy(observables%gemc_energies)
-        if (allocated(observables%gemc_nums_particles)) deallocate(observables%gemc_nums_particles)
+        call observables_energies_destroy(observables%energies)
+        if (allocated(observables%nums_particles)) deallocate(observables%nums_particles)
         call reals_destroy(observables%volumes_change_success)
         call observables_changes_destroy(observables%volumes_change_counter)
         if (allocated(observables%accessible_domains_size)) &

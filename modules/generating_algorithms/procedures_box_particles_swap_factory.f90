@@ -29,10 +29,10 @@ contains
 
         class(Abstract_Hetero_Couples), allocatable :: couples(:)
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
-        logical :: can_exchange(size(physical_model%mixture%gemc_components, 1), &
-            size(physical_model%mixture%gemc_components, 2))
+        logical :: can_exchange(size(physical_model%mixture%components, 1), &
+            size(physical_model%mixture%components, 2))
 
-        call set_can_exchange(can_exchange, physical_model%mixture%gemc_components)
+        call set_can_exchange(can_exchange, physical_model%mixture%components)
         if (count(can_exchange(:, 1)) > 1) then
             allocate(Box_Particles_Transmutation :: particles_transmutation)
         else
@@ -45,7 +45,7 @@ contains
             type is (Box_Particles_Transmutation)
                 call particles_transmutation%construct(physical_model%environment, physical_model%&
                     mixture, physical_model%short_interactions, physical_model%&
-                    gemc_dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
+                    dipolar_interactions_dynamic, physical_model%dipolar_interactions_static, &
                     changes, can_exchange, couples, selectors)
             type is (Null_Generating_Algorithm)
             class default
@@ -63,9 +63,9 @@ contains
 
         class(Abstract_Hetero_Couples), allocatable :: couples(:)
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
-        logical :: can_translate(size(changes%gemc_components, 1), size(changes%gemc_components, 2))
+        logical :: can_translate(size(changes%components, 1), size(changes%components, 2))
 
-        call set_can_translate(can_translate, changes%gemc_components)
+        call set_can_translate(can_translate, changes%components)
         if (count(can_translate(:, 1)) > 1) then
             allocate(Box_Particles_Switch :: particles_switch)
         else
@@ -77,8 +77,8 @@ contains
         select type (particles_switch)
             type is (Box_Particles_Switch)
                 call particles_switch%construct(physical_model%environment, physical_model%mixture,&
-                    physical_model%short_interactions, physical_model%gemc_dipolar_interactions_dynamic,&
-                    physical_model%gemc_dipolar_interactions_static, changes, can_translate, couples, &
+                    physical_model%short_interactions, physical_model%dipolar_interactions_dynamic,&
+                    physical_model%dipolar_interactions_static, changes, can_translate, couples, &
                     selectors)
             type is (Null_Generating_Algorithm)
             class default

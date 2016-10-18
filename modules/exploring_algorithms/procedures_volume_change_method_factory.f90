@@ -38,7 +38,7 @@ contains
             num_changes = 0
         end if
         call volume_change_method%construct(physical_model%environment, physical_model%mixture%&
-            gemc_components, physical_model%short_interactions, physical_model%&
+            components, physical_model%short_interactions, physical_model%&
             dipolar_interactions_facades, changed_boxes_size_ratio, num_changes)
     end subroutine create
 

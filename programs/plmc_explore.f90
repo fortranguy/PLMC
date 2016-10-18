@@ -25,7 +25,7 @@ implicit none
     type(Exploring_Observables_Wrapper) :: observables
     type(Exploring_IO_Wrapper) :: io
 
-    integer :: num_snaps, i_snap
+    integer :: i_box, num_snaps, i_snap
     logical :: visit_energies
 
     call plmc_catch_exploring_help()
@@ -37,7 +37,7 @@ implicit none
     call plmc_visit_set(visit_energies, io%exploring_data, "Check.")
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, visit_energies, io%&
         exploring_data)
-    call plmc_create(observables, physical_model%mixture%gemc_components)
+    call plmc_create(observables, physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_explorer, visit_energies,&
         io%generating_data)
     call plmc_destroy(io%generating_data, io%exploring_data)
@@ -49,10 +49,12 @@ implicit none
     do i_snap = 1, num_snaps
         call plmc_set(io%readers, i_snap)
         call plmc_reset(physical_model)
-        call plmc_visit(observables%gemc_energies, physical_model, visit_energies)
+        call plmc_visit(observables%energies, physical_model, visit_energies)
         call markov_chain_explorer%maximum_box_compression_explorer%try(observables)
-        call markov_chain_explorer%changed_box_size_ratio%set(observables%&
-            maximum_box_compression_delta)
+        do i_box = 1, size(markov_chain_explorer%changed_boxes_size_ratio)
+            call markov_chain_explorer%changed_boxes_size_ratio(i_box)%&
+                set(observables%maximum_boxes_compression_delta(i_box))
+        end do
         call markov_chain_explorer%volume_change_method%try(observables)
         call markov_chain_explorer%particle_insertion_method%try(observables)
         call plmc_set(observables)

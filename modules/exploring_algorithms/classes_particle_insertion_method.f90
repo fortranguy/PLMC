@@ -97,17 +97,17 @@ contains
         integer :: i_box, i_component, i_particle
         logical :: overlap
 
-        allocate(deltas%short_energies(size(observables%inv_pow_activities)))
-        allocate(deltas%dipolar_energies(size(deltas%short_energies)))
-        observables%gemc_inv_pow_activities = 0._DP
+        observables%inv_pow_activities = 0._DP
         test%i = 0
         do i_box = 1, size(this%environment%periodic_boxes)
+            allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies)))
+            allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies)))
             do i_component = 1, size(this%nums_particles)
                 inv_pow_activity_sum = 0._DP
                 do i_particle = 1, this%nums_particles(i_component)%get()
 
-                    observables%gemc_insertion_counters(i_component, i_box)%num_hits = observables%&
-                        gemc_insertion_counters(i_component, i_box)%num_hits + 1
+                    observables%insertion_counters(i_component, i_box)%num_hits = observables%&
+                        insertion_counters(i_component, i_box)%num_hits + 1
                     test%position = this%random_positions(i_box)%get(i_component)
                     test%orientation = this%random_orientation%get(i_component)
                     test%dipole_moment = this%components(i_component, i_box)%dipole_moments%get_norm() * &
@@ -126,12 +126,14 @@ contains
                         dipolar_shared_energy
                     inv_pow_activity_sum = inv_pow_activity_sum + exp(-delta_energy / this%environment%&
                         temperature%get())
-                    observables%gemc_insertion_counters(i_component, i_box)%num_successes = observables%&
-                        gemc_insertion_counters(i_component, i_box)%num_successes + 1
+                    observables%insertion_counters(i_component, i_box)%num_successes = observables%&
+                        insertion_counters(i_component, i_box)%num_successes + 1
                 end do
-                observables%gemc_inv_pow_activities(i_component, i_box) = inv_pow_activity_sum / real(this%&
+                observables%inv_pow_activities(i_component, i_box) = inv_pow_activity_sum / real(this%&
                     nums_particles(i_component)%get())
             end do
+            deallocate(deltas%dipolar_energies)
+            deallocate(deltas%short_energies)
         end do
     end subroutine Abstract_try
 
@@ -142,7 +144,7 @@ contains
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: test
 
-        call this%environment%gemc_visitable_walls(i_box)%visit(overlap, delta, test%position, this%&
+        call this%environment%visitable_walls(i_box)%visit(overlap, delta, test%position, this%&
             short_interactions%wall_pairs(i_component)%potential)
     end subroutine Abstract_visit_walls
 

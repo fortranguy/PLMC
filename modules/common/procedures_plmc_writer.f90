@@ -42,21 +42,21 @@ contains
         do i_box = 1, size(observables%accessible_domains_size, 2)
             call writers%accessible_domains_size(i_box)%write(i_step, observables%&
                 accessible_domains_size(:, i_box))
-            call writers%gemc_nums_particles(i_box)%write(i_step, observables%&
-                gemc_nums_particles(:, i_box))
-            call write_energies(writers%gemc_energies(i_box), i_step, observables%&
-                gemc_energies(i_box))
+            call writers%nums_particles(i_box)%write(i_step, observables%&
+                nums_particles(:, i_box))
+            call write_energies(writers%energies(i_box), i_step, observables%&
+                energies(i_box))
         end do
 
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
-            do i_box = 1, size(writers%gemc_components_changes, 2)
-                do i_component = 1, size(writers%gemc_components_changes, 1)
-                    call writers%gemc_components_changes(i_component, i_box)%writer%write(i_step, &
+            do i_box = 1, size(writers%components_changes, 2)
+                do i_component = 1, size(writers%components_changes, 1)
+                    call writers%components_changes(i_component, i_box)%writer%write(i_step, &
                         observables%changes(i_box)%changes_sucesses(i_component))
                 end do
-                call writers%gemc_switches_successes(i_box)%write(i_step, observables%&
+                call writers%switches_successes(i_box)%write(i_step, observables%&
                     changes(i_box)%switches_successes)
-                call writers%gemc_transmutations_successes(i_box)%write(i_step, observables%&
+                call writers%transmutations_successes(i_box)%write(i_step, observables%&
                     changes(i_box)%transmutations_successes)
             end do
         end if
@@ -71,12 +71,15 @@ contains
         type(Exploring_Observables_Wrapper), intent(in) :: observables
         integer, intent(in) :: i_snap
 
-        call writers%maximum_box_compression_delta%write(i_snap, observables%&
-            maximum_box_compression_delta)
-        call writers%beta_pressure_excess%write(i_snap, observables%beta_pressure_excess)
-        call write_energies(writers%energies, i_snap, observables%energies)
-        call writers%inv_pow_activities%write(i_snap, observables%inv_pow_activities)
-        call writers%insertion_successes%write(i_snap, observables%insertion_successes)
+        integer :: i_box
+
+        do i_box = 1, size(writers%maximum_boxes_compression_delta)
+            call writers%maximum_boxes_compression_delta(i_box)%write(i_snap, observables%maximum_boxes_compression_delta(i_box))
+            call writers%beta_pressures_excess(i_box)%write(i_snap, observables%beta_pressures_excess(i_box))
+            call write_energies(writers%energies(i_box), i_snap, observables%energies(i_box))
+            call writers%inv_pow_activities(i_box)%write(i_snap, observables%inv_pow_activities(:, i_box))
+            call writers%insertion_successes(i_box)%write(i_snap, observables%insertion_successes(:, i_box))
+        end do
     end subroutine write_exploring_observables
 
     subroutine write_energies(writers, i_step, energies)

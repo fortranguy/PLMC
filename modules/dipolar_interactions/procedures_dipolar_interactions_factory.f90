@@ -7,7 +7,8 @@ use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => des
 use classes_permittivity, only: Abstract_Permittivity
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_inquirers, only: use_permittivity, use_reciprocal_lattice
+use procedures_environment_inquirers, only: total_volume_can_change, use_permittivity, &
+    use_reciprocal_lattice
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_total_moments_factory, only: set_are_dipolar
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
@@ -24,12 +25,12 @@ use procedures_dlc_factory, only: dlc_create => create, dlc_destroy => destroy
 implicit none
 
 private
-public :: dipolar_interactions_create, dipolar_interactions_destroy
+public :: create, destroy
 
 contains
 
-    subroutine dipolar_interactions_create(dipolar_interactions_dynamic, &
-        dipolar_interactions_static, environment, mixture, generating_data)
+    subroutine create(dipolar_interactions_dynamic, dipolar_interactions_static, environment, &
+        mixture, generating_data)
         type(Dipolar_Interactions_Dynamic_Wrapper), allocatable, intent(out) :: &
             dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), allocatable, intent(out) :: &
@@ -39,34 +40,34 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         integer :: i_box
-        logical :: are_dipolar(size(mixture%gemc_components, 1), size(mixture%gemc_components, 2))
+        logical :: are_dipolar(size(mixture%components, 1), size(mixture%components, 2))
 
-        call set_are_dipolar(are_dipolar, mixture%gemc_components)
+        call set_are_dipolar(are_dipolar, mixture%components)
         do i_box = 1, size(are_dipolar, 2)
             call check_consistency(environment%reciprocal_lattices(i_box), environment%&
                 permittivity, any(are_dipolar(:, i_box)))
         end do
 
-        allocate(dipolar_interactions_dynamic(size(mixture%gemc_components, 2)))
+        allocate(dipolar_interactions_dynamic(size(mixture%components, 2)))
         do i_box = 1, size(dipolar_interactions_dynamic)
             call des_convergence_parameter_create(dipolar_interactions_dynamic(i_box)%alpha, any(are_dipolar),&
                 generating_data, dipolar_interactions_prefix)
         end do
 
-        allocate(dipolar_interactions_static(size(mixture%gemc_components, 2)))
+        allocate(dipolar_interactions_static(size(mixture%components, 2)))
         do i_box = 1, size(dipolar_interactions_static)
             call boxes_create(dipolar_interactions_static(i_box)%box_size_memento_real, &
-                environment%periodic_boxes(i_box), environment%beta_pressure, &
-                any(are_dipolar(:, i_box)))
+                environment%periodic_boxes(i_box), &
+                total_volume_can_change(environment%beta_pressure) .or. &
+                size(environment%periodic_boxes) > 1, any(are_dipolar(:, i_box)))
             call des_real_create(dipolar_interactions_static(i_box)%real_pair, &
                 dipolar_interactions_static(i_box)%box_size_memento_real, environment%permittivity,&
                 mixture%components_min_distances, any(are_dipolar(:, i_box)), &
                 dipolar_interactions_dynamic(i_box)%alpha, generating_data, dipolar_interactions_prefix//&
                 "Real.")
             call des_real_create(dipolar_interactions_dynamic(i_box)%real_components, environment%&
-                periodic_boxes(i_box), mixture%gemc_components(:, i_box), are_dipolar(:, i_box), dipolar_interactions_static(i_box))
+                periodic_boxes(i_box), mixture%components(:, i_box), are_dipolar(:, i_box), dipolar_interactions_static(i_box))
         end do
-
 
         do i_box = 1, size(dipolar_interactions_static)
             allocate(dipolar_interactions_static(i_box)%box_size_memento_reci, &
@@ -79,7 +80,7 @@ contains
                 dipolar_interactions_dynamic(i_box)%alpha)
             call des_reci_create(dipolar_interactions_static(i_box)%reci_structure, environment%&
                 periodic_boxes(i_box), dipolar_interactions_static(i_box)%box_size_memento_reci, &
-                environment%reciprocal_lattices(i_box), mixture%gemc_components(:, i_box), &
+                environment%reciprocal_lattices(i_box), mixture%components(:, i_box), &
                 are_dipolar(:, i_box))
             call des_reci_create(dipolar_interactions_dynamic(i_box)%reci_visitor, environment%&
                 periodic_boxes(i_box), environment%reciprocal_lattices(i_box), dipolar_interactions_static(i_box))
@@ -87,7 +88,7 @@ contains
 
         do i_box = 1, size(dipolar_interactions_dynamic)
             call des_self_create(dipolar_interactions_dynamic(i_box)%self_components, environment%&
-                periodic_boxes(i_box), environment%permittivity, mixture%gemc_components(:, i_box), are_dipolar(:, i_box), &
+                periodic_boxes(i_box), environment%permittivity, mixture%components(:, i_box), are_dipolar(:, i_box), &
                 dipolar_interactions_dynamic(i_box)%alpha)
             call des_surf_mixture_create(dipolar_interactions_dynamic(i_box)%surf_mixture, environment%&
                 periodic_boxes(i_box), environment%permittivity, mixture%total_moments(i_box))
@@ -99,20 +100,26 @@ contains
                 permittivity, any(are_dipolar(:, i_box)))
             call dlc_create(dipolar_interactions_static(i_box)%dlc_structures, environment%&
                 periodic_boxes(i_box), environment%reciprocal_lattices(i_box), mixture%&
-                gemc_components(:, i_box), are_dipolar(:, i_box))
+                components(:, i_box), are_dipolar(:, i_box))
             call dlc_create(dipolar_interactions_dynamic(i_box)%dlc_visitor, environment%&
                 periodic_boxes(i_box), environment%reciprocal_lattices(i_box), dipolar_interactions_static(i_box))
         end do
-    end subroutine dipolar_interactions_create
+    end subroutine create
 
-    !> @todo if (allocated(dipolar_interactions_static, dipolar_interactions_dynamic)): before?
-    subroutine dipolar_interactions_destroy(dipolar_interactions_dynamic, &
-        dipolar_interactions_static)
+    !> @todo if (allocated(dipolar_interactions_static, dipolar_interactions_dynamic)):
+    !> improve error handling.
+    subroutine destroy(dipolar_interactions_dynamic, dipolar_interactions_static)
         type(Dipolar_Interactions_Dynamic_Wrapper), allocatable, intent(inout) :: dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), allocatable, intent(inout) :: &
             dipolar_interactions_static(:)
 
         integer :: i_box
+
+        if (.not.allocated(dipolar_interactions_static) .or. &
+            .not.allocated(dipolar_interactions_dynamic)) then
+            call warning_continue("procedures_dipolar_interactions_factory: destroy:"//&
+                "dipolar_interactions_static and dipolar_interactions_static were not allocated.")
+        end if
 
         do i_box = size(dipolar_interactions_static), 1, -1
             call dlc_destroy(dipolar_interactions_dynamic(i_box)%dlc_visitor)
@@ -137,13 +144,13 @@ contains
             call des_real_destroy(dipolar_interactions_static(i_box)%real_pair)
             call boxes_destroy(dipolar_interactions_static(i_box)%box_size_memento_real)
         end do
-        if (allocated(dipolar_interactions_static)) deallocate(dipolar_interactions_static)
+        deallocate(dipolar_interactions_static)
 
         do i_box = size(dipolar_interactions_dynamic), 1, -1
             call des_convergence_parameter_destroy(dipolar_interactions_dynamic(i_box)%alpha)
         end do
-        if (allocated(dipolar_interactions_dynamic)) deallocate(dipolar_interactions_dynamic)
-    end subroutine dipolar_interactions_destroy
+        deallocate(dipolar_interactions_dynamic)
+    end subroutine destroy
 
     subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
@@ -152,12 +159,12 @@ contains
 
         if (dipoles_exist) then
             if (.not.use_reciprocal_lattice(reciprocal_lattice)) then
-                call warning_continue("dipolar_interactions_check: "//&
-                    "dipoles exist but reciprocal_lattice unused.")
+                call warning_continue("procedures_dipolar_interactions_factory: "//&
+                    "check_consistency: dipoles exist but reciprocal_lattice unused.")
             end if
             if (.not.use_permittivity(permittivity)) then
-                call warning_continue("dipolar_interactions_check: "//&
-                    "dipoles exist but permittivity unused.")
+                call warning_continue("procedures_dipolar_interactions_factory: "//&
+                    "check_consistency: dipoles exist but permittivity unused.")
             end if
         end if
     end subroutine check_consistency

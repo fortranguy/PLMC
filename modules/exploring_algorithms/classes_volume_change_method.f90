@@ -133,7 +133,7 @@ contains
                 call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells, &
                     only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
                 call this%dipolar_interactions_facades(i_box)%reset()
-                call this%set_delta_energy(overlap, delta_energy, i_box, box_size_ratio, observables%energies)
+                call this%set_delta_energy(overlap, delta_energy, i_box, box_size_ratio, observables%energies(i_box))
                 if (overlap) call error_exit("Abstract_Volume_Change_Method: try: set_delta_energy: "//&
                     "overlap")
                 delta_volume = product(this%environment%accessible_domains(i_box)%get_size()) * &

@@ -24,10 +24,10 @@ contains
         type(Changes_Wrapper), intent(in) :: changes
 
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
-        logical :: can_exchange(size(physical_model%mixture%gemc_components, 1), &
-            size(physical_model%mixture%gemc_components, 2))
+        logical :: can_exchange(size(physical_model%mixture%components, 1), &
+            size(physical_model%mixture%components, 2))
 
-        call set_can_exchange(can_exchange, physical_model%mixture%gemc_components)
+        call set_can_exchange(can_exchange, physical_model%mixture%components)
         if (any(can_exchange)) then
             allocate(Box_Particle_Add :: particle_add)
         else
@@ -39,8 +39,8 @@ contains
         select type (particle_add)
             type is (Box_Particle_Add)
                 call particle_add%construct(physical_model%environment, physical_model%mixture, &
-                    physical_model%short_interactions, physical_model%gemc_dipolar_interactions_dynamic,&
-                    physical_model%gemc_dipolar_interactions_static, changes, can_exchange, &
+                    physical_model%short_interactions, physical_model%dipolar_interactions_dynamic,&
+                    physical_model%dipolar_interactions_static, changes, can_exchange, &
                     selectors)
             type is (Null_Generating_Algorithm)
             class default
@@ -56,10 +56,10 @@ contains
         type(Changes_Wrapper), intent(in) :: changes
 
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
-        logical :: can_exchange(size(physical_model%mixture%gemc_components, 1), &
-            size(physical_model%mixture%gemc_components, 2))
+        logical :: can_exchange(size(physical_model%mixture%components, 1), &
+            size(physical_model%mixture%components, 2))
 
-        call set_can_exchange(can_exchange, physical_model%mixture%gemc_components)
+        call set_can_exchange(can_exchange, physical_model%mixture%components)
         if (any(can_exchange)) then
             allocate(Box_Particle_Remove :: particle_remove)
         else
@@ -71,8 +71,8 @@ contains
         select type (particle_remove)
             type is (Box_Particle_Remove)
                 call particle_remove%construct(physical_model%environment, physical_model%mixture, &
-                    physical_model%short_interactions, physical_model%gemc_dipolar_interactions_dynamic,&
-                    physical_model%gemc_dipolar_interactions_static, changes, can_exchange, &
+                    physical_model%short_interactions, physical_model%dipolar_interactions_dynamic,&
+                    physical_model%dipolar_interactions_static, changes, can_exchange, &
                     selectors)
             type is (Null_Generating_Algorithm)
             class default

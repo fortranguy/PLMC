@@ -50,13 +50,13 @@ contains
         call walls_create(floor_penetration, generating_data, environment_prefix)
         call hard_core_create(environment%wall_min_distance, use_walls(floor_penetration), &
             generating_data, environment_prefix//"Walls.")
-        call walls_create(environment%gemc_visitable_walls, environment%periodic_boxes, &
+        call walls_create(environment%visitable_walls, environment%periodic_boxes, &
             floor_penetration,environment%wall_min_distance, generating_data, environment_prefix)
         call walls_destroy(floor_penetration)
         call fields_create(field_expression, environment%permittivity, field_applied, &
             generating_data, environment_prefix)
         call boxes_create(parallelepiped_domains, environment%periodic_boxes, environment%&
-            gemc_visitable_walls, field_applied, generating_data, environment_prefix//&
+            visitable_walls, field_applied, generating_data, environment_prefix//&
             "External Field.")
         call fields_create(environment%external_fields, parallelepiped_domains, field_expression, &
             field_applied)
@@ -65,19 +65,19 @@ contains
         call boxes_create(environment%reciprocal_lattices, environment%periodic_boxes, &
             generating_data, environment_prefix)
         call boxes_create(environment%boxes_size_checker, environment%reciprocal_lattices, &
-            environment%gemc_visitable_walls)
+            environment%visitable_walls)
         if (all(periodicity_is_xyz(environment%periodic_boxes))) then
             call boxes_create(environment%accessible_domains, environment%periodic_boxes, &
                 needed=.true.)
         else if (all(periodicity_is_xy(environment%periodic_boxes))) then
             call boxes_create(environment%accessible_domains, environment%periodic_boxes, &
-                environment%gemc_visitable_walls, needed=.true.)
+                environment%visitable_walls, needed=.true.)
         else
             call error_exit("procedures_environment_factory: create: "//&
                 "box periodicity is unknown.")
         end if
 
-        call check(environment%periodic_boxes, environment%gemc_visitable_walls, environment%&
+        call check(environment%periodic_boxes, environment%visitable_walls, environment%&
             boxes_size_checker)
     end subroutine create
 
@@ -109,7 +109,7 @@ contains
         call boxes_destroy(environment%boxes_size_checker)
         call boxes_destroy(environment%reciprocal_lattices)
         call fields_destroy(environment%external_fields)
-        call walls_destroy(environment%gemc_visitable_walls)
+        call walls_destroy(environment%visitable_walls)
         call hard_core_destroy(environment%wall_min_distance)
         call permittivity_destroy(environment%permittivity)
         call temperature_destroy(environment%temperature)

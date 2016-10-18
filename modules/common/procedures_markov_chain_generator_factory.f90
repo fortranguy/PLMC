@@ -23,18 +23,18 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         call changes_create(markov_chain_generator%changes, physical_model%environment, &
-            physical_model%mixture%gemc_components, num_tuning_steps, generating_data)
-        call generating_algorithms_create(markov_chain_generator%gemc_generating_algorithms, &
+            physical_model%mixture%components, num_tuning_steps, generating_data)
+        call generating_algorithms_create(markov_chain_generator%generating_algorithms, &
             physical_model, markov_chain_generator%changes)
         call plmc_propagator_create(markov_chain_generator%plmc_propagator, physical_model%mixture%&
-            gemc_components, markov_chain_generator%gemc_generating_algorithms)
+            components, markov_chain_generator%generating_algorithms)
     end subroutine create
 
     subroutine destroy(markov_chain_generator)
         type(Markov_Chain_Generator_Wrapper), intent(inout) :: markov_chain_generator
 
         call plmc_propagator_destroy(markov_chain_generator%plmc_propagator)
-        call generating_algorithms_destroy(markov_chain_generator%gemc_generating_algorithms)
+        call generating_algorithms_destroy(markov_chain_generator%generating_algorithms)
         call changes_destroy(markov_chain_generator%changes)
     end subroutine destroy
 

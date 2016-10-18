@@ -36,7 +36,7 @@ contains
         logical :: data_found
         integer :: i_component
 
-        call composition_create(nums_particles, size(physical_model%mixture%gemc_components, 1), &
+        call composition_create(nums_particles, size(physical_model%mixture%components, 1), &
             measure_inv_pow_activities)
         if (measure_inv_pow_activities) then
             allocate(Concrete_Particle_Insertion_Method :: particle_insertion_method)
@@ -52,8 +52,8 @@ contains
         end if
 
         call particle_insertion_method%construct(physical_model%environment, nums_particles, &
-            physical_model%mixture%gemc_components, physical_model%short_interactions, physical_model%&
-            gemc_dipolar_interactions_dynamic, random_positions, random_orientation)
+            physical_model%mixture%components, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_dynamic, random_positions, random_orientation)
         call composition_destroy(nums_particles)
     end subroutine create
 

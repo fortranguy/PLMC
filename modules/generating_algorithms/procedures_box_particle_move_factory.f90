@@ -39,7 +39,7 @@ contains
             type is (Box_Particle_Translation)
                 call particle_translation%construct(physical_model%environment, physical_model%&
                     mixture, physical_model%short_interactions, physical_model%&
-                    gemc_dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
+                    dipolar_interactions_dynamic, physical_model%dipolar_interactions_static, &
                     changes_components, can_translate, selectors)
             type is (Null_Generating_Algorithm)
             class default
@@ -70,8 +70,8 @@ contains
             type is (Box_Particle_Translation)
                 call particle_rotation%construct(physical_model%environment, &
                     physical_model%mixture, physical_model%short_interactions, &
-                    physical_model%gemc_dipolar_interactions_dynamic, &
-                    physical_model%gemc_dipolar_interactions_static, changes_components, &
+                    physical_model%dipolar_interactions_dynamic, &
+                    physical_model%dipolar_interactions_static, changes_components, &
                     can_rotate, selectors)
             type is (Null_Generating_Algorithm)
             class default

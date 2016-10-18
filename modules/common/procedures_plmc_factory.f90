@@ -80,10 +80,10 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         call readers_create(readers, physical_model%environment, physical_model%mixture%&
-            gemc_components)
+            components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
-            short_interactions%wall_pairs, physical_model%mixture%gemc_components, physical_model%&
-            short_interactions%components_pairs, changes%gemc_components, changes%changed_boxes_size, &
+            short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
+            short_interactions%components_pairs, changes%components, changes%changed_boxes_size, &
             generating_data)
     end subroutine create_generating_readers_writers
 
@@ -105,9 +105,9 @@ contains
         type(json_file), intent(inout) :: generating_data
 
         call readers_create(readers, physical_model%environment, physical_model%mixture%&
-            gemc_components)
+            components)
         call exploring_writers_create(writers, physical_model%environment, physical_model%&
-            short_interactions%wall_pairs, physical_model%mixture%gemc_components, physical_model%&
+            short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
             short_interactions%components_pairs, markov_chain_explorer%volume_change_method, &
             markov_chain_explorer%particle_insertion_method, visit_energies, generating_data)
     end subroutine create_exploring_readers_writers
@@ -148,7 +148,7 @@ contains
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
         logical :: all_boxes_size_tuned,  box_size_tuned
-        logical, dimension(size(changes%gemc_components, 1), size(changes%gemc_components, 2)) :: &
+        logical, dimension(size(changes%components, 1), size(changes%components, 2)) :: &
             translation_tuned, rotation_tuned
         integer :: i_box, j_box, i_component
 
@@ -156,15 +156,15 @@ contains
         do j_box = 1, size(changes%boxes_size_change_tuner)
             do i_box = 1, size(changes%boxes_size_change_tuner(j_box)%line)
                 call changes%boxes_size_change_tuner(j_box)%line(i_box)%tuner%&
-                    tune(box_size_tuned, i_step, observables%volume_change_success)
+                    tune(box_size_tuned, i_step, observables%volumes_change_success(j_box)%line(i_box))
                 all_boxes_size_tuned = all_boxes_size_tuned .and. box_size_tuned
             end do
 
-            do i_component = 1, size(changes%gemc_components, 1)
-                call changes%gemc_components(i_component, j_box)%translation_tuner%&
+            do i_component = 1, size(changes%components, 1)
+                call changes%components(i_component, j_box)%translation_tuner%&
                     tune(translation_tuned(i_component, j_box), i_step, observables%changes(i_box)%&
                     changes_sucesses(i_component)%translation)
-                call changes%gemc_components(i_component, j_box)%rotation_tuner%&
+                call changes%components(i_component, j_box)%rotation_tuner%&
                     tune(rotation_tuned(i_component, j_box), i_step, observables%changes(i_box)%&
                     changes_sucesses(i_component)%rotation)
             end do
@@ -175,22 +175,33 @@ contains
     subroutine set_success_and_reset_counter_generating(observables)
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
-        call set_successes(observables%volume_change_success, observables%volume_change_counter)
-        call reset_counters(observables%volume_change_counter)
-        call set_successes(observables%changes_sucesses, observables%changes_counters)
-        call reset_counters(observables%changes_counters)
-        call set_successes(observables%switches_successes, observables%switches_counters)
-        call reset_counters(observables%switches_counters)
-        call set_successes(observables%transmutations_successes, observables%&
-            transmutations_counters)
-        call reset_counters(observables%transmutations_counters)
+        integer :: i_box
+
+        call set_successes(observables%volumes_change_success, observables%volumes_change_counter)
+        call reset_counters(observables%volumes_change_counter)
+        do i_box = 1, size(observables%changes)
+            call set_successes(observables%changes(i_box)%changes_sucesses, observables%&
+                changes(i_box)%changes_counters)
+            call reset_counters(observables%changes(i_box)%changes_counters)
+            call set_successes(observables%changes(i_box)%switches_successes, observables%&
+                changes(i_box)%switches_counters)
+            call reset_counters(observables%changes(i_box)%switches_counters)
+            call set_successes(observables%changes(i_box)%transmutations_successes, observables%&
+                changes(i_box)%transmutations_counters)
+            call reset_counters(observables%changes(i_box)%transmutations_counters)
+        end do
     end subroutine set_success_and_reset_counter_generating
 
     subroutine set_success_and_reset_counter_exploring(observables)
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
-        call set_successes(observables%insertion_successes, observables%insertion_counters)
-        call reset_counters(observables%insertion_counters)
+        integer :: i_box
+
+        do i_box = 1, size(observables%insertion_successes, 2)
+            call set_successes(observables%insertion_successes(:, i_box), observables%&
+                insertion_counters(:, i_box))
+            call reset_counters(observables%insertion_counters(:, i_box))
+        end do
     end subroutine set_success_and_reset_counter_exploring
 
     subroutine set_initial_observables(observables, physical_model)
@@ -200,7 +211,7 @@ contains
         integer :: i_box
 
         do i_box = 1, size(observables%accessible_domains_size, 2)
-            call set_nums_particles(observables%gemc_nums_particles(:, i_box), physical_model%mixture%gemc_components(:, i_box))
+            call set_nums_particles(observables%nums_particles(:, i_box), physical_model%mixture%components(:, i_box))
             observables%accessible_domains_size(:, i_box) = physical_model%environment%accessible_domains(i_box)%get_size()
         end do
     end subroutine set_initial_observables

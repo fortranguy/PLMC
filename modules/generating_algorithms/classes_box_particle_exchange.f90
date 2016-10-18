@@ -198,7 +198,7 @@ contains
     subroutine Abstract_reset_selectors(this)
         class(Box_Particle_Exchange), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%mixture%gemc_components, this%can_exchange)
+        call selectors_reset(this%selectors, this%mixture%components, this%can_exchange)
     end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
@@ -222,15 +222,15 @@ contains
 
         i_box = random_integer(size(this%environment%periodic_boxes))
         i_component = this%selectors(i_box)%get()
-        call this%increment_hit(observables%changes_counters(i_component))
-        allocate(deltas%short_energies(size(observables%energies%short_energies)))
-        allocate(deltas%dipolar_energies(size(observables%energies%dipolar_energies)))
+        call this%increment_hit(observables%changes(i_box)%changes_counters(i_component))
+        allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies)))
+        allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies)))
         call this%metropolis_algorithm(success, deltas, i_box, i_component)
         if (success) then
-            observables%nums_particles(i_component) = this%mixture%gemc_components(i_component, i_box)%&
+            observables%nums_particles(i_component, i_box) = this%mixture%components(i_component, i_box)%&
                 num_particles%get()
-            call observables_energies_set(observables%energies, deltas, i_component)
-            call this%increment_success(observables%changes_counters(i_component))
+            call observables_energies_set(observables%energies(i_box), deltas, i_component)
+            call this%increment_success(observables%changes(i_box)%changes_counters(i_component))
         end if
     end subroutine Abstract_try
 
@@ -273,10 +273,10 @@ contains
         integer, intent(in) :: i_box, i_component
 
         abort = .false.
-        particle%i = this%mixture%gemc_components(i_component, i_box)%num_particles%get() + 1
+        particle%i = this%mixture%components(i_component, i_box)%num_particles%get() + 1
         particle%position = this%changes%random_positions(i_box)%get(i_component)
         particle%orientation = this%changes%random_orientation%get(i_component)
-        particle%dipole_moment = this%mixture%gemc_components(i_component, i_box)%dipole_moments%get_norm()*&
+        particle%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get_norm()*&
             particle%orientation
     end subroutine Add_define_exchange
 
@@ -290,7 +290,7 @@ contains
         integer, intent(in) :: i_box, i_component
         real(DP), intent(in) :: delta_energy
 
-        associate(component => this%mixture%gemc_components(i_component, i_box))
+        associate(component => this%mixture%components(i_component, i_box))
             probability = product(this%environment%accessible_domains(i_box)%get_size()) * &
                 component%chemical_potential%get_density() / &
                 (real(component%num_particles%get() + 1, DP)) * &
@@ -307,7 +307,7 @@ contains
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        call this%environment%gemc_visitable_walls(i_box)%visit(overlap, delta_energy, particle%&
+        call this%environment%visitable_walls(i_box)%visit(overlap, delta_energy, particle%&
             position, this%short_interactions%wall_pairs(i_component)%potential)
     end subroutine Add_visit_walls
 
@@ -368,10 +368,10 @@ contains
 
         integer :: j_component
 
-        call this%mixture%gemc_components(i_component, i_box)%num_particles%set(this%mixture%&
-            gemc_components(i_component, i_box)%num_particles%get() + 1)
-        call this%mixture%gemc_components(i_component, i_box)%positions%add(particle%position)
-        call this%mixture%gemc_components(i_component, i_box)%orientations%add(particle%orientation)
+        call this%mixture%components(i_component, i_box)%num_particles%set(this%mixture%&
+            components(i_component, i_box)%num_particles%get() + 1)
+        call this%mixture%components(i_component, i_box)%positions%add(particle%position)
+        call this%mixture%components(i_component, i_box)%orientations%add(particle%orientation)
         call this%mixture%total_moments(i_box)%add(i_component, particle%dipole_moment)
         do j_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
             call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%add(particle)
@@ -402,16 +402,16 @@ contains
         logical, intent(out) :: abort
         integer, intent(in) :: i_box, i_component
 
-        if (this%mixture%gemc_components(i_component, i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(i_component, i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
-        particle%i = random_integer(this%mixture%gemc_components(i_component, i_box)%num_particles%get())
-        particle%position = this%mixture%gemc_components(i_component, i_box)%positions%get(particle%i)
-        particle%orientation = this%mixture%gemc_components(i_component, i_box)%orientations%get(particle%i)
-        particle%dipole_moment = this%mixture%gemc_components(i_component, i_box)%dipole_moments%&
+        particle%i = random_integer(this%mixture%components(i_component, i_box)%num_particles%get())
+        particle%position = this%mixture%components(i_component, i_box)%positions%get(particle%i)
+        particle%orientation = this%mixture%components(i_component, i_box)%orientations%get(particle%i)
+        particle%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%&
             get(particle%i)
     end subroutine Remove_define_exchange
 
@@ -425,7 +425,7 @@ contains
         integer, intent(in) :: i_box, i_component
         real(DP), intent(in) :: delta_energy
 
-        associate(component => this%mixture%gemc_components(i_component, i_box))
+        associate(component => this%mixture%components(i_component, i_box))
             probability = real(component%num_particles%get(), DP) / &
                 product(this%environment%accessible_domains(i_box)%get_size()) / &
                 component%chemical_potential%get_density() * &
@@ -442,7 +442,7 @@ contains
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
-        call this%environment%gemc_visitable_walls(i_box)%visit(overlap, delta_energy, particle%&
+        call this%environment%visitable_walls(i_box)%visit(overlap, delta_energy, particle%&
             position, this%short_interactions%wall_pairs(i_component)%potential)
         delta_energy = -delta_energy
     end subroutine Remove_visit_walls
@@ -511,10 +511,10 @@ contains
             call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%remove(particle)
         end do
         call this%mixture%total_moments(i_box)%remove(i_component, particle%dipole_moment)
-        call this%mixture%gemc_components(i_component, i_box)%orientations%remove(particle%i)
-        call this%mixture%gemc_components(i_component, i_box)%positions%remove(particle%i)
-        call this%mixture%gemc_components(i_component, i_box)%num_particles%set(this%mixture%&
-            gemc_components(i_component, i_box)%num_particles%get() - 1)
+        call this%mixture%components(i_component, i_box)%orientations%remove(particle%i)
+        call this%mixture%components(i_component, i_box)%positions%remove(particle%i)
+        call this%mixture%components(i_component, i_box)%num_particles%set(this%mixture%&
+            components(i_component, i_box)%num_particles%get() - 1)
     end subroutine Remove_update_actor
 
     subroutine Remove_increment_hit(changes_counters)

@@ -15,20 +15,12 @@ private
     type, public :: Generating_Writers_Wrapper
         class(Abstract_Real_Writer), allocatable :: accessible_domains_size(:)
         class(Abstract_Triangle_Writer), allocatable :: volumes_change_success
-        class(Abstract_Line_Writer), allocatable :: gemc_nums_particles(:)
+        class(Abstract_Line_Writer), allocatable :: nums_particles(:)
         class(Abstract_Complete_Coordinates_Writer), allocatable :: complete_coordinates
-        type(Concrete_Energies_Writers), allocatable :: gemc_energies(:)
-        type(Changes_Success_Writer_Wrapper), allocatable :: gemc_components_changes(:, :)
-        class(Abstract_Triangle_Writer), allocatable :: gemc_switches_successes(:)
-        class(Abstract_Rectangle_Writer), allocatable :: gemc_transmutations_successes(:)
-
-        class(Abstract_Real_Writer), allocatable :: accessible_domain_size
-        class(Abstract_Real_Writer), allocatable :: volume_change_success
-        class(Abstract_Line_Writer), allocatable :: nums_particles
-        type(Concrete_Energies_Writers) :: energies
-        type(Changes_Success_Writer_Wrapper), allocatable :: components_changes(:)
-        class(Abstract_Triangle_Writer), allocatable :: switches_successes
-        class(Abstract_Rectangle_Writer), allocatable :: transmutations_successes
+        type(Concrete_Energies_Writers), allocatable :: energies(:)
+        type(Changes_Success_Writer_Wrapper), allocatable :: components_changes(:, :)
+        class(Abstract_Triangle_Writer), allocatable :: switches_successes(:)
+        class(Abstract_Rectangle_Writer), allocatable :: transmutations_successes(:)
     end type Generating_Writers_Wrapper
 
 end module types_generating_writers_wrapper

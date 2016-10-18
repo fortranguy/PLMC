@@ -212,7 +212,7 @@ contains
     subroutine Abstract_reset_selectors(this)
         class(Abstract_Box_Particles_Swap), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%couples, this%mixture%gemc_components, this%can_swap)
+        call selectors_reset(this%selectors, this%couples, this%mixture%components, this%can_swap)
     end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
@@ -237,11 +237,11 @@ contains
         i_box = random_integer(size(this%environment%periodic_boxes))
         ij_actors = this%couples(i_box)%get(this%selectors(i_box)%get())
         call this%increment_hit(observables%changes(i_box), ij_actors)
-        allocate(deltas%short_energies(size(observables%energies%short_energies), 2))
-        allocate(deltas%dipolar_energies(size(observables%energies%dipolar_energies), 2))
+        allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies), 2))
+        allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies), 2))
         call this%metropolis_algorithm(success, deltas, i_box, ij_actors)
         if (success) then
-            call observables_energies_set(observables%energies, deltas, ij_actors)
+            call observables_energies_set(observables%energies(i_box), deltas, ij_actors)
             call this%increment_success(observables%changes(i_box), ij_actors)
         end if
     end subroutine Abstract_try
@@ -298,28 +298,28 @@ contains
         type(Concrete_Temporary_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, ij_actors(:)
 
-        if (this%mixture%gemc_components(ij_actors(1), i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(ij_actors(1), i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
 
-        particles(1)%i = random_integer(this%mixture%gemc_components(ij_actors(1), i_box)%&
+        particles(1)%i = random_integer(this%mixture%components(ij_actors(1), i_box)%&
             num_particles%get())
-        particles(1)%position = this%mixture%gemc_components(ij_actors(1), i_box)%positions%&
+        particles(1)%position = this%mixture%components(ij_actors(1), i_box)%positions%&
             get(particles(1)%i)
-        particles(1)%orientation = this%mixture%gemc_components(ij_actors(1), i_box)%orientations%&
+        particles(1)%orientation = this%mixture%components(ij_actors(1), i_box)%orientations%&
             get(particles(1)%i)
-        particles(1)%dipole_moment = this%mixture%gemc_components(ij_actors(1), i_box)%dipole_moments%&
+        particles(1)%dipole_moment = this%mixture%components(ij_actors(1), i_box)%dipole_moments%&
             get(particles(1)%i)
 
-        particles(2)%i = this%mixture%gemc_components(ij_actors(2), i_box)%num_particles%get() + 1
+        particles(2)%i = this%mixture%components(ij_actors(2), i_box)%num_particles%get() + 1
         call this%changes%position_copiers(i_box)%copy(particles(2)%position, particles(1)%position, &
             ij_actors)
         call this%changes%orientation_copier%copy(particles(2)%orientation, particles(1)%&
             orientation, ij_actors)
-        particles(2)%dipole_moment = this%mixture%gemc_components(ij_actors(2), i_box)%dipole_moments%&
+        particles(2)%dipole_moment = this%mixture%components(ij_actors(2), i_box)%dipole_moments%&
             get_norm() * particles(2)%orientation
     end subroutine Transmutation_define_swap
 
@@ -333,8 +333,8 @@ contains
         integer, intent(in) :: i_box, ij_actors(:)
         real(DP), intent(in) :: delta_energy
 
-        associate(component_i => this%mixture%gemc_components(ij_actors(1), i_box), &
-            component_j => this%mixture%gemc_components(ij_actors(2), i_box))
+        associate(component_i => this%mixture%components(ij_actors(1), i_box), &
+            component_j => this%mixture%components(ij_actors(2), i_box))
 
             probability = real(component_i%num_particles%get(), DP) / &
                 real(component_j%num_particles%get() + 1, DP) * &
@@ -358,7 +358,7 @@ contains
         integer :: i_partner
 
         do i_partner = size(particles), 1, -1
-            call this%environment%gemc_visitable_walls(i_box)%visit(overlap, delta_energies(i_partner), &
+            call this%environment%visitable_walls(i_box)%visit(overlap, delta_energies(i_partner), &
                 particles(i_partner)%position, this%short_interactions%&
                 wall_pairs(ij_actors(i_partner))%potential)
             if (overlap) return
@@ -445,15 +445,15 @@ contains
         end do
 
         call this%mixture%total_moments(i_box)%remove(ij_actors(1), particles(1)%dipole_moment)
-        call this%mixture%gemc_components(ij_actors(1), i_box)%orientations%remove(particles(1)%i)
-        call this%mixture%gemc_components(ij_actors(1), i_box)%positions%remove(particles(1)%i)
-        call this%mixture%gemc_components(ij_actors(1), i_box)%num_particles%set(this%mixture%&
-            gemc_components(ij_actors(1), i_box)%num_particles%get() - 1)
+        call this%mixture%components(ij_actors(1), i_box)%orientations%remove(particles(1)%i)
+        call this%mixture%components(ij_actors(1), i_box)%positions%remove(particles(1)%i)
+        call this%mixture%components(ij_actors(1), i_box)%num_particles%set(this%mixture%&
+            components(ij_actors(1), i_box)%num_particles%get() - 1)
 
-        call this%mixture%gemc_components(ij_actors(2), i_box)%num_particles%set(this%mixture%&
-            gemc_components(ij_actors(2), i_box)%num_particles%get() + 1)
-        call this%mixture%gemc_components(ij_actors(2), i_box)%positions%add(particles(2)%position)
-        call this%mixture%gemc_components(ij_actors(2), i_box)%orientations%add(particles(2)%orientation)
+        call this%mixture%components(ij_actors(2), i_box)%num_particles%set(this%mixture%&
+            components(ij_actors(2), i_box)%num_particles%get() + 1)
+        call this%mixture%components(ij_actors(2), i_box)%positions%add(particles(2)%position)
+        call this%mixture%components(ij_actors(2), i_box)%orientations%add(particles(2)%orientation)
         call this%mixture%total_moments(i_box)%add(ij_actors(2), particles(2)%dipole_moment)
 
         do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
@@ -497,8 +497,8 @@ contains
 
         integer :: i_partner
 
-        if (this%mixture%gemc_components(ij_actors(1), i_box)%num_particles%get() == 0 .or. &
-            this%mixture%gemc_components(ij_actors(2), i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(ij_actors(1), i_box)%num_particles%get() == 0 .or. &
+            this%mixture%components(ij_actors(2), i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
@@ -506,13 +506,13 @@ contains
         end if
 
         do i_partner = 1, size(particles)
-            particles(i_partner)%i = random_integer(this%mixture%gemc_components(ij_actors(i_partner), i_box)%&
+            particles(i_partner)%i = random_integer(this%mixture%components(ij_actors(i_partner), i_box)%&
                 num_particles%get())
-            particles(i_partner)%position = this%mixture%gemc_components(ij_actors(i_partner), i_box)%&
+            particles(i_partner)%position = this%mixture%components(ij_actors(i_partner), i_box)%&
                 positions%get(particles(i_partner)%i)
-            particles(i_partner)%orientation = this%mixture%gemc_components(ij_actors(i_partner), i_box)%&
+            particles(i_partner)%orientation = this%mixture%components(ij_actors(i_partner), i_box)%&
                 orientations%get(particles(i_partner)%i)
-            particles(i_partner)%dipole_moment = this%mixture%gemc_components(ij_actors(i_partner), i_box)%&
+            particles(i_partner)%dipole_moment = this%mixture%components(ij_actors(i_partner), i_box)%&
                 dipole_moments%get(particles(i_partner)%i)
         end do
     end subroutine Switch_define_swap
@@ -537,13 +537,13 @@ contains
         integer :: i_partner
 
         do i_partner = 1, size(particles)
-            call this%environment%gemc_visitable_walls(i_box)%visit(overlap, energies_new(i_partner), &
+            call this%environment%visitable_walls(i_box)%visit(overlap, energies_new(i_partner), &
                 particles(size(particles) + 1 - i_partner)%position, this%short_interactions%&
                 wall_pairs(ij_actors(i_partner))%potential)
             if (overlap) return
         end do
         do i_partner = 1, size(particles)
-            call this%environment%gemc_visitable_walls(i_box)%visit(overlap, energies_old(i_partner), &
+            call this%environment%visitable_walls(i_box)%visit(overlap, energies_old(i_partner), &
                 particles(i_partner)%position, this%short_interactions%&
                 wall_pairs(ij_actors(i_partner))%potential)
         end do
@@ -650,7 +650,7 @@ contains
 
         do i_partner = 1, size(particles)
             swapped_position = particles(size(particles) + 1 - i_partner)%position
-            call this%mixture%gemc_components(ij_actors(i_partner), i_box)%positions%&
+            call this%mixture%components(ij_actors(i_partner), i_box)%positions%&
                 set(particles(i_partner)%i, swapped_position)
             do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
                 call this%short_interactions%cells(i_box)%visitable_cells(ij_actors(i_partner), i_component)%&

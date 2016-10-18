@@ -10,7 +10,7 @@ use procedures_changed_boxes_size_ratio_factory, only: changed_boxes_size_ratio_
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use classes_changed_box_size, only: Abstract_Changed_Box_Size, Concrete_Changed_Box_Size, &
     Null_Changed_Box_Size, Changed_Box_Size_Line
-use procedures_environment_inquirers, only: gemc_box_size_can_change
+use procedures_environment_inquirers, only: box_size_can_change
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
 
 implicit none
@@ -83,7 +83,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        if (gemc_box_size_can_change(changed_box_size_ratio)) then
+        if (box_size_can_change(changed_box_size_ratio)) then
             allocate(Concrete_Changed_Box_Size :: changed_box_size)
             data_field = prefix//"frequency ratio"
             call generating_data%get(data_field, frequency_ratio, data_found)

@@ -40,13 +40,13 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: generating_data
 
-        call create(mixture%gemc_components, environment%periodic_boxes, environment%&
+        call create(mixture%components, environment%periodic_boxes, environment%&
             accessible_domains, generating_data, mixture_prefix)
-        call hard_core_create(mixture%components_min_distances, mixture%gemc_components(:, 1), &
+        call hard_core_create(mixture%components_min_distances, mixture%components(:, 1), &
             generating_data, mixture_prefix)
         call hard_core_create(mixture%wall_min_distances, environment%wall_min_distance, mixture%&
-            components_min_distances, mixture%gemc_components(:, 1), environment%gemc_visitable_walls(1))
-        call mixture_total_moments_create(mixture%total_moments, mixture%gemc_components)
+            components_min_distances, mixture%components(:, 1), environment%visitable_walls(1))
+        call mixture_total_moments_create(mixture%total_moments, mixture%components)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
@@ -55,7 +55,7 @@ contains
         call mixture_total_moments_destroy(mixture%total_moments)
         call hard_core_destroy(mixture%wall_min_distances)
         call hard_core_destroy(mixture%components_min_distances)
-        call destroy(mixture%gemc_components)
+        call destroy(mixture%components)
     end subroutine destroy_all
 
     subroutine create_components(components, periodic_boxes, accessible_domains, generating_data, &

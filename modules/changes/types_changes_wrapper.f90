@@ -15,7 +15,7 @@ private
         type(Move_Tuner_Line), allocatable :: boxes_size_change_tuner(:)
         class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
         class(Abstract_Coordinates_Copier), allocatable :: position_copiers(:), orientation_copier
-        type(Changes_Component_Wrapper), allocatable :: gemc_components(:, :)
+        type(Changes_Component_Wrapper), allocatable :: components(:, :)
     end type Changes_Wrapper
 
 end module types_changes_wrapper

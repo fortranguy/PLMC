@@ -20,24 +20,24 @@ contains
         type(Exploring_Observables_Wrapper), intent(out) ::observables
         integer, intent(in) :: num_boxes, num_components
 
-        allocate(observables%gemc_inv_pow_activities(num_components, num_boxes))
-        observables%gemc_inv_pow_activities = 0._DP
-        call observables_energies_create(observables%gemc_energies, num_boxes, num_components)
-        allocate(observables%gemc_insertion_successes(num_components, num_boxes))
-        observables%gemc_insertion_successes = 0._DP
-        call observables_changes_create(observables%gemc_insertion_counters, num_components, &
+        allocate(observables%inv_pow_activities(num_components, num_boxes))
+        observables%inv_pow_activities = 0._DP
+        call observables_energies_create(observables%energies, num_boxes, num_components)
+        allocate(observables%insertion_successes(num_components, num_boxes))
+        observables%insertion_successes = 0._DP
+        call observables_changes_create(observables%insertion_counters, num_components, &
             num_boxes)
     end subroutine create
 
     pure subroutine destroy(observables)
         type(Exploring_Observables_Wrapper), intent(inout) ::observables
 
-        call observables_changes_destroy(observables%gemc_insertion_counters)
-        if (allocated(observables%gemc_insertion_successes)) &
-            deallocate(observables%gemc_insertion_successes)
-        call observables_energies_destroy(observables%gemc_energies)
-        if (allocated(observables%gemc_inv_pow_activities)) &
-            deallocate(observables%gemc_inv_pow_activities)
+        call observables_changes_destroy(observables%insertion_counters)
+        if (allocated(observables%insertion_successes)) &
+            deallocate(observables%insertion_successes)
+        call observables_energies_destroy(observables%energies)
+        if (allocated(observables%inv_pow_activities)) &
+            deallocate(observables%inv_pow_activities)
     end subroutine destroy
 
 end module procedures_exploring_observables_factory

@@ -6,7 +6,7 @@ use procedures_walls_factory, only: walls_create => create, walls_destroy => des
 use procedures_beta_pressures_excess_factory, only: beta_pressures_excess_create => create, &
     beta_pressures_excess_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_inquirers, only: box_size_can_change
+use procedures_environment_inquirers, only: total_volume_can_change
 use types_mixture_wrapper, only:  Mixture_Wrapper
 use classes_dirac_distribution_plus, only: Abstract_Dirac_Distribution_Plus
 use procedures_dirac_distribution_plus_factory, only: dirac_distribution_plus_create => create, &
@@ -35,7 +35,8 @@ contains
         type(json_file), intent(inout) :: generating_data
         type(json_file), optional, intent(inout) :: exploring_data
 
-        logical :: interact_with_walls, interact, measure_pressure
+        logical :: boxes_size_can_change, measure_pressure
+        logical :: interact_with_walls, interact
         class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
         class(Abstract_Visitable_List), allocatable :: list_mold
 
@@ -54,7 +55,7 @@ contains
         call dirac_distribution_plus_destroy(dirac_plus)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&
             wall_min_distances, generating_data, short_interactions_prefix)
-        call walls_create(short_interactions%walls_visitors, environment%gemc_visitable_walls, &
+        call walls_create(short_interactions%walls_visitors, environment%visitable_walls, &
             interact_with_walls)
         call pairs_create(short_interactions%components_pairs, interact, mixture%&
             components_min_distances, generating_data, short_interactions_prefix)
@@ -63,10 +64,12 @@ contains
         call visitable_list_allocate(list_mold, interact, generating_data, &
             short_interactions_prefix)
         call cells_create(short_interactions%cells, environment%periodic_boxes, environment%&
-            accessible_domains, mixture%gemc_components, short_interactions%hard_contact, &
+            accessible_domains, mixture%components, short_interactions%hard_contact, &
             short_interactions%components_pairs, list_mold, interact)
+        boxes_size_can_change = total_volume_can_change(environment%beta_pressure) .or. &
+            size(environment%periodic_boxes) > 1
         call cells_create(short_interactions%visitable_cells_memento, list_mold, &
-            (box_size_can_change(environment%beta_pressure) .or. measure_pressure) .and. interact)
+            (boxes_size_can_change .or. measure_pressure) .and. interact)
         call visitable_list_deallocate(list_mold)
     end subroutine create
 

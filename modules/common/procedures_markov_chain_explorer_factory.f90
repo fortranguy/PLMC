@@ -32,8 +32,6 @@ public :: create, destroy
 
 contains
 
-    !> @todo
-    !> multiple boxes generalisation
     subroutine create(markov_chain_explorer, physical_model, visit_energies, exploring_data)
         type(Markov_Chain_Explorer_Wrapper), intent(out) :: markov_chain_explorer
         type(Physical_Model_Wrapper), intent(in) :: physical_model
@@ -43,9 +41,8 @@ contains
         class(Abstract_Maximum_Box_Compression), allocatable :: maximum_box_compression
         logical :: boxes_size_can_change(size(physical_model%environment%periodic_boxes))
         logical :: measure_pressure_excess, measure_inv_pow_activities
-        logical :: have_positions(size(physical_model%mixture%gemc_components, 1), &
-            size(physical_model%mixture%gemc_components, 2))
-        logical :: have_orientations(size(have_positions, 1), size(have_positions, 2))
+        logical, dimension(size(physical_model%mixture%components, 1), &
+            size(physical_model%mixture%components, 2)) :: have_positions, have_orientations
         class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
         logical :: can_exchange(size(have_positions, 1), size(have_positions, 2))
 
@@ -69,15 +66,15 @@ contains
         measure_inv_pow_activities = measure_chemical_potentials(exploring_data, &
             particle_insertion_prefix)
 
-       call set_have_positions(have_positions, physical_model%mixture%gemc_components)
+       call set_have_positions(have_positions, physical_model%mixture%components)
         can_exchange = measure_inv_pow_activities ! as if exchange
 
         call boxes_create(markov_chain_explorer%particle_insertion_domains, physical_model%&
-            environment%periodic_boxes, physical_model%environment%gemc_visitable_walls, &
+            environment%periodic_boxes, physical_model%environment%visitable_walls, &
             any(can_exchange) .and. any(have_positions), exploring_data, particle_insertion_prefix)
         call random_coordinates_create(random_positions, markov_chain_explorer%&
             particle_insertion_domains, have_positions, can_exchange)
-        call set_have_orientations(have_orientations, physical_model%mixture%gemc_components)
+        call set_have_orientations(have_orientations, physical_model%mixture%components)
         call random_coordinates_create(random_orientation, have_orientations,can_exchange)
         call particle_insertion_method_create(markov_chain_explorer%particle_insertion_method, &
             physical_model, random_positions, random_orientation, measure_inv_pow_activities, &

@@ -84,32 +84,32 @@ contains
             changed_boxes_size)
 
         call set_can_exchange(can_exchange, components)
-        call line_writer_create(writers%gemc_nums_particles, boxes_path, "nums_particles.out", &
+        call line_writer_create(writers%nums_particles, boxes_path, "nums_particles.out", &
             can_exchange)
         call complete_coordinates_writer_create(writers%complete_coordinates, coordinates_path, &
             "coordinates", environment%periodic_boxes, components, generating_data, writers_prefix)
 
-        call energies_writers_create(writers%gemc_energies, boxes_path, environment%external_fields, &
+        call energies_writers_create(writers%energies, boxes_path, environment%external_fields, &
             wall_pairs, components, short_pairs, visit_energies=.true.)
-        call changes_success_writer_create(writers%gemc_components_changes, boxes_path, &
+        call changes_success_writer_create(writers%components_changes, boxes_path, &
             changes_components, components)
-        call triangle_writer_create(writers%gemc_switches_successes, boxes_path, &
+        call triangle_writer_create(writers%switches_successes, boxes_path, &
             "switches_successes.out", components)
-        call rectangle_writer_create(writers%gemc_transmutations_successes, boxes_path, &
+        call rectangle_writer_create(writers%transmutations_successes, boxes_path, &
             "transmutations_successes.out", components)
     end subroutine create
 
     subroutine destroy(writers)
         type(Generating_Writers_Wrapper), intent(inout) :: writers
 
-        call rectangle_writer_destroy(writers%gemc_transmutations_successes)
-        call triangle_writer_destroy(writers%gemc_switches_successes)
-        call changes_success_writer_destroy(writers%gemc_components_changes)
+        call rectangle_writer_destroy(writers%transmutations_successes)
+        call triangle_writer_destroy(writers%switches_successes)
+        call changes_success_writer_destroy(writers%components_changes)
 
-        call energies_writers_destroy(writers%gemc_energies)
+        call energies_writers_destroy(writers%energies)
 
         call complete_coordinates_writer_destroy(writers%complete_coordinates)
-        call line_writer_destroy(writers%gemc_nums_particles)
+        call line_writer_destroy(writers%nums_particles)
 
         call triangle_writer_destroy(writers%volumes_change_success)
         call real_writer_destroy(writers%accessible_domains_size)

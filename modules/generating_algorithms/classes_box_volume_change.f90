@@ -96,7 +96,7 @@ contains
     subroutine Abstract_reset_selectors(this)
         class(Box_Volume_Change), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%changed_boxes_size, this%mixture%gemc_components,&
+        call selectors_reset(this%selectors, this%changed_boxes_size, this%mixture%components,&
             this%have_positions)
     end subroutine Abstract_reset_selectors
 
@@ -135,19 +135,20 @@ contains
 
         call this%environment%periodic_boxes(i_box)%set(new_box_size)
         call this%rescale_positions(i_box, box_size_ratio)
-        call logical_create(only_resized_triangle, size(this%mixture%gemc_components, 1))
+        call logical_create(only_resized_triangle, size(this%mixture%components, 1))
         call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
         call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells, &
             only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
         call this%dipolar_interactions_facades(i_box)%reset()
-        call observables_energies_create(new_energies, size(this%mixture%gemc_components, 1))
-        call this%metropolis_algorithm(success, new_energies, i_box, box_size_ratio, observables%energies)
+        call observables_energies_create(new_energies, size(this%mixture%components, 1))
+        call this%metropolis_algorithm(success, new_energies, i_box, box_size_ratio, observables%energies(i_box))
 
         if (success) then
-            observables%accessible_domain_size = this%environment%accessible_domains(i_box)%get_size()
-            call observables_energies_set(observables%energies, new_energies)
-            observables%volume_change_counter%num_successes = observables%volume_change_counter%&
-                num_successes + 1
+            observables%accessible_domains_size(:, i_box) = this%environment%&
+                accessible_domains(i_box)%get_size()
+            call observables_energies_set(observables%energies(i_box), new_energies)
+            observables%volumes_change_counter(i_box)%line(i_box)%num_successes = observables%&
+                volumes_change_counter(i_box)%line(i_box)%num_successes + 1
         else
             call this%environment%periodic_boxes(i_box)%set(box_size)
             call this%rescale_positions(i_box, 1._DP / box_size_ratio)
@@ -170,18 +171,18 @@ contains
         logical :: overlap
 
         success = .false.
-        call observables_energies_create(deltas, size(this%mixture%gemc_components, 1))
+        call observables_energies_create(deltas, size(this%mixture%components, 1))
         call short_interactions_visit(overlap, new_energies%walls_energies, this%mixture%&
-            gemc_components(:, i_box), this%short_interactions%walls_visitors(i_box), this%&
+            components(:, i_box), this%short_interactions%walls_visitors(i_box), this%&
             short_interactions%wall_pairs)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
         call short_interactions_visit_cells(overlap, new_energies%short_energies, this%mixture%&
-            gemc_components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
+            components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
         deltas%short_energies = new_energies%short_energies - energies%short_energies
         if (overlap) return
         call dipolar_interactions_visit(new_energies%field_energies, this%environment%&
-            external_fields(i_box), this%mixture%gemc_components(:, i_box))
+            external_fields(i_box), this%mixture%components(:, i_box))
         deltas%field_energies = new_energies%field_energies - energies%field_energies
         call this%dipolar_interactions_facades(i_box)%visit(new_energies%dipolar_energies, new_energies%&
             dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies, energies%&
@@ -212,8 +213,8 @@ contains
         integer :: i_component, num_particles
 
         num_particles = 0._DP
-        do i_component = 1, size(this%mixture%gemc_components, 1)
-            num_particles = num_particles + this%mixture%gemc_components(i_component, i_box)%num_particles%get()
+        do i_component = 1, size(this%mixture%components, 1)
+            num_particles = num_particles + this%mixture%components(i_component, i_box)%num_particles%get()
         end do
         volume_ratio = product(box_size_ratio)
 
@@ -231,8 +232,8 @@ contains
 
         integer :: i_component
 
-        do i_component = 1, size(this%mixture%gemc_components, 1)
-            call this%mixture%gemc_components(i_component, i_box)%positions%rescale_all(box_size_ratio)
+        do i_component = 1, size(this%mixture%components, 1)
+            call this%mixture%components(i_component, i_box)%positions%rescale_all(box_size_ratio)
         end do
     end subroutine Abstract_rescale_positions
 
@@ -249,7 +250,7 @@ contains
 
         integer :: i_component, j_component
 
-        call cells_allocate_triangle(neighbour_cells, size(this%mixture%gemc_components, 1))
+        call cells_allocate_triangle(neighbour_cells, size(this%mixture%components, 1))
         do j_component = 1, size(neighbour_cells)
             do i_component = 1, size(neighbour_cells(j_component)%line)
                 only_resized_triangle(j_component)%line(i_component) = this%short_interactions%cells(i_box)%&

@@ -87,7 +87,6 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
-    !> @todo Multiple box
     subroutine Abstract_try(this, observables)
         class(Abstract_Maximum_Box_Compression_Explorer), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables

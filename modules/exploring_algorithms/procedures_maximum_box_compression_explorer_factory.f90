@@ -26,7 +26,7 @@ contains
             allocate(Null_Maximum_Box_Compression_Explorer :: maximum_box_compression_explorer)
         end if
         call maximum_box_compression_explorer%construct(physical_model%environment, physical_model%&
-            mixture%gemc_components, physical_model%short_interactions, maximum_box_compression)
+            mixture%components, physical_model%short_interactions, maximum_box_compression)
     end subroutine create
 
     subroutine destroy(maximum_box_compression_explorer)

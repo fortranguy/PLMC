@@ -29,14 +29,14 @@ contains
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
         integer :: i_box, num_candidates
         logical :: boxes_size_can_change(size(physical_model%environment%periodic_boxes))
-        logical :: have_positions(size(physical_model%mixture%gemc_components, 1), &
-            size(physical_model%mixture%gemc_components, 2))
+        logical :: have_positions(size(physical_model%mixture%components, 1), &
+            size(physical_model%mixture%components, 2))
 
         do i_box = 1, size(changed_boxes_size)
             boxes_size_can_change(i_box) = box_size_can_change(changed_boxes_size(i_box)%&
                 line(i_box)%changed)
         end do
-        call set_have_positions(have_positions, physical_model%mixture%gemc_components)
+        call set_have_positions(have_positions, physical_model%mixture%components)
         if (all(boxes_size_can_change)) then
             allocate(Box_Volume_Change :: volume_change)
         else

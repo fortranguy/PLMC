@@ -13,8 +13,7 @@ public :: create, destroy
 
 contains
 
-    !> @todo
-    !> Replace all() by any()?
+    !> @todo Replace all() by any()?
     subroutine create(boxes_size_checker, reciprocal_lattices, visitable_walls)
         class(Abstract_Box_Size_Checker), allocatable, intent(out) :: boxes_size_checker(:)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattices(:)

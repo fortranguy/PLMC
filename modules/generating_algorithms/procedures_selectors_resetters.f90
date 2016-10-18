@@ -36,7 +36,6 @@ contains
         end do
     end subroutine reset_one_particle
 
-    !> @todo Multi boxes generalisation
     !> @todo What is the best compromise between minval(), maxval() and average()?
     subroutine reset_two_particles(selectors, couples, components, can_swap)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)

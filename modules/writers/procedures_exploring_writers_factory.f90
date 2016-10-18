@@ -67,19 +67,19 @@ contains
             "maximum_box_compression_delta.out", measure_pressure)
         call real_writer_create(writers%beta_pressures_excess, boxes_path, "beta_pressure_excess.out", &
             measure_pressure)
-        call energies_writers_create(writers%gemc_energies, boxes_path, environment%external_fields, wall_pairs, &
+        call energies_writers_create(writers%energies, boxes_path, environment%external_fields, wall_pairs, &
             components, short_pairs, visit_energies)
         selectors = measure_chemical_potentials(particle_insertion_method)
-        call line_writer_create(writers%gemc_insertion_successes, boxes_path, "insertion_successes.out", selectors)
-        call line_writer_create(writers%gemc_inv_pow_activities, boxes_path, "inv_pow_activities.out", selectors)
+        call line_writer_create(writers%insertion_successes, boxes_path, "insertion_successes.out", selectors)
+        call line_writer_create(writers%inv_pow_activities, boxes_path, "inv_pow_activities.out", selectors)
     end subroutine create
 
     subroutine destroy(writers)
         type(Exploring_Writers_Wrapper), intent(inout) :: writers
 
-        call energies_writers_destroy(writers%gemc_energies)
-        call line_writer_destroy(writers%gemc_inv_pow_activities)
-        call line_writer_destroy(writers%gemc_insertion_successes)
+        call energies_writers_destroy(writers%energies)
+        call line_writer_destroy(writers%inv_pow_activities)
+        call line_writer_destroy(writers%insertion_successes)
         call real_writer_destroy(writers%beta_pressures_excess)
         call real_writer_destroy(writers%maximum_boxes_compression_delta)
     end subroutine destroy
