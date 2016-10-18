@@ -36,7 +36,7 @@ contains
         logical :: data_found
         integer :: i_component
 
-        call composition_create(nums_particles, size(physical_model%mixture%components), &
+        call composition_create(nums_particles, size(physical_model%mixture%gemc_components, 1), &
             measure_inv_pow_activities)
         if (measure_inv_pow_activities) then
             allocate(Concrete_Particle_Insertion_Method :: particle_insertion_method)

@@ -23,8 +23,9 @@ contains
                 call physical_model%mixture%gemc_components(i_component, i_box)%average_num_particles%&
                     set()
             end do
+            call physical_model%mixture%total_moments(i_box)%reset()
         end do
-        call physical_model%mixture%total_moment%reset()
+
         call short_interactions_reset(physical_model%short_interactions%neighbour_cells)
         call short_interactions_reset(physical_model%short_interactions%visitable_cells)
         reset_real_pair = .true.

@@ -26,11 +26,11 @@ use procedures_hard_core_factory, only: hard_core_create => create, hard_core_de
 implicit none
 
 private
-public :: environment_create, environment_destroy
+public :: create, destroy
 
 contains
 
-    subroutine environment_create(environment, generating_data, unique_box)
+    subroutine create(environment, generating_data, unique_box)
         type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: generating_data
         logical, optional, intent(in) :: unique_box
@@ -73,13 +73,13 @@ contains
             call boxes_create(environment%accessible_domains, environment%periodic_boxes, &
                 environment%gemc_visitable_walls, needed=.true.)
         else
-            call error_exit("procedures_environment_factory: environment_create: "//&
+            call error_exit("procedures_environment_factory: create: "//&
                 "box periodicity is unknown.")
         end if
 
         call check(environment%periodic_boxes, environment%gemc_visitable_walls, environment%&
             boxes_size_checker)
-    end subroutine environment_create
+    end subroutine create
 
     subroutine check(periodic_boxes, visitable_walls, boxes_size_checker)
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
@@ -102,7 +102,7 @@ contains
         end do
     end subroutine check
 
-    subroutine environment_destroy(environment)
+    subroutine destroy(environment)
         type(Environment_Wrapper), intent(inout) :: environment
 
         call boxes_destroy(environment%accessible_domains)
@@ -115,6 +115,6 @@ contains
         call temperature_destroy(environment%temperature)
         call beta_pressure_destroy(environment%beta_pressure)
         call boxes_destroy(environment%periodic_boxes)
-    end subroutine environment_destroy
+    end subroutine destroy
 
 end module procedures_environment_factory

@@ -19,18 +19,18 @@ use procedures_mixture_inquirers, only: component_has_positions, component_has_o
 implicit none
 
 private
-public :: mixture_create, mixture_destroy, set_nums_particles, set_have_positions, &
+public :: create, destroy, set_nums_particles, set_have_positions, &
     set_have_orientations
 
-interface mixture_create
+interface create
     module procedure :: create_all
     module procedure :: create_components
-end interface mixture_create
+end interface create
 
-interface mixture_destroy
+interface destroy
     module procedure :: destroy_components
     module procedure :: destroy_all
-end interface mixture_destroy
+end interface destroy
 
 contains
 
@@ -40,7 +40,7 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: generating_data
 
-        call mixture_create(mixture%gemc_components, environment%periodic_boxes, environment%&
+        call create(mixture%gemc_components, environment%periodic_boxes, environment%&
             accessible_domains, generating_data, mixture_prefix)
         call hard_core_create(mixture%components_min_distances, mixture%gemc_components(:, 1), &
             generating_data, mixture_prefix)
@@ -55,7 +55,7 @@ contains
         call mixture_total_moments_destroy(mixture%total_moments)
         call hard_core_destroy(mixture%wall_min_distances)
         call hard_core_destroy(mixture%components_min_distances)
-        call mixture_destroy(mixture%gemc_components)
+        call destroy(mixture%gemc_components)
     end subroutine destroy_all
 
     subroutine create_components(components, periodic_boxes, accessible_domains, generating_data, &
