@@ -8,7 +8,7 @@ use procedures_checks, only: check_file_exists
 use types_string_wrapper, only: String_Wrapper
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_checker, only: Abstract_Box_Size_Checker
-use types_component_coordinates_reader_wrapper, only: Component_Coordinates_Reader_wrapper
+use classes_component_coordinates_reader, only: Component_Coordinates_Reader_wrapper
 use procedures_component_coordinates_reader_factory, only: component_coordinates_reader_destroy => &
     destroy
 

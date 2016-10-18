@@ -1,7 +1,7 @@
 module types_mixture_wrapper
 
 use types_component_wrapper, only: Component_Wrapper
-use types_min_distance_wrapper, only: Min_Distance_Wrapper, Min_Distances_Line
+use classes_min_distance, only: Min_Distance_Wrapper, Min_Distances_Line
 use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment
 
 implicit none

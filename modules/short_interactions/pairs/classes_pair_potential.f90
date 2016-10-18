@@ -77,6 +77,14 @@ private
         procedure :: meet => Null_meet
     end type Null_Pair_Potential
 
+    type, public :: Pair_Potential_Wrapper
+        class(Abstract_Pair_Potential), allocatable :: potential
+    end type Pair_Potential_Wrapper
+
+    type, public :: Pair_Potentials_Line
+        type(Pair_Potential_Wrapper), allocatable :: line(:)
+    end type Pair_Potentials_Line
+
 contains
 
 !implementation Abstract_Pair_Potential

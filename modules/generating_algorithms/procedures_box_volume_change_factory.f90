@@ -7,7 +7,7 @@ use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower
     destroy
 use procedures_mixture_factory, only: set_have_positions
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
 use classes_box_volume_change, only: Box_Volume_Change
 use procedures_environment_inquirers, only: box_size_can_change

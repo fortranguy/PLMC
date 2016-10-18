@@ -38,6 +38,10 @@ private
         procedure :: write => Null_write
     end type Null_Component_Coordinates_Writer
 
+    type, public :: Component_Coordinates_Writer_Wrapper
+        class(Abstract_Component_Coordinates_Writer), allocatable :: writer
+    end type Component_Coordinates_Writer_Wrapper
+
 contains
 
 !implementation Abstract_Component_Coordinates_Writer

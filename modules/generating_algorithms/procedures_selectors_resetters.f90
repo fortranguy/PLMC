@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use types_component_wrapper, only: Component_Wrapper
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
 
 implicit none
 

@@ -1,9 +1,7 @@
 module types_changes_wrapper
 
-use classes_changed_box_size, only: Abstract_Changed_Box_Size
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
-use classes_move_tuner, only: Abstract_Move_Tuner
-use types_move_tuner_wrapper, only: Move_Tuner_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_move_tuner, only: Move_Tuner_Line
 use classes_random_coordinates, only: Abstract_Random_Coordinates
 use classes_coordinates_copier, only: Abstract_Coordinates_Copier
 use types_changes_component_wrapper, only: Changes_Component_Wrapper

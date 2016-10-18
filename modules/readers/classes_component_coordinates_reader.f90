@@ -72,6 +72,10 @@ private
         procedure :: read => Null_read
     end type Null_Component_Coordinates_Reader
 
+    type, public :: Component_Coordinates_Reader_wrapper
+        class(Abstract_Component_Coordinates_Reader), allocatable :: reader
+    end type Component_Coordinates_Reader_wrapper
+
 contains
 
 !implementation Concrete_Component_Coordinates_Reader

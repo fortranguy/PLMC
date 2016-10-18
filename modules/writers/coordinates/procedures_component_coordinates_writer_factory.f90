@@ -5,8 +5,8 @@ use classes_component_coordinates, only: Abstract_Component_Coordinates
 use procedures_mixture_inquirers, only:  component_has_positions, component_has_orientations
 use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
 use classes_component_coordinates_writer, only: Abstract_Component_Coordinates_Writer, &
-    Concrete_Component_Coordinates_Writer, Null_Component_Coordinates_Writer
-use types_component_coordinates_writer_wrapper, only: Component_Coordinates_Writer_Wrapper
+    Concrete_Component_Coordinates_Writer, Null_Component_Coordinates_Writer, &
+    Component_Coordinates_Writer_Wrapper
 
 implicit none
 

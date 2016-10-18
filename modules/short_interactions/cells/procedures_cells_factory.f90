@@ -4,7 +4,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use types_component_wrapper, only: Component_Wrapper
 use classes_hard_contact, only: Abstract_Hard_Contact
-use types_pair_potential_wrapper, only: Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potentials_Line
 use procedures_neighbour_cells_factory, only: neighbour_cells_create_triangle => create_triangle, &
     neighbour_cells_create_element => create_element, neighbour_cells_destroy_triangle => &
     destroy_triangle,  neighbour_cells_destroy_element => destroy_element, &

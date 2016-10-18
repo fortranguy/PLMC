@@ -25,6 +25,14 @@ private
         procedure :: get => Null_get
     end type Null_Min_Distance
 
+    type, public :: Min_Distance_Wrapper
+        class(Abstract_Min_Distance), allocatable :: distance
+    end type Min_Distance_Wrapper
+
+    type, public :: Min_Distances_Line
+        type(Min_Distance_Wrapper), allocatable :: line(:)
+    end type Min_Distances_Line
+
 contains
 
 !implementation Abstract_Min_Distance

@@ -8,8 +8,7 @@ use procedures_mixture_inquirers, only:  component_can_translate, component_can_
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_success_writer_selector, only: Changes_Success_Writer_Selector
 use classes_changes_success_writer, only: Abstract_Changes_Success_Writer, &
-    Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
-use types_changes_success_writer_wrapper, only: Changes_Success_Writer_Wrapper
+    Concrete_Changes_Success_Writer, Null_Changes_Success_Writer, Changes_Success_Writer_Wrapper
 
 implicit none
 

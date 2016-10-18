@@ -40,6 +40,10 @@ private
         procedure :: visit => Null_visit
     end type Null_DES_Real_Component
 
+    type, public :: DES_Real_Component_Wrapper
+        class(Abstract_DES_Real_Component), allocatable :: component
+    end type DES_Real_Component_Wrapper
+
 contains
 
 !implementation Abstract_DES_Real_Component

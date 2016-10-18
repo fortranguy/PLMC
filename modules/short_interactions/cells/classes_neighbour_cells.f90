@@ -82,6 +82,14 @@ private
         procedure, private :: set_skip_layers => Null_set_skip_layers
     end type Null_Neighbour_Cells
 
+    type, public :: Neighbour_Cells_Wrapper
+        class(Abstract_Neighbour_Cells), allocatable :: cells
+    end type Neighbour_Cells_Wrapper
+
+    type, public :: Neighbour_Cells_Line
+        type(Neighbour_Cells_Wrapper), allocatable :: line(:)
+    end type Neighbour_Cells_Line
+
 contains
 
 !implementation Abstract_Neighbour_Cells

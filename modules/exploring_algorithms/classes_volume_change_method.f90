@@ -8,7 +8,7 @@ use types_logical_line, only: Concrete_Logical_Line
 use procedures_logical_factory, only: logical_create => create
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
+use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_triangle => &
     allocate_triangle

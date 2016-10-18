@@ -28,4 +28,3 @@
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
 - DiracDistributionPlus: gaussian -> halfGaussian
-- Wrappers: defined them in class if possible

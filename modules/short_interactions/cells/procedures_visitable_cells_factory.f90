@@ -3,8 +3,8 @@ module procedures_visitable_cells_factory
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use classes_hard_contact, only: Abstract_Hard_Contact
-use types_pair_potential_wrapper, only: Pair_Potentials_Line
-use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
+use classes_pair_potential, only: Pair_Potentials_Line
+use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_visitable_cells, only: Abstract_Visitable_Cells, Concrete_Visitable_Cells, &
     Null_Visitable_Cells

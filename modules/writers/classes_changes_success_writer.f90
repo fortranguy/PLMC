@@ -34,6 +34,10 @@ private
         procedure :: write => Null_write
     end type Null_Changes_Success_Writer
 
+    type, public :: Changes_Success_Writer_Wrapper
+        class(Abstract_Changes_Success_Writer), allocatable :: writer
+    end type Changes_Success_Writer_Wrapper
+
 contains
 
 !implementation Abstract_Changes_Success_Writer

@@ -10,8 +10,8 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_complete_coordinates_writer_factory, only: complete_coordinates_writer_create => &
     create, complete_coordinates_writer_destroy => destroy
-use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_factory, only: set_can_exchange
 use procedures_real_writer_factory, only: real_writer_create => create, &

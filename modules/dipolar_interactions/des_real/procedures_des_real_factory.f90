@@ -6,7 +6,7 @@ use types_component_wrapper, only: Component_Wrapper
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use procedures_des_real_pair_factory, only: des_real_pair_create => create, &
     des_real_pair_destroy => destroy
-use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
+use classes_des_real_component, only: DES_Real_Component_Wrapper
 use procedures_des_real_component_factory, only: des_real_component_create => create, &
     des_real_component_destroy => destroy
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper

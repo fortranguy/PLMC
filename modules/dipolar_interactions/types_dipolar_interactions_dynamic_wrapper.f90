@@ -1,9 +1,9 @@
 module types_dipolar_interactions_dynamic_wrapper
 
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
-use types_des_real_component_wrapper, only: DES_Real_Component_Wrapper
+use classes_des_real_component, only: DES_Real_Component_Wrapper
 use classes_des_reci_visitor, only: Abstract_DES_Reci_Visitor
-use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
+use classes_des_self_component, only: DES_Self_Component_Wrapper
 use classes_des_surf_mixture, only: Abstract_DES_Surf_Mixture
 use classes_dlc_visitor, only: Abstract_DLC_Visitor
 

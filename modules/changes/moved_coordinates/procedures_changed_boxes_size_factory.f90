@@ -9,9 +9,8 @@ use procedures_changed_boxes_size_ratio_factory, only: changed_boxes_size_ratio_
     changed_boxes_size_ratio_destroy => destroy
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use classes_changed_box_size, only: Abstract_Changed_Box_Size, Concrete_Changed_Box_Size, &
-    Null_Changed_Box_Size
+    Null_Changed_Box_Size, Changed_Box_Size_Line
 use procedures_environment_inquirers, only: gemc_box_size_can_change
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
 
 implicit none

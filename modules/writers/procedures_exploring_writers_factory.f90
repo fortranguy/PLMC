@@ -8,7 +8,7 @@ use classes_number_to_string, only: Concrete_Number_to_String
 use types_string_wrapper, only: String_Wrapper
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use classes_volume_change_method, only: Abstract_Volume_Change_Method
 use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method
 use procedures_real_writer_factory, only: real_writer_create => create, &

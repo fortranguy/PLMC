@@ -79,9 +79,6 @@
 		<Unit filename="modules/changes/move_tuner/types_move_tuner_parameters.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="modules/changes/move_tuner/types_move_tuner_wrapper.f90">
-			<Option weight="3" />
-		</Unit>
 		<Unit filename="modules/changes/moved_coordinates/classes_changed_box_size.f90">
 			<Option weight="3" />
 		</Unit>
@@ -103,9 +100,6 @@
 		<Unit filename="modules/changes/moved_coordinates/procedures_moved_component_coordinates_factory.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/types_changed_box_size_wrapper.f90">
-			<Option weight="4" />
-		</Unit>
 		<Unit filename="modules/changes/procedures_changed_boxes_size_ratio_factory.f90">
 			<Option weight="8" />
 		</Unit>
@@ -125,7 +119,7 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/changes/types_changes_wrapper.f90">
-			<Option weight="5" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/common/classes_hetero_couples.f90">
 			<Option weight="2" />
@@ -277,9 +271,6 @@
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_pair_factory.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/dipolar_interactions/des_real/types_des_real_component_wrapper.f90">
-			<Option weight="6" />
-		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_structure.f90">
 			<Option weight="8" />
 		</Unit>
@@ -309,9 +300,6 @@
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_self/procedures_des_self_factory.f90">
 			<Option weight="8" />
-		</Unit>
-		<Unit filename="modules/dipolar_interactions/des_self/types_des_self_component_wrapper.f90">
-			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/classes_dlc_structures.f90">
 			<Option weight="8" />
@@ -607,9 +595,6 @@
 		<Unit filename="modules/mixture/hard_core/procedures_min_distance_factory.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/mixture/hard_core/types_min_distance_wrapper.f90">
-			<Option weight="3" />
-		</Unit>
 		<Unit filename="modules/mixture/procedures_component_factory.f90">
 			<Option weight="9" />
 		</Unit>
@@ -715,9 +700,6 @@
 		<Unit filename="modules/readers/types_component_coordinates_reader_selector.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="modules/readers/types_component_coordinates_reader_wrapper.f90">
-			<Option weight="5" />
-		</Unit>
 		<Unit filename="modules/readers/types_readers_wrapper.f90">
 			<Option weight="10" />
 		</Unit>
@@ -751,9 +733,6 @@
 		<Unit filename="modules/short_interactions/cells/types_cells_wrapper.f90">
 			<Option weight="8" />
 		</Unit>
-		<Unit filename="modules/short_interactions/cells/types_neighbour_cells_wrapper.f90">
-			<Option weight="7" />
-		</Unit>
 		<Unit filename="modules/short_interactions/classes_dirac_distribution_plus.f90">
 			<Option weight="2" />
 		</Unit>
@@ -786,9 +765,6 @@
 		</Unit>
 		<Unit filename="modules/short_interactions/pairs/procedures_short_pairs_visitors_factory.f90">
 			<Option weight="5" />
-		</Unit>
-		<Unit filename="modules/short_interactions/pairs/types_pair_potential_wrapper.f90">
-			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/short_interactions/procedures_dirac_distribution_plus.f90">
 			<Option weight="3" />
@@ -844,9 +820,6 @@
 		<Unit filename="modules/writers/coordinates/types_component_coordinates_writer_selector.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="modules/writers/coordinates/types_component_coordinates_writer_wrapper.f90">
-			<Option weight="5" />
-		</Unit>
 		<Unit filename="modules/writers/procedures_changes_success_writer_factory.f90">
 			<Option weight="8" />
 		</Unit>
@@ -876,9 +849,6 @@
 		</Unit>
 		<Unit filename="modules/writers/types_changes_success_writer_selector.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/writers/types_changes_success_writer_wrapper.f90">
-			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/writers/types_energies_writers.f90">
 			<Option weight="5" />

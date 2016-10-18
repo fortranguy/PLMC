@@ -4,7 +4,7 @@ use types_string_wrapper, only: String_Wrapper
 use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moments_factory, only: set_are_dipolar
-use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy
 use procedures_line_writer_factory, only: line_writer_create => create, &

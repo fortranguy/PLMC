@@ -5,9 +5,9 @@ use types_string_wrapper, only: String_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only: component_exists, component_can_exchange
-use types_pair_potential_wrapper, only: Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potentials_Line
 use procedures_short_interactions_inquirers, only: components_interact
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
 use classes_triangle_writer, only: Abstract_Triangle_Writer, Concrete_Triangle_Writer, &
     Null_Triangle_Writer
 

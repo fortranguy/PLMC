@@ -7,7 +7,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only:  component_has_positions, component_has_orientations
 use types_component_coordinates_writer_selector, only: Component_Coordinates_Writer_Selector
-use types_component_coordinates_writer_wrapper, only: Component_Coordinates_Writer_Wrapper
+use classes_component_coordinates_writer, only: Component_Coordinates_Writer_Wrapper
 use procedures_component_coordinates_writer_factory, only: component_coordinates_writer_create => &
     create, component_coordinates_writer_destroy => destroy
 use classes_complete_coordinates_writer, only: Abstract_Complete_Coordinates_Writer, &

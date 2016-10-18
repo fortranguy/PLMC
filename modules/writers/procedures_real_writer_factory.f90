@@ -2,7 +2,7 @@ module procedures_real_writer_factory
 
 use types_string_wrapper, only: String_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
 use classes_real_writer, only: Abstract_Real_Writer, Concrete_Real_Writer, Null_Real_Writer
 
 implicit none

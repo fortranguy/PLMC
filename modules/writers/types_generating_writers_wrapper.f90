@@ -5,7 +5,7 @@ use classes_line_writer, only: Abstract_Line_Writer
 use classes_triangle_writer, only: Abstract_Triangle_Writer
 use classes_rectangle_writer, only: Abstract_Rectangle_Writer
 use classes_complete_coordinates_writer, only: Abstract_Complete_Coordinates_Writer
-use types_changes_success_writer_wrapper, only: Changes_Success_Writer_Wrapper
+use classes_changes_success_writer, only: Changes_Success_Writer_Wrapper
 use types_energies_writers, only: Concrete_Energies_Writers
 
 implicit none

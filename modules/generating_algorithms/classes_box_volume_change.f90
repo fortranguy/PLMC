@@ -9,7 +9,7 @@ use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
+use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_triangle => &
     allocate_triangle
@@ -20,7 +20,7 @@ use procedures_short_interactions_visitor, only: short_interactions_visit => vis
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
-use types_changed_box_size_wrapper, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Changed_Box_Size_Line
 use procedures_triangle_observables, only: operator(-)
 use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_observables_energies_factory, only: observables_energies_set => set

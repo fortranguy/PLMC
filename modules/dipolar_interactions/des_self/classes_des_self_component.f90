@@ -36,6 +36,10 @@ private
         procedure :: meet => Null_meet
     end type Null_DES_Self_Component
 
+    type, public :: DES_Self_Component_Wrapper
+        class(Abstract_DES_Self_Component), allocatable :: component
+    end type DES_Self_Component_Wrapper
+
 contains
 
 !implementation Abstract_DES_Self_Component

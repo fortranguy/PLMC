@@ -1,6 +1,6 @@
 module types_cells_wrapper
 
-use types_neighbour_cells_wrapper, only: Neighbour_Cells_Line
+use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 
 implicit none

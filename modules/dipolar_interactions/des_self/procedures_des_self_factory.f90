@@ -6,7 +6,7 @@ use types_component_wrapper, only: Component_Wrapper
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 use procedures_des_self_component_factory, only: des_self_component_create => create, &
     des_self_component_destroy => destroy
-use types_des_self_component_wrapper, only: DES_Self_Component_Wrapper
+use classes_des_self_component, only: DES_Self_Component_Wrapper
 
 implicit none
 

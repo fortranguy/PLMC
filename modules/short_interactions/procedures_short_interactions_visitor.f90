@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_component_wrapper, only: Component_Wrapper
-use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use classes_walls_visitor, only: Abstract_Walls_Visitor
 use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use classes_visitable_cells, only: Abstract_Visitable_Cells
