@@ -27,7 +27,7 @@ contains
         call mixture_create(physical_model%mixture, physical_model%environment, generating_data)
         call short_interactions_create(physical_model%short_interactions, physical_model%&
             environment, physical_model%mixture, generating_data)
-        call dipolar_interactions_create(physical_model%dipolar_interactions_dynamic, &
+        call dipolar_interactions_create(physical_model%gemc_dipolar_interactions_dynamic, &
             physical_model%gemc_dipolar_interactions_static, physical_model%environment, physical_model%&
             mixture, generating_data)
         call dipolar_interactions_facades_create(physical_model%dipolar_interactions_facades, &
@@ -44,7 +44,7 @@ contains
         call mixture_create(physical_model%mixture, physical_model%environment, generating_data)
         call short_interactions_create(physical_model%short_interactions, physical_model%&
             environment, physical_model%mixture, generating_data, exploring_data)
-        call dipolar_interactions_create(physical_model%dipolar_interactions_dynamic, &
+        call dipolar_interactions_create(physical_model%gemc_dipolar_interactions_dynamic, &
             physical_model%gemc_dipolar_interactions_static, physical_model%environment, physical_model%&
             mixture, generating_data)
         call dipolar_interactions_facades_create(physical_model%dipolar_interactions_facades, &
@@ -57,7 +57,7 @@ contains
         type(Physical_Model_Wrapper), intent(inout) :: physical_model
 
         call dipolar_interactions_facades_destroy(physical_model%dipolar_interactions_facades)
-        call dipolar_interactions_destroy(physical_model%dipolar_interactions_dynamic, &
+        call dipolar_interactions_destroy(physical_model%gemc_dipolar_interactions_dynamic, &
             physical_model%gemc_dipolar_interactions_static)
         call short_interactions_destroy(physical_model%short_interactions)
         call mixture_destroy(physical_model%mixture)

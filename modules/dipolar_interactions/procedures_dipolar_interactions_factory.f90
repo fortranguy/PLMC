@@ -30,7 +30,8 @@ contains
 
     subroutine dipolar_interactions_create(dipolar_interactions_dynamic, &
         dipolar_interactions_static, environment, mixture, generating_data)
-        type(Dipolar_Interactions_Dynamic_Wrapper), intent(out) :: dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Dynamic_Wrapper), allocatable, intent(out) :: &
+            dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), allocatable, intent(out) :: &
             dipolar_interactions_static(:)
         type(Environment_Wrapper), intent(in) :: environment
@@ -46,11 +47,13 @@ contains
                 permittivity, any(are_dipolar(:, i_box)))
         end do
 
-        call des_convergence_parameter_create(dipolar_interactions_dynamic%alpha, any(are_dipolar),&
-            generating_data, dipolar_interactions_prefix)
+        allocate(dipolar_interactions_dynamic(size(mixture%gemc_components, 2)))
+        do i_box = 1, size(dipolar_interactions_dynamic)
+            call des_convergence_parameter_create(dipolar_interactions_dynamic(i_box)%alpha, any(are_dipolar),&
+                generating_data, dipolar_interactions_prefix)
+        end do
 
         allocate(dipolar_interactions_static(size(mixture%gemc_components, 2)))
-
         do i_box = 1, size(dipolar_interactions_static)
             call boxes_create(dipolar_interactions_static(i_box)%box_size_memento_real, &
                 environment%periodic_boxes(i_box), environment%beta_pressure, &
@@ -58,11 +61,12 @@ contains
             call des_real_create(dipolar_interactions_static(i_box)%real_pair, &
                 dipolar_interactions_static(i_box)%box_size_memento_real, environment%permittivity,&
                 mixture%components_min_distances, any(are_dipolar(:, i_box)), &
-                dipolar_interactions_dynamic%alpha, generating_data, dipolar_interactions_prefix//&
+                dipolar_interactions_dynamic(i_box)%alpha, generating_data, dipolar_interactions_prefix//&
                 "Real.")
+            call des_real_create(dipolar_interactions_dynamic(i_box)%real_components, environment%&
+                periodic_boxes(i_box), mixture%gemc_components(:, i_box), are_dipolar(:, i_box), dipolar_interactions_static(i_box))
         end do
-        call des_real_create(dipolar_interactions_dynamic%gemc_real_components, environment%&
-            periodic_boxes, mixture%gemc_components, are_dipolar, dipolar_interactions_static)
+
 
         do i_box = 1, size(dipolar_interactions_static)
             allocate(dipolar_interactions_static(i_box)%box_size_memento_reci, &
@@ -72,21 +76,22 @@ contains
             call des_reci_create(dipolar_interactions_static(i_box)%reci_weight, &
                 dipolar_interactions_static(i_box)%box_size_memento_reci, environment%&
                 reciprocal_lattices(i_box), environment%permittivity, any(are_dipolar(:, i_box)), &
-                dipolar_interactions_dynamic%alpha)
+                dipolar_interactions_dynamic(i_box)%alpha)
             call des_reci_create(dipolar_interactions_static(i_box)%reci_structure, environment%&
                 periodic_boxes(i_box), dipolar_interactions_static(i_box)%box_size_memento_reci, &
                 environment%reciprocal_lattices(i_box), mixture%gemc_components(:, i_box), &
                 are_dipolar(:, i_box))
+            call des_reci_create(dipolar_interactions_dynamic(i_box)%reci_visitor, environment%&
+                periodic_boxes(i_box), environment%reciprocal_lattices(i_box), dipolar_interactions_static(i_box))
         end do
-        call des_reci_create(dipolar_interactions_dynamic%reci_visitors, environment%&
-                periodic_boxes, environment%reciprocal_lattices, dipolar_interactions_static)
 
-        call des_self_create(dipolar_interactions_dynamic%gemc_self_components, environment%&
-            periodic_boxes, environment%permittivity, mixture%gemc_components, are_dipolar, &
-            dipolar_interactions_dynamic%alpha)
-
-        call des_surf_mixture_create(dipolar_interactions_dynamic%gemc_surf_mixture, environment%&
-            periodic_boxes, environment%permittivity, mixture%total_moments)
+        do i_box = 1, size(dipolar_interactions_dynamic)
+            call des_self_create(dipolar_interactions_dynamic(i_box)%self_components, environment%&
+                periodic_boxes(i_box), environment%permittivity, mixture%gemc_components(:, i_box), are_dipolar(:, i_box), &
+                dipolar_interactions_dynamic(i_box)%alpha)
+            call des_surf_mixture_create(dipolar_interactions_dynamic(i_box)%surf_mixture, environment%&
+                periodic_boxes(i_box), environment%permittivity, mixture%total_moments(i_box))
+        end do
 
         do i_box = 1, size(dipolar_interactions_static)
             call dlc_create(dipolar_interactions_static(i_box)%dlc_weight, environment%&
@@ -95,47 +100,49 @@ contains
             call dlc_create(dipolar_interactions_static(i_box)%dlc_structures, environment%&
                 periodic_boxes(i_box), environment%reciprocal_lattices(i_box), mixture%&
                 gemc_components(:, i_box), are_dipolar(:, i_box))
+            call dlc_create(dipolar_interactions_dynamic(i_box)%dlc_visitor, environment%&
+                periodic_boxes(i_box), environment%reciprocal_lattices(i_box), dipolar_interactions_static(i_box))
         end do
-        call dlc_create(dipolar_interactions_dynamic%dlc_visitors, environment%&
-                periodic_boxes, environment%reciprocal_lattices, dipolar_interactions_static)
     end subroutine dipolar_interactions_create
 
-    !> @todo
-    !> if (allocated(dipolar_interactions_static)): before?
+    !> @todo if (allocated(dipolar_interactions_static, dipolar_interactions_dynamic)): before?
     subroutine dipolar_interactions_destroy(dipolar_interactions_dynamic, &
         dipolar_interactions_static)
-        type(Dipolar_Interactions_Dynamic_Wrapper), intent(inout) :: dipolar_interactions_dynamic
+        type(Dipolar_Interactions_Dynamic_Wrapper), allocatable, intent(inout) :: dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), allocatable, intent(inout) :: &
             dipolar_interactions_static(:)
 
         integer :: i_box
 
-        call dlc_destroy(dipolar_interactions_dynamic%dlc_visitors)
         do i_box = size(dipolar_interactions_static), 1, -1
+            call dlc_destroy(dipolar_interactions_dynamic(i_box)%dlc_visitor)
             call dlc_destroy(dipolar_interactions_static(i_box)%dlc_structures)
             call dlc_destroy(dipolar_interactions_static(i_box)%dlc_weight)
         end do
 
-        call des_surf_mixture_destroy(dipolar_interactions_dynamic%gemc_surf_mixture)
+        do i_box = size(dipolar_interactions_dynamic), 1, -1
+            call des_surf_mixture_destroy(dipolar_interactions_dynamic(i_box)%surf_mixture)
+            call des_self_destroy(dipolar_interactions_dynamic(i_box)%self_components)
+        end do
 
-        call des_self_destroy(dipolar_interactions_dynamic%gemc_self_components)
-
-        call des_reci_destroy(dipolar_interactions_dynamic%reci_visitors)
         do i_box = size(dipolar_interactions_static), 1, -1
+            call des_reci_destroy(dipolar_interactions_dynamic(i_box)%reci_visitor)
             call des_reci_destroy(dipolar_interactions_static(i_box)%reci_structure)
             call des_reci_destroy(dipolar_interactions_static(i_box)%reci_weight)
             call boxes_destroy(dipolar_interactions_static(i_box)%box_size_memento_reci)
         end do
 
-        call des_real_destroy(dipolar_interactions_dynamic%gemc_real_components)
         do i_box = size(dipolar_interactions_static), 1, -1
+            call des_real_destroy(dipolar_interactions_dynamic(i_box)%real_components)
             call des_real_destroy(dipolar_interactions_static(i_box)%real_pair)
             call boxes_destroy(dipolar_interactions_static(i_box)%box_size_memento_real)
         end do
-
         if (allocated(dipolar_interactions_static)) deallocate(dipolar_interactions_static)
 
-        call des_convergence_parameter_destroy(dipolar_interactions_dynamic%alpha)
+        do i_box = size(dipolar_interactions_dynamic), 1, -1
+            call des_convergence_parameter_destroy(dipolar_interactions_dynamic(i_box)%alpha)
+        end do
+        if (allocated(dipolar_interactions_dynamic)) deallocate(dipolar_interactions_dynamic)
     end subroutine dipolar_interactions_destroy
 
     subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)

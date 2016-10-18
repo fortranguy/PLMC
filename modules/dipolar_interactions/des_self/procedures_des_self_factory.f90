@@ -25,39 +25,33 @@ end interface destroy
 
 contains
 
-    subroutine create_components(components, periodic_boxes, permittivity, mixture_components, &
+    subroutine create_components(components, periodic_box, permittivity, mixture_components, &
         are_dipolar, alpha)
-        type(DES_Self_Component_Wrapper), allocatable, intent(out) :: components(:, :)
-        class(Abstract_Periodic_Box), intent(in) ::periodic_boxes(:)
+        type(DES_Self_Component_Wrapper), allocatable, intent(out) :: components(:)
+        class(Abstract_Periodic_Box), intent(in) ::periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
-        type(Component_Wrapper), intent(in) :: mixture_components(:, :)
-        logical, intent(in) :: are_dipolar(:, :)
+        type(Component_Wrapper), intent(in) :: mixture_components(:)
+        logical, intent(in) :: are_dipolar(:)
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
 
-        integer :: i_box
         integer :: i_component
 
-        allocate(components(size(mixture_components, 1), size(mixture_components, 2)))
-        do i_box = 1, size(components, 2)
-            do i_component = 1, size(components, 1)
-                call create(components(i_component, i_box)%component, periodic_boxes(i_box), &
-                    permittivity, mixture_components(i_component, i_box)%dipole_moments, &
-                    are_dipolar(i_component, i_box), alpha)
-            end do
+        allocate(components(size(mixture_components)))
+        do i_component = 1, size(components)
+            call create(components(i_component)%component, periodic_box, &
+                permittivity, mixture_components(i_component)%dipole_moments, &
+                are_dipolar(i_component), alpha)
         end do
     end subroutine create_components
 
     subroutine destroy_components(components)
-        type(DES_Self_Component_Wrapper), allocatable, intent(inout) :: components(:, :)
+        type(DES_Self_Component_Wrapper), allocatable, intent(inout) :: components(:)
 
-        integer :: i_box
         integer :: i_component
 
         if (allocated(components)) then
-            do i_box = size(components, 2), 1, -1
-                do i_component = size(components, 1), 1, -1
-                    call destroy(components(i_component, i_box)%component)
-                end do
+            do i_component = size(components), 1, -1
+                call destroy(components(i_component)%component)
             end do
             deallocate(components)
         end if

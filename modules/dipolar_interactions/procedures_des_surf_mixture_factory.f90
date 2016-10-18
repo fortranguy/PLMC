@@ -16,45 +16,37 @@ public :: create, destroy
 
 contains
 
-    subroutine create(mixture, periodic_boxes, permittivity, total_moments)
-        class(Abstract_DES_Surf_Mixture), allocatable, intent(out) :: mixture(:)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+    subroutine create(mixture, periodic_box, permittivity, total_moment)
+        class(Abstract_DES_Surf_Mixture), allocatable, intent(out) :: mixture
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Mixture_Total_Moment), intent(in) :: total_moments(:)
+        class(Abstract_Mixture_Total_Moment), intent(in) :: total_moment
 
-        integer :: i_box
-
-        select type(total_moments)
+        select type(total_moment)
             type is (Concrete_Mixture_Total_Moment)
-                if (all(periodicity_is_xyz(periodic_boxes))) then
-                    allocate(Spherical_DES_Surf_Mixture :: mixture(size(total_moments)))
-                else if (all(periodicity_is_xy(periodic_boxes))) then
-                    allocate(Rectangular_DES_Surf_Mixture :: mixture(size(total_moments)))
+                if (periodicity_is_xyz(periodic_box)) then
+                    allocate(Spherical_DES_Surf_Mixture :: mixture)
+                else if (periodicity_is_xy(periodic_box)) then
+                    allocate(Rectangular_DES_Surf_Mixture :: mixture)
                 else
                     call error_exit("procedures_des_surf_mixture_factory: create: "//&
                             "box periodicity is unknown.")
                 end if
             type is (Null_Mixture_Total_Moment)
-                allocate(Null_DES_Surf_Mixture :: mixture(size(total_moments)))
+                allocate(Null_DES_Surf_Mixture :: mixture)
             class default
                 call error_exit("procedures_des_surf_mixture_factory: create: //"&
-                    "total_moments type unknown.")
+                    "total_moment type unknown.")
         end select
 
-        do i_box = 1, size(mixture)
-            call mixture(i_box)%construct(periodic_boxes(i_box), permittivity, total_moments(i_box))
-        end do
+            call mixture%construct(periodic_box, permittivity, total_moment)
     end subroutine create
 
     subroutine destroy(mixture)
-        class(Abstract_DES_Surf_Mixture), allocatable, intent(inout) :: mixture(:)
-
-        integer :: i_box
+        class(Abstract_DES_Surf_Mixture), allocatable, intent(inout) :: mixture
 
         if (allocated(mixture)) then
-            do i_box = size(mixture), 1, -1
-                call mixture(i_box)%destroy()
-            end do
+            call mixture%destroy()
             deallocate(mixture)
         end if
     end subroutine destroy

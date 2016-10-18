@@ -30,48 +30,40 @@ end interface destroy
 
 contains
 
-    subroutine create_components(components, periodic_boxes, mixture_components, are_dipolar, &
+    subroutine create_components(components, periodic_box, mixture_components, are_dipolar, &
         dipolar_interactions_static)
-        type(DES_Real_Component_Wrapper), allocatable, intent(out) :: components(:, :, :)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
-        type(Component_Wrapper), intent(in) :: mixture_components(:, :)
-        logical, intent(in) :: are_dipolar(:, :)
-        type(Dipolar_Interactions_Static_Wrapper), intent(in) ::dipolar_interactions_static(:)
+        type(DES_Real_Component_Wrapper), allocatable, intent(out) :: components(:, :)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Component_Wrapper), intent(in) :: mixture_components(:)
+        logical, intent(in) :: are_dipolar(:)
+        type(Dipolar_Interactions_Static_Wrapper), intent(in) ::dipolar_interactions_static
 
-        integer :: i_box
         integer :: i_component, j_component
         logical :: interact_ij
 
-        allocate(components(size(mixture_components, 1), size(mixture_components, 1), &
-            size(mixture_components, 2)))
+        allocate(components(size(mixture_components), size(mixture_components)))
 
-        do i_box = 1, size(components, 3)
-            do j_component = 1, size(components, 2)
-                do i_component = 1, size(components, 1)
-                    interact_ij = are_dipolar(i_component, i_box) .and. &
-                        are_dipolar(j_component, i_box)
-                    call create(components(i_component, j_component, i_box)%component, &
-                        periodic_boxes(i_box), dipolar_interactions_static(i_box)%&
-                        box_size_memento_real, mixture_components(i_component, i_box)%positions, &
-                        mixture_components(i_component, i_box)%dipole_moments, interact_ij, &
-                        dipolar_interactions_static(i_box)%real_pair)
-                end do
+        do j_component = 1, size(components, 2)
+            do i_component = 1, size(components, 1)
+                interact_ij = are_dipolar(i_component) .and. are_dipolar(j_component)
+                call create(components(i_component, j_component)%component, periodic_box, &
+                    dipolar_interactions_static%box_size_memento_real, &
+                    mixture_components(i_component)%positions, &
+                    mixture_components(i_component)%dipole_moments, interact_ij, &
+                    dipolar_interactions_static%real_pair)
             end do
         end do
     end subroutine create_components
 
     subroutine destroy_components(components)
-        type(DES_Real_Component_Wrapper), allocatable, intent(inout) :: components(:, :, :)
+        type(DES_Real_Component_Wrapper), allocatable, intent(inout) :: components(:, :)
 
-        integer :: i_box
         integer :: i_component, j_component
 
         if (allocated(components)) then
-            do i_box = size(components, 3), 1, -1
-                do j_component = size(components, 2), 1, -1
-                    do i_component = size(components, 1), 1, -1
-                        call destroy(components(i_component, j_component, i_box)%component)
-                    end do
+            do j_component = size(components, 2), 1, -1
+                do i_component = size(components, 1), 1, -1
+                    call destroy(components(i_component, j_component)%component)
                 end do
             end do
             deallocate(components)
