@@ -23,12 +23,6 @@ private
         type(Pair_Potentials_Line), allocatable :: components_pairs(:)
         type(Cells_Wrapper), allocatable :: cells(:)
         class(Abstract_Visitable_Cells_Memento), allocatable :: visitable_cells_memento
-
-        class(Abstract_Beta_Pressure_Excess), allocatable :: beta_pressure_excess
-        class(Abstract_Walls_Visitor), allocatable :: walls_visitor
-        class(Abstract_Short_Pairs_Visitor), allocatable :: components_visitor
-        type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
-        class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
     end type Short_Interactions_Wrapper
 
 end module types_short_interactions_wrapper

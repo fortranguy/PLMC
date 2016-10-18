@@ -16,7 +16,6 @@ contains
         type(Physical_Model_Wrapper), intent(inout) :: physical_model
 
         integer :: i_box, i_component
-        logical :: reset_real_pair
 
         do i_box = 1, size(physical_model%mixture%gemc_components, 2)
             do i_component = 1, size(physical_model%mixture%gemc_components, 1)
@@ -24,12 +23,12 @@ contains
                     set()
             end do
             call physical_model%mixture%total_moments(i_box)%reset()
-        end do
 
-        call short_interactions_reset(physical_model%short_interactions%neighbour_cells)
-        call short_interactions_reset(physical_model%short_interactions%visitable_cells)
-        reset_real_pair = .true.
-        call dipolar_interactions_reset(physical_model%dipolar_interactions_static, reset_real_pair)
+            call short_interactions_reset(physical_model%short_interactions%cells(i_box)%neighbour_cells)
+            call short_interactions_reset(physical_model%short_interactions%cells(i_box)%visitable_cells)
+
+            call dipolar_interactions_reset(physical_model%gemc_dipolar_interactions_static(i_box), reset_real_pair=.true.)
+        end do
     end subroutine plmc_reset
 
 end module procedures_plmc_resetter

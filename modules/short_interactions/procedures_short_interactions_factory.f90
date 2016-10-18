@@ -24,12 +24,11 @@ use procedures_exploration_inquirers, only: property_measure_pressure => measure
 implicit none
 
 private
-public :: short_interactions_create, short_interactions_destroy
+public :: create, destroy
 
 contains
 
-    subroutine short_interactions_create(short_interactions, environment, mixture, generating_data,&
-        exploring_data)
+    subroutine create(short_interactions, environment, mixture, generating_data, exploring_data)
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
@@ -69,9 +68,9 @@ contains
         call cells_create(short_interactions%visitable_cells_memento, list_mold, &
             (box_size_can_change(environment%beta_pressure) .or. measure_pressure) .and. interact)
         call visitable_list_deallocate(list_mold)
-    end subroutine short_interactions_create
+    end subroutine create
 
-    subroutine short_interactions_destroy(short_interactions)
+    subroutine destroy(short_interactions)
         type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
 
         call cells_destroy(short_interactions%visitable_cells_memento)
@@ -82,6 +81,6 @@ contains
         call pairs_destroy(short_interactions%wall_pairs)
         call hard_contact_destroy(short_interactions%hard_contact)
         call beta_pressures_excess_destroy(short_interactions%beta_pressures_excess)
-    end subroutine short_interactions_destroy
+    end subroutine destroy
 
 end module procedures_short_interactions_factory

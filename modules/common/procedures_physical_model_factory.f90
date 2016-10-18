@@ -4,8 +4,8 @@ use json_module, only: json_file
 use procedures_environment_factory, only: environment_create => create, environment_destroy => &
     destroy
 use procedures_mixture_factory, only: mixture_create => create, mixture_destroy => destroy
-use procedures_short_interactions_factory, only: short_interactions_create, &
-    short_interactions_destroy
+use procedures_short_interactions_factory, only: short_interactions_create => create, &
+    short_interactions_destroy => destroy
 use procedures_dipolar_interactions_factory, only: dipolar_interactions_create, &
     dipolar_interactions_destroy
 use procedures_dipolar_interactions_facades_factory, only: dipolar_interactions_facades_create => &
