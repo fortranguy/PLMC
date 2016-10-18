@@ -136,7 +136,8 @@ contains
         real(DP), intent(in) :: new_box_size(:)
 
         call this%set_real_pair_flag(reset_real_pair, new_box_size)
-        call this%clone(dipolar_interactions_static, this%dipolar_interactions_static, reset_real_pair)
+        call this%clone(dipolar_interactions_static, this%dipolar_interactions_static, &
+            reset_real_pair)
     end subroutine Abstract_save
 
     subroutine Abstract_restore(this, dipolar_interactions_static, reset_real_pair)
@@ -144,7 +145,8 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static
         logical, intent(in) :: reset_real_pair
 
-        call this%clone(this%dipolar_interactions_static, dipolar_interactions_static, reset_real_pair)
+        call this%clone(this%dipolar_interactions_static, dipolar_interactions_static, &
+            reset_real_pair)
         call this%target()
     end subroutine Abstract_restore
 

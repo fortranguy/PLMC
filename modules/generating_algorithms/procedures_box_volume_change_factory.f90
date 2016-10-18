@@ -49,7 +49,7 @@ contains
         select type (volume_change)
             type is (Box_Volume_Change)
                 call volume_change%construct(physical_model%environment, physical_model%mixture, &
-                    physical_model%short_interactions, physical_model%dipolar_interactions_facades, &
+                    physical_model%short_interactions, physical_model%dipolar_interactions_facades,&
                     changed_boxes_size, have_positions, selectors)
             type is (Null_Generating_Algorithm)
             class default

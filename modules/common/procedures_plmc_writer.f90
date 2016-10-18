@@ -74,11 +74,15 @@ contains
         integer :: i_box
 
         do i_box = 1, size(writers%maximum_boxes_compression_delta)
-            call writers%maximum_boxes_compression_delta(i_box)%write(i_snap, observables%maximum_boxes_compression_delta(i_box))
-            call writers%beta_pressures_excess(i_box)%write(i_snap, observables%beta_pressures_excess(i_box))
+            call writers%maximum_boxes_compression_delta(i_box)%write(i_snap, observables%&
+                    maximum_boxes_compression_delta(i_box))
+            call writers%beta_pressures_excess(i_box)%write(i_snap, observables%&
+                beta_pressures_excess(i_box))
             call write_energies(writers%energies(i_box), i_snap, observables%energies(i_box))
-            call writers%inv_pow_activities(i_box)%write(i_snap, observables%inv_pow_activities(:, i_box))
-            call writers%insertion_successes(i_box)%write(i_snap, observables%insertion_successes(:, i_box))
+            call writers%inv_pow_activities(i_box)%write(i_snap, observables%&
+                inv_pow_activities(:, i_box))
+            call writers%insertion_successes(i_box)%write(i_snap, observables%&
+                insertion_successes(:, i_box))
         end do
     end subroutine write_exploring_observables
 

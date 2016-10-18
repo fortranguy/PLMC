@@ -40,7 +40,8 @@ contains
         end if
 
         call hetero_couples_create_full(couples, size(can_exchange, 2), size(can_exchange, 1))
-        call tower_sampler_create(selectors, size(couples), couples(1)%get_num(), count(can_exchange(:, 1)) > 1)
+        call tower_sampler_create(selectors, size(couples), couples(1)%get_num(), &
+            count(can_exchange(:, 1)) > 1)
         select type (particles_transmutation)
             type is (Box_Particles_Transmutation)
                 call particles_transmutation%construct(physical_model%environment, physical_model%&
@@ -73,7 +74,8 @@ contains
         end if
 
         call hetero_couples_create_half(couples, size(can_translate, 2), size(can_translate, 1))
-        call tower_sampler_create(selectors, size(couples), couples(1)%get_num(), count(can_translate(:, 1)) > 1)
+        call tower_sampler_create(selectors, size(couples), couples(1)%get_num(), &
+            count(can_translate(:, 1)) > 1)
         select type (particles_switch)
             type is (Box_Particles_Switch)
                 call particles_switch%construct(physical_model%environment, physical_model%mixture,&

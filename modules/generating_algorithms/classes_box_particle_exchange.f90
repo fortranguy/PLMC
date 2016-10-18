@@ -66,7 +66,8 @@ private
             integer, intent(in) :: i_box, i_component
         end subroutine Abstract_define_exchange
 
-        pure real(DP) function Abstract_acceptation_probability(this, i_box, i_component, delta_energy)
+        pure real(DP) function Abstract_acceptation_probability(this, i_box, i_component, &
+            delta_energy)
         import :: DP, Box_Particle_Exchange
             class(Box_Particle_Exchange), intent(in) :: this
             integer, intent(in) :: i_box, i_component
@@ -99,8 +100,8 @@ private
             type(Concrete_Temporary_Particle), intent(in) :: particle
         end subroutine Abstract_visit_field
 
-        subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, &
-            particle)
+        subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+            i_component, particle)
         import :: DP, Concrete_Temporary_Particle, Box_Particle_Exchange
             class(Box_Particle_Exchange), intent(in) :: this
             real(DP), intent(out) :: delta_energies(:)
@@ -227,8 +228,8 @@ contains
         allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies)))
         call this%metropolis_algorithm(success, deltas, i_box, i_component)
         if (success) then
-            observables%nums_particles(i_component, i_box) = this%mixture%components(i_component, i_box)%&
-                num_particles%get()
+            observables%nums_particles(i_component, i_box) = this%mixture%components(i_component, &
+                i_box)%num_particles%get()
             call observables_energies_set(observables%energies(i_box), deltas, i_component)
             call this%increment_success(observables%changes(i_box)%changes_counters(i_component))
         end if
@@ -258,7 +259,8 @@ contains
 
         delta_energy = deltas%walls_energy + deltas%field_energy + &
             sum(deltas%short_energies + deltas%dipolar_energies) + deltas%dipolar_shared_energy
-        success = metropolis_algorithm(this%acceptation_probability(i_box, i_component, delta_energy))
+        success = metropolis_algorithm(this%acceptation_probability(i_box, i_component, &
+            delta_energy))
         if (success) call this%update_actor(i_box, i_component, particle)
     end subroutine Abstract_metropolis_algorithm
 
@@ -276,8 +278,8 @@ contains
         particle%i = this%mixture%components(i_component, i_box)%num_particles%get() + 1
         particle%position = this%changes%random_positions(i_box)%get(i_component)
         particle%orientation = this%changes%random_orientation%get(i_component)
-        particle%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get_norm()*&
-            particle%orientation
+        particle%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%&
+            get_norm() * particle%orientation
     end subroutine Add_define_exchange
 
     !> \[
@@ -338,7 +340,8 @@ contains
         delta_energy = dipoles_field_visit_add(this%environment%external_fields(i_box), particle)
     end subroutine Add_visit_field
 
-    subroutine Add_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, particle)
+    subroutine Add_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, &
+        particle)
         class(Box_Particle_Add), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
@@ -349,13 +352,16 @@ contains
 
         do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(particle%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%component%&
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
                 visit(delta_energies(j_component), particle, visit_different, i_exclude)
         end do
-        delta_energies(i_component) = delta_energies(i_component) - this%dipolar_interactions_dynamic(i_box)%&
-            self_components(i_component)%component%meet(particle%dipole_moment)
+        delta_energies(i_component) = delta_energies(i_component) - this%&
+            dipolar_interactions_dynamic(i_box)%self_components(i_component)%component%&
+            meet(particle%dipole_moment)
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic(i_box)%reci_visitor%visit_add(i_component, particle) + &
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
+                visit_add(i_component, particle) + &
             this%dipolar_interactions_dynamic(i_box)%surf_mixture%visit_add(i_component, particle%&
                 dipole_moment) - &
             this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_add(i_component, particle)
@@ -374,10 +380,13 @@ contains
         call this%mixture%components(i_component, i_box)%orientations%add(particle%orientation)
         call this%mixture%total_moments(i_box)%add(i_component, particle%dipole_moment)
         do j_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
-            call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%add(particle)
+            call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%&
+                add(particle)
         end do
-        call this%dipolar_interactions_static(i_box)%reci_structure%update_add(i_component, particle)
-        call this%dipolar_interactions_static(i_box)%dlc_structures%update_add(i_component, particle)
+        call this%dipolar_interactions_static(i_box)%reci_structure%&
+            update_add(i_component, particle)
+        call this%dipolar_interactions_static(i_box)%dlc_structures%&
+            update_add(i_component, particle)
     end subroutine Add_update_actor
 
     subroutine Add_increment_hit(changes_counters)
@@ -410,7 +419,8 @@ contains
         end if
         particle%i = random_integer(this%mixture%components(i_component, i_box)%num_particles%get())
         particle%position = this%mixture%components(i_component, i_box)%positions%get(particle%i)
-        particle%orientation = this%mixture%components(i_component, i_box)%orientations%get(particle%i)
+        particle%orientation = this%mixture%components(i_component, i_box)%orientations%&
+            get(particle%i)
         particle%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%&
             get(particle%i)
     end subroutine Remove_define_exchange
@@ -474,7 +484,8 @@ contains
         delta_energy = dipoles_field_visit_remove(this%environment%external_fields(i_box), particle)
     end subroutine Remove_visit_field
 
-    subroutine Remove_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, particle)
+    subroutine Remove_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, &
+        particle)
         class(Box_Particle_Remove), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
@@ -485,16 +496,19 @@ contains
 
         do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(particle%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%component%&
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
                 visit(delta_energies(j_component), particle, visit_different, i_exclude)
         end do
-        delta_energies(i_component) = delta_energies(i_component) - this%dipolar_interactions_dynamic(i_box)%&
-            self_components(i_component)%component%meet(particle%dipole_moment)
+        delta_energies(i_component) = delta_energies(i_component) - this%&
+            dipolar_interactions_dynamic(i_box)%self_components(i_component)%component%&
+            meet(particle%dipole_moment)
         delta_energies = -delta_energies
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic(i_box)%reci_visitor%visit_remove(i_component, particle) + &
-            this%dipolar_interactions_dynamic(i_box)%surf_mixture%visit_remove(i_component, particle%&
-                dipole_moment) - &
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
+                visit_remove(i_component, particle) + &
+            this%dipolar_interactions_dynamic(i_box)%surf_mixture%&
+                visit_remove(i_component, particle%dipole_moment) - &
             this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_remove(i_component, particle)
     end subroutine Remove_visit_dipolar
 
@@ -505,10 +519,13 @@ contains
 
         integer :: j_component
 
-        call this%dipolar_interactions_static(i_box)%dlc_structures%update_remove(i_component, particle)
-        call this%dipolar_interactions_static(i_box)%reci_structure%update_remove(i_component, particle)
+        call this%dipolar_interactions_static(i_box)%dlc_structures%&
+            update_remove(i_component, particle)
+        call this%dipolar_interactions_static(i_box)%reci_structure%&
+            update_remove(i_component, particle)
         do j_component = size(this%short_interactions%cells(i_box)%visitable_cells, 2), 1, -1
-            call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%remove(particle)
+            call this%short_interactions%cells(i_box)%visitable_cells(i_component, j_component)%&
+                remove(particle)
         end do
         call this%mixture%total_moments(i_box)%remove(i_component, particle%dipole_moment)
         call this%mixture%components(i_component, i_box)%orientations%remove(particle%i)

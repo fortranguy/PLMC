@@ -78,7 +78,8 @@ contains
         end do
     end subroutine visit_short_intra
 
-    pure subroutine visit_short_inter(overlap, energies, components, components_visitor, components_pairs)
+    pure subroutine visit_short_inter(overlap, energies, components, components_visitor, &
+        components_pairs)
         logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)

@@ -75,51 +75,54 @@ contains
         if (allocated(energies%walls_energies)) deallocate(energies%walls_energies)
     end subroutine destroy_element
 
-    pure subroutine add_single(energies, deltas, i_actor)
+    pure subroutine add_single(energies, deltas, i_component)
         type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Concrete_Single_Energies), intent(in) :: deltas
-        integer, intent(in) :: i_actor
+        integer, intent(in) :: i_component
 
-        energies%walls_energies(i_actor) = energies%walls_energies(i_actor) + deltas%walls_energy
-        call add_energies(energies%short_energies, deltas%short_energies, i_actor)
-        energies%field_energies(i_actor) = energies%field_energies(i_actor) + deltas%field_energy
-        call add_energies(energies%dipolar_energies, deltas%dipolar_energies, i_actor)
+        energies%walls_energies(i_component) = energies%walls_energies(i_component) + deltas%&
+            walls_energy
+        call add_energies(energies%short_energies, deltas%short_energies, i_component)
+        energies%field_energies(i_component) = energies%field_energies(i_component) + deltas%&
+            field_energy
+        call add_energies(energies%dipolar_energies, deltas%dipolar_energies, i_component)
         energies%dipolar_shared_energy = energies%dipolar_shared_energy + deltas%&
             dipolar_shared_energy
     end subroutine add_single
 
-    pure subroutine add_double(energies, deltas, ij_actors)
+    pure subroutine add_double(energies, deltas, ij_components)
         type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Concrete_Double_Energies), intent(in) :: deltas
-        integer, intent(in) :: ij_actors(:)
+        integer, intent(in) :: ij_components(:)
 
-        integer :: i
+        integer :: i_partner
 
-        do i = 1, size(ij_actors)
-            energies%walls_energies(ij_actors(i)) = energies%walls_energies(ij_actors(i)) + deltas%&
-                walls_energies(i)
-            call add_energies(energies%short_energies, deltas%short_energies(:, i), ij_actors(i))
-            energies%field_energies(ij_actors(i)) = energies%field_energies(ij_actors(i)) + deltas%&
-                field_energies(i)
-            call add_energies(energies%dipolar_energies, deltas%dipolar_energies(:, i),  &
-                ij_actors(i))
+        do i_partner = 1, size(ij_components)
+            energies%walls_energies(ij_components(i_partner)) = energies%&
+                walls_energies(ij_components(i_partner)) + deltas%walls_energies(i_partner)
+            call add_energies(energies%short_energies, deltas%short_energies(:, i_partner), &
+                ij_components(i_partner))
+            energies%field_energies(ij_components(i_partner)) = energies%&
+                field_energies(ij_components(i_partner)) + deltas%field_energies(i_partner)
+            call add_energies(energies%dipolar_energies, deltas%dipolar_energies(:, i_partner),  &
+                ij_components(i_partner))
         end do
         energies%dipolar_shared_energy = energies%dipolar_shared_energy + deltas%&
             dipolar_shared_energy
     end subroutine add_double
 
-    pure subroutine add_energies(energies, deltas, i_actor)
+    pure subroutine add_energies(energies, deltas, i_component)
         type(Reals_Line), intent(inout) :: energies(:)
         real(DP), intent(in) :: deltas(:)
-        integer, intent(in) :: i_actor
+        integer, intent(in) :: i_component
 
-        integer :: i_component, i_observable, j_observable
+        integer :: j_component, i_observable, j_observable
 
-        do i_component = 1, size(deltas)
-            j_observable = maxval([i_actor, i_component])
-            i_observable = minval([i_actor, i_component])
+        do j_component = 1, size(deltas)
+            j_observable = maxval([i_component, j_component])
+            i_observable = minval([i_component, j_component])
             energies(j_observable)%line(i_observable) = energies(j_observable)%&
-                line(i_observable) + deltas(i_component)
+                line(i_observable) + deltas(j_component)
         end do
     end subroutine add_energies
 

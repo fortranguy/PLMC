@@ -51,14 +51,15 @@ contains
             if (overlap) call error_exit("procedures_plmc_visitor: visit: "//&
                 "short_interactions_visit: walls: overlap.")
             call short_interactions_visit(overlap, energies(i_box)%short_energies, physical_model%&
-                mixture%components(:, i_box), physical_model%short_interactions%components_visitors(i_box), &
-                physical_model%short_interactions%components_pairs)
+                mixture%components(:, i_box), physical_model%short_interactions%&
+                components_visitors(i_box), physical_model%short_interactions%components_pairs)
             if (overlap) call error_exit("procedures_plmc_visitor: visit: "//&
                 "short_interactions_visit: short: overlap.")
-            call dipolar_interactions_visit(energies(i_box)%field_energies, physical_model%environment%&
-                external_fields(i_box), physical_model%mixture%components(:, i_box))
-            call dipolar_interactions_visit(energies(i_box)%dipolar_energies, energies(i_box)%dipolar_shared_energy, &
-                physical_model%mixture%components(:, i_box), physical_model%dipolar_interactions_dynamic(i_box))
+            call dipolar_interactions_visit(energies(i_box)%field_energies, physical_model%&
+                environment%external_fields(i_box), physical_model%mixture%components(:, i_box))
+            call dipolar_interactions_visit(energies(i_box)%dipolar_energies, energies(i_box)%&
+                dipolar_shared_energy, physical_model%mixture%components(:, i_box), physical_model%&
+                dipolar_interactions_dynamic(i_box))
             end do
     end subroutine visit
 

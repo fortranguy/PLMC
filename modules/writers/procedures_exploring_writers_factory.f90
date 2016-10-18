@@ -65,13 +65,15 @@ contains
         measure_pressure = property_measure_pressure(volume_change_method)
         call real_writer_create(writers%maximum_boxes_compression_delta, boxes_path, &
             "maximum_box_compression_delta.out", measure_pressure)
-        call real_writer_create(writers%beta_pressures_excess, boxes_path, "beta_pressure_excess.out", &
-            measure_pressure)
-        call energies_writers_create(writers%energies, boxes_path, environment%external_fields, wall_pairs, &
-            components, short_pairs, visit_energies)
+        call real_writer_create(writers%beta_pressures_excess, boxes_path, &
+            "beta_pressure_excess.out", measure_pressure)
+        call energies_writers_create(writers%energies, boxes_path, environment%external_fields, &
+            wall_pairs, components, short_pairs, visit_energies)
         selectors = measure_chemical_potentials(particle_insertion_method)
-        call line_writer_create(writers%insertion_successes, boxes_path, "insertion_successes.out", selectors)
-        call line_writer_create(writers%inv_pow_activities, boxes_path, "inv_pow_activities.out", selectors)
+        call line_writer_create(writers%insertion_successes, boxes_path, "insertion_successes.out",&
+            selectors)
+        call line_writer_create(writers%inv_pow_activities, boxes_path, "inv_pow_activities.out", &
+            selectors)
     end subroutine create
 
     subroutine destroy(writers)

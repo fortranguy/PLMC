@@ -110,27 +110,27 @@ contains
                         insertion_counters(i_component, i_box)%num_hits + 1
                     test%position = this%random_positions(i_box)%get(i_component)
                     test%orientation = this%random_orientation%get(i_component)
-                    test%dipole_moment = this%components(i_component, i_box)%dipole_moments%get_norm() * &
-                        test%orientation
+                    test%dipole_moment = this%components(i_component, i_box)%dipole_moments%&
+                        get_norm() * test%orientation
 
                     call this%visit_walls(overlap, deltas%walls_energy, i_box, i_component, test)
                     if (overlap) cycle
                     call this%visit_short(overlap, deltas%short_energies, i_box, i_component, test)
                     if (overlap) cycle
                     call this%visit_field(deltas%field_energy, i_box, test)
-                    call this%visit_dipolar(deltas%dipolar_energies, deltas%dipolar_shared_energy, i_box, &
-                        i_component, test)
+                    call this%visit_dipolar(deltas%dipolar_energies, deltas%dipolar_shared_energy, &
+                        i_box, i_component, test)
 
                     delta_energy = deltas%field_energy + deltas%walls_energy + &
                         sum(deltas%short_energies + deltas%dipolar_energies) + deltas%&
                         dipolar_shared_energy
-                    inv_pow_activity_sum = inv_pow_activity_sum + exp(-delta_energy / this%environment%&
-                        temperature%get())
+                    inv_pow_activity_sum = inv_pow_activity_sum + &
+                        exp(-delta_energy / this%environment%temperature%get())
                     observables%insertion_counters(i_component, i_box)%num_successes = observables%&
                         insertion_counters(i_component, i_box)%num_successes + 1
                 end do
-                observables%inv_pow_activities(i_component, i_box) = inv_pow_activity_sum / real(this%&
-                    nums_particles(i_component)%get())
+                observables%inv_pow_activities(i_component, i_box) = inv_pow_activity_sum / &
+                    real(this%nums_particles(i_component)%get())
             end do
             deallocate(deltas%dipolar_energies)
             deallocate(deltas%short_energies)
@@ -185,8 +185,9 @@ contains
 
         do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(test%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
-                component%visit(deltas(j_component), test, visit_different, i_exclude)
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
+                visit(deltas(j_component), test, visit_different, i_exclude)
         end do
         deltas(i_component) = deltas(i_component) - this%dipolar_interactions_dynamic(i_box)%&
             self_components(i_component)%component%meet(test%dipole_moment)

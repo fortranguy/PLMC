@@ -332,8 +332,8 @@ contains
             new%position, old)
     end subroutine Translation_visit_field
 
-    subroutine Translation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component,&
-        new, old)
+    subroutine Translation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+        i_component, new, old)
         class(Box_Particle_Translation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
@@ -345,10 +345,12 @@ contains
 
         do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(new%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
-                component%visit(real_energies_new(j_component), new, visit_different, i_exclude)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
-                component%visit(real_energies_old(j_component), old, visit_different, i_exclude)
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
+                visit(real_energies_new(j_component), new, visit_different, i_exclude)
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
+                visit(real_energies_old(j_component), old, visit_different, i_exclude)
         end do
         delta_shared_energy = &
             this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
@@ -410,8 +412,9 @@ contains
         old%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get(old%i)
         new%i = old%i
         new%position = old%position
-        new%orientation = this%changes_components(i_component, i_box)%rotated_orientations%get(new%i)
-        new%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get_norm() * &
+        new%orientation = this%changes_components(i_component, i_box)%rotated_orientations%&
+            get(new%i)
+        new%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get_norm() *&
             new%orientation
     end subroutine Rotation_define_change
 
@@ -445,8 +448,8 @@ contains
             dipole_moment, old)
     end subroutine Rotation_visit_field
 
-    subroutine Rotation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, i_component, &
-        new, old)
+    subroutine Rotation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+        i_component, new, old)
         class(Box_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
@@ -458,10 +461,12 @@ contains
 
         do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(new%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
-                component%visit(real_energies_new(j_component), new, visit_different, i_exclude)
-            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
-                component%visit(real_energies_old(j_component), old, visit_different, i_exclude)
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
+                visit(real_energies_new(j_component), new, visit_different, i_exclude)
+            call this%dipolar_interactions_dynamic(i_box)%&
+                real_components(j_component, i_component)%component%&
+                visit(real_energies_old(j_component), old, visit_different, i_exclude)
         end do
         delta_energies = real_energies_new - real_energies_old
         delta_shared_energy = &

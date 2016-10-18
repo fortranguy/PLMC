@@ -96,9 +96,10 @@ contains
         real(DP) :: min_distance_ratio, max_distance_ratio
 
         do i_box = 1, size(this%environment%periodic_boxes)
-            max_distance_ratio = this%environment%periodic_boxes(i_box)%get_max_distance() / this%min_distance
-            call short_interactions_visit_cells(overlap, min_distance_ratio, max_distance_ratio, this%&
-                components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
+            max_distance_ratio = this%environment%periodic_boxes(i_box)%get_max_distance() / &
+                this%min_distance
+            call short_interactions_visit_cells(overlap, min_distance_ratio, max_distance_ratio, &
+                this%components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
             if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&
                 "short_interactions_visit_cells: overlap")
             observables%maximum_boxes_compression_delta(i_box) = this%maximum_box_compression%&

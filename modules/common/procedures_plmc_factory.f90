@@ -156,7 +156,8 @@ contains
         do j_box = 1, size(changes%boxes_size_change_tuner)
             do i_box = 1, size(changes%boxes_size_change_tuner(j_box)%line)
                 call changes%boxes_size_change_tuner(j_box)%line(i_box)%tuner%&
-                    tune(box_size_tuned, i_step, observables%volumes_change_success(j_box)%line(i_box))
+                    tune(box_size_tuned, i_step, observables%volumes_change_success(j_box)%&
+                        line(i_box))
                 all_boxes_size_tuned = all_boxes_size_tuned .and. box_size_tuned
             end do
 
@@ -211,8 +212,10 @@ contains
         integer :: i_box
 
         do i_box = 1, size(observables%accessible_domains_size, 2)
-            call set_nums_particles(observables%nums_particles(:, i_box), physical_model%mixture%components(:, i_box))
-            observables%accessible_domains_size(:, i_box) = physical_model%environment%accessible_domains(i_box)%get_size()
+            call set_nums_particles(observables%nums_particles(:, i_box), physical_model%mixture%&
+                components(:, i_box))
+            observables%accessible_domains_size(:, i_box) = physical_model%environment%&
+                accessible_domains(i_box)%get_size()
         end do
     end subroutine set_initial_observables
 

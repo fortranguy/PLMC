@@ -63,37 +63,39 @@ private
 
     abstract interface
 
-        subroutine Abstract_define_swap(this, abort, particles, i_box, ij_actors)
+        subroutine Abstract_define_swap(this, abort, particles, i_box, ij_components)
         import :: Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             logical, intent(out) :: abort
             type(Concrete_Temporary_Particle), intent(out) :: particles(:)
-            integer, intent(in) :: i_box, ij_actors(:)
+            integer, intent(in) :: i_box, ij_components(:)
         end subroutine Abstract_define_swap
 
-        pure real(DP) function Abstract_acceptation_probability(this, i_box, ij_actors, &
+        pure real(DP) function Abstract_acceptation_probability(this, i_box, ij_components, &
             delta_energy) result(probability)
         import :: DP, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
-            integer, intent(in) :: i_box, ij_actors(:)
+            integer, intent(in) :: i_box, ij_components(:)
             real(DP), intent(in) :: delta_energy
         end function Abstract_acceptation_probability
 
-        subroutine Abstract_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
+        subroutine Abstract_visit_walls(this, overlap, delta_energies, i_box, ij_components, &
+            particles)
         import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energies(:)
-            integer, intent(in) :: i_box, ij_actors(:)
+            integer, intent(in) :: i_box, ij_components(:)
             type(Concrete_Temporary_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_walls
 
-        subroutine Abstract_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
+        subroutine Abstract_visit_short(this, overlap, delta_energies, i_box, ij_components, &
+            particles)
         import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energies(:, :)
-            integer, intent(in) :: i_box, ij_actors(:)
+            integer, intent(in) :: i_box, ij_components(:)
             type(Concrete_Temporary_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_short
 
@@ -106,32 +108,32 @@ private
         end subroutine Abstract_visit_field
 
         subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
-            ij_actors, particles)
+            ij_components, particles)
         import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             real(DP), intent(out) :: delta_energies(:, :)
             real(DP), intent(out) :: delta_shared_energy
-            integer, intent(in) :: i_box, ij_actors(:)
+            integer, intent(in) :: i_box, ij_components(:)
             type(Concrete_Temporary_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_dipolar
 
-        subroutine Abstract_update_actors(this, i_box, ij_actors, particles)
+        subroutine Abstract_update_actors(this, i_box, ij_components, particles)
         import :: Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
-            integer, intent(in) :: i_box, ij_actors(:)
+            integer, intent(in) :: i_box, ij_components(:)
             type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
         end subroutine Abstract_update_actors
 
-        subroutine Abstract_increment_hit(changes, ij_actors)
+        subroutine Abstract_increment_hit(changes, ij_components)
         import :: Concrete_Observables_Changes
             type(Concrete_Observables_Changes), intent(inout) :: changes
-            integer, intent(in) :: ij_actors(:)
+            integer, intent(in) :: ij_components(:)
         end subroutine Abstract_increment_hit
 
-        subroutine Abstract_increment_success(changes, ij_actors)
+        subroutine Abstract_increment_success(changes, ij_components)
         import :: Concrete_Observables_Changes
             type(Concrete_Observables_Changes), intent(inout) :: changes
-            integer, intent(in) :: ij_actors(:)
+            integer, intent(in) :: ij_components(:)
         end subroutine Abstract_increment_success
 
     end interface
@@ -232,56 +234,58 @@ contains
 
         logical :: success
         type(Concrete_Double_Energies) :: deltas
-        integer :: i_box, ij_actors(2)
+        integer :: i_box, ij_components(2)
 
         i_box = random_integer(size(this%environment%periodic_boxes))
-        ij_actors = this%couples(i_box)%get(this%selectors(i_box)%get())
-        call this%increment_hit(observables%changes(i_box), ij_actors)
+        ij_components = this%couples(i_box)%get(this%selectors(i_box)%get())
+        call this%increment_hit(observables%changes(i_box), ij_components)
         allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies), 2))
         allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies), 2))
-        call this%metropolis_algorithm(success, deltas, i_box, ij_actors)
+        call this%metropolis_algorithm(success, deltas, i_box, ij_components)
         if (success) then
-            call observables_energies_set(observables%energies(i_box), deltas, ij_actors)
-            call this%increment_success(observables%changes(i_box), ij_actors)
+            call observables_energies_set(observables%energies(i_box), deltas, ij_components)
+            call this%increment_success(observables%changes(i_box), ij_components)
         end if
     end subroutine Abstract_try
 
-    subroutine Abstract_metropolis_algorithm(this, success, deltas, i_box, ij_actors)
+    subroutine Abstract_metropolis_algorithm(this, success, deltas, i_box, ij_components)
         class(Abstract_Box_Particles_Swap), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Double_Energies), intent(inout) :: deltas
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
 
         type(Concrete_Temporary_Particle) :: particles(2)
         real(DP) :: delta_energy
         logical :: abort, overlap
 
         success = .false.
-        call this%define_swap(abort, particles, i_box, ij_actors)
+        call this%define_swap(abort, particles, i_box, ij_components)
         if (abort) return
 
-        call this%visit_walls(overlap, deltas%walls_energies, i_box, ij_actors, particles)
+        call this%visit_walls(overlap, deltas%walls_energies, i_box, ij_components, particles)
         if (overlap) return
-        call this%visit_short(overlap, deltas%short_energies, i_box, ij_actors, particles)
+        call this%visit_short(overlap, deltas%short_energies, i_box, ij_components, particles)
         if (overlap) return
         call this%visit_field(deltas%field_energies, i_box, particles)
         call this%visit_dipolar(deltas%dipolar_energies, deltas%dipolar_shared_energy, i_box, &
-            ij_actors, particles)
+            ij_components, particles)
 
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             sum(deltas%short_energies + deltas%dipolar_energies) + deltas%dipolar_shared_energy
-        success = metropolis_algorithm(this%acceptation_probability(i_box, ij_actors, delta_energy))
-        if (success) call this%update_actors(i_box, ij_actors, particles)
+        success = metropolis_algorithm(this%acceptation_probability(i_box, ij_components, &
+            delta_energy))
+        if (success) call this%update_actors(i_box, ij_components, particles)
     end subroutine Abstract_metropolis_algorithm
 
     !> @note The i_actor <-> j_actor term is ignored.
-    pure integer function i_exclude_particle(i_component, ij_actors, particles) result(i_exclude)
-        integer, intent(in) :: i_component, ij_actors(:)
+    pure integer function i_exclude_particle(k_component, ij_components, particles) &
+        result(i_exclude)
+        integer, intent(in) :: k_component, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        if (i_component == ij_actors(1)) then
+        if (k_component == ij_components(1)) then
             i_exclude = particles(1)%i
-        else if (i_component == ij_actors(2)) then
+        else if (k_component == ij_components(2)) then
             i_exclude = particles(2)%i
         else
             i_exclude = 0
@@ -292,49 +296,49 @@ contains
 
 !implementation Box_Particles_Transmutation
 
-    subroutine Transmutation_define_swap(this, abort, particles, i_box, ij_actors)
+    subroutine Transmutation_define_swap(this, abort, particles, i_box, ij_components)
         class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: particles(:)
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
 
-        if (this%mixture%components(ij_actors(1), i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(ij_components(1), i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
             abort = .false.
         end if
 
-        particles(1)%i = random_integer(this%mixture%components(ij_actors(1), i_box)%&
+        particles(1)%i = random_integer(this%mixture%components(ij_components(1), i_box)%&
             num_particles%get())
-        particles(1)%position = this%mixture%components(ij_actors(1), i_box)%positions%&
+        particles(1)%position = this%mixture%components(ij_components(1), i_box)%positions%&
             get(particles(1)%i)
-        particles(1)%orientation = this%mixture%components(ij_actors(1), i_box)%orientations%&
+        particles(1)%orientation = this%mixture%components(ij_components(1), i_box)%orientations%&
             get(particles(1)%i)
-        particles(1)%dipole_moment = this%mixture%components(ij_actors(1), i_box)%dipole_moments%&
-            get(particles(1)%i)
+        particles(1)%dipole_moment = this%mixture%components(ij_components(1), i_box)%&
+            dipole_moments%get(particles(1)%i)
 
-        particles(2)%i = this%mixture%components(ij_actors(2), i_box)%num_particles%get() + 1
-        call this%changes%position_copiers(i_box)%copy(particles(2)%position, particles(1)%position, &
-            ij_actors)
+        particles(2)%i = this%mixture%components(ij_components(2), i_box)%num_particles%get() + 1
+        call this%changes%position_copiers(i_box)%copy(particles(2)%position, &
+            particles(1)%position, ij_components)
         call this%changes%orientation_copier%copy(particles(2)%orientation, particles(1)%&
-            orientation, ij_actors)
-        particles(2)%dipole_moment = this%mixture%components(ij_actors(2), i_box)%dipole_moments%&
-            get_norm() * particles(2)%orientation
+            orientation, ij_components)
+        particles(2)%dipole_moment = this%mixture%components(ij_components(2), i_box)%&
+            dipole_moments%get_norm() * particles(2)%orientation
     end subroutine Transmutation_define_swap
 
     !> \[
     !>      P[i \in I \to j \in J] = min \left( 1, \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
     !>          e^{-\beta \Delta U_{i \to j}} \frac{a_I^{-N_I}}{a_J^{-N_J}} \right)
     !> \]
-    pure real(DP) function Transmutation_acceptation_probability(this, i_box, ij_actors, delta_energy)&
-        result(probability)
+    pure real(DP) function Transmutation_acceptation_probability(this, i_box, ij_components, &
+        delta_energy) result(probability)
         class(Box_Particles_Transmutation), intent(in) :: this
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         real(DP), intent(in) :: delta_energy
 
-        associate(component_i => this%mixture%components(ij_actors(1), i_box), &
-            component_j => this%mixture%components(ij_actors(2), i_box))
+        associate(component_i => this%mixture%components(ij_components(1), i_box), &
+            component_j => this%mixture%components(ij_components(2), i_box))
 
             probability = real(component_i%num_particles%get(), DP) / &
                 real(component_j%num_particles%get() + 1, DP) * &
@@ -348,11 +352,12 @@ contains
         probability = min(1._DP, probability)
     end function Transmutation_acceptation_probability
 
-    subroutine Transmutation_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
+    subroutine Transmutation_visit_walls(this, overlap, delta_energies, i_box, ij_components, &
+        particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         integer :: i_partner
@@ -360,27 +365,29 @@ contains
         do i_partner = size(particles), 1, -1
             call this%environment%visitable_walls(i_box)%visit(overlap, delta_energies(i_partner), &
                 particles(i_partner)%position, this%short_interactions%&
-                wall_pairs(ij_actors(i_partner))%potential)
+                wall_pairs(ij_components(i_partner))%potential)
             if (overlap) return
         end do
         delta_energies(1) = -delta_energies(1)
     end subroutine Transmutation_visit_walls
 
-    subroutine Transmutation_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
+    subroutine Transmutation_visit_short(this, overlap, delta_energies, i_box, ij_components, &
+        particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        integer :: i_component, i_partner, i_exclude
+        integer :: k_component, i_partner, i_exclude
 
         do i_partner = size(particles), 1, -1
-            do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
-                i_exclude = i_exclude_particle(i_component, ij_actors, particles)
-                call this%short_interactions%cells(i_box)%visitable_cells(i_component, ij_actors(i_partner))%&
-                    visit_energy(overlap, delta_energies(i_component, i_partner), &
-                    particles(i_partner), visit_different, i_exclude)
+            do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
+                i_exclude = i_exclude_particle(k_component, ij_components, particles)
+                call this%short_interactions%cells(i_box)%visitable_cells(k_component, &
+                    ij_components(i_partner))%&
+                    visit_energy(overlap, delta_energies(k_component, i_partner), &
+                        particles(i_partner), visit_different, i_exclude)
                 if (overlap) return
             end do
         end do
@@ -399,88 +406,89 @@ contains
     end subroutine Transmutation_visit_field
 
     subroutine Transmutation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
-        ij_actors, particles)
+        ij_components, particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        integer :: i_component, i_partner, i_exclude
+        integer :: k_component, i_partner, i_exclude
 
         do i_partner = 1, size(particles)
-            do i_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
-                i_exclude = i_exclude_particle(i_component, ij_actors, particles)
+            do k_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
+                i_exclude = i_exclude_particle(k_component, ij_components, particles)
                 call this%dipolar_interactions_dynamic(i_box)%&
-                    real_components(i_component, ij_actors(i_partner))%&
-                    component%visit(delta_energies(i_component, i_partner), particles(i_partner), &
+                    real_components(k_component, ij_components(i_partner))%&
+                    component%visit(delta_energies(k_component, i_partner), particles(i_partner), &
                     visit_different, i_exclude)
             end do
-            delta_energies(ij_actors(i_partner), i_partner) = &
-                delta_energies(ij_actors(i_partner), i_partner) - &
-                this%dipolar_interactions_dynamic(i_box)%self_components(ij_actors(i_partner))%component%&
-                meet(particles(i_partner)%dipole_moment)
+            delta_energies(ij_components(i_partner), i_partner) = &
+                delta_energies(ij_components(i_partner), i_partner) - &
+                this%dipolar_interactions_dynamic(i_box)%self_components(ij_components(i_partner))%&
+                component%meet(particles(i_partner)%dipole_moment)
         end do
         delta_energies(:, 1) = -delta_energies(:, 1)
         delta_shared_energy = &
             this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
-                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)) + &
+                visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1)) + &
             this%dipolar_interactions_dynamic(i_box)%surf_mixture%&
-                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)%&
+                visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1)%&
                     dipole_moment) - &
             this%dipolar_interactions_dynamic(i_box)%dlc_visitor%&
-                visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
+                visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
     end subroutine Transmutation_visit_dipolar
 
-    subroutine Transmutation_update_actors(this, i_box, ij_actors, particles)
+    subroutine Transmutation_update_actors(this, i_box, ij_components, particles)
         class(Box_Particles_Transmutation), intent(in) :: this
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
 
-        integer :: i_component
+        integer :: k_component
 
-        do i_component = size(this%short_interactions%cells(i_box)%visitable_cells, 2), 1, -1
-            call this%short_interactions%cells(i_box)%visitable_cells(ij_actors(1), i_component)%&
-                remove(particles(1))
+        do k_component = size(this%short_interactions%cells(i_box)%visitable_cells, 2), 1, -1
+            call this%short_interactions%cells(i_box)%&
+                visitable_cells(ij_components(1), k_component)%remove(particles(1))
         end do
 
-        call this%mixture%total_moments(i_box)%remove(ij_actors(1), particles(1)%dipole_moment)
-        call this%mixture%components(ij_actors(1), i_box)%orientations%remove(particles(1)%i)
-        call this%mixture%components(ij_actors(1), i_box)%positions%remove(particles(1)%i)
-        call this%mixture%components(ij_actors(1), i_box)%num_particles%set(this%mixture%&
-            components(ij_actors(1), i_box)%num_particles%get() - 1)
+        call this%mixture%total_moments(i_box)%remove(ij_components(1), particles(1)%dipole_moment)
+        call this%mixture%components(ij_components(1), i_box)%orientations%remove(particles(1)%i)
+        call this%mixture%components(ij_components(1), i_box)%positions%remove(particles(1)%i)
+        call this%mixture%components(ij_components(1), i_box)%num_particles%set(this%mixture%&
+            components(ij_components(1), i_box)%num_particles%get() - 1)
 
-        call this%mixture%components(ij_actors(2), i_box)%num_particles%set(this%mixture%&
-            components(ij_actors(2), i_box)%num_particles%get() + 1)
-        call this%mixture%components(ij_actors(2), i_box)%positions%add(particles(2)%position)
-        call this%mixture%components(ij_actors(2), i_box)%orientations%add(particles(2)%orientation)
-        call this%mixture%total_moments(i_box)%add(ij_actors(2), particles(2)%dipole_moment)
+        call this%mixture%components(ij_components(2), i_box)%num_particles%set(this%mixture%&
+            components(ij_components(2), i_box)%num_particles%get() + 1)
+        call this%mixture%components(ij_components(2), i_box)%positions%add(particles(2)%position)
+        call this%mixture%components(ij_components(2), i_box)%orientations%add(particles(2)%&
+            orientation)
+        call this%mixture%total_moments(i_box)%add(ij_components(2), particles(2)%dipole_moment)
 
-        do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
-            call this%short_interactions%cells(i_box)%visitable_cells(ij_actors(2), i_component)%&
-                add(particles(2))
+        do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
+            call this%short_interactions%cells(i_box)%&
+                visitable_cells(ij_components(2), k_component)%add(particles(2))
         end do
 
         call this%dipolar_interactions_static(i_box)%reci_structure%&
-            update_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
+            update_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
-            update_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
+            update_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
     end subroutine Transmutation_update_actors
 
-    subroutine Transmutation_increment_hit(changes, ij_actors)
+    subroutine Transmutation_increment_hit(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes
-        integer, intent(in) :: ij_actors(:)
+        integer, intent(in) :: ij_components(:)
 
-        changes%transmutations_counters(ij_actors(1), ij_actors(2))%num_hits = changes%&
-            transmutations_counters(ij_actors(1), ij_actors(2))%num_hits + 1
+        changes%transmutations_counters(ij_components(1), ij_components(2))%num_hits = changes%&
+            transmutations_counters(ij_components(1), ij_components(2))%num_hits + 1
     end subroutine Transmutation_increment_hit
 
-    subroutine Transmutation_increment_success(changes, ij_actors)
+    subroutine Transmutation_increment_success(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes
-        integer, intent(in) :: ij_actors(:)
+        integer, intent(in) :: ij_components(:)
 
-        changes%transmutations_counters(ij_actors(1), ij_actors(2))%num_successes = changes%&
-            transmutations_counters(ij_actors(1), ij_actors(2))%num_successes + 1
+        changes%transmutations_counters(ij_components(1), ij_components(2))%num_successes = &
+            changes%transmutations_counters(ij_components(1), ij_components(2))%num_successes + 1
     end subroutine Transmutation_increment_success
 
 !end implementation Box_Particles_Transmutation
@@ -489,16 +497,16 @@ contains
 
     !> @note The change is partially defined because the priority was to share the same interface
     !> with Box_Particles_Transmutation, cf. visit_...() methods for completion.
-    subroutine Switch_define_swap(this, abort, particles, i_box, ij_actors)
+    subroutine Switch_define_swap(this, abort, particles, i_box, ij_components)
         class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: abort
         type(Concrete_Temporary_Particle), intent(out) :: particles(:)
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
 
         integer :: i_partner
 
-        if (this%mixture%components(ij_actors(1), i_box)%num_particles%get() == 0 .or. &
-            this%mixture%components(ij_actors(2), i_box)%num_particles%get() == 0) then
+        if (this%mixture%components(ij_components(1), i_box)%num_particles%get() == 0 .or. &
+            this%mixture%components(ij_components(2), i_box)%num_particles%get() == 0) then
             abort = .true.
             return
         else
@@ -506,31 +514,32 @@ contains
         end if
 
         do i_partner = 1, size(particles)
-            particles(i_partner)%i = random_integer(this%mixture%components(ij_actors(i_partner), i_box)%&
-                num_particles%get())
-            particles(i_partner)%position = this%mixture%components(ij_actors(i_partner), i_box)%&
-                positions%get(particles(i_partner)%i)
-            particles(i_partner)%orientation = this%mixture%components(ij_actors(i_partner), i_box)%&
-                orientations%get(particles(i_partner)%i)
-            particles(i_partner)%dipole_moment = this%mixture%components(ij_actors(i_partner), i_box)%&
-                dipole_moments%get(particles(i_partner)%i)
+            particles(i_partner)%i = random_integer(this%mixture%&
+                components(ij_components(i_partner), i_box)%num_particles%get())
+            particles(i_partner)%position = this%mixture%&
+                components(ij_components(i_partner), i_box)%positions%get(particles(i_partner)%i)
+            particles(i_partner)%orientation = this%mixture%&
+                components(ij_components(i_partner), i_box)%orientations%get(particles(i_partner)%i)
+            particles(i_partner)%dipole_moment = this%mixture%&
+                components(ij_components(i_partner), i_box)%dipole_moments%&
+                get(particles(i_partner)%i)
         end do
     end subroutine Switch_define_swap
 
-    pure real(DP) function Switch_acceptation_probability(this, i_box, ij_actors, delta_energy) &
+    pure real(DP) function Switch_acceptation_probability(this, i_box, ij_components, delta_energy)&
         result(probability)
         class(Box_Particles_Switch), intent(in) :: this
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         real(DP), intent(in) :: delta_energy
 
         probability = min(1._DP, exp(-delta_energy / this%environment%temperature%get()))
     end function Switch_acceptation_probability
 
-    subroutine Switch_visit_walls(this, overlap, delta_energies, i_box, ij_actors, particles)
+    subroutine Switch_visit_walls(this, overlap, delta_energies, i_box, ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         real(DP) :: energies_new(size(particles)), energies_old(size(particles))
@@ -539,48 +548,50 @@ contains
         do i_partner = 1, size(particles)
             call this%environment%visitable_walls(i_box)%visit(overlap, energies_new(i_partner), &
                 particles(size(particles) + 1 - i_partner)%position, this%short_interactions%&
-                wall_pairs(ij_actors(i_partner))%potential)
+                wall_pairs(ij_components(i_partner))%potential)
             if (overlap) return
         end do
         do i_partner = 1, size(particles)
             call this%environment%visitable_walls(i_box)%visit(overlap, energies_old(i_partner), &
                 particles(i_partner)%position, this%short_interactions%&
-                wall_pairs(ij_actors(i_partner))%potential)
+                wall_pairs(ij_components(i_partner))%potential)
         end do
         delta_energies = energies_new - energies_old
     end subroutine Switch_visit_walls
 
-    subroutine Switch_visit_short(this, overlap, delta_energies, i_box, ij_actors, particles)
+    subroutine Switch_visit_short(this, overlap, delta_energies, i_box, ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         real(DP), dimension(size(delta_energies, 1), size(delta_energies, 2)) :: energies_new, &
             energies_old
         type(Concrete_Temporary_Particle) :: swapped(size(particles))
-        integer :: i_component, i_partner
+        integer :: k_component, i_partner
 
         swapped%i = particles%i
         swapped(1)%position = particles(2)%position
         swapped(2)%position = particles(1)%position
 
         do i_partner = 1, size(swapped)
-            do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
-                call this%short_interactions%cells(i_box)%visitable_cells(i_component, ij_actors(i_partner))%&
-                    visit_energy(overlap, energies_new(i_component, i_partner), &
+            do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
+                call this%short_interactions%cells(i_box)%&
+                    visitable_cells(k_component, ij_components(i_partner))%&
+                    visit_energy(overlap, energies_new(k_component, i_partner), &
                         swapped(i_partner), visit_different, &
-                        i_exclude_particle(i_component, ij_actors, swapped))
+                        i_exclude_particle(k_component, ij_components, swapped))
                 if (overlap) return
             end do
         end do
         do i_partner = 1, size(particles)
-            do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
-                call this%short_interactions%cells(i_box)%visitable_cells(i_component, ij_actors(i_partner))%&
-                    visit_energy(overlap, energies_old(i_component, i_partner), &
+            do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
+                call this%short_interactions%cells(i_box)%&
+                    visitable_cells(k_component, ij_components(i_partner))%&
+                    visit_energy(overlap, energies_old(k_component, i_partner), &
                         particles(i_partner), visit_different, &
-                        i_exclude_particle(i_component, ij_actors, particles))
+                        i_exclude_particle(k_component, ij_components, particles))
             end do
         end do
         delta_energies = energies_new - energies_old
@@ -601,18 +612,18 @@ contains
         end do
     end subroutine Switch_visit_field
 
-    subroutine Switch_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, ij_actors,&
-        particles)
+    subroutine Switch_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+        ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         real(DP), dimension(size(delta_energies, 1), size(delta_energies, 2)) :: real_energies_new,&
             real_energies_old
         type(Concrete_Temporary_Particle) :: swapped(size(particles))
-        integer :: i_component, i_partner
+        integer :: k_component, i_partner
 
         swapped%i = particles%i
         swapped(1)%position = particles(2)%position
@@ -622,62 +633,64 @@ contains
         end do
 
         do i_partner = 1, size(swapped)
-            do i_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
+            do k_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
                 call this%dipolar_interactions_dynamic(i_box)%&
-                    real_components(i_component, ij_actors(i_partner))%component%&
-                    visit(real_energies_new(i_component, i_partner), swapped(i_partner), &
-                        visit_different, i_exclude_particle(i_component, ij_actors, swapped))
+                    real_components(k_component, ij_components(i_partner))%component%&
+                    visit(real_energies_new(k_component, i_partner), swapped(i_partner), &
+                        visit_different, i_exclude_particle(k_component, ij_components, swapped))
                 call this%dipolar_interactions_dynamic(i_box)%&
-                    real_components(i_component, ij_actors(i_partner))%component%&
-                    visit(real_energies_old(i_component, i_partner), particles(i_partner), &
-                        visit_different, i_exclude_particle(i_component, ij_actors, particles))
+                    real_components(k_component, ij_components(i_partner))%component%&
+                    visit(real_energies_old(k_component, i_partner), particles(i_partner), &
+                        visit_different, i_exclude_particle(k_component, ij_components, particles))
             end do
         end do
         delta_energies = real_energies_new - real_energies_old
         delta_shared_energy = &
             this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
-                visit_switch(ij_actors, particles) - &
-            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_switch(ij_actors, particles)
+                visit_switch(ij_components, particles) - &
+            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_switch(ij_components, &
+                particles)
     end subroutine Switch_visit_dipolar
 
-    subroutine Switch_update_actors(this, i_box, ij_actors, particles)
+    subroutine Switch_update_actors(this, i_box, ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
-        integer, intent(in) :: i_box, ij_actors(:)
+        integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
-        integer :: i_component, i_partner
+        integer :: k_component, i_partner
         real(DP) :: swapped_position(num_dimensions)
 
         do i_partner = 1, size(particles)
             swapped_position = particles(size(particles) + 1 - i_partner)%position
-            call this%mixture%components(ij_actors(i_partner), i_box)%positions%&
+            call this%mixture%components(ij_components(i_partner), i_box)%positions%&
                 set(particles(i_partner)%i, swapped_position)
-            do i_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
-                call this%short_interactions%cells(i_box)%visitable_cells(ij_actors(i_partner), i_component)%&
+            do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
+                call this%short_interactions%cells(i_box)%&
+                    visitable_cells(ij_components(i_partner), k_component)%&
                     translate(swapped_position, particles(i_partner))
             end do
         end do
 
         call this%dipolar_interactions_static(i_box)%reci_structure%&
-            update_switch(ij_actors, particles)
+            update_switch(ij_components, particles)
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
-            update_switch(ij_actors, particles)
+            update_switch(ij_components, particles)
     end subroutine Switch_update_actors
 
-    subroutine Switch_increment_hit(changes, ij_actors)
+    subroutine Switch_increment_hit(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes
-        integer, intent(in) :: ij_actors(:)
+        integer, intent(in) :: ij_components(:)
 
-        changes%switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits = changes%&
-            switches_counters(ij_actors(1))%line(ij_actors(2))%num_hits + 1
+        changes%switches_counters(ij_components(1))%line(ij_components(2))%num_hits = changes%&
+            switches_counters(ij_components(1))%line(ij_components(2))%num_hits + 1
     end subroutine Switch_increment_hit
 
-    subroutine Switch_increment_success(changes, ij_actors)
+    subroutine Switch_increment_success(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes
-        integer, intent(in) :: ij_actors(:)
+        integer, intent(in) :: ij_components(:)
 
-        changes%switches_counters(ij_actors(1))%line(ij_actors(2))%num_successes = changes%&
-            switches_counters(ij_actors(1))%line(ij_actors(2))%num_successes + 1
+        changes%switches_counters(ij_components(1))%line(ij_components(2))%num_successes = changes%&
+            switches_counters(ij_components(1))%line(ij_components(2))%num_successes + 1
     end subroutine Switch_increment_success
 
 !end implementation Box_Particles_Switch

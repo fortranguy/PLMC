@@ -40,7 +40,8 @@ contains
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
         logical :: field_applied
 
-        call boxes_create(environment%periodic_boxes, generating_data, environment_prefix, unique_box)
+        call boxes_create(environment%periodic_boxes, generating_data, environment_prefix, &
+            unique_box)
         call beta_pressure_create(environment%beta_pressure, &
             total_volume_can_change(generating_data, environment_prefix), generating_data, &
                 environment_prefix)

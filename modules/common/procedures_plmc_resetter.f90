@@ -24,10 +24,13 @@ contains
             end do
             call physical_model%mixture%total_moments(i_box)%reset()
 
-            call short_interactions_reset(physical_model%short_interactions%cells(i_box)%neighbour_cells)
-            call short_interactions_reset(physical_model%short_interactions%cells(i_box)%visitable_cells)
+            call short_interactions_reset(physical_model%short_interactions%cells(i_box)%&
+                neighbour_cells)
+            call short_interactions_reset(physical_model%short_interactions%cells(i_box)%&
+                visitable_cells)
 
-            call dipolar_interactions_reset(physical_model%dipolar_interactions_static(i_box), reset_real_pair=.true.)
+            call dipolar_interactions_reset(physical_model%dipolar_interactions_static(i_box), &
+                reset_real_pair=.true.)
         end do
     end subroutine plmc_reset
 
