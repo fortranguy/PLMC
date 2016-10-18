@@ -13,15 +13,15 @@ public :: create, destroy
 
 contains
 
-    subroutine create(maximum_box_compression, periodic_box, measure)
+    subroutine create(maximum_box_compression, periodic_boxes, measure)
         class(Abstract_Maximum_Box_Compression), allocatable, intent(out) :: maximum_box_compression
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
         logical, intent(in) :: measure
 
         if (measure) then
-            if (periodicity_is_xyz(periodic_box)) then
+            if (all(periodicity_is_xyz(periodic_boxes))) then
                 allocate(XYZ_Maximum_Box_Compression :: maximum_box_compression)
-            else if (periodicity_is_xy(periodic_box)) then
+            else if (all(periodicity_is_xy(periodic_boxes))) then
                 allocate(XY_Maximum_Box_Compression :: maximum_box_compression)
             else
                 call error_exit("procedures_maximum_box_compression_factory: create: "//&

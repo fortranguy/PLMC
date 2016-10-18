@@ -1,6 +1,7 @@
 module classes_dipolar_interactions_facade
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use procedures_checks, only: check_positive
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use procedures_boxes_factory, boxes_destroy => destroy
@@ -22,6 +23,7 @@ private
 
     type, abstract, public :: Abstract_Dipolar_Interactions_Facade
     private
+        integer :: i_box = 0
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
                 null()
@@ -188,14 +190,17 @@ contains
 
 !implementation Scalable_Dipolar_Interactions_Facade
 
-    subroutine Scalable_construct(this, components, dipolar_interactions_dynamic, &
+    subroutine Scalable_construct(this, i_box, components, dipolar_interactions_dynamic, &
         dipolar_interactions_static)
         class(Scalable_Dipolar_Interactions_Facade), intent(out) :: this
+        integer, intent(in) :: i_box
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
             dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
 
+        call check_positive("Scalable_Dipolar_Interactions_Facade", "i_box", i_box)
+        this%i_box = i_box
         this%components => components
         this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
         this%dipolar_interactions_static => dipolar_interactions_static
@@ -265,15 +270,18 @@ contains
 
 !implementation Unscalable_Dipolar_Interactions_Facade
 
-    subroutine Unscalable_construct(this, periodic_box, components, dipolar_interactions_dynamic, &
+    subroutine Unscalable_construct(this, i_box, periodic_box, components, dipolar_interactions_dynamic, &
         dipolar_interactions_static)
         class(Unscalable_Dipolar_Interactions_Facade), intent(out) :: this
+        integer, intent(in) :: i_box
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
             dipolar_interactions_dynamic
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: dipolar_interactions_static
 
+        call check_positive("Unscalable_Dipolar_Interactions_Facade", "i_box", i_box)
+        this%i_box = i_box
         this%periodic_box => periodic_box
         this%components => components
         this%dipolar_interactions_dynamic => dipolar_interactions_dynamic
@@ -360,7 +368,7 @@ contains
         type(Reals_Line), intent(in) :: energies(:)
         real(DP), intent(in) :: shared_energy
 
-        call dipolar_interactions_visit(new_energies, new_shared_energy, this%components, this%&
+        call dipolar_interactions_visit(new_energies, new_shared_energy, this%i_box, this%components, this%&
             dipolar_interactions_dynamic)
     end subroutine Unscalable_visit
 

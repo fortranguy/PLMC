@@ -34,7 +34,7 @@ contains
 
     !> @todo multiple boxes
     subroutine visit(energies, physical_model, visit_energies)
-        type(Concrete_Observables_Energies), intent(inout) :: energies
+        type(Concrete_Observables_Energies), intent(inout) :: energies(:)
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         logical, optional, intent(in) :: visit_energies
 
@@ -45,19 +45,22 @@ contains
             if (.not.visit_energies) return
         end if
 
-        call short_interactions_visit(overlap, energies%walls_energies, physical_model%&
-            mixture%gemc_components(:, i_box), physical_model%short_interactions%&
-            walls_visitors(i_box), physical_model%short_interactions%wall_pairs)
-        if (overlap) call error_exit("procedures_plmc_visitor: visit_generating: "//&
-            "short_interactions_visit: walls: overlap.")
-        call short_interactions_visit(overlap, energies%short_energies, physical_model%&
-            mixture%components, physical_model%short_interactions)
-        if (overlap) call error_exit("procedures_plmc_visitor: visit_generating: "//&
-            "short_interactions_visit: short: overlap.")
-        call dipolar_interactions_visit(energies%field_energies, physical_model%environment%&
-            external_field, physical_model%mixture%components)
-        call dipolar_interactions_visit(energies%dipolar_energies, energies%dipolar_shared_energy, &
-            physical_model%mixture%components, physical_model%dipolar_interactions_dynamic)
+        do i_box = 1, size(energies)
+            call short_interactions_visit(overlap, energies(i_box)%walls_energies, physical_model%&
+                mixture%gemc_components(:, i_box), physical_model%short_interactions%&
+                walls_visitors(i_box), physical_model%short_interactions%wall_pairs)
+            if (overlap) call error_exit("procedures_plmc_visitor: visit: "//&
+                "short_interactions_visit: walls: overlap.")
+            call short_interactions_visit(overlap, energies(i_box)%short_energies, physical_model%&
+                mixture%gemc_components(:, i_box), physical_model%short_interactions%components_visitors(i_box), &
+                physical_model%short_interactions%components_pairs)
+            if (overlap) call error_exit("procedures_plmc_visitor: visit: "//&
+                "short_interactions_visit: short: overlap.")
+            call dipolar_interactions_visit(energies(i_box)%field_energies, physical_model%environment%&
+                external_fields(i_box), physical_model%mixture%gemc_components(:, i_box))
+            call dipolar_interactions_visit(energies(i_box)%dipolar_energies, energies(i_box)%dipolar_shared_energy, &
+                i_box, physical_model%mixture%gemc_components(:, i_box), physical_model%dipolar_interactions_dynamic)
+            end do
     end subroutine visit
 
 end module procedures_plmc_visitor

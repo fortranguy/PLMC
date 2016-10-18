@@ -55,7 +55,7 @@ contains
                 "measure_pressure_excess needs visit_energies.")
         end if
         call maximum_box_compression_create(maximum_box_compression, physical_model%environment%&
-            periodic_box, measure_pressure_excess)
+            periodic_boxes, measure_pressure_excess)
         call maximum_box_compression_explorer_create(markov_chain_explorer%&
             maximum_box_compression_explorer, physical_model, maximum_box_compression, &
             measure_pressure_excess)

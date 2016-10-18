@@ -188,8 +188,12 @@ contains
         type(Generating_Observables_Wrapper), intent(inout) :: observables
         type(Physical_Model_Wrapper), intent(in) :: physical_model
 
-        call set_nums_particles(observables%nums_particles, physical_model%mixture%components)
-        observables%accessible_domain_size = physical_model%environment%accessible_domain%get_size()
+        integer :: i_box
+
+        do i_box = 1, size(observables%accessible_domains_size, 2)
+            call set_nums_particles(observables%gemc_nums_particles(:, i_box), physical_model%mixture%gemc_components(:, i_box))
+            observables%accessible_domains_size(:, i_box) = physical_model%environment%accessible_domains(i_box)%get_size()
+        end do
     end subroutine set_initial_observables
 
     subroutine set_coordinates_from_json(readers, generating_data)

@@ -40,7 +40,7 @@ implicit none
     call plmc_reset(physical_model)
     call markov_chain_generator%plmc_propagator%reset_selector()
     call plmc_set(observables, physical_model) !in exploring too?
-    call plmc_visit(observables%energies, physical_model)
+    call plmc_visit(observables%gemc_energies, physical_model)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune propagator & changes..."
     do i_step = -num_tuning_steps + 1, 0
@@ -59,7 +59,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations end."
     call plmc_reset(physical_model)
-    call plmc_visit(observables%energies, physical_model)
+    call plmc_visit(observables%gemc_energies, physical_model)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, num_steps)
 
     call plmc_destroy(io%readers, io%writers)

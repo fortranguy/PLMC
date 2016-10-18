@@ -50,7 +50,7 @@ contains
             periodic_boxes, environment%accessible_domains, measure_pressure)
         call dirac_distribution_plus_create(dirac_plus, measure_pressure, exploring_data, &
             volume_change_prefix)
-        call hard_contact_create(short_interactions%hard_contact, environment%periodic_box, &
+        call hard_contact_create(short_interactions%hard_contact, environment%periodic_boxes, &
             dirac_plus, measure_pressure)
         call dirac_distribution_plus_destroy(dirac_plus)
         call pairs_create(short_interactions%wall_pairs, interact_with_walls, mixture%&

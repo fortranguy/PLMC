@@ -49,7 +49,7 @@ implicit none
     do i_snap = 1, num_snaps
         call plmc_set(io%readers, i_snap)
         call plmc_reset(physical_model)
-        call plmc_visit(observables%energies, physical_model, visit_energies)
+        call plmc_visit(observables%gemc_energies, physical_model, visit_energies)
         call markov_chain_explorer%maximum_box_compression_explorer%try(observables)
         call markov_chain_explorer%changed_box_size_ratio%set(observables%&
             maximum_box_compression_delta)

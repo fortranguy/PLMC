@@ -45,7 +45,7 @@ contains
         call hard_core_create(mixture%components_min_distances, mixture%gemc_components(:, 1), &
             generating_data, mixture_prefix)
         call hard_core_create(mixture%wall_min_distances, environment%wall_min_distance, mixture%&
-            components_min_distances, mixture%gemc_components(:, 1), environment%visitable_walls)
+            components_min_distances, mixture%gemc_components(:, 1), environment%gemc_visitable_walls(1))
         call mixture_total_moments_create(mixture%total_moments, mixture%gemc_components)
     end subroutine create_all
 

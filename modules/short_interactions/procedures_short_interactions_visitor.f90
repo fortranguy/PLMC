@@ -4,10 +4,10 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_component_wrapper, only: Component_Wrapper
-use types_pair_potential_wrapper, only: Pair_Potential_Wrapper
+use types_pair_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Line
 use classes_walls_visitor, only: Abstract_Walls_Visitor
+use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_reals_line, only: Reals_Line
 
 implicit none
@@ -45,22 +45,25 @@ contains
         end do
     end subroutine visit_walls
 
-    pure subroutine visit_short(overlap, energies, components, short_interactions)
+    pure subroutine visit_short(overlap, energies, components, components_visitor, components_pairs)
         logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        class(Abstract_Short_Pairs_Visitor), intent(in) :: components_visitor
+        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
 
-        call visit_short_intra(overlap, energies, components, short_interactions)
+        call visit_short_intra(overlap, energies, components, components_visitor, components_pairs)
         if (overlap) return
-        call visit_short_inter(overlap, energies, components, short_interactions)
+        call visit_short_inter(overlap, energies, components, components_visitor, components_pairs)
     end subroutine visit_short
 
-    pure subroutine visit_short_intra(overlap, energies, components, short_interactions)
+    pure subroutine visit_short_intra(overlap, energies, components, components_visitor, &
+        components_pairs)
         logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        class(Abstract_Short_Pairs_Visitor), intent(in) :: components_visitor
+        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
 
         integer :: i_component
 
@@ -68,20 +71,19 @@ contains
         do i_component = 1, size(components)
             associate(energy_i => energies(i_component)%line(i_component), &
                 positions_i => components(i_component)%positions, &
-                potential_i => short_interactions%components_pairs(i_component)%line(i_component)%&
-                    potential)
-            call short_interactions%components_visitor%visit(overlap, energy_i, positions_i, &
-                potential_i)
+                potential_i => components_pairs(i_component)%line(i_component)%potential)
+            call components_visitor%visit(overlap, energy_i, positions_i, potential_i)
             end associate
             if (overlap) return
         end do
     end subroutine visit_short_intra
 
-    pure subroutine visit_short_inter(overlap, energies, components, short_interactions)
+    pure subroutine visit_short_inter(overlap, energies, components, components_visitor, components_pairs)
         logical, intent(out) :: overlap
         type(Reals_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        class(Abstract_Short_Pairs_Visitor), intent(in) :: components_visitor
+        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
 
         integer :: i_component, j_component
 
@@ -91,10 +93,9 @@ contains
                 associate(energy_ij => energies(j_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
                     positions_j => components(j_component)%positions, &
-                    potential_ij => short_interactions%components_pairs(j_component)%&
-                        line(i_component)%potential)
-                    call short_interactions%components_visitor%visit(overlap, energy_ij, &
-                        positions_i, positions_j, potential_ij)
+                    potential_ij => components_pairs(j_component)%line(i_component)%potential)
+                    call components_visitor%visit(overlap, energy_ij, positions_i, positions_j, &
+                        potential_ij)
                 end associate
                 if (overlap) return
             end do

@@ -61,13 +61,14 @@ contains
         allocate(this%maximum_box_compression, source=maximum_box_compression)
     end subroutine Abstract_construct
 
+    !> @warning periodic_boxes(1): arbitrary
     subroutine Abstract_set_min_distance(this)
         class(Abstract_Maximum_Box_Compression_Explorer), intent(inout) :: this
 
         integer :: i_component, j_component
         real(DP) :: min_distance_ij
 
-        this%min_distance = this%environment%periodic_box%get_max_distance()
+        this%min_distance = this%environment%periodic_boxes(1)%get_max_distance()
         do j_component = 1, size(this%components, 1)
             do i_component = 1, j_component
                 min_distance_ij = this%short_interactions%components_pairs(j_component)%&

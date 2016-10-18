@@ -59,12 +59,12 @@ contains
         select type (facades)
             type is (Scalable_Dipolar_Interactions_Facade)
                 do i_box = 1, size(facades)
-                    call facades(i_box)%construct(components(:, i_box), &
+                    call facades(i_box)%construct(i_box, components(:, i_box), &
                         dipolar_interactions_dynamic, dipolar_interactions_static(i_box))
                 end do
             type is (Unscalable_Dipolar_Interactions_Facade)
                 do i_box = 1, size(facades)
-                    call facades(i_box)%construct(environment%periodic_boxes(i_box), &
+                    call facades(i_box)%construct(i_box, environment%periodic_boxes(i_box), &
                         components(:, i_box), dipolar_interactions_dynamic, &
                         dipolar_interactions_static(i_box))
                 end do
