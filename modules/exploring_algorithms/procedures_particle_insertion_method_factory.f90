@@ -20,12 +20,12 @@ public :: create, destroy
 
 contains
 
-    subroutine create(particle_insertion_method, physical_model, random_position, &
+    subroutine create(particle_insertion_method, physical_model, random_positions, &
         random_orientation, measure_inv_pow_activities, exploring_data)
         class(Abstract_Particle_Insertion_Method), allocatable, intent(out) :: &
             particle_insertion_method
         type(Physical_Model_Wrapper), intent(in) :: physical_model
-        class(Abstract_Random_Coordinates), intent(in) :: random_position, random_orientation
+        class(Abstract_Random_Coordinates), intent(in) :: random_positions(:), random_orientation
         logical, intent(in) :: measure_inv_pow_activities
         type(json_file), intent(inout) :: exploring_data
 
@@ -52,8 +52,8 @@ contains
         end if
 
         call particle_insertion_method%construct(physical_model%environment, nums_particles, &
-            physical_model%mixture%components, physical_model%short_interactions, physical_model%&
-            dipolar_interactions_dynamic, random_position, random_orientation)
+            physical_model%mixture%gemc_components, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_dynamic, random_positions, random_orientation)
         call composition_destroy(nums_particles)
     end subroutine create
 

@@ -48,7 +48,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(GeneratingAlgorithm.north -| Import)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{BoxVolumeChange}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{BoxVolumeChange}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
                     $\mathAggregation$ mixture: \type{Mixture},
@@ -57,7 +57,7 @@
                     $\mathAggregation$ changedBoxSize: \type{ChangedBoxSize},
                     havePositions: \type{bool[\numComponents]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
-            \end{abstractclass}
+            \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(BoxParticleMove.north) - (9 cm, 0 cm)$)}]

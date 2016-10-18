@@ -34,11 +34,11 @@ private
     type, extends(Abstract_Exploring_Algorithm), abstract, public :: Abstract_Volume_Change_Method
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Component_Wrapper), pointer :: components(:) => null()
+        type(Component_Wrapper), pointer :: components(:, :) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facade => &
+        class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facades(:) => &
             null()
-        class(Abstract_Changed_Box_Size_Ratio), pointer :: changed_box_size_ratio => null()
+        class(Abstract_Changed_Box_Size_Ratio), pointer :: changed_boxes_size_ratio(:) => null()
         integer :: num_changes = 0
     contains
         procedure :: construct => Abstract_construct
@@ -66,21 +66,21 @@ contains
 !implementation Abstract_Volume_Change_Method
 
     subroutine Abstract_construct(this, environment, components, short_interactions, &
-        dipolar_interactions_facade, changed_box_size_ratio, num_changes)
+        dipolar_interactions_facades, changed_boxes_size_ratio, num_changes)
         class(Abstract_Volume_Change_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
-            dipolar_interactions_facade
-        class(Abstract_Changed_Box_Size_Ratio), target, intent(in) :: changed_box_size_ratio
+            dipolar_interactions_facades(:)
+        class(Abstract_Changed_Box_Size_Ratio), target, intent(in) :: changed_boxes_size_ratio(:)
         integer, intent(in) :: num_changes
 
         this%environment => environment
         this%components => components
         this%short_interactions => short_interactions
-        this%dipolar_interactions_facade => dipolar_interactions_facade
-        this%changed_box_size_ratio => changed_box_size_ratio
+        this%dipolar_interactions_facades => dipolar_interactions_facades
+        this%changed_boxes_size_ratio => changed_boxes_size_ratio
         call check_positive("Abstract_Volume_Change_Method: construct", "num_changes", num_changes)
         this%num_changes = num_changes
     end subroutine Abstract_construct
@@ -88,8 +88,8 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Volume_Change_Method), intent(inout) :: this
 
-        this%changed_box_size_ratio => null()
-        this%dipolar_interactions_facade => null()
+        this%changed_boxes_size_ratio => null()
+        this%dipolar_interactions_facades => null()
         this%short_interactions => null()
         this%components => null()
         this%environment => null()
@@ -100,6 +100,7 @@ contains
         type(Exploring_Observables_Wrapper), intent(inout) :: observables !too much?
 
         logical :: overlap
+        integer :: i_box
         real(DP) :: beta_pressure_excess_sum
         real(DP) :: contacts, delta_energy, delta_volume
         real(DP), dimension(num_dimensions) :: new_box_size, box_size, box_size_ratio
@@ -107,68 +108,75 @@ contains
         type(Concrete_Logical_Line), allocatable :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
         type(Dipolar_Interactions_Static_Wrapper) :: dipolar_interactions_static
+        logical :: reset_real_pair
         integer :: i_change
 
-        call short_interactions_visit_cells(overlap, contacts, this%components, this%&
-            short_interactions)
-        if (overlap) then
-            call error_exit("Abstract_Volume_Change_Method: try: short_interactions_visit_cells:"//&
-                " overlap")
-        end if
-        box_size = this%environment%periodic_box%get_size()
-        beta_pressure_excess_sum = 0._DP
-        do i_change = 1, this%num_changes
-            box_size_ratio = this%changed_box_size_ratio%get()
-            new_box_size = box_size * box_size_ratio
-            call this%dipolar_interactions_facade%save(dipolar_interactions_static, new_box_size)
+        do i_box = 1, size(this%environment%periodic_boxes)
+            call short_interactions_visit_cells(overlap, contacts, this%components(:, i_box), this%&
+                short_interactions%cells(i_box)%visitable_cells)
+            if (overlap) then
+                call error_exit("Abstract_Volume_Change_Method: try: "//&
+                    "short_interactions_visit_cells: overlap")
+            end if
 
-            call this%environment%periodic_box%set(box_size * box_size_ratio)
-            call this%rescale_positions(box_size_ratio)
-            call logical_create(only_resized_triangle, size(this%components))
-            call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells)
-            call short_interactions_reset(this%short_interactions%neighbour_cells, &
-                only_resized_triangle, this%short_interactions%visitable_cells)
-            call this%dipolar_interactions_facade%reset()
-            call this%set_delta_energy(overlap, delta_energy, box_size_ratio, observables%energies)
-            if (overlap) call error_exit("Abstract_Volume_Change_Method: try: set_delta_energy: "//&
-                "overlap")
-            delta_volume = product(this%environment%accessible_domain%get_size()) * &
-                (product(box_size_ratio) - 1._DP)
-            beta_pressure_excess_sum = beta_pressure_excess_sum - delta_energy / delta_volume / &
-                this%environment%temperature%get()
+            box_size = this%environment%periodic_boxes(i_box)%get_size()
+            beta_pressure_excess_sum = 0._DP
+            do i_change = 1, this%num_changes
+                box_size_ratio = this%changed_boxes_size_ratio(i_box)%get()
+                new_box_size = box_size * box_size_ratio
+                call this%dipolar_interactions_facades(i_box)%save(dipolar_interactions_static, reset_real_pair, new_box_size)
 
-            call this%environment%periodic_box%set(box_size)
-            call this%rescale_positions(1._DP / box_size_ratio)
-            call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells)
-            call this%dipolar_interactions_facade%restore(dipolar_interactions_static)
+                call this%environment%periodic_boxes(i_box)%set(box_size * box_size_ratio)
+                call this%rescale_positions(i_box, box_size_ratio)
+                call logical_create(only_resized_triangle, size(this%components, 1))
+                call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
+                call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells, &
+                    only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
+                call this%dipolar_interactions_facades(i_box)%reset()
+                call this%set_delta_energy(overlap, delta_energy, i_box, box_size_ratio, observables%energies)
+                if (overlap) call error_exit("Abstract_Volume_Change_Method: try: set_delta_energy: "//&
+                    "overlap")
+                delta_volume = product(this%environment%accessible_domains(i_box)%get_size()) * &
+                    (product(box_size_ratio) - 1._DP)
+                beta_pressure_excess_sum = beta_pressure_excess_sum - delta_energy / delta_volume / &
+                    this%environment%temperature%get()
+
+                call this%environment%periodic_boxes(i_box)%set(box_size)
+                call this%rescale_positions(i_box, 1._DP / box_size_ratio)
+                call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
+                call this%dipolar_interactions_facades(i_box)%restore(dipolar_interactions_static, reset_real_pair)
+            end do
+            observables%beta_pressures_excess(i_box) = this%short_interactions%beta_pressures_excess(i_box)%&
+                get(contacts) + beta_pressure_excess_sum / real(this%num_changes, DP)
         end do
-        observables%beta_pressure_excess = this%short_interactions%beta_pressure_excess%&
-            get(contacts) + beta_pressure_excess_sum / this%num_changes
     end subroutine Abstract_try
 
-    subroutine Abstract_set_delta_energy(this, overlap, delta_energy, box_size_ratio, energies)
+
+    subroutine Abstract_set_delta_energy(this, overlap, delta_energy, i_box, box_size_ratio, energies)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
+        integer, intent(in) :: i_box
         real(DP), intent(in) :: box_size_ratio(:)
         type(Concrete_Observables_Energies), intent(in) :: energies
 
         type(Concrete_Observables_Energies) :: deltas, new_energies
 
-        call observables_energies_create(deltas, size(this%components))
-        call observables_energies_create(new_energies, size(this%components))
-        call short_interactions_visit(overlap, new_energies%walls_energies, this%components, this%&
-            short_interactions)
+        call observables_energies_create(deltas, size(this%components, 1))
+        call observables_energies_create(new_energies, size(this%components, 1))
+        call short_interactions_visit(overlap, new_energies%walls_energies, this%&
+            components(:, i_box), this%short_interactions%walls_visitors(i_box), this%&
+            short_interactions%wall_pairs)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
-        call short_interactions_visit_cells(overlap, new_energies%short_energies, this%components, &
-            this%short_interactions)
+        call short_interactions_visit_cells(overlap, new_energies%short_energies, this%components(:, i_box), &
+            this%short_interactions%cells(i_box)%visitable_cells)
         if (overlap) return
         deltas%short_energies = new_energies%short_energies - energies%short_energies
         call dipolar_interactions_visit(new_energies%field_energies, this%environment%&
-            external_field, this%components)
+            external_fields(i_box), this%components(:, i_box))
         deltas%field_energies = new_energies%field_energies - energies%field_energies
-        call this%dipolar_interactions_facade%visit(new_energies%dipolar_energies, new_energies%&
+        call this%dipolar_interactions_facades(i_box)%visit(new_energies%dipolar_energies, new_energies%&
             dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies, energies%&
             dipolar_shared_energy)
         deltas%dipolar_energies = new_energies%dipolar_energies - energies%dipolar_energies
@@ -180,69 +188,72 @@ contains
             triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_shared_energy
     end subroutine Abstract_set_delta_energy
 
-    subroutine Abstract_rescale_positions(this, box_size_ratio)
+    subroutine Abstract_rescale_positions(this, i_box, box_size_ratio)
         class(Abstract_Volume_Change_Method), intent(in) :: this
+        integer, intent(in) :: i_box
         real(DP), intent(in) :: box_size_ratio(:)
 
         integer :: i_component
 
-        do i_component = 1, size(this%components)
-            call this%components(i_component)%positions%rescale_all(box_size_ratio)
+        do i_component = 1, size(this%components, 1)
+            call this%components(i_component, i_box)%positions%rescale_all(box_size_ratio)
         end do
     end subroutine Abstract_rescale_positions
 
     !> @note
     !> cf. [[classes_box_volume_change:Abstract_save_cells]]
-    subroutine Abstract_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)
+    subroutine Abstract_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells, i_box)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
         type(Concrete_Logical_Line), intent(inout) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
+        integer, intent(in) :: i_box
 
         integer :: i_component, j_component
 
-        call cells_allocate_triangle(neighbour_cells, size(this%components))
+        call cells_allocate_triangle(neighbour_cells, size(this%components, 1))
         do j_component = 1, size(neighbour_cells)
             do i_component = 1, size(neighbour_cells(j_component)%line)
-                only_resized_triangle(j_component)%line(i_component) = this%short_interactions%&
+                only_resized_triangle(j_component)%line(i_component) = this%short_interactions%cells(i_box)%&
                     neighbour_cells(j_component)%line(i_component)%cells%resize_only()
                 if (.not. only_resized_triangle(j_component)%line(i_component)) then
                     allocate(neighbour_cells(j_component)%line(i_component)%cells, source=this%&
-                        short_interactions%neighbour_cells(j_component)%line(i_component)%cells)
+                        short_interactions%cells(i_box)%neighbour_cells(j_component)%line(i_component)%cells)
                 end if
             end do
         end do
         call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
-            short_interactions%visitable_cells)
+            short_interactions%cells(i_box)%visitable_cells)
     end subroutine Abstract_save_cells
 
     !> @note
     !> cf. [[classes_box_volume_change:Abstract_restore_cells]]
-    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells)
+    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, visitable_cells, i_box)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Neighbour_Cells_Line), allocatable, intent(inout) :: neighbour_cells(:)
         type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells(:, :)
+        integer, intent(in) :: i_box
 
         integer :: i_component, j_component
 
-        do j_component = 1, size(this%short_interactions%neighbour_cells)
-            do i_component = 1, size(this%short_interactions%neighbour_cells(j_component)%line)
+        do j_component = 1, size(this%short_interactions%cells(i_box)%neighbour_cells)
+            do i_component = 1, size(this%short_interactions%cells(i_box)%neighbour_cells(j_component)%line)
                 if (only_resized_triangle(j_component)%line(i_component)) then
-                    call this%short_interactions%neighbour_cells(j_component)%line(i_component)%&
+                    call this%short_interactions%cells(i_box)%neighbour_cells(j_component)%line(i_component)%&
                         cells%reset()
                 else
-                    call cells_destroy(this%short_interactions%neighbour_cells(j_component)%&
+                    call cells_destroy(this%short_interactions%cells(i_box)%neighbour_cells(j_component)%&
                         line(i_component)%cells)
-                    allocate(this%short_interactions%neighbour_cells(j_component)%&
+                    allocate(this%short_interactions%cells(i_box)%neighbour_cells(j_component)%&
                         line(i_component)%cells, source=neighbour_cells(j_component)%&
                         line(i_component)%cells)
                 end if
             end do
         end do
         call cells_destroy(neighbour_cells)
-        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
-            visitable_cells, this%short_interactions%neighbour_cells, only_resized_triangle, &
+        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%cells(i_box)%&
+            visitable_cells, this%short_interactions%cells(i_box)%neighbour_cells, only_resized_triangle, &
             visitable_cells)
         call cells_destroy(visitable_cells)
     end subroutine Abstract_restore_cells
@@ -252,14 +263,14 @@ contains
 !implementation Null_Volume_Change_Method
 
     subroutine Null_construct(this, environment, components, short_interactions, &
-        dipolar_interactions_facade, changed_box_size_ratio, num_changes)
+        dipolar_interactions_facades, changed_boxes_size_ratio, num_changes)
         class(Null_Volume_Change_Method), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
-            dipolar_interactions_facade
-        class(Abstract_Changed_Box_Size_Ratio), target, intent(in) :: changed_box_size_ratio
+            dipolar_interactions_facades(:)
+        class(Abstract_Changed_Box_Size_Ratio), target, intent(in) :: changed_boxes_size_ratio(:)
         integer, intent(in) :: num_changes
     end subroutine Null_construct
 

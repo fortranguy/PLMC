@@ -19,7 +19,7 @@ private
         Abstract_Maximum_Box_Compression_Explorer
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Component_Wrapper), pointer :: components(:) => null()
+        type(Component_Wrapper), pointer :: components(:, :) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         class(Abstract_Maximum_Box_Compression), allocatable :: maximum_box_compression
         real(DP) :: min_distance
@@ -50,7 +50,7 @@ contains
         maximum_box_compression)
         class(Abstract_Maximum_Box_Compression_Explorer), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Maximum_Box_Compression), intent(in) :: maximum_box_compression
 
@@ -68,7 +68,7 @@ contains
         real(DP) :: min_distance_ij
 
         this%min_distance = this%environment%periodic_box%get_max_distance()
-        do j_component = 1, size(this%components)
+        do j_component = 1, size(this%components, 1)
             do i_component = 1, j_component
                 min_distance_ij = this%short_interactions%components_pairs(j_component)%&
                     line(i_component)%potential%get_min_distance()
@@ -86,20 +86,24 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
+    !> @todo Multiple box
     subroutine Abstract_try(this, observables)
         class(Abstract_Maximum_Box_Compression_Explorer), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables
 
         logical :: overlap
+        integer :: i_box
         real(DP) :: min_distance_ratio, max_distance_ratio
 
-        max_distance_ratio = this%environment%periodic_box%get_max_distance() / this%min_distance
-        call short_interactions_visit_cells(overlap, min_distance_ratio, max_distance_ratio, this%&
-            components, this%short_interactions)
-        if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&
-            "short_interactions_visit_cells: overlap")
-        observables%maximum_box_compression_delta = this%maximum_box_compression%&
-            get_delta(min_distance_ratio)
+        do i_box = 1, size(this%environment%periodic_boxes)
+            max_distance_ratio = this%environment%periodic_boxes(i_box)%get_max_distance() / this%min_distance
+            call short_interactions_visit_cells(overlap, min_distance_ratio, max_distance_ratio, this%&
+                components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
+            if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&
+                "short_interactions_visit_cells: overlap")
+            observables%maximum_boxes_compression_delta(i_box) = this%maximum_box_compression%&
+                get_delta(min_distance_ratio)
+        end do
     end subroutine Abstract_try
 
 !end implementation Abstract_Maximum_Box_Compression_Explorer
@@ -109,7 +113,7 @@ contains
     subroutine Null_construct(this, environment, components, short_interactions)
         class(Null_Maximum_Box_Compression_Explorer), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Component_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
     end subroutine Null_construct
 

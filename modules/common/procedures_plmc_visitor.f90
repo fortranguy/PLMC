@@ -32,19 +32,22 @@ contains
         visit_energies = logical_from_json(exploring_data, prefix//"visit energies")
     end subroutine set_visit_energies
 
+    !> @todo multiple boxes
     subroutine visit(energies, physical_model, visit_energies)
         type(Concrete_Observables_Energies), intent(inout) :: energies
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         logical, optional, intent(in) :: visit_energies
 
         logical :: overlap
+        integer :: i_box
 
         if (present(visit_energies)) then
             if (.not.visit_energies) return
         end if
 
         call short_interactions_visit(overlap, energies%walls_energies, physical_model%&
-            mixture%components, physical_model%short_interactions)
+            mixture%gemc_components(:, i_box), physical_model%short_interactions%&
+            walls_visitors(i_box), physical_model%short_interactions%wall_pairs)
         if (overlap) call error_exit("procedures_plmc_visitor: visit_generating: "//&
             "short_interactions_visit: walls: overlap.")
         call short_interactions_visit(overlap, energies%short_energies, physical_model%&

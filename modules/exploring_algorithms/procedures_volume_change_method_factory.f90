@@ -16,11 +16,11 @@ public :: create, destroy
 
 contains
 
-    subroutine create(volume_change_method, physical_model, changed_box_size_ratio, &
+    subroutine create(volume_change_method, physical_model, changed_boxes_size_ratio, &
         measure_pressure_excess, exploring_data)
         class(Abstract_Volume_Change_Method), allocatable, intent(out) :: volume_change_method
         type(Physical_Model_Wrapper), intent(in) :: physical_model
-        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_boxes_size_ratio(:)
         logical, intent(in) :: measure_pressure_excess
         type(json_file), intent(inout) :: exploring_data
 
@@ -38,8 +38,8 @@ contains
             num_changes = 0
         end if
         call volume_change_method%construct(physical_model%environment, physical_model%mixture%&
-            components, physical_model%short_interactions, physical_model%&
-            dipolar_interactions_facade, changed_box_size_ratio, num_changes)
+            gemc_components, physical_model%short_interactions, physical_model%&
+            dipolar_interactions_facades, changed_boxes_size_ratio, num_changes)
     end subroutine create
 
     subroutine destroy(volume_change_method)

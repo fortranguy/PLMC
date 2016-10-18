@@ -3,8 +3,7 @@ module procedures_generating_algorithms_factory
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
-use procedures_box_volume_change_factory, only: box_volume_change_create => create, &
-    box_volume_change_destroy => destroy
+use procedures_box_volume_change_factory, only: box_volume_change_create => create
 use procedures_box_particle_move_factory, only: box_particle_translation_create => &
     create_translation, box_particle_rotation_create => create_rotation
 use procedures_box_particle_exchange_factory, only: box_particle_add_create => create_add, &
@@ -25,8 +24,8 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
 
-        call box_volume_change_create(generating_algorithms%box_volume_change, physical_model, &
-            changes%changed_box_size)
+        call box_volume_change_create(generating_algorithms%volume_change, physical_model, &
+            changes%changed_boxes_size)
         call box_particle_translation_create(generating_algorithms%one_particle_translation, &
             physical_model, changes%gemc_components)
         call box_particle_rotation_create(generating_algorithms%one_particle_rotation, &
@@ -50,7 +49,7 @@ contains
         call destroy_element(generating_algorithms%one_particle_add)
         call destroy_element(generating_algorithms%one_particle_rotation)
         call destroy_element(generating_algorithms%one_particle_translation)
-        call box_volume_change_destroy(generating_algorithms%box_volume_change)
+        call destroy_element(generating_algorithms%volume_change)
     end subroutine generating_algorithms_destroy
 
     subroutine destroy_element(algorithm)

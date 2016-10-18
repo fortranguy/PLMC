@@ -12,6 +12,7 @@ public :: create, destroy
 
 interface create
     module procedure :: create_accessible_domains_size
+    module procedure :: create_line
     module procedure :: create_element
 end interface create
 
@@ -47,6 +48,25 @@ contains
         end do
     end subroutine create_accessible_domains_size
 
+    subroutine create_line(writers, paths, filename, needed)
+        class(Abstract_Real_Writer), allocatable, intent(out) :: writers(:)
+        type(String_Wrapper), intent(in) :: paths(:)
+        character(len=*), intent(in) :: filename
+        logical, intent(in) :: needed
+
+        integer :: i_box
+
+        if (needed) then
+            allocate(Concrete_Real_Writer :: writers(size(paths)))
+        else
+            allocate(Null_Real_Writer :: writers(size(paths)))
+        end if
+
+        do i_box = 1, size(writers)
+            call writers(i_box)%construct(paths(i_box)%string//filename)
+        end do
+    end subroutine create_line
+
     subroutine destroy_line(writer)
         class(Abstract_Real_Writer), allocatable, intent(inout) :: writer(:)
 
@@ -60,7 +80,6 @@ contains
         end if
     end subroutine destroy_line
 
-    !> @warning deprecated
     subroutine create_element(writer, filename, needed)
         class(Abstract_Real_Writer), allocatable, intent(out) :: writer
         character(len=*), intent(in) :: filename
@@ -74,7 +93,6 @@ contains
         call writer%construct(filename)
     end subroutine create_element
 
-    !> @warning deprecated
     subroutine destroy_element(writer)
         class(Abstract_Real_Writer), allocatable, intent(inout) :: writer
 

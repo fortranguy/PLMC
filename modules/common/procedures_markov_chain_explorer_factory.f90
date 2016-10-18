@@ -64,7 +64,7 @@ contains
         call changed_boxes_size_ratio_create(markov_chain_explorer%changed_boxes_size_ratio, &
             physical_model%environment%periodic_boxes, boxes_size_can_change)
         call volume_change_method_create(markov_chain_explorer%volume_change_method, &
-            physical_model, markov_chain_explorer%changed_box_size_ratio, measure_pressure_excess, &
+            physical_model, markov_chain_explorer%changed_boxes_size_ratio, measure_pressure_excess, &
             exploring_data)
         measure_inv_pow_activities = measure_chemical_potentials(exploring_data, &
             particle_insertion_prefix)
@@ -80,7 +80,7 @@ contains
         call set_have_orientations(have_orientations, physical_model%mixture%gemc_components)
         call random_coordinates_create(random_orientation, have_orientations,can_exchange)
         call particle_insertion_method_create(markov_chain_explorer%particle_insertion_method, &
-            physical_model, random_positions(1), random_orientation, measure_inv_pow_activities, &
+            physical_model, random_positions, random_orientation, measure_inv_pow_activities, &
             exploring_data)
         call random_coordinates_destroy(random_orientation)
         call random_coordinates_destroy(random_positions)

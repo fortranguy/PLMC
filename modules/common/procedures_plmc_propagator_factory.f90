@@ -25,7 +25,7 @@ contains
         class(Abstract_Tower_Sampler), allocatable :: selector
         type(Generating_Algorithm_Pointer) :: algorithms(7)
 
-        algorithms(1)%algorithm => generating_algorithms%box_volume_change
+        algorithms(1)%algorithm => generating_algorithms%volume_change
         algorithms(2)%algorithm => generating_algorithms%one_particle_translation
         algorithms(3)%algorithm => generating_algorithms%one_particle_rotation
         algorithms(4)%algorithm => generating_algorithms%two_particles_switch

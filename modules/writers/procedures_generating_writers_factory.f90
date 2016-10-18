@@ -36,7 +36,6 @@ public :: create, destroy
 
 contains
 
-    !> @todo make folders for boxes
     subroutine create(writers, environment, wall_pairs, components, short_pairs, &
         changes_components, changed_boxes_size, generating_data)
         type(Generating_Writers_Wrapper), intent(out) :: writers

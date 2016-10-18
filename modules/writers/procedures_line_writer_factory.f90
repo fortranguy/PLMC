@@ -18,7 +18,6 @@ interface create
     module procedure :: create_walls_energies
     module procedure :: create_field_energies
     module procedure :: create_line
-    module procedure :: create_element
 end interface create
 
 interface destroy
@@ -105,21 +104,6 @@ contains
         end if
     end subroutine destroy_line
 
-    !> @warning deprecated
-    subroutine create_element(writer, filename, selector)
-        class(Abstract_Line_Writer), allocatable, intent(out) :: writer
-        character(len=*), intent(in) :: filename
-        logical, intent(in) :: selector(:)
-
-        if (any(selector)) then
-            allocate(Concrete_Line_Writer :: writer)
-        else
-            allocate(Null_Line_Writer :: writer)
-        end if
-        call writer%construct(filename, selector)
-    end subroutine create_element
-
-    !> @warning deprecated
     subroutine destroy_element(writer)
         class(Abstract_Line_Writer), allocatable, intent(inout) :: writer
 
