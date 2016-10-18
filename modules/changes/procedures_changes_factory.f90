@@ -32,22 +32,17 @@ use types_changes_wrapper, only: Changes_Wrapper
 implicit none
 
 private
-public :: changes_create, changes_destroy, set_can_translate, set_can_rotate, set_can_exchange
+public :: create, destroy, set_can_translate, set_can_rotate, set_can_exchange
 
-interface changes_create
+interface create
     module procedure :: create_all
     module procedure :: create_components
-end interface changes_create
+end interface create
 
-interface changes_destroy
+interface destroy
     module procedure :: destroy_components
     module procedure :: destroy_all
-end interface changes_destroy
-
-interface set_can_exchange
-    module procedure :: set_can_exchange_boxes
-    module procedure :: set_can_exchange_box
-end interface set_can_exchange
+end interface destroy
 
 contains
 
@@ -62,9 +57,8 @@ contains
             components_tuning_parameters
         type(Concrete_Move_Tuner_Parameters) :: box_size_tuner_parameters, &
             components_tuner_parameters
-        logical :: have_positions(size(components, 1), size(components, 2))
-        logical :: have_orientations(size(components, 1), size(components, 2))
-        logical :: can_exchange(size(components, 1), size(components, 2))
+        logical, dimension(size(components, 1), size(components, 2)) :: have_positions, &
+            have_orientations, can_exchange
         logical :: total_volume_can_change
         logical :: some_boxes_size_can_change, some_components_have_coordinates
 
@@ -90,7 +84,7 @@ contains
         call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
             some_components_have_coordinates, generating_data, changes_prefix//"Components.")
 
-        call changes_create(changes%gemc_components, environment%periodic_boxes, components, &
+        call create(changes%gemc_components, environment%periodic_boxes, components, &
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
             generating_data, changes_prefix)
 
@@ -209,7 +203,7 @@ contains
         end do
     end subroutine set_can_rotate
 
-    subroutine set_can_exchange_boxes(can_exchange, components)
+    subroutine set_can_exchange(can_exchange, components)
         logical, intent(inout) :: can_exchange(:, :)
         type(Component_Wrapper), intent(in) :: components(:, :)
 
@@ -221,20 +215,7 @@ contains
                     component_can_exchange(components(i_component, i_box)%chemical_potential)
             end do
         end do
-    end subroutine set_can_exchange_boxes
-
-    !> @warning deprecated
-    subroutine set_can_exchange_box(can_exchange, components)
-        logical, intent(out) :: can_exchange(:)
-        type(Component_Wrapper), intent(in) :: components(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(can_exchange)
-            can_exchange(i_component) = component_can_exchange(components(i_component)%&
-                chemical_potential)
-        end do
-    end subroutine set_can_exchange_box
+    end subroutine set_can_exchange
 
     subroutine destroy_all(changes)
         type(Changes_Wrapper), intent(inout) :: changes

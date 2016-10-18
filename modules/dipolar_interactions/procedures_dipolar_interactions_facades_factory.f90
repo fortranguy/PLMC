@@ -39,10 +39,7 @@ contains
             measure_pressure = .false.
         end if
 
-        do i_box = 1, size(are_dipolar, 2)
-            call set_are_dipolar(are_dipolar(:, i_box), components(:, i_box))
-        end do
-
+        call set_are_dipolar(are_dipolar, components)
         if ((box_size_can_change(environment%beta_pressure) .or. measure_pressure) .and. &
             any(are_dipolar)) then
             if (all(periodicity_is_xyz(environment%periodic_boxes))) then

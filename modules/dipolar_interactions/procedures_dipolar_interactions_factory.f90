@@ -41,8 +41,8 @@ contains
         integer :: i_box
         logical :: are_dipolar(size(mixture%gemc_components, 1), size(mixture%gemc_components, 2))
 
+        call set_are_dipolar(are_dipolar, mixture%gemc_components)
         do i_box = 1, size(are_dipolar, 2)
-            call set_are_dipolar(are_dipolar(:, i_box), mixture%gemc_components(:, i_box))
             call check_consistency(environment%reciprocal_lattices(i_box), environment%&
                 permittivity, any(are_dipolar(:, i_box)))
         end do

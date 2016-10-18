@@ -2,7 +2,7 @@ module procedures_markov_chain_generator_factory
 
 use json_module, only: json_file
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
-use procedures_changes_factory, only: changes_create, changes_destroy
+use procedures_changes_factory, only: changes_create => create, changes_destroy => destroy
 use procedures_generating_algorithms_factory, only: generating_algorithms_create, &
     generating_algorithms_destroy
 use procedures_plmc_propagator_factory, only: plmc_propagator_create => create, &

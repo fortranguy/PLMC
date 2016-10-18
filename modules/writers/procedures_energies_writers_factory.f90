@@ -40,12 +40,14 @@ contains
         type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
         logical, intent(in) :: visit_energies
 
+        logical :: are_dipolar(size(components, 1), size(components, 2))
         integer :: i_box
 
+        call set_are_dipolar(are_dipolar, components)
         allocate(energies(size(paths)))
         do i_box = 1, size(energies)
             call create(energies(i_box), paths(i_box)%string, external_fields(i_box), wall_pairs, &
-                components(:, i_box), short_pairs, visit_energies)
+                components(:, i_box), are_dipolar(:, i_box), short_pairs, visit_energies)
         end do
     end subroutine create_line
 
@@ -62,17 +64,16 @@ contains
         end if
     end subroutine destroy_line
 
-    subroutine create_element(energies, path, external_field, wall_pairs, components, short_pairs, &
-        visit_energies)
+    subroutine create_element(energies, path, external_field, wall_pairs, components, are_dipolar, &
+        short_pairs, visit_energies)
         type(Concrete_Energies_Writers), intent(out) :: energies
         character(len=*), intent(in) :: path
         class(Abstract_External_Field), intent(in) :: external_field
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(in) :: are_dipolar(:)
         type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
         logical, intent(in) :: visit_energies
-
-        logical, dimension(size(components)) :: are_dipolar
 
         call line_writer_create(energies%walls_energies, path//"walls_energies.out", wall_pairs, &
             visit_energies)
@@ -80,7 +81,6 @@ contains
             external_field, components, visit_energies)
         call triangle_writer_create(energies%short_energies, path//"short_energies.out", &
             short_pairs, visit_energies)
-        call set_are_dipolar(are_dipolar, components)
         call triangle_writer_create(energies%dipolar_energies, path//"dipolar_energies.out", &
             are_dipolar, visit_energies)
         call real_writer_create(energies%dipolar_shared_energy, path//"dipolar_shared_energy.out", &

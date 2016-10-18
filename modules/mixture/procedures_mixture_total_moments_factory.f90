@@ -12,8 +12,7 @@ public :: create, destroy, set_are_dipolar
 
 contains
 
-    !> @todo
-    !> More restrictive condition for are_dipolar than any?
+    !> @todo More restrictive condition for are_dipolar than any?
     subroutine create(total_moments, components)
         class(Abstract_Mixture_Total_Moment), allocatable, intent(out) :: total_moments(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
@@ -21,9 +20,7 @@ contains
         integer :: i_box
         logical :: are_dipolar(size(components, 1), size(components, 2))
 
-        do i_box = 1, size(are_dipolar, 2)
-            call set_are_dipolar(are_dipolar(:, i_box), components(:, i_box))
-        end do
+        call set_are_dipolar(are_dipolar, components)
         if (any(are_dipolar)) then
             allocate(Concrete_Mixture_Total_Moment :: total_moments(size(components, 2)))
         else
@@ -49,13 +46,16 @@ contains
     end subroutine destroy
 
     subroutine set_are_dipolar(are_dipolar, components)
-        logical, intent(inout) :: are_dipolar(:)
-        type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(inout) :: are_dipolar(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        do i_component = 1, size(are_dipolar)
-            are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipole_moments)
+        do i_box = 1, size(are_dipolar, 2)
+            do i_component = 1, size(are_dipolar, 1)
+                are_dipolar(i_component, i_box) = &
+                    component_is_dipolar(components(i_component, i_box)%dipole_moments)
+            end do
         end do
     end subroutine set_are_dipolar
 
