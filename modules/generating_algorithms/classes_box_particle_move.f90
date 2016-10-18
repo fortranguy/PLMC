@@ -32,7 +32,7 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic(:) => &
             null()
         type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static(:) => &
             null()
@@ -159,7 +159,7 @@ contains
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
-            dipolar_interactions_dynamic
+            dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: &
             dipolar_interactions_static(:)
         type(Changes_Component_Wrapper), target, intent(in) :: changes_components(:, :)
@@ -343,17 +343,17 @@ contains
         real(DP), dimension(size(delta_energies)) :: real_energies_new, real_energies_old
         integer :: j_component, i_exclude
 
-        do j_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 1)
+        do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(new%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic%gemc_real_components(j_component, i_component, i_box)%&
+            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
                 component%visit(real_energies_new(j_component), new, visit_different, i_exclude)
-            call this%dipolar_interactions_dynamic%gemc_real_components(j_component, i_component, i_box)%&
+            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
                 component%visit(real_energies_old(j_component), old, visit_different, i_exclude)
         end do
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
                 visit_translation(i_component, new%position, old) - &
-            this%dipolar_interactions_dynamic%dlc_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%&
                 visit_translation(i_component, new%position, old)
         delta_energies = real_energies_new - real_energies_old
     end subroutine Translation_visit_dipolar
@@ -456,20 +456,20 @@ contains
         real(DP), dimension(size(delta_energies)) :: real_energies_new, real_energies_old
         integer :: j_component, i_exclude
 
-        do j_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 1)
+        do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(new%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic%gemc_real_components(j_component, i_component, i_box)%&
+            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
                 component%visit(real_energies_new(j_component), new, visit_different, i_exclude)
-            call this%dipolar_interactions_dynamic%gemc_real_components(j_component, i_component, i_box)%&
+            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
                 component%visit(real_energies_old(j_component), old, visit_different, i_exclude)
         end do
         delta_energies = real_energies_new - real_energies_old
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
                 visit_rotation(i_component, new%dipole_moment, old) + &
-            this%dipolar_interactions_dynamic%gemc_surf_mixture(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%surf_mixture%&
                 visit_rotation(i_component, new%dipole_moment, old%dipole_moment) - &
-            this%dipolar_interactions_dynamic%dlc_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%&
                 visit_rotation(i_component, new%dipole_moment, old)
     end subroutine Rotation_visit_dipolar
 

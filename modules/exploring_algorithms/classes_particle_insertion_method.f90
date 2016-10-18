@@ -27,7 +27,7 @@ private
         class(Abstract_Num_Particles), allocatable :: nums_particles(:)
         type(Component_Wrapper), pointer :: components(:, :) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic(:) => &
             null()
         class(Abstract_Random_Coordinates), allocatable :: random_positions(:), random_orientation
     contains
@@ -63,7 +63,7 @@ contains
         type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
-            dipolar_interactions_dynamic
+            dipolar_interactions_dynamic(:)
         class(Abstract_Random_Coordinates), intent(in) :: random_positions(:), random_orientation
 
         this%environment => environment
@@ -181,18 +181,18 @@ contains
 
         integer :: j_component, i_exclude
 
-        do j_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 1)
+        do j_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
             i_exclude = merge(test%i, 0, j_component == i_component)
-            call this%dipolar_interactions_dynamic%gemc_real_components(j_component, i_component, i_box)%&
+            call this%dipolar_interactions_dynamic(i_box)%real_components(j_component, i_component)%&
                 component%visit(deltas(j_component), test, visit_different, i_exclude)
         end do
-        deltas(i_component) = deltas(i_component) - this%dipolar_interactions_dynamic%&
-            gemc_self_components(i_component, i_box)%component%meet(test%dipole_moment)
+        deltas(i_component) = deltas(i_component) - this%dipolar_interactions_dynamic(i_box)%&
+            self_components(i_component)%component%meet(test%dipole_moment)
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitors(i_box)%visit_add(i_component, test) + &
-            this%dipolar_interactions_dynamic%gemc_surf_mixture(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%visit_add(i_component, test) + &
+            this%dipolar_interactions_dynamic(i_box)%surf_mixture%&
                 visit_add(i_component, test%dipole_moment) - &
-            this%dipolar_interactions_dynamic%dlc_visitors(i_box)%visit_add(i_component, test)
+            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_add(i_component, test)
     end subroutine Abstract_visit_dipolar
 
 !end implementation Abstract_Particle_Insertion_Method
@@ -207,7 +207,7 @@ contains
         type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
-            dipolar_interactions_dynamic
+            dipolar_interactions_dynamic(:)
         class(Abstract_Random_Coordinates), intent(in) :: random_positions(:), random_orientation
     end subroutine Null_construct
 

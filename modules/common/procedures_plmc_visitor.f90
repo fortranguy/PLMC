@@ -59,7 +59,7 @@ contains
             call dipolar_interactions_visit(energies(i_box)%field_energies, physical_model%environment%&
                 external_fields(i_box), physical_model%mixture%gemc_components(:, i_box))
             call dipolar_interactions_visit(energies(i_box)%dipolar_energies, energies(i_box)%dipolar_shared_energy, &
-                i_box, physical_model%mixture%gemc_components(:, i_box), physical_model%dipolar_interactions_dynamic)
+                physical_model%mixture%gemc_components(:, i_box), physical_model%gemc_dipolar_interactions_dynamic(i_box))
             end do
     end subroutine visit
 

@@ -39,10 +39,9 @@ contains
         end do
     end subroutine visit_field
 
-    subroutine visit_dipolar(energies, shared_energy, i_box, components, dipolar_interactions_dynamic)
+    subroutine visit_dipolar(energies, shared_energy, components, dipolar_interactions_dynamic)
         type(Reals_Line), intent(inout) :: energies(:)
         real(DP), intent(out) :: shared_energy
-        integer, intent(in) :: i_box
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
 
@@ -52,16 +51,16 @@ contains
         call triangle_observables_init(energies)
 
         call reals_create(real_energies, size(components))
-        call visit_des_real(real_energies, components, dipolar_interactions_dynamic%gemc_real_components(:, :, i_box))
+        call visit_des_real(real_energies, components, dipolar_interactions_dynamic%real_components)
         call triangle_observables_add(energies, real_energies)
         call reals_destroy(real_energies)
 
-        call visit_des_self(self_energies, dipolar_interactions_dynamic%gemc_self_components(:, i_box))
+        call visit_des_self(self_energies, dipolar_interactions_dynamic%self_components)
         call triangle_observables_add(energies, -self_energies)
 
-        shared_energy = dipolar_interactions_dynamic%reci_visitors(i_box)%visit() + &
-            dipolar_interactions_dynamic%gemc_surf_mixture(i_box)%visit() - &
-            dipolar_interactions_dynamic%dlc_visitors(i_box)%visit()
+        shared_energy = dipolar_interactions_dynamic%reci_visitor%visit() + &
+            dipolar_interactions_dynamic%surf_mixture%visit() - &
+            dipolar_interactions_dynamic%dlc_visitor%visit()
     end subroutine visit_dipolar
 
     subroutine visit_des_real(energies, components, real_components)

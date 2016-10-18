@@ -32,7 +32,7 @@ contains
             mixture, generating_data)
         call dipolar_interactions_facades_create(physical_model%dipolar_interactions_facades, &
             physical_model%environment, physical_model%mixture%gemc_components, physical_model%&
-            dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static)
+            gemc_dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static)
     end subroutine create_generating
 
     subroutine create_exploring(physical_model, generating_data, exploring_data, unique_box)
@@ -49,7 +49,7 @@ contains
             mixture, generating_data)
         call dipolar_interactions_facades_create(physical_model%dipolar_interactions_facades, &
             physical_model%environment, physical_model%mixture%gemc_components, physical_model%&
-            dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
+            gemc_dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
             exploring_data)
     end subroutine create_exploring
 

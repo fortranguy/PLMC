@@ -39,7 +39,7 @@ contains
         select type (particle_add)
             type is (Box_Particle_Add)
                 call particle_add%construct(physical_model%environment, physical_model%mixture, &
-                    physical_model%short_interactions, physical_model%dipolar_interactions_dynamic,&
+                    physical_model%short_interactions, physical_model%gemc_dipolar_interactions_dynamic,&
                     physical_model%gemc_dipolar_interactions_static, changes, can_exchange, &
                     selectors)
             type is (Null_Generating_Algorithm)
@@ -71,7 +71,7 @@ contains
         select type (particle_remove)
             type is (Box_Particle_Remove)
                 call particle_remove%construct(physical_model%environment, physical_model%mixture, &
-                    physical_model%short_interactions, physical_model%dipolar_interactions_dynamic,&
+                    physical_model%short_interactions, physical_model%gemc_dipolar_interactions_dynamic,&
                     physical_model%gemc_dipolar_interactions_static, changes, can_exchange, &
                     selectors)
             type is (Null_Generating_Algorithm)

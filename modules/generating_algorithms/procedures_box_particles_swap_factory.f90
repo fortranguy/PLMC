@@ -47,7 +47,7 @@ contains
             type is (Box_Particles_Swap_Identities)
                 call particles_transmutation%construct(physical_model%environment, physical_model%&
                     mixture, physical_model%short_interactions, physical_model%&
-                    dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
+                    gemc_dipolar_interactions_dynamic, physical_model%gemc_dipolar_interactions_static, &
                     changes, can_exchange, couples, selectors)
             type is (Null_Generating_Algorithm)
             class default
@@ -80,7 +80,7 @@ contains
         select type (particles_switch)
             type is (Box_Particles_Swap_Positions)
                 call particles_switch%construct(physical_model%environment, physical_model%mixture,&
-                    physical_model%short_interactions, physical_model%dipolar_interactions_dynamic,&
+                    physical_model%short_interactions, physical_model%gemc_dipolar_interactions_dynamic,&
                     physical_model%gemc_dipolar_interactions_static, changes, can_translate, couples, &
                     selectors)
             type is (Null_Generating_Algorithm)

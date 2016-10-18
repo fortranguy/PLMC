@@ -53,7 +53,7 @@ contains
 
         call particle_insertion_method%construct(physical_model%environment, nums_particles, &
             physical_model%mixture%gemc_components, physical_model%short_interactions, physical_model%&
-            dipolar_interactions_dynamic, random_positions, random_orientation)
+            gemc_dipolar_interactions_dynamic, random_positions, random_orientation)
         call composition_destroy(nums_particles)
     end subroutine create
 

@@ -35,7 +35,7 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
-        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic => &
+        type(Dipolar_Interactions_Dynamic_Wrapper), pointer :: dipolar_interactions_dynamic(:) => &
             null()
         type(Dipolar_Interactions_Static_Wrapper), pointer :: dipolar_interactions_static(:) => &
             null()
@@ -174,7 +174,7 @@ contains
         type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Dipolar_Interactions_Dynamic_Wrapper), target, intent(in) :: &
-            dipolar_interactions_dynamic
+            dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), target, intent(in) :: &
             dipolar_interactions_static(:)
         type(Changes_Wrapper), target, intent(in) :: changes
@@ -407,26 +407,26 @@ contains
         integer :: i_component, i_partner, i_exclude
 
         do i_partner = 1, size(particles)
-            do i_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 1)
+            do i_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
                 i_exclude = i_exclude_particle(i_component, ij_actors, particles)
-                call this%dipolar_interactions_dynamic%&
-                    gemc_real_components(i_component, ij_actors(i_partner), i_box)%&
+                call this%dipolar_interactions_dynamic(i_box)%&
+                    real_components(i_component, ij_actors(i_partner))%&
                     component%visit(delta_energies(i_component, i_partner), particles(i_partner), &
                     visit_different, i_exclude)
             end do
             delta_energies(ij_actors(i_partner), i_partner) = &
                 delta_energies(ij_actors(i_partner), i_partner) - &
-                this%dipolar_interactions_dynamic%gemc_self_components(ij_actors(i_partner), i_box)%component%&
+                this%dipolar_interactions_dynamic(i_box)%self_components(ij_actors(i_partner))%component%&
                 meet(particles(i_partner)%dipole_moment)
         end do
         delta_energies(:, 1) = -delta_energies(:, 1)
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
                 visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)) + &
-            this%dipolar_interactions_dynamic%gemc_surf_mixture(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%surf_mixture%&
                 visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1)%&
                     dipole_moment) - &
-            this%dipolar_interactions_dynamic%dlc_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%&
                 visit_transmutation(ij_actors, particles(2)%dipole_moment, particles(1))
     end subroutine Identities_visit_dipolar
 
@@ -620,22 +620,22 @@ contains
         end do
 
         do i_partner = 1, size(swapped)
-            do i_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 1)
-                call this%dipolar_interactions_dynamic%&
-                    gemc_real_components(i_component, ij_actors(i_partner), i_box)%component%&
+            do i_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
+                call this%dipolar_interactions_dynamic(i_box)%&
+                    real_components(i_component, ij_actors(i_partner))%component%&
                     visit(real_energies_new(i_component, i_partner), swapped(i_partner), &
                         visit_different, i_exclude_particle(i_component, ij_actors, swapped))
-                call this%dipolar_interactions_dynamic%&
-                    gemc_real_components(i_component, ij_actors(i_partner), i_box)%component%&
+                call this%dipolar_interactions_dynamic(i_box)%&
+                    real_components(i_component, ij_actors(i_partner))%component%&
                     visit(real_energies_old(i_component, i_partner), particles(i_partner), &
                         visit_different, i_exclude_particle(i_component, ij_actors, particles))
             end do
         end do
         delta_energies = real_energies_new - real_energies_old
         delta_shared_energy = &
-            this%dipolar_interactions_dynamic%reci_visitors(i_box)%&
+            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
                 visit_switch(ij_actors, particles) - &
-            this%dipolar_interactions_dynamic%dlc_visitors(i_box)%visit_switch(ij_actors, particles)
+            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%visit_switch(ij_actors, particles)
     end subroutine Positions_visit_dipolar
 
     subroutine Positions_update_actors(this, i_box, ij_actors, particles)
