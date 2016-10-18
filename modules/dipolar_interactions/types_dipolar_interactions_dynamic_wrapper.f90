@@ -19,11 +19,11 @@ private
         class(Abstract_DES_Surf_Mixture), allocatable :: gemc_surf_mixture(:)
         class(Abstract_DLC_Visitor), allocatable :: dlc_visitors(:)
 
-        type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
-        class(Abstract_DES_Reci_Visitor), allocatable :: reci_visitor
-        type(DES_Self_Component_Wrapper), allocatable :: self_components(:)
-        class(Abstract_DES_Surf_Mixture), allocatable :: surf_mixture
-        class(Abstract_DLC_Visitor), allocatable :: dlc_visitor
+        !type(DES_Real_Component_Wrapper), allocatable :: real_components(:, :)
+        !class(Abstract_DES_Reci_Visitor), allocatable :: reci_visitor
+        !type(DES_Self_Component_Wrapper), allocatable :: self_components(:)
+        !class(Abstract_DES_Surf_Mixture), allocatable :: surf_mixture
+        !class(Abstract_DLC_Visitor), allocatable :: dlc_visitor
     end type Dipolar_Interactions_Dynamic_Wrapper
 
 end module types_dipolar_interactions_dynamic_wrapper

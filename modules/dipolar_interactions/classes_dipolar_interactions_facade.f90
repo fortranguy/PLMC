@@ -175,10 +175,10 @@ contains
         if (this%reset_real_pair) then
             call this%dipolar_interactions_static%real_pair%target(this%&
                 dipolar_interactions_static%box_size_memento_real)
-            do j_component = 1, size(this%dipolar_interactions_dynamic%real_components, 2)
-                do i_component = 1, size(this%dipolar_interactions_dynamic%real_components, 1)
+            do j_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 2)
+                do i_component = 1, size(this%dipolar_interactions_dynamic%gemc_real_components, 1)
                     call this%dipolar_interactions_dynamic%&
-                        real_components(i_component, j_component)%component%&
+                        gemc_real_components(i_component, j_component, this%i_box)%component%&
                         target(this%dipolar_interactions_static%box_size_memento_real, this%&
                             dipolar_interactions_static%real_pair)
                 end do
@@ -315,13 +315,13 @@ contains
             box_size_memento_reci)
         call this%dipolar_interactions_static%reci_structure%target(this%periodic_box, this%&
             dipolar_interactions_static%box_size_memento_reci, this%components)
-        call this%dipolar_interactions_dynamic%reci_visitor%target(this%&
+        call this%dipolar_interactions_dynamic%reci_visitors(this%i_box)%target(this%&
             dipolar_interactions_static%box_size_memento_reci, this%dipolar_interactions_static%&
             reci_weight, this%dipolar_interactions_static%reci_structure)
         call this%dipolar_interactions_static%dlc_weight%target(this%periodic_box)
         call this%dipolar_interactions_static%dlc_structures%target(this%periodic_box, this%&
             components)
-        call this%dipolar_interactions_dynamic%dlc_visitor%target(this%dipolar_interactions_static%&
+        call this%dipolar_interactions_dynamic%dlc_visitors(this%i_box)%target(this%dipolar_interactions_static%&
             dlc_weight, this%dipolar_interactions_static%dlc_structures)
     end subroutine Unscalable_target
 
