@@ -21,6 +21,7 @@ private
         class(Abstract_Temperature), allocatable :: temperature
         class(Abstract_Permittivity), allocatable :: permittivity
         class(Abstract_External_Field), allocatable :: external_fields(:)
+        class(Abstract_Parallelepiped_Domain), allocatable :: fields_domain(:)
         class(Abstract_Reciprocal_Lattice), allocatable :: reciprocal_lattices(:)
         class(Abstract_Min_Distance), allocatable :: wall_min_distance
         class(Abstract_Visitable_Walls), allocatable :: visitable_walls(:)

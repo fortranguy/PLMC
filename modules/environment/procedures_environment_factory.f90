@@ -36,7 +36,6 @@ contains
         logical, optional, intent(in) :: unique_box
 
         class(Abstract_Field_Expression), allocatable :: field_expression
-        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domains(:)
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
         logical :: field_applied
 
@@ -56,17 +55,14 @@ contains
         call walls_destroy(floor_penetration)
         call fields_create(field_expression, environment%permittivity, field_applied, &
             generating_data, environment_prefix)
-        call boxes_create(parallelepiped_domains, environment%periodic_boxes, environment%&
+        call boxes_create(environment%fields_domain, environment%periodic_boxes, environment%&
             visitable_walls, field_applied, generating_data, environment_prefix//&
             "External Field.")
-        call fields_create(environment%external_fields, parallelepiped_domains, field_expression, &
-            field_applied)
+        call fields_create(environment%external_fields, environment%fields_domain, &
+            field_expression, field_applied)
         call fields_destroy(field_expression)
-        call boxes_destroy(parallelepiped_domains)
         call boxes_create(environment%reciprocal_lattices, environment%periodic_boxes, &
             generating_data, environment_prefix)
-        call boxes_create(environment%boxes_size_checker, environment%reciprocal_lattices, &
-            environment%visitable_walls)
         if (all(periodicity_is_xyz(environment%periodic_boxes))) then
             call boxes_create(environment%accessible_domains, environment%periodic_boxes, &
                 needed=.true.)
@@ -77,17 +73,15 @@ contains
             call error_exit("procedures_environment_factory: create: "//&
                 "box periodicity is unknown.")
         end if
+        call boxes_create(environment%boxes_size_checker, environment%accessible_domains, &
+            environment%fields_domain, environment%reciprocal_lattices, environment%visitable_walls)
 
-        call check(environment%periodic_boxes, environment%visitable_walls, environment%&
-            boxes_size_checker)
+        call check(environment%periodic_boxes, environment%visitable_walls)
     end subroutine create
 
-    subroutine check(periodic_boxes, visitable_walls, boxes_size_checker)
+    subroutine check(periodic_boxes, visitable_walls)
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
-        class(Abstract_Box_Size_Checker), intent(in) :: boxes_size_checker(:)
-
-        integer :: i_box
 
         if (all(periodicity_is_xyz(periodic_boxes)) .and. all(use_walls(visitable_walls))) then
             call warning_continue("procedures_environment_factory: check: "//&
@@ -97,10 +91,6 @@ contains
             call warning_continue("procedures_environment_factory: check: "//&
                 "periodicity is XY but walls are not used.")
         end if
-
-        do i_box = 1, size(boxes_size_checker)
-            call boxes_size_checker(i_box)%check()
-        end do
     end subroutine check
 
     subroutine destroy(environment)
@@ -110,6 +100,7 @@ contains
         call boxes_destroy(environment%boxes_size_checker)
         call boxes_destroy(environment%reciprocal_lattices)
         call fields_destroy(environment%external_fields)
+        call boxes_destroy(environment%fields_domain)
         call walls_destroy(environment%visitable_walls)
         call hard_core_destroy(environment%wall_min_distance)
         call permittivity_destroy(environment%permittivity)

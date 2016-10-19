@@ -127,7 +127,10 @@
 
         \begin{scope}[shift={($(PeriodicBox |- ReciprocalLattice.north) - (0 cm, 0.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
-                \operation{\procedure{construct}{reciprocalLattice: \type{ReciprocalLattice},
+                \operation{\procedure{construct}{$\mathAggregation$ accessibleDomain:
+                    \type{ParallelepipedDomain},
+                    $\mathAggregation$ fieldDomain: \type{ParallelepipedDomain},
+                    reciprocalLattice: \type{ReciprocalLattice},
                     visitableWalls: \type{VisitableWalls}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{check}{}}
@@ -147,6 +150,7 @@
                 \UMLattribute{temperature: \type{Temperature}}
                 \UMLattribute{permittivity: \type{Permittivity}}
                 \UMLattribute{externalFields: \type{ExternalField[\numBoxes]}}
+                \UMLattribute{fieldsDomain: \type{ParallelepipedDomain[\numBoxes]}}
                 \UMLattribute{reciprocalLattices: \type{ReciprocalLattice[\numBoxes]}}
                 \UMLattribute{wallMinDistance: \type{MinDistance}}
                 \UMLattribute{visitableWalls: \type{VisitableWalls[\numBoxes]}}
@@ -158,12 +162,13 @@
         \begin{scope}[on background layer]
             \aggregation{ParallelepipedDomain}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \aggregation{ReciprocalLattice}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
-            \composition{ExternalField}{\refName{parallelepipedDomain}}{\numRef{1}}
+            \aggregation{ExternalField}{\refName{parallelepipedDomain}}{\numRef{1}}
                 {ParallelepipedDomain}
             \composition{ExternalField}{\refName{fieldExpression}}{\numRef{1}}{FieldExpression}
             \aggregation{WallsVisitor}{\refName{visitableWalls}}{\numRef{1}}{VisitableWalls}
             \aggregation{VisitableWalls}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
             \composition{VisitableWalls}{\refName{floorPenetration}}{\numRef{1}}{FloorPenetration}
+            %\aggregation{BoxSizeChecker}{\refName{domains}}{\numRef{2}}{ParallelepipedDomain}
             \aggregation{BoxSizeChecker}{\refName{reciprocalLattice}}{\numRef{1}}{ReciprocalLattice}
             \aggregation{BoxSizeChecker}{\refName{visitableWalls}}{\numRef{1}}{VisitableWalls}
             \aggregation{BoxSizeMemento}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}

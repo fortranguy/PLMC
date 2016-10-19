@@ -20,9 +20,8 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: target => Abstract_target
-        procedure :: reset => Abstract_set
+        procedure :: reset => Abstract_reset
         procedure :: get => Abstract_get
-        procedure, private :: set => Abstract_set
     end type Abstract_DLC_Weight
 
     type, extends(Abstract_DLC_Weight), public :: Concrete_DLC_Weight
@@ -34,7 +33,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: target => Null_target
-        procedure :: reset => Null_set
+        procedure :: reset => Null_reset
         procedure :: get => Null_get
     end type Null_DLC_Weight
 
@@ -42,6 +41,8 @@ contains
 
 !implementation Abstract_DLC_Weight
 
+    !> @note cf. [[classes_des_reci_weight:Abstract_construct]] for
+    !> [[classes_dlc_weight:Abstract_reset]]
     subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, permittivity)
         class(Abstract_DLC_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
@@ -52,7 +53,7 @@ contains
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%permittivity = permittivity%get()
         allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2)))
-        call this%set()
+        this%weight = 0._DP
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -69,7 +70,7 @@ contains
         this%periodic_box => periodic_box
     end subroutine Abstract_target
 
-    subroutine Abstract_set(this)
+    subroutine Abstract_reset(this)
         class(Abstract_DLC_Weight), intent(inout) :: this
 
         real(DP) :: box_size(num_dimensions), wave_vector(2), wave_norm
@@ -93,7 +94,7 @@ contains
 
         end do
         end do
-    end subroutine Abstract_set
+    end subroutine Abstract_reset
 
     !> \[
     !>      w(\vec{k}_{1:2}) =
@@ -129,9 +130,9 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
     end subroutine Null_target
 
-    subroutine Null_set(this)
+    subroutine Null_reset(this)
         class(Null_DLC_Weight), intent(inout) :: this
-    end subroutine Null_set
+    end subroutine Null_reset
 
     pure real(DP) function Null_get(this, n_1, n_2) result(weight)
         class(Null_DLC_Weight), intent(in) :: this

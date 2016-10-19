@@ -4,6 +4,7 @@ use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use procedures_property_inquirers, only: logical_from_json
 use classes_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, Null_Parallelepiped_Domain
 use classes_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use classes_beta_pressure, only: Abstract_Beta_Pressure, Concrete_Beta_Pressure
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
@@ -18,8 +19,8 @@ implicit none
 
 private
 public :: num_boxes, periodicity_is_xyz, periodicity_is_xy, total_volume_can_change, &
-    box_size_can_change, apply_external_field, use_permittivity, use_reciprocal_lattice, &
-    use_walls
+    box_size_can_change, use_domain, apply_external_field, use_permittivity, &
+    use_reciprocal_lattice, use_walls
 
 interface num_boxes
     module procedure :: num_boxes_from_json
@@ -124,6 +125,17 @@ contains
                 box_size_can_change = .true.
         end select
     end function box_size_can_change_from_ratio
+
+    elemental logical function use_domain(parallelepiped_domain)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+
+        select type (parallelepiped_domain)
+            type is (Null_Parallelepiped_Domain)
+                use_domain = .false.
+            class default
+                use_domain = .true.
+        end select
+    end function use_domain
 
     pure logical function box_size_can_change_from_changed(changed_box_size) &
         result(box_size_can_change)

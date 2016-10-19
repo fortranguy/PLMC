@@ -3,6 +3,7 @@ module classes_external_field
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_field_expression, only: Abstract_Field_Expression
+use procedures_field_expression_factory, only: field_expression_destroy => destroy
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 
 implicit none
@@ -11,7 +12,7 @@ private
 
     type, abstract, public :: Abstract_External_Field
     private
-        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), pointer :: field_domain => null()
         class(Abstract_Field_Expression), allocatable :: field_expression
     contains
         procedure :: construct => Abstract_construct
@@ -34,20 +35,20 @@ contains
 
 !implementation Abstract_External_Field
 
-    subroutine Abstract_construct(this, parallelepiped_domain, field_expression)
+    subroutine Abstract_construct(this, field_domain, field_expression)
         class(Abstract_External_Field), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), target, intent(in) :: field_domain
         class(Abstract_Field_Expression), intent(in) :: field_expression
 
-        allocate(this%parallelepiped_domain, source = parallelepiped_domain)
+        this%field_domain => field_domain
         allocate(this%field_expression, source = field_expression)
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_External_Field), intent(inout) :: this
 
-        if (allocated(this%field_expression)) deallocate(this%field_expression)
-        if (allocated(this%parallelepiped_domain)) deallocate(this%parallelepiped_domain)
+        call field_expression_destroy(this%field_expression)
+        this%field_domain => null()
     end subroutine Abstract_destroy
 
     pure function Abstract_get(this, position) result(external_field)
@@ -55,7 +56,7 @@ contains
         real(DP), intent(in) :: position(:)
         real(DP) :: external_field(num_dimensions)
 
-        if (this%parallelepiped_domain%is_inside(position)) then
+        if (this%field_domain%is_inside(position)) then
             external_field = this%field_expression%get(position)
         else
             external_field = 0._DP
@@ -66,9 +67,9 @@ contains
 
 !implementation Null_External_Field
 
-    subroutine Null_construct(this, parallelepiped_domain, field_expression)
+    subroutine Null_construct(this, field_domain, field_expression)
         class(Null_External_Field), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), target, intent(in) :: field_domain
         class(Abstract_Field_Expression), intent(in) :: field_expression
     end subroutine Null_construct
 

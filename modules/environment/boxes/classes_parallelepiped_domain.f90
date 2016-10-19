@@ -17,10 +17,10 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
     contains
-        procedure :: is_boxed => Abstract_is_boxed
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_get_origin), deferred :: get_origin
         procedure(Abstract_get_size), deferred :: get_size
+        procedure :: is_boxed => Abstract_is_boxed
         procedure :: is_inside => Abstract_is_inside
     end type Abstract_Parallelepiped_Domain
 
@@ -79,6 +79,7 @@ private
         procedure :: destroy => Null_destroy
         procedure :: get_origin => Null_get_origin
         procedure :: get_size => Null_get_size
+        procedure :: is_boxed => Null_is_boxed
         procedure :: is_inside => Null_is_inside
     end type Null_Parallelepiped_Domain
 
@@ -98,7 +99,6 @@ contains
             is_inside_included) .and. point_is_inside_box(box_origin, this%periodic_box%get_size(),&
             corner_p, is_inside_included)
     end function Abstract_is_boxed
-
 
     pure logical function Abstract_is_inside(this, position) result(is_inside)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
@@ -123,9 +123,6 @@ contains
         call check_array_size("Concrete_Parallelepiped_Domain", "size", size, num_dimensions)
         call check_positive("Concrete_Parallelepiped_Domain", "size", size)
         this%size = size
-        if (.not.this%is_boxed()) then
-            call error_exit("Parallelepiped_construct: domain is not boxed.")
-        end if
     end subroutine Parallelepiped_construct
 
     subroutine Parallelepiped_destroy(this)
@@ -157,9 +154,6 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
 
         this%periodic_box => periodic_box
-        if (.not.this%is_boxed()) then
-            call error_exit("Boxed_Parallelepiped_Domain: domain is not boxed.")
-        end if
     end subroutine Boxed_construct
 
     subroutine Boxed_destroy(this)
@@ -193,9 +187,6 @@ contains
 
         this%periodic_box => periodic_box
         this%size_3 = visitable_walls%get_gap_radii()
-        if (.not.this%is_boxed()) then
-            call error_exit("Walled_Parallelepiped_Domain: domain is not boxed.")
-        end if
     end subroutine Walled_construct
 
     subroutine Walled_destroy(this)
@@ -243,6 +234,11 @@ contains
         real(DP) :: size(num_dimensions)
         size = 0._DP
     end function Null_get_size
+
+    pure logical function Null_is_boxed(this) result(is_boxed)
+        class(Null_Parallelepiped_Domain), intent(in) :: this
+        is_boxed = .true.
+    end function Null_is_boxed
 
     pure function Null_is_inside(this, position) result(is_inside)
         class(Null_Parallelepiped_Domain), intent(in) :: this

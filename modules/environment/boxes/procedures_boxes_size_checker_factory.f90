@@ -1,10 +1,11 @@
 module procedures_boxes_size_checker_factory
 
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use classes_visitable_walls, only: Abstract_Visitable_Walls
 use classes_box_size_checker, only: Abstract_Box_Size_Checker, Concrete_Box_Size_Checker, &
     Null_Box_Size_Checker
-use procedures_environment_inquirers, only: use_reciprocal_lattice, use_walls
+use procedures_environment_inquirers, only: use_domain, use_reciprocal_lattice, use_walls
 
 implicit none
 
@@ -14,22 +15,26 @@ public :: create, destroy
 contains
 
     !> @todo Replace all() by any()?
-    subroutine create(boxes_size_checker, reciprocal_lattices, visitable_walls)
+    subroutine create(boxes_size_checker, accessible_domains, fields_domain, reciprocal_lattices, &
+        visitable_walls)
         class(Abstract_Box_Size_Checker), allocatable, intent(out) :: boxes_size_checker(:)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domains(:)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: fields_domain(:)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattices(:)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
 
         integer :: i_box
 
-        if (all(use_reciprocal_lattice(reciprocal_lattices)) .or. all(use_walls(visitable_walls))) &
+        if (all(use_domain(accessible_domains)) .or. all(use_domain(fields_domain)) .or. &
+            all(use_reciprocal_lattice(reciprocal_lattices)) .or. all(use_walls(visitable_walls))) &
             then
             allocate(Concrete_Box_Size_Checker :: boxes_size_checker(size(visitable_walls)))
         else
             allocate(Null_Box_Size_Checker :: boxes_size_checker(size(visitable_walls)))
         end if
         do i_box = 1, size(boxes_size_checker)
-            call boxes_size_checker(i_box)%construct(reciprocal_lattices(i_box), &
-                visitable_walls(i_box))
+            call boxes_size_checker(i_box)%construct(accessible_domains(i_box), &
+                fields_domain(i_box), reciprocal_lattices(i_box), visitable_walls(i_box))
         end do
     end subroutine create
 
