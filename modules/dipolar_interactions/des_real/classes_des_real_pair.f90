@@ -225,6 +225,8 @@ contains
 
 !implementation Raw_DES_Real_Pair
 
+    !> @note this%alpha and this%expression_domain_max will be set later, cf.
+    !> [[classes_des_real_pair:Raw_reset]].
     subroutine Raw_construct(this, box_size_memento, permittivity, alpha, domain)
         class(Raw_DES_Real_Pair), intent(out) :: this
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
@@ -235,11 +237,10 @@ contains
         call this%target(box_size_memento)
         this%coulomb = 1._DP / (4._DP * PI * permittivity%get())
         this%alpha_x_box_edge = alpha%get_times_box_edge()
-        this%alpha = this%alpha_x_box_edge / this%box_size_memento%get_edge()
         call this%set_domain(domain)
     end subroutine Raw_construct
 
-    !> cf. [[classes_des_real_pair:Tabulated_set_domain]]
+    !> note cf. [[classes_des_real_pair:Tabulated_set_domain]]
     subroutine Raw_set_domain(this, domain)
         class(Raw_DES_Real_Pair), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
@@ -254,8 +255,6 @@ contains
         selector%check_max_over_box_edge = .false.
         selector%check_delta = .false.
         call check_potential_domain("Raw_DES_Real_Pair: set_domain", this%domain, selector)
-        this%expression_domain_max =  [des_real_B(this%alpha, this%domain%max), &
-            des_real_C(this%alpha, this%domain%max)]
     end subroutine Raw_set_domain
 
     subroutine Raw_destroy(this)

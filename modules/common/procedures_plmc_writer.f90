@@ -38,7 +38,6 @@ contains
 
         integer :: i_box, i_component
 
-        call writers%volumes_change_success%write(i_box, observables%volumes_change_success)
         do i_box = 1, size(observables%accessible_domains_size, 2)
             call writers%accessible_domains_size(i_box)%write(i_step, observables%&
                 accessible_domains_size(:, i_box))
@@ -49,6 +48,7 @@ contains
         end do
 
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
+            call writers%volumes_change_success%write(i_step, observables%volumes_change_success)
             do i_box = 1, size(writers%components_changes, 2)
                 do i_component = 1, size(writers%components_changes, 1)
                     call writers%components_changes(i_component, i_box)%writer%write(i_step, &

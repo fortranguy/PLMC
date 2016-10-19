@@ -140,7 +140,7 @@ contains
         call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
         call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells, &
             only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
-        call this%dipolar_interactions_facades(i_box)%reset()
+        call this%dipolar_interactions_facades(i_box)%reset(reset_real_pair)
         call observables_energies_create(new_energies, size(this%mixture%components, 1))
         call this%metropolis_algorithm(success, new_energies, i_box, box_size_ratio, &
             observables%energies(i_box))

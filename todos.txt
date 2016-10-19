@@ -26,3 +26,4 @@
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
 - DiracDistributionPlus: gaussian -> halfGaussian
+- BetaPressure: one value?
