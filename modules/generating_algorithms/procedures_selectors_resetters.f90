@@ -44,7 +44,7 @@ contains
         logical, intent(in) :: can_swap(:, :)
 
         integer :: i_box
-        integer :: nums_candidates(size(can_swap, 1)), i_couple, ij_couple(2)
+        integer :: nums_candidates(couples(1)%get_num()), i_couple, ij_couple(2)
 
         do i_box = 1, size(selectors)
             do i_couple = 1, size(nums_candidates)

@@ -1,9 +1,10 @@
 {
     "Environment": {
-        "Box": {
+        "Boxes": {
+            "number": 1,
             "periodicity": "XYZ",
-            "initial size": [12.0, 12.0, 12.0],
-            "size can change": false
+            "initial size": [[12.0, 12.0, 12.0]],
+            "total volume can change": false
         },
         "Thermostat": {
             "temperature": 2.0
@@ -119,7 +120,7 @@
     },
     "Changes": {
         "number of tuning steps": 1000,
-        "Components": {
+        "Mixture": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
@@ -152,12 +153,16 @@
         "number of steps": 10000
     },
     "Input": {
-        "initial coordinates": "initial_coordinates.xyz"
+        "initial coordinates": ["initial_coordinates.xyz"]
     },
     "Output": {
         "Coordinates": {
             "write": true,
             "period": 10
+        },
+        "Shell": {
+            "make directory command": "mkdir -p",
+            "path separator": "/"
         }
     }
 }

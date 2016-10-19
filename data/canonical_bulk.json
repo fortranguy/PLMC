@@ -155,8 +155,8 @@
             "period": 10
         },
         "Shell": {
-            "path separator": "/",
-            "make directory command": "mkdir -p"
+            "make directory command": "mkdir -p",
+            "path separator": "/"
         }
     }
 }
