@@ -163,10 +163,10 @@ contains
 
             do i_component = 1, size(changes%components, 1)
                 call changes%components(i_component, j_box)%translation_tuner%&
-                    tune(translation_tuned(i_component, j_box), i_step, observables%changes(i_box)%&
+                    tune(translation_tuned(i_component, j_box), i_step, observables%changes(j_box)%&
                     changes_sucesses(i_component)%translation)
                 call changes%components(i_component, j_box)%rotation_tuner%&
-                    tune(rotation_tuned(i_component, j_box), i_step, observables%changes(i_box)%&
+                    tune(rotation_tuned(i_component, j_box), i_step, observables%changes(j_box)%&
                     changes_sucesses(i_component)%rotation)
             end do
         end do

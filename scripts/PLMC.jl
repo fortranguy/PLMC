@@ -30,9 +30,9 @@ module PLMC
         return orientations
     end
 
-    function set(inputData)
+    function set(iBox, inputData)
 
-        boxSize = map(Float64, inputData["Environment"]["Box"]["initial size"])
+        boxSize = map(Float64, inputData["Environment"]["Boxes"]["initial size"][iBox])
 
         components = Array{Component}(inputData["Mixture"]["number of components"])
         if (size(components, 1) == 0)
@@ -41,7 +41,7 @@ module PLMC
 
         interMinDistances = zeros(size(components, 1), size(components, 1)) # triangle?
         for iComponent = 1:size(components, 1)
-            initialNumber = inputData["Mixture"]["Component $(iComponent)"]["initial number"]
+            initialNumber = inputData["Mixture"]["Component $(iComponent)"]["initial number"][iBox]
             components[iComponent] = Component(initialNumber, zeros(3, 0), zeros(3, 0))
             for jComponent = 1:iComponent-1
                 interMinDistances[iComponent, jComponent] =
@@ -55,8 +55,8 @@ module PLMC
 
     end
 
-    function write(components, boxSize, inputData)
-        outputFile = open(inputData["Input"]["initial coordinates"], "w")
+    function write(iBox, components, boxSize, inputData)
+        outputFile = open(inputData["Input"]["initial coordinates"][iBox], "w")
         println(outputFile, "# box_size    ", join(boxSize, "    "))
         println(outputFile, "# nums_particles    ",
             join(map(component -> component.num, components), "    "))
@@ -79,7 +79,7 @@ module PLMC
             end
         end
         close(outputFile)
-        println("Coordinates written in ", outputFile.name)
+        println("Box $(iBox): Coordinates written in ", outputFile.name)
     end
 
 end

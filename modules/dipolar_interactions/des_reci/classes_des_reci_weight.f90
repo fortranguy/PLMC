@@ -22,9 +22,8 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: target => Abstract_target
-        procedure :: reset => Abstract_set
+        procedure :: reset => Abstract_reset
         procedure :: get => Abstract_get
-        procedure, private :: set => Abstract_set
     end type Abstract_DES_Reci_Weight
 
     type, extends(Abstract_DES_Reci_Weight), public :: Concrete_DES_Reci_Weight
@@ -36,7 +35,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: target => Null_target
-        procedure :: reset => Null_set
+        procedure :: reset => Null_reset
         procedure :: get => Null_get
     end type Null_DES_Reci_Weight
 
@@ -44,6 +43,8 @@ contains
 
 !implementation Abstract_DES_Reci_Weight
 
+    !> @note Since box_size_memento may not be initialised,
+    !> [[classes_des_reci_weight:Abstract_reset]] will be delayed.
     subroutine Abstract_construct(this, box_size_memento, reciprocal_lattice, permittivity, alpha)
         class(Abstract_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
@@ -58,7 +59,6 @@ contains
         allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2), &
                              0:this%reci_numbers(3)))
         this%weight = 0._DP
-        call this%set()
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -75,7 +75,7 @@ contains
         this%box_size_memento => box_size_memento
     end subroutine Abstract_target
 
-    pure subroutine Abstract_set(this)
+    pure subroutine Abstract_reset(this)
         class(Abstract_DES_Reci_Weight), intent(inout) :: this
 
         integer :: n_1, n_2, n_3
@@ -103,7 +103,7 @@ contains
         end do
         end do
         end do
-    end subroutine Abstract_set
+    end subroutine Abstract_reset
 
     !> \[
     !>      w_\alpha(\vec{k}) =
@@ -140,9 +140,9 @@ contains
         class(Abstract_Box_Size_Memento), target, intent(in) :: box_size_memento
     end subroutine Null_target
 
-    pure subroutine Null_set(this)
+    pure subroutine Null_reset(this)
         class(Null_DES_Reci_Weight), intent(inout) :: this
-    end subroutine Null_set
+    end subroutine Null_reset
 
     pure real(DP) function Null_get(this, n_1, n_2, n_3) result(weight)
         class(Null_DES_Reci_Weight), intent(in) :: this

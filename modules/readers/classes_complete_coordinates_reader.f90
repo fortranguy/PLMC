@@ -65,9 +65,9 @@ contains
         character(len=max_word_length) :: field
         integer :: coordinates_unit
 
-        if (size(coordinates) /= size(this%components_coordinates)) then
-            call error_exit("Abstract_Complete_Coordinates_Reader: read: size(coordinates) is not"&
-                //" correct.")
+        if (size(coordinates) /= size(this%components_coordinates, 2)) then
+            call error_exit("Abstract_Complete_Coordinates_Reader: read: the number of boxes is "&
+                //"not correct.")
         end if
 
         do i_box = 1, size(this%components_coordinates, 2)

@@ -132,6 +132,7 @@ contains
 
 !implementation Tabulated_DES_Real_Pair
 
+    !> @note create_tabulation() is delayed in reset()
     subroutine Tabulated_construct(this, box_size_memento, permittivity, alpha, domain)
         class(Tabulated_DES_Real_Pair), intent(out) :: this
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
@@ -143,9 +144,9 @@ contains
         this%coulomb = 1._DP / (4._DP*PI * permittivity%get())
         this%alpha_x_box_edge = alpha%get_times_box_edge()
         call this%set_domain(domain)
-        call this%create_tabulation()
     end subroutine Tabulated_construct
 
+    !> @note Since box_size_memento may not be initialised, max_over_box_edge won't be checked now.
     subroutine Tabulated_set_domain(this, domain)
         class(Tabulated_DES_Real_Pair), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
@@ -156,7 +157,8 @@ contains
         this%domain%max_over_box_edge = domain%max_over_box_edge
         this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         this%domain%delta = domain%delta
-        selector%check_max_over_box_edge = .true.
+        selector%check_max = .false.
+        selector%check_max_over_box_edge = .false.
         selector%check_delta = .true.
         call check_potential_domain("Tabulated_DES_Real_Pair: set_domain", this%domain, selector)
     end subroutine Tabulated_set_domain
@@ -237,6 +239,7 @@ contains
         call this%set_domain(domain)
     end subroutine Raw_construct
 
+    !> cf. [[classes_des_real_pair:Tabulated_set_domain]]
     subroutine Raw_set_domain(this, domain)
         class(Raw_DES_Real_Pair), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
@@ -247,7 +250,8 @@ contains
         this%domain%max_over_box_edge = domain%max_over_box_edge
         this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         this%domain%delta = 0._DP
-        selector%check_max_over_box_edge = .true.
+        selector%check_max = .false.
+        selector%check_max_over_box_edge = .false.
         selector%check_delta = .false.
         call check_potential_domain("Raw_DES_Real_Pair: set_domain", this%domain, selector)
         this%expression_domain_max =  [des_real_B(this%alpha, this%domain%max), &

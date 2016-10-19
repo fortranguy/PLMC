@@ -187,6 +187,7 @@ contains
         end if
     end subroutine check_increase_factor
 
+    !> @todo useful? to rewrite?
     subroutine check_potential_domain(context, domain, selector)
         character(len=*), intent(in) :: context
         type(Concrete_Potential_Domain), intent(in) :: domain
@@ -195,20 +196,23 @@ contains
         real(DP) :: distance_range
 
         call check_positive(context, "min", domain%min)
-        call check_positive(context, "max", domain%max)
-        if (domain%min > domain%max) then
-            call error_exit(context//": min > max.")
-        end if
-        distance_range = domain%max - domain%min
-        if (distance_range < real_zero) then
-            call warning_continue(context//": distance_range may be too small.")
+
+        if (selector%check_max) then
+            call check_positive(context, "max", domain%max)
+            if (domain%min > domain%max) then
+                call error_exit(context//": min > max.")
+            end if
+            distance_range = domain%max - domain%min
+            if (distance_range < real_zero) then
+                call warning_continue(context//": distance_range may be too small.")
+            end if
         end if
 
         if (selector%check_max_over_box_edge) then
             call check_positive(context, "max_over_box_edge", domain%max_over_box_edge)
         end if
 
-        if (.not. selector%check_delta) return
+        if (.not.(selector%check_max .and. selector%check_delta)) return
         call check_positive(context, "domain%delta", domain%delta)
         if (distance_range / domain%delta < 1._DP) then
             call warning_continue(context//": delta may be too big.")

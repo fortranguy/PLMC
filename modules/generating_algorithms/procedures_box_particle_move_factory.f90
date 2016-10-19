@@ -8,8 +8,8 @@ use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_factory, only: set_can_translate, set_can_rotate
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
-use classes_box_particle_move, only: Abstract_Box_Particle_Move, &
-    Box_Particle_Translation, Box_Particle_Rotation
+use classes_box_particle_move, only: Abstract_Box_Particle_Move, Box_Particle_Translation, &
+    Box_Particle_Rotation
 
 implicit none
 
@@ -67,7 +67,7 @@ contains
         call tower_sampler_create(selectors, size(can_rotate, 2), size(can_rotate, 1), &
             any(can_rotate))
         select type (particle_rotation)
-            type is (Box_Particle_Translation)
+            type is (Box_Particle_Rotation)
                 call particle_rotation%construct(physical_model%environment, &
                     physical_model%mixture, physical_model%short_interactions, &
                     physical_model%dipolar_interactions_dynamic, &

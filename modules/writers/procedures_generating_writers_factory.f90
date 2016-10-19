@@ -58,10 +58,10 @@ contains
         integer :: i_box, box_stat_i
 
         write_coordinates = property_write_coordinates(generating_data, writers_prefix)
-        data_field = writers_prefix//"path separator"
+        data_field = writers_prefix//"Shell.path separator"
         call generating_data%get(data_field, separator, data_found)
         call check_data_found(data_field, data_found)
-        data_field = writers_prefix//"make directory command"
+        data_field = writers_prefix//"Shell.make directory command"
         call generating_data%get(data_field, make_directory_cmd, data_found)
         call check_data_found(data_field, data_found)
         do i_box = 1, size(boxes_path)

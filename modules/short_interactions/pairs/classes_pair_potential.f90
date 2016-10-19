@@ -121,8 +121,9 @@ contains
 
         type(Concrete_Potential_Domain_Selector) :: selector
 
-        selector%check_delta = .true.
+        selector%check_max = .true.
         selector%check_max_over_box_edge = .false.
+        selector%check_delta = .true.
         call check_potential_domain("Tabulated_Pair_Potential: set_domain", domain, selector)
         this%domain%min = domain%min
         this%domain%max = domain%max
@@ -195,8 +196,9 @@ contains
 
         type(Concrete_Potential_Domain_Selector) :: selector
 
-        selector%check_delta = .false.
+        selector%check_max = .true.
         selector%check_max_over_box_edge = .false.
+        selector%check_delta = .false.
         call check_potential_domain("Raw_Pair_Potential: set_domain", domain, selector)
         this%domain%min = domain%min
         this%domain%max = domain%max

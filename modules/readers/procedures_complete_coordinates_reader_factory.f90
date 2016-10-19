@@ -22,8 +22,7 @@ contains
         class(Abstract_Box_Size_Checker), intent(in) :: boxes_size_checker(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
 
-        type(Component_Coordinates_Reader_wrapper) :: &
-            components_coordinates(size(components, 1), size(components, 2))
+        type(Component_Coordinates_Reader_wrapper), allocatable :: components_coordinates(:, :)
 
         allocate(Concrete_Complete_Coordinates_Reader :: coordinates)
 

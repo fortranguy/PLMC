@@ -80,9 +80,9 @@ contains
 
         some_components_have_coordinates = any(have_positions) .or. any(have_orientations)
         call set_tuning_parameters(components_tuning_parameters, num_tuning_steps, &
-            some_components_have_coordinates, generating_data, changes_prefix//"Components.")
+            some_components_have_coordinates, generating_data, changes_prefix//"Mixture.")
         call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
-            some_components_have_coordinates, generating_data, changes_prefix//"Components.")
+            some_components_have_coordinates, generating_data, changes_prefix//"Mixture.")
 
         call create(changes%components, environment%periodic_boxes, components, &
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
