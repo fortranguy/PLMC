@@ -1,9 +1,10 @@
 {
     "Environment": {
-        "Box": {
+        "Boxes": {
+            "number": 1,
             "periodicity": "XY",
-            "initial size": [18.0, 18.0, 18.0],
-            "size can change": true
+            "initial size": [[18.0, 18.0, 18.0]],
+            "total volume can change": true
         },
         "Beta Pressure": {
             "density": 0.7891414141414141,
@@ -37,25 +38,23 @@
     },
     "Mixture": {
         "number of components": 3,
+        "can exchange with reservoir": false,
         "Component 1": {
             "initial number": 200,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
-            "can exchange": false
+            "moment norm": 1.0
         },
         "Component 2": {
             "initial number": 1000,
             "minimum distance": 0.8,
-            "is dipolar": false,
-            "can exchange": false
+            "is dipolar": false
         },
         "Component 3": {
             "initial number": 300,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 0.25,
-            "can exchange": false
+            "moment norm": 0.25
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -148,43 +147,43 @@
     },
     "Changes": {
         "number of tuning steps": 1000,
-        "Box Size": {
-            "number": 10,
-            "Small Change": {
+        "Boxes": {
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 100,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01,
+            "Box 1": {
+                "frequency ratio": 0.01,
                 "initial delta": 0.01
-            },
+            }
+        },
+        "Mixture": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
             "wanted success ratio": 0.75,
-            "tolerance": 0.01
-        },
-        "Components": {
-            "increase factor": 1.05,
-            "maximum increase factor": 1.5,
-            "accumulation period": 100,
-            "wanted success ratio": 0.75,
-            "tolerance": 0.01
-        },
-        "Component 1": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "tolerance": 0.01,
+            "Component 1": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
-            }
-        },
-        "Component 2": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
-            }
-        },
-        "Component 3": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "Component 2": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
+            "Component 3": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             }
         }
     },
@@ -192,12 +191,16 @@
         "number of steps": 10000
     },
     "Input": {
-        "initial coordinates": "initial_coordinates.xyz"
+        "initial coordinates": ["initial_coordinates.xyz"]
     },
     "Output": {
         "Coordinates": {
             "write": true,
             "period": 10
+        },
+        "Shell": {
+            "make directory command": "mkdir -p",
+            "path separator": "/"
         }
     }
 }
