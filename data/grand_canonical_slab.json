@@ -1,9 +1,10 @@
 {
     "Environment": {
-        "Box": {
+        "Boxes": {
+            "number": 1,
             "periodicity": "XY",
-            "initial size": [12.0, 12.0, 18.0],
-            "size can change": false
+            "initial size": [[12.0, 12.0, 18.0]],
+            "total volume can change": false
         },
         "Thermostat": {
             "temperature": 2.0
@@ -33,12 +34,12 @@
     },
     "Mixture": {
         "number of components": 3,
+        "can exchange with reservoir": true,
         "Component 1": {
             "initial number": 0,
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0,
-            "can exchange": true,
             "density": 0.11397052022052022,
             "inverse powered activity": 0.03757636600979546
         },
@@ -46,7 +47,6 @@
             "initial number": 0,
             "minimum distance": 0.8,
             "is dipolar": false,
-            "can exchange": true,
             "density": 0.56666019166019166,
             "inverse powered activity": 0.012133022671524659
         },
@@ -55,7 +55,6 @@
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 0.25,
-            "can exchange": true,
             "density": 0.17054242054242053,
             "inverse powered activity": 0.02474289886810979
         },
@@ -150,32 +149,32 @@
     },
     "Changes": {
         "number of tuning steps": 1000,
-        "Components": {
+        "Mixture": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
             "wanted success ratio": 0.75,
-            "tolerance": 0.01
-        },
-        "Component 1": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "tolerance": 0.01,
+            "Component 1": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
-            }
-        },
-        "Component 2": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
-            }
-        },
-        "Component 3": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "Component 2": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
+            "Component 3": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             }
         }
     },
@@ -183,12 +182,16 @@
         "number of steps": 10000
     },
     "Input": {
-        "initial coordinates": "initial_coordinates.xyz"
+        "initial coordinates": ["initial_coordinates.xyz"]
     },
     "Output": {
         "Coordinates": {
             "write": true,
             "period": 10
+        },
+        "Shell": {
+            "make directory command": "mkdir -p",
+            "path separator": "/"
         }
     }
 }

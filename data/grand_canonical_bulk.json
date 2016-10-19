@@ -125,27 +125,27 @@
             "maximum increase factor": 1.5,
             "accumulation period": 100,
             "wanted success ratio": 0.75,
-            "tolerance": 0.01
-        },
-        "Component 1": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "tolerance": 0.01,
+            "Component 1": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
-            }
-        },
-        "Component 2": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
-            }
-        },
-        "Component 3": {
-            "Small Move": {
-                "initial delta": [0.3, 0.3, 0.3]
+            "Component 2": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                }
             },
-            "Small Rotation": {
-                "initial delta": 1.0
+            "Component 3": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                },
+                "Small Rotation": {
+                    "initial delta": 1.0
+                }
             }
         }
     },

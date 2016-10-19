@@ -86,7 +86,7 @@ contains
 
         call create(changes%components, environment%periodic_boxes, components, &
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
-            generating_data, changes_prefix)
+            generating_data, changes_prefix//"Mixture.")
 
         call set_can_exchange(can_exchange, components)
         call random_coordinates_create(changes%random_positions, environment%accessible_domains, &
