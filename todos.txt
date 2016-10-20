@@ -27,4 +27,6 @@
 - DiracDistributionPlus: gaussian -> halfGaussian
 - BetaPressure: one value?
 - Add SemiGrand Canonical ensemble
-- Uniformise the Line notation
++ GeneratingAlgorithms:
+    - BoxParticleMove: new, old -> particles(2)
+    - acceptationProbability(): uniformise comment notation

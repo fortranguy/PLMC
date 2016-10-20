@@ -13,7 +13,7 @@ use procedures_complete_coordinates_writer_factory, only: complete_coordinates_w
 use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use classes_changed_box_size, only: Changed_Box_Size_Line
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use procedures_changes_factory, only: set_can_exchange
+use procedures_changes_factory, only: set_can_translate, set_can_exchange
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy
 use procedures_line_writer_factory, only: line_writer_create => create, &
@@ -36,7 +36,7 @@ public :: create, destroy
 
 contains
 
-    !> @note valgrind seems to suggest to initialise box_stat_i.
+    !> @note Valgrind seems to suggest to initialise box_stat_i.
     subroutine create(writers, environment, wall_pairs, components, short_pairs, &
         changes_components, changed_boxes_size, generating_data)
         type(Generating_Writers_Wrapper), intent(out) :: writers
@@ -51,12 +51,13 @@ contains
         type(String_Wrapper), dimension(size(environment%periodic_boxes)) :: boxes_path, &
             coordinates_path
         logical :: write_coordinates
+        logical :: can_translate(size(changes_components, 1), size(changes_components, 2))
         logical :: can_exchange(size(components, 1), size(components, 2))
         character(len=:), allocatable :: make_directory_cmd, separator
         logical :: data_found
         character(len=:), allocatable :: data_field
         type(Concrete_Number_to_String) :: string
-        integer :: i_box, box_stat_i
+        integer :: i_box, box_stat_i, teleporation_stat
 
         write_coordinates = property_write_coordinates(generating_data, writers_prefix)
         data_field = writers_prefix//"Shell.make directory command"
@@ -71,23 +72,29 @@ contains
             call execute_command_line(make_directory_cmd//" "//boxes_path(i_box)%string, &
                 exitstat=box_stat_i)
             if (box_stat_i /= 0) call error_exit("procedures_generating_writers_factory: create:"//&
-                " directory can't be created.")
+                " "//boxes_path(i_box)%string//" directory can't be created.")
             if (.not. write_coordinates) cycle
             coordinates_path(i_box)%string = boxes_path(i_box)%string//"coordinates"//separator
             call execute_command_line(make_directory_cmd//" "//coordinates_path(i_box)%string, &
                 exitstat=box_stat_i)
             if (box_stat_i /= 0) call error_exit("procedures_generating_writers_factory: create:"//&
-                " directory can't be created.")
+                " "//coordinates_path(i_box)%string//" directory can't be created.")
         end do
 
         call real_writer_create(writers%accessible_domains_size, boxes_path, &
             "accessible_domain_size.out", changed_boxes_size)
+        call set_can_translate(can_translate, changes_components)
+        call execute_command_line(make_directory_cmd//" teleportations", exitstat=teleporation_stat)
+        if (teleporation_stat /= 0) call error_exit("procedures_generating_writers_factory: "//&
+            "create: teleportations directory can't be created.")
+        call line_writer_create(writers%teleportations_successes, "teleportations"//separator//&
+            "successes", can_translate)
         call triangle_writer_create(writers%volumes_change_success, "volumes_change_success.out", &
             changed_boxes_size)
 
         call set_can_exchange(can_exchange, components)
         call line_writer_create(writers%nums_particles, boxes_path, "nums_particles.out", &
-            can_exchange)
+            can_exchange .or. size(can_exchange, 2) > 1)
         call complete_coordinates_writer_create(writers%complete_coordinates, coordinates_path, &
             "coordinates", environment%periodic_boxes, components, generating_data, writers_prefix)
 
@@ -114,6 +121,7 @@ contains
         call line_writer_destroy(writers%nums_particles)
 
         call triangle_writer_destroy(writers%volumes_change_success)
+        call line_writer_destroy(writers%teleportations_successes)
         call real_writer_destroy(writers%accessible_domains_size)
     end subroutine destroy
 

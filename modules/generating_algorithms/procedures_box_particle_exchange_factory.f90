@@ -7,8 +7,7 @@ use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
-use classes_box_particle_exchange, only: Box_Particle_Exchange, Box_Particle_Add, &
-    Box_Particle_Remove
+use classes_box_particle_exchange, only: Box_Particle_Add, Box_Particle_Remove
 use procedures_changes_factory, only: set_can_exchange
 
 implicit none

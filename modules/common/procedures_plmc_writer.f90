@@ -36,19 +36,24 @@ contains
         type(Generating_Writers_Wrapper), intent(in) :: writers
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
-        integer :: i_box, i_component
+        integer :: i_box, j_box, i_component
 
-        do i_box = 1, size(observables%accessible_domains_size, 2)
+        do i_box = 1, size(writers%accessible_domains_size)
             call writers%accessible_domains_size(i_box)%write(i_step, observables%&
                 accessible_domains_size(:, i_box))
-            call writers%nums_particles(i_box)%write(i_step, observables%&
-                nums_particles(:, i_box))
-            call write_energies(writers%energies(i_box), i_step, observables%&
-                energies(i_box))
+            call writers%nums_particles(i_box)%write(i_step, observables%nums_particles(:, i_box))
+            call write_energies(writers%energies(i_box), i_step, observables%energies(i_box))
         end do
 
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
+            do j_box = 1, size(writers%teleportations_successes, 2)
+                do i_box = 1, size(writers%teleportations_successes, 1)
+                    call writers%teleportations_successes(i_box, j_box)%writer%&
+                        write(i_step, observables%teleportations_successes(:, i_box, j_box))
+                end do
+            end do
             call writers%volumes_change_success%write(i_step, observables%volumes_change_success)
+
             do i_box = 1, size(writers%components_changes, 2)
                 do i_component = 1, size(writers%components_changes, 1)
                     call writers%components_changes(i_component, i_box)%writer%write(i_step, &

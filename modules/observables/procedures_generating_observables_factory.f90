@@ -22,8 +22,13 @@ contains
 
         allocate(observables%accessible_domains_size(num_dimensions, num_boxes))
         observables%accessible_domains_size = 0._DP
+        call observables_changes_create(observables%teleportations_counters, num_boxes, &
+            num_components)
+        allocate(observables%teleportations_successes(num_components, num_boxes, num_boxes))
+        observables%teleportations_successes = 0._DP
         call observables_changes_create(observables%volumes_change_counter, num_boxes)
         call reals_create(observables%volumes_change_success, num_boxes)
+
         allocate(observables%nums_particles(num_components, num_boxes))
         observables%nums_particles = 0
         call observables_energies_create(observables%energies, num_boxes, num_components)
@@ -36,8 +41,12 @@ contains
         call observables_changes_destroy(observables%changes)
         call observables_energies_destroy(observables%energies)
         if (allocated(observables%nums_particles)) deallocate(observables%nums_particles)
+
         call reals_destroy(observables%volumes_change_success)
         call observables_changes_destroy(observables%volumes_change_counter)
+        if (allocated(observables%teleportations_successes)) &
+            deallocate(observables%teleportations_successes)
+        call observables_changes_destroy(observables%teleportations_counters)
         if (allocated(observables%accessible_domains_size)) &
             deallocate(observables%accessible_domains_size)
     end subroutine destroy

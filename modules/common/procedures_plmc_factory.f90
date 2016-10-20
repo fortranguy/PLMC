@@ -160,16 +160,19 @@ contains
                         line(i_box))
                 all_boxes_size_tuned = all_boxes_size_tuned .and. box_size_tuned
             end do
+        end do
 
+        do i_box = 1, size(changes%components, 2)
             do i_component = 1, size(changes%components, 1)
-                call changes%components(i_component, j_box)%translation_tuner%&
-                    tune(translation_tuned(i_component, j_box), i_step, observables%changes(j_box)%&
+                call changes%components(i_component, i_box)%translation_tuner%&
+                    tune(translation_tuned(i_component, i_box), i_step, observables%changes(i_box)%&
                     changes_sucesses(i_component)%translation)
-                call changes%components(i_component, j_box)%rotation_tuner%&
-                    tune(rotation_tuned(i_component, j_box), i_step, observables%changes(j_box)%&
+                call changes%components(i_component, i_box)%rotation_tuner%&
+                    tune(rotation_tuned(i_component, i_box), i_step, observables%changes(i_box)%&
                     changes_sucesses(i_component)%rotation)
             end do
         end do
+
         tuned = all_boxes_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
     end subroutine tune_moved_coordinates
 
@@ -178,8 +181,12 @@ contains
 
         integer :: i_box
 
+        call set_successes(observables%teleportations_successes, observables%&
+            teleportations_counters)
+        call reset_counters(observables%teleportations_counters)
         call set_successes(observables%volumes_change_success, observables%volumes_change_counter)
         call reset_counters(observables%volumes_change_counter)
+
         do i_box = 1, size(observables%changes)
             call set_successes(observables%changes(i_box)%changes_sucesses, observables%&
                 changes(i_box)%changes_counters)

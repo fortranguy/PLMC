@@ -11,6 +11,8 @@ use procedures_box_particle_exchange_factory, only: box_particle_add_create => c
     box_particle_remove_create => create_remove
 use procedures_box_particles_swap_factory, only: box_particles_transmutation_create => &
     create_transmutation, box_particles_switch_create => create_switch
+use procedures_boxes_particle_teleportation_factory, only: boxes_particle_teleportation_create => &
+    create
 
 implicit none
 
@@ -24,9 +26,9 @@ contains
         type(Physical_Model_Wrapper), intent(in) :: physical_model
         type(Changes_Wrapper), intent(in) :: changes
 
-        if (size(generating_algorithms) /= 7) then
+        if (size(generating_algorithms) /= 8) then
             call error_exit("procedures_generating_algorithms_factory: create: "//&
-                "size(generating_algorithms) must be 7.")
+                "the number of generating algorithms is wrong.")
         end if
 
         call box_volume_change_create(generating_algorithms(1)%algorithm, physical_model, &
@@ -42,6 +44,8 @@ contains
         call box_particles_transmutation_create(generating_algorithms(6)%algorithm, &
             physical_model, changes)
         call box_particles_switch_create(generating_algorithms(7)%algorithm, &
+            physical_model, changes)
+        call boxes_particle_teleportation_create(generating_algorithms(8)%algorithm, &
             physical_model, changes)
     end subroutine create
 

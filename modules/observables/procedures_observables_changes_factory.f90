@@ -17,15 +17,17 @@ interface create
     module procedure :: create_changes_counters
     module procedure :: create_triangle_counters
     module procedure :: create_square_counters, create_rectangle_counters
+    module procedure :: create_teleportations_counters
     module procedure :: create_change_counters
     module procedure :: create_changes_successes
 end interface create
 
 interface destroy
-    module procedure :: destroy_changes_counters
-    module procedure :: destroy_triangle_counters
-    module procedure :: destroy_rectangle_counters
     module procedure :: destroy_changes_successes
+    module procedure :: destroy_changes_counters
+    module procedure :: destroy_teleportations_counters
+    module procedure :: destroy_rectangle_counters
+    module procedure :: destroy_triangle_counters
     module procedure :: destroy_change_counters
     module procedure :: destroy_element
     module procedure :: destroy_line
@@ -150,6 +152,20 @@ contains
 
         if (allocated(counters)) deallocate(counters)
     end subroutine destroy_rectangle_counters
+
+    pure subroutine create_teleportations_counters(counters, num_boxes, num_components)
+        type(Concrete_Change_Counter), allocatable, intent(out) :: counters(:, :, :)
+        integer, intent(in) :: num_boxes, num_components
+
+        allocate(counters(num_components, num_boxes, num_boxes))
+        call reset_counters(counters)
+    end subroutine create_teleportations_counters
+
+    pure subroutine destroy_teleportations_counters(counters)
+        type(Concrete_Change_Counter), allocatable, intent(inout) :: counters(:, :, :)
+
+        if (allocated(counters)) deallocate(counters)
+    end subroutine destroy_teleportations_counters
 
     pure subroutine create_change_counters(counters, num_elements)
         type(Concrete_Change_Counter), allocatable, intent(out) :: counters(:)

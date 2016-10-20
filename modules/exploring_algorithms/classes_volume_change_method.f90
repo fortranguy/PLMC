@@ -97,7 +97,7 @@ contains
     end subroutine Abstract_destroy
 
     !> @todo Test if [[procedures_dipolar_interactions_factory:destroy_static]] is needed,
-    !> cf. [[classes_box_volume_change:Abstract_try]].
+    !> cf. [[classes_box_volume_change:Concrete_try]].
     subroutine Abstract_try(this, observables)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables !too much?

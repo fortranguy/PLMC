@@ -23,6 +23,7 @@ end interface destroy
 
 contains
 
+    !> @todo The condition is suboptimal. Is all(boxes_size_can_change) too strict?
     subroutine create_accessible_domains_size(domains_size, paths, filename, changed_boxes_size)
         class(Abstract_Real_Writer), allocatable, intent(out) :: domains_size(:)
         type(String_Wrapper), intent(in) :: paths(:)
@@ -30,11 +31,16 @@ contains
         type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
 
         logical :: boxes_size_can_change(size(changed_boxes_size))
-        integer :: i_box
+        integer :: j_box, i_box
 
-        do i_box = 1, size(boxes_size_can_change)
-            boxes_size_can_change(i_box) = box_size_can_change(changed_boxes_size(i_box)%&
-                line(i_box)%changed)
+        boxes_size_can_change = .false.
+        do j_box = 1, size(boxes_size_can_change)
+            do i_box = 1, j_box
+                if (box_size_can_change(changed_boxes_size(j_box)%line(i_box)%changed)) then
+                    boxes_size_can_change(i_box) = .true.
+                    boxes_size_can_change(j_box) = .true.
+                end if
+            end do
         end do
 
         if (all(boxes_size_can_change)) then

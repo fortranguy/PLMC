@@ -26,6 +26,14 @@ private
         procedure, nopass, private :: get_integer => Null_get_integer
     end type Null_Number_to_String
 
+    type, public :: Number_to_String_Wrapper
+        class(Abstract_Number_to_String), allocatable :: string
+    end type Number_to_String_Wrapper
+
+    type, public :: Number_to_String_Line
+        type(Number_to_String_Wrapper), allocatable :: line(:)
+    end type Number_to_String_Line
+
 contains
 
 !implementation Abstract_Number_to_String

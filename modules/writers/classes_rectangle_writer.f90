@@ -3,8 +3,8 @@ module classes_rectangle_writer
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
-use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
-use types_string_wrapper, only: Number_to_String_Wrapper
+use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String, &
+    Number_to_String_Wrapper
 
 implicit none
 

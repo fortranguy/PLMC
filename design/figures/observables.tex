@@ -18,6 +18,10 @@
                 \UMLattribute{numsParticles: \type{int[\numComponents, \numBoxes]}}
                 \UMLattribute{energies: \type{ObservablesEnergies[\numBoxes]}}
                 \UMLattribute{changes: \type{ObservablesChanges[\numBoxes]}}
+                \UMLattribute{teleportationsCounters:
+                    \type{ChangeCounter[\numComponents, \numBoxes, \numBoxes]}}
+                \UMLattribute{teleportationsSuccesses:
+                    \type{real[\numComponents, \numBoxes, \numBoxes]}}
             \end{class}
         \end{scope}
 

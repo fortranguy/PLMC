@@ -8,6 +8,16 @@ implicit none
 private
 public :: create_half, create_full, destroy
 
+interface create_full
+    module procedure :: create_full_line
+    module procedure :: create_full_element
+end interface create_full
+
+interface destroy
+    module procedure :: destroy_line
+    module procedure :: destroy_element
+end interface destroy
+
 contains
 
     subroutine create_half(couples, num_elements, num_partners)
@@ -27,7 +37,7 @@ contains
         end do
     end subroutine create_half
 
-    subroutine create_full(couples, num_elements, num_partners)
+    subroutine create_full_line(couples, num_elements, num_partners)
         class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples(:)
         integer, intent(in) :: num_elements, num_partners
 
@@ -42,9 +52,22 @@ contains
         do i_element = 1, size(couples)
             call couples(i_element)%construct(num_partners)
         end do
-    end subroutine create_full
+    end subroutine create_full_line
 
-    subroutine destroy(couples)
+    subroutine create_full_element(couples, num_partners)
+        class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples
+        integer, intent(in) :: num_partners
+
+        if (num_partners > 1) then
+            allocate(Full_Hetero_Couples :: couples)
+        else
+            allocate(Null_Hetero_Couples :: couples)
+        end if
+
+        call couples%construct(num_partners)
+    end subroutine create_full_element
+
+    subroutine destroy_line(couples)
         class(Abstract_Hetero_Couples), allocatable, intent(inout) :: couples(:)
 
         integer :: i_element
@@ -55,6 +78,15 @@ contains
             end do
             deallocate(couples)
         end if
-    end subroutine destroy
+    end subroutine destroy_line
+
+    subroutine destroy_element(couples)
+        class(Abstract_Hetero_Couples), allocatable, intent(inout) :: couples
+
+        if (allocated(couples)) then
+            call couples%destroy()
+            deallocate(couples)
+        end if
+    end subroutine destroy_element
 
 end module procedures_hetero_couples_factory

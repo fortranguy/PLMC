@@ -1,6 +1,7 @@
 module procedures_string_factory
 
-use types_string_wrapper, only: String_Wrapper, Number_to_String_Wrapper, Number_to_String_Line
+use types_string_wrapper, only: String_Wrapper
+use classes_number_to_string, only: Number_to_String_Wrapper, Number_to_String_Line
 
 implicit none
 

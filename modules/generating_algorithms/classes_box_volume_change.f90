@@ -47,21 +47,21 @@ private
         logical, allocatable :: have_positions(:, :)
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
     contains
-        procedure :: construct => Abstract_construct
-        procedure :: destroy => Abstract_destroy
-        procedure :: reset_selectors => Abstract_reset_selectors
-        procedure :: get_num_choices => Abstract_get_num_choices
-        procedure :: try => Abstract_try
-        procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
-        procedure, private :: acceptation_probability => Abstract_acceptation_probability
-        procedure, private :: rescale_positions => Abstract_rescale_positions
-        procedure, private :: save_cells => Abstract_save_cells
-        procedure, private :: restore_cells => Abstract_restore_cells
+        procedure :: construct => Concrete_construct
+        procedure :: destroy => Concrete_destroy
+        procedure :: reset_selectors => Concrete_reset_selectors
+        procedure :: get_num_choices => Concrete_get_num_choices
+        procedure :: try => Concrete_try
+        procedure, private :: metropolis_algorithm => Concrete_metropolis_algorithm
+        procedure, private :: acceptation_probability => Concrete_acceptation_probability
+        procedure, private :: rescale_positions => Concrete_rescale_positions
+        procedure, private :: save_cells => Concrete_save_cells
+        procedure, private :: restore_cells => Concrete_restore_cells
     end type Box_Volume_Change
 
 contains
 
-    subroutine Abstract_construct(this, environment, mixture, short_interactions, &
+    subroutine Concrete_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_facades, changed_boxes_size, have_positions, selectors)
         class(Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
@@ -80,9 +80,9 @@ contains
         this%changed_boxes_size => changed_boxes_size
         allocate(this%have_positions, source=have_positions)
         allocate(this%selectors, source=selectors)
-    end subroutine Abstract_construct
+    end subroutine Concrete_construct
 
-    subroutine Abstract_destroy(this)
+    subroutine Concrete_destroy(this)
         class(Box_Volume_Change), intent(inout) :: this
 
         call tower_sampler_destroy(this%selectors)
@@ -92,16 +92,16 @@ contains
         this%short_interactions => null()
         this%mixture => null()
         this%environment => null()
-    end subroutine Abstract_destroy
+    end subroutine Concrete_destroy
 
-    subroutine Abstract_reset_selectors(this)
+    subroutine Concrete_reset_selectors(this)
         class(Box_Volume_Change), intent(inout) :: this
 
         call selectors_reset(this%selectors, this%changed_boxes_size, this%mixture%components,&
             this%have_positions)
-    end subroutine Abstract_reset_selectors
+    end subroutine Concrete_reset_selectors
 
-    pure integer function Abstract_get_num_choices(this) result(num_choices)
+    pure integer function Concrete_get_num_choices(this) result(num_choices)
         class(Box_Volume_Change), intent(in) :: this
 
         integer :: i_box
@@ -110,12 +110,12 @@ contains
         do i_box = 1, size(this%selectors)
             num_choices = num_choices + this%selectors(i_box)%get_num_choices()
         end do
-    end function Abstract_get_num_choices
+    end function Concrete_get_num_choices
 
     !> @note [[procedures_dipolar_interactions_factory:destroy_static]] is not necessary
     !> since dipolar_interactions_static is declared inside the subroutine.
     !> @todo Send a bug report to ifort.
-    subroutine Abstract_try(this, observables)
+    subroutine Concrete_try(this, observables)
         class(Box_Volume_Change), intent(in) :: this
         type(Generating_Observables_Wrapper), intent(inout) :: observables
 
@@ -164,9 +164,9 @@ contains
         end if
 
         call dipolar_interactions_destroy(dipolar_interactions_static)
-    end subroutine Abstract_try
+    end subroutine Concrete_try
 
-    subroutine Abstract_metropolis_algorithm(this, success, new_energies, i_box, box_size_ratio, &
+    subroutine Concrete_metropolis_algorithm(this, success, new_energies, i_box, box_size_ratio, &
         energies)
         class(Box_Volume_Change), intent(in) :: this
         logical, intent(out) :: success
@@ -208,14 +208,14 @@ contains
             triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_shared_energy
         success = metropolis_algorithm(this%acceptation_probability(i_box, box_size_ratio, &
             delta_energy))
-    end subroutine Abstract_metropolis_algorithm
+    end subroutine Concrete_metropolis_algorithm
 
     !> \[
-    !>      P[V \to V^\prime] = min \left( 1, e^{-\beta p V \left( \frac{V^\prime}{V} - 1 \right)}
+    !>      P[V \to V^\prime] = \min \left( 1, e^{-\beta p V \left( \frac{V^\prime}{V} - 1 \right)}
     !>          \left( \frac{V^\prime}{V} \right)^{N+1}
     !>          e^{-\beta [U(\vec{s}^N, V^\prime) - U(\vec{s}^N, V)]} \right)
     !> \]
-    pure real(DP) function Abstract_acceptation_probability(this, i_box, box_size_ratio, &
+    pure real(DP) function Concrete_acceptation_probability(this, i_box, box_size_ratio, &
         delta_energy) result(probability)
         class(Box_Volume_Change), intent(in) :: this
         integer, intent(in) :: i_box
@@ -237,9 +237,9 @@ contains
             (volume_ratio - 1._DP)) * volume_ratio**(num_particles + 1) * &
             exp(-delta_energy / this%environment%temperature%get())
         probability = min(1._DP, probability)
-    end function Abstract_acceptation_probability
+    end function Concrete_acceptation_probability
 
-    subroutine Abstract_rescale_positions(this, i_box, box_size_ratio)
+    subroutine Concrete_rescale_positions(this, i_box, box_size_ratio)
         class(Box_Volume_Change), intent(in) :: this
         integer, intent(in) :: i_box
         real(DP), intent(in) :: box_size_ratio(:)
@@ -249,13 +249,13 @@ contains
         do i_component = 1, size(this%mixture%components, 1)
             call this%mixture%components(i_component, i_box)%positions%rescale_all(box_size_ratio)
         end do
-    end subroutine Abstract_rescale_positions
+    end subroutine Concrete_rescale_positions
 
-    !> @note The methods [[classes_box_volume_change:Abstract_save_cells]] and
-    !> [[classes_volume_change_method:Abstract_save_cells]]
+    !> @note The methods [[classes_box_volume_change:Concrete_save_cells]] and
+    !> [[classes_volume_change_method:Concrete_save_cells]]
     !> should be factorised. However, this would create a memory leak.
     !> @todo Send a bug report to gfortran.
-    subroutine Abstract_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells, &
+    subroutine Concrete_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells, &
         i_box)
         class(Box_Volume_Change), intent(in) :: this
         type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
@@ -279,12 +279,12 @@ contains
         end do
         call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
             short_interactions%cells(i_box)%visitable_cells)
-    end subroutine Abstract_save_cells
+    end subroutine Concrete_save_cells
 
-    !> @note The methods [[classes_box_volume_change:Abstract_restore_cells]] and
-    !> [[classes_volume_change_method:Abstract_restore_cells]]
-    !> should be factorised. cf. [[classes_box_volume_change:Abstract_save_cells]].
-    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, &
+    !> @note The methods [[classes_box_volume_change:Concrete_restore_cells]] and
+    !> [[classes_volume_change_method:Concrete_restore_cells]]
+    !> should be factorised. cf. [[classes_box_volume_change:Concrete_save_cells]].
+    subroutine Concrete_restore_cells(this, neighbour_cells, only_resized_triangle, &
         visitable_cells, i_box)
         class(Box_Volume_Change), intent(in) :: this
         type(Neighbour_Cells_Line), allocatable, intent(inout) :: neighbour_cells(:)
@@ -314,6 +314,6 @@ contains
             cells(i_box)%visitable_cells, this%short_interactions%cells(i_box)%neighbour_cells, &
             only_resized_triangle, visitable_cells)
         call cells_destroy(visitable_cells)
-    end subroutine Abstract_restore_cells
+    end subroutine Concrete_restore_cells
 
 end module classes_box_volume_change

@@ -46,6 +46,7 @@ end interface destroy
 
 contains
 
+    !> @todo Review the compatibility with GEMC
     subroutine create_all(changes, environment, components, num_tuning_steps, generating_data)
         type(Changes_Wrapper), intent(out) :: changes
         type(Environment_Wrapper), intent(in) :: environment
@@ -90,7 +91,7 @@ contains
 
         call set_can_exchange(can_exchange, components)
         call random_coordinates_create(changes%random_positions, environment%accessible_domains, &
-            have_positions, can_exchange)
+            have_positions, can_exchange .or. size(environment%periodic_boxes) > 1)
         call random_coordinates_create(changes%random_orientation, have_orientations, can_exchange)
 
         call coordinates_copier_create_position(changes%position_copiers, changes%random_positions,&

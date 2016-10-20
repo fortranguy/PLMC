@@ -32,7 +32,7 @@ contains
 
         integer :: i_box
 
-        if (any(have_positions) .and. any(can_exchange)) then
+        if (any(have_positions .and. can_exchange)) then
             allocate(Concrete_Random_Position :: random_positions(size(parallelepiped_domains)))
         else
             allocate(Null_Random_Coordinates :: random_positions(size(parallelepiped_domains)))
@@ -55,7 +55,7 @@ contains
         class(Abstract_Random_Coordinates), allocatable, intent(out) :: random_orientation
         logical, dimension(:, :), intent(in) :: have_orientations, can_exchange
 
-        if (any(have_orientations) .and. any(can_exchange)) then
+        if (any(have_orientations .and. can_exchange)) then
             allocate(Concrete_Random_Orientation :: random_orientation)
         else
             allocate(Null_Random_Coordinates :: random_orientation)

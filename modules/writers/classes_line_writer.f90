@@ -3,8 +3,8 @@ module classes_line_writer
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
-use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
-use types_string_wrapper, only: Number_to_String_Wrapper
+use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String, &
+    Number_to_String_Wrapper
 use procedures_string_factory, only: string_destroy => destroy
 
 implicit none
@@ -35,6 +35,10 @@ private
         procedure, private :: write_reals => Null_write_reals
         procedure, private :: write_integers => Null_write_integers
     end type Null_Line_Writer
+
+    type, public :: Line_Writer_Wrapper
+        class(Abstract_Line_Writer), allocatable :: writer
+    end type Line_Writer_Wrapper
 
 contains
 

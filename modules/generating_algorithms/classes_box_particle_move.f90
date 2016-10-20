@@ -42,16 +42,16 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: try => Abstract_try
         procedure :: reset_selectors => Abstract_reset_selectors
         procedure :: get_num_choices => Abstract_get_num_choices
+        procedure :: try => Abstract_try
         procedure, private :: metropolis_algorithm => Abstract_metropolis_algorithm
         procedure(Abstract_define_change), private, deferred :: define_change
         procedure(Abstract_visit_walls), private, deferred :: visit_walls
         procedure(Abstract_visit_short), private, deferred :: visit_short
         procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_dipolar), private, deferred :: visit_dipolar
-        procedure(Abstract_update_actor), private, deferred :: update_actor
+        procedure(Abstract_update_component), private, deferred :: update_component
         procedure(Abstract_increment_hit), private, nopass, deferred :: increment_hit
         procedure(Abstract_increment_success), private, nopass, deferred :: increment_success
     end type Abstract_Box_Particle_Move
@@ -102,12 +102,12 @@ private
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_visit_dipolar
 
-        subroutine Abstract_update_actor(this, i_box, i_component, new, old)
+        subroutine Abstract_update_component(this, i_box, i_component, new, old)
         import :: Concrete_Temporary_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             integer, intent(in) :: i_box, i_component
             type(Concrete_Temporary_Particle), intent(in) :: new, old
-        end subroutine Abstract_update_actor
+        end subroutine Abstract_update_component
 
         subroutine Abstract_increment_hit(changes_counters)
         import :: Concrete_Changes_Counter
@@ -128,7 +128,7 @@ private
         procedure, private :: visit_short => Translation_visit_short
         procedure, private :: visit_field => Translation_visit_field
         procedure, private :: visit_dipolar => Translation_visit_dipolar
-        procedure, private :: update_actor => Translation_update_actor
+        procedure, private :: update_component => Translation_update_component
         procedure, private, nopass :: increment_hit => Translation_increment_hit
         procedure, private, nopass :: increment_success => Translation_increment_success
     end type Box_Particle_Translation
@@ -140,7 +140,7 @@ private
         procedure, private :: visit_short => Rotation_visit_short
         procedure, private :: visit_field => Rotation_visit_field
         procedure, private :: visit_dipolar => Rotation_visit_dipolar
-        procedure, private :: update_actor => Rotation_update_actor
+        procedure, private :: update_component => Rotation_update_component
         procedure, private, nopass :: increment_hit => Rotation_increment_hit
         procedure, private, nopass :: increment_success => Rotation_increment_success
     end type Box_Particle_Rotation
@@ -149,7 +149,7 @@ contains
 
 !implementation Abstract_Box_Particle_Move
 
-    !> @note this%selectors construction is delayed in
+    !> @note this%selectors must be reset, cf.
     !> [[classes_box_particle_move:Abstract_reset_selectors]]
     subroutine Abstract_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_dynamic, dipolar_interactions_static, changes_components, can_move, &
@@ -251,14 +251,15 @@ contains
         delta_energy = deltas%walls_energy + deltas%field_energy + &
             sum(deltas%short_energies + deltas%dipolar_energies) + deltas%dipolar_shared_energy
         success = metropolis_algorithm(min(1._DP, &
-            exp(-delta_energy/this%environment%temperature%get())))
-        if (success) call this%update_actor(i_box, i_component, new, old)
+            exp(-delta_energy / this%environment%temperature%get())))
+        if (success) call this%update_component(i_box, i_component, new, old)
     end subroutine Abstract_metropolis_algorithm
 
 !end implementation Abstract_Box_Particle_Move
 
 !implementation Box_Particle_Translation
 
+    !> @todo new, old -> particles(2)?
     subroutine Translation_define_change(this, abort, new, old, i_box, i_component)
         class(Box_Particle_Translation), intent(in) :: this
         logical, intent(out) :: abort
@@ -271,10 +272,12 @@ contains
         else
             abort = .false.
         end if
+
         old%i = random_integer(this%mixture%components(i_component, i_box)%num_particles%get())
         old%position = this%mixture%components(i_component, i_box)%positions%get(old%i)
         old%orientation = this%mixture%components(i_component, i_box)%orientations%get(old%i)
         old%dipole_moment = this%mixture%components(i_component, i_box)%dipole_moments%get(old%i)
+
         new%i = old%i
         new%position = this%changes_components(i_component, i_box)%translated_positions%get(new%i)
         new%orientation = old%orientation
@@ -360,7 +363,7 @@ contains
         delta_energies = real_energies_new - real_energies_old
     end subroutine Translation_visit_dipolar
 
-    subroutine Translation_update_actor(this, i_box, i_component, new, old)
+    subroutine Translation_update_component(this, i_box, i_component, new, old)
         class(Box_Particle_Translation), intent(in) :: this
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -376,7 +379,7 @@ contains
             update_translation(i_component, new%position, old)
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
             update_translation(i_component, new%position, old)
-    end subroutine Translation_update_actor
+    end subroutine Translation_update_component
 
     subroutine Translation_increment_hit(changes_counters)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counters
@@ -478,7 +481,7 @@ contains
                 visit_rotation(i_component, new%dipole_moment, old)
     end subroutine Rotation_visit_dipolar
 
-    subroutine Rotation_update_actor(this, i_box, i_component, new, old)
+    subroutine Rotation_update_component(this, i_box, i_component, new, old)
         class(Box_Particle_Rotation), intent(in) :: this
         integer, intent(in) :: i_box, i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -490,7 +493,7 @@ contains
             update_rotation(i_component, new%dipole_moment, old)
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
             update_rotation(i_component, new%dipole_moment, old)
-    end subroutine Rotation_update_actor
+    end subroutine Rotation_update_component
 
     subroutine Rotation_increment_hit(changes_counters)
         type(Concrete_Changes_Counter), intent(inout) :: changes_counters

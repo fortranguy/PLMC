@@ -18,7 +18,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(GeneratingAlgorithm.north) + (0 cm, 7 cm)$)}]
+        \begin{scope}[shift={($(GeneratingAlgorithm.north) + (0 cm, 8 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxParticleMove}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
@@ -28,8 +28,9 @@
                         \type{DipolarInteractionsDynamic[\numBoxes]},
                     $\mathAggregation$ dipolarInteractionsStatic:
                         \type{DipolarInteractionsStatic[\numBoxes]},
-                    $\mathAggregation$ changesComponents: \type{ChangesComponent[:]},
-                    canChange: \type{bool[\numComponents]},
+                    $\mathAggregation$ changesComponents:
+                        \type{ChangesComponent[\numComponents, \numBoxes]},
+                    canMove: \type{bool[\numComponents, \numBoxes]},
                     $\mathComposition$ selectors: \type{TowerSampler[\numBoxes]}}}
             \end{abstractclass}
         \end{scope}
@@ -78,7 +79,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxParticleExchange |- GeneratingAlgorithm.north)$)}]
+        \begin{scope}[shift={($(BoxParticleExchange.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxParticlesSwap}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
@@ -93,6 +94,39 @@
                     $\mathComposition$ couples: \type{HeteroCouples},
                     $\mathComposition$ selectors: \type{TowerSampler[\numBoxes]}}}
             \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(BoxParticlesSwap.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{BoxesParticlesSwitch}{0, 0}
+                \inherit{GeneratingAlgorithm}
+                \operation{\procedure{construct}{}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(BoxVolumeChange.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{BoxesVolumeChange}{0, 0}
+                \inherit{GeneratingAlgorithm}
+                \operation{\procedure{construct}{}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(BoxesParticlesSwitch.north)!0.5!(BoxesVolumeChange.north) -
+            (0 cm, 0 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{BoxesParticleTeleportation}{0, 0}
+                \inherit{GeneratingAlgorithm}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                $\mathAggregation$ mixture: \type{Mixture},
+                $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                $\mathAggregation$ dipolarInteractionsDynamic:
+                    \type{DipolarInteractionsDynamic[\numBoxes]},
+                $\mathAggregation$ dipolarInteractionsStatic:
+                    \type{DipolarInteractionsStatic[\numBoxes]},
+                $\mathAggregation$ changes: \type{Changes},
+                canMove: \type{bool[\numComponents, \numBoxes]},
+                $\mathComposition$ boxCouples: \type{HeteroCouples},
+                $\mathComposition$ boxesSelector: \type{TowerSampler},
+                $\mathComposition$ componentSelectors: \type{TowerSampler[\numBoxes]}}}
+            \end{class}
         \end{scope}
 
     \end{tikzpicture}

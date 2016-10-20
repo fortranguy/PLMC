@@ -1,7 +1,7 @@
 module types_generating_writers_wrapper
 
 use classes_real_writer, only: Abstract_Real_Writer
-use classes_line_writer, only: Abstract_Line_Writer
+use classes_line_writer, only: Abstract_Line_Writer, Line_Writer_Wrapper
 use classes_triangle_writer, only: Abstract_Triangle_Writer
 use classes_rectangle_writer, only: Abstract_Rectangle_Writer
 use classes_complete_coordinates_writer, only: Abstract_Complete_Coordinates_Writer
@@ -14,6 +14,7 @@ private
 
     type, public :: Generating_Writers_Wrapper
         class(Abstract_Real_Writer), allocatable :: accessible_domains_size(:)
+        type(Line_Writer_Wrapper), allocatable :: teleportations_successes(:, :)
         class(Abstract_Triangle_Writer), allocatable :: volumes_change_success
         class(Abstract_Line_Writer), allocatable :: nums_particles(:)
         class(Abstract_Complete_Coordinates_Writer), allocatable :: complete_coordinates

@@ -163,7 +163,7 @@ contains
     end subroutine destroy_all
 
     !> @note This subroutine should not be necessary,
-    !> cf. [[classes_box_volume_change:Abstract_try]].
+    !> cf. [[classes_box_volume_change:Concrete_try]].
     subroutine destroy_static(dipolar_interactions_static)
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
 

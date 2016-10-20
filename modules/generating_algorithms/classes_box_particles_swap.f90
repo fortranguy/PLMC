@@ -19,8 +19,8 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_translation 
     visit_remove
 use types_changes_wrapper, only: Changes_Wrapper
 use types_observables_energies, only: Concrete_Double_Energies
-use types_observables_changes, only: Concrete_Observables_Changes
 use procedures_observables_energies_factory, only: observables_energies_set => set
+use types_observables_changes, only: Concrete_Observables_Changes
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_selectors_resetters, only: selectors_reset => reset
@@ -56,7 +56,7 @@ private
         procedure(Abstract_visit_short), private, deferred :: visit_short
         procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_dipolar), private, deferred :: visit_dipolar
-        procedure(Abstract_update_actors), private, deferred :: update_actors
+        procedure(Abstract_update_components), private, deferred :: update_components
         procedure(Abstract_increment_hit), private, deferred, nopass :: increment_hit
         procedure(Abstract_increment_success), private, deferred, nopass :: increment_success
     end type Abstract_Box_Particles_Swap
@@ -117,12 +117,12 @@ private
             type(Concrete_Temporary_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_dipolar
 
-        subroutine Abstract_update_actors(this, i_box, ij_components, particles)
+        subroutine Abstract_update_components(this, i_box, ij_components, particles)
         import :: Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             integer, intent(in) :: i_box, ij_components(:)
             type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
-        end subroutine Abstract_update_actors
+        end subroutine Abstract_update_components
 
         subroutine Abstract_increment_hit(changes, ij_components)
         import :: Concrete_Observables_Changes
@@ -147,7 +147,7 @@ private
         procedure, private :: visit_short => Transmutation_visit_short
         procedure, private :: visit_field => Transmutation_visit_field
         procedure, private :: visit_dipolar => Transmutation_visit_dipolar
-        procedure, private :: update_actors => Transmutation_update_actors
+        procedure, private :: update_components => Transmutation_update_components
         procedure, private, nopass :: increment_hit => Transmutation_increment_hit
         procedure, private, nopass :: increment_success => Transmutation_increment_success
     end type Box_Particles_Transmutation
@@ -161,7 +161,7 @@ private
         procedure, private :: visit_short => Switch_visit_short
         procedure, private :: visit_field => Switch_visit_field
         procedure, private :: visit_dipolar => Switch_visit_dipolar
-        procedure, private :: update_actors => Switch_update_actors
+        procedure, private :: update_components => Switch_update_components
         procedure, private, nopass :: increment_hit => Switch_increment_hit
         procedure, private, nopass :: increment_success => Switch_increment_success
     end type Box_Particles_Switch
@@ -254,8 +254,8 @@ contains
         type(Concrete_Double_Energies), intent(inout) :: deltas
         integer, intent(in) :: i_box, ij_components(:)
 
-        type(Concrete_Temporary_Particle) :: particles(2)
         real(DP) :: delta_energy
+        type(Concrete_Temporary_Particle) :: particles(2)
         logical :: abort, overlap
 
         success = .false.
@@ -274,7 +274,7 @@ contains
             sum(deltas%short_energies + deltas%dipolar_energies) + deltas%dipolar_shared_energy
         success = metropolis_algorithm(this%acceptation_probability(i_box, ij_components, &
             delta_energy))
-        if (success) call this%update_actors(i_box, ij_components, particles)
+        if (success) call this%update_components(i_box, ij_components, particles)
     end subroutine Abstract_metropolis_algorithm
 
     !> @note The i_actor <-> j_actor term is ignored.
@@ -328,7 +328,7 @@ contains
     end subroutine Transmutation_define_swap
 
     !> \[
-    !>      P[i \in I \to j \in J] = min \left( 1, \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
+    !>      P[i \in I \to j \in J] = \min \left( 1, \frac{N_I}{N_J + 1} \frac{\rho_J}{\rho_I}
     !>          e^{-\beta \Delta U_{i \to j}} \frac{a_I^{-N_I}}{a_J^{-N_J}} \right)
     !> \]
     pure real(DP) function Transmutation_acceptation_probability(this, i_box, ij_components, &
@@ -340,10 +340,11 @@ contains
         associate(component_i => this%mixture%components(ij_components(1), i_box), &
             component_j => this%mixture%components(ij_components(2), i_box))
 
-            probability = real(component_i%num_particles%get(), DP) / &
+            probability = &
+                real(component_i%num_particles%get(), DP) / &
                 real(component_j%num_particles%get() + 1, DP) * &
-                component_j%chemical_potential%get_density() / component_i%chemical_potential%&
-                    get_density() * &
+                component_j%chemical_potential%get_density() / &
+                component_i%chemical_potential%get_density() * &
                 exp(-delta_energy / this%environment%temperature%get()) * &
                 component_i%chemical_potential%get_inv_pow_activity() / &
                 component_j%chemical_potential%get_inv_pow_activity()
@@ -439,7 +440,7 @@ contains
                 visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
     end subroutine Transmutation_visit_dipolar
 
-    subroutine Transmutation_update_actors(this, i_box, ij_components, particles)
+    subroutine Transmutation_update_components(this, i_box, ij_components, particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
@@ -473,7 +474,7 @@ contains
             update_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
             update_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
-    end subroutine Transmutation_update_actors
+    end subroutine Transmutation_update_components
 
     subroutine Transmutation_increment_hit(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes
@@ -652,7 +653,7 @@ contains
                 particles)
     end subroutine Switch_visit_dipolar
 
-    subroutine Switch_update_actors(this, i_box, ij_components, particles)
+    subroutine Switch_update_components(this, i_box, ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
         integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
@@ -675,7 +676,7 @@ contains
             update_switch(ij_components, particles)
         call this%dipolar_interactions_static(i_box)%dlc_structures%&
             update_switch(ij_components, particles)
-    end subroutine Switch_update_actors
+    end subroutine Switch_update_components
 
     subroutine Switch_increment_hit(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes

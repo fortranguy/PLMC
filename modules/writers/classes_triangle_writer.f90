@@ -5,7 +5,7 @@ use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
 use types_real_line, only: Real_Line
 use types_logical_line, only: Logical_Line
-use types_string_wrapper, only: Number_to_String_Line
+use classes_number_to_string, only: Number_to_String_Line
 use procedures_string_factory, only: string_destroy => destroy
 
 implicit none
