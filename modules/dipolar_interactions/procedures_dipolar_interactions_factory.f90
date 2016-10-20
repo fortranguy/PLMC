@@ -27,6 +27,11 @@ implicit none
 private
 public :: create, destroy
 
+interface destroy
+    module procedure :: destroy_all
+    module procedure :: destroy_static
+end interface destroy
+
 contains
 
     subroutine create(dipolar_interactions_dynamic, dipolar_interactions_static, environment, &
@@ -112,7 +117,7 @@ contains
 
     !> @todo if (allocated(dipolar_interactions_static, dipolar_interactions_dynamic)):
     !> improve error handling.
-    subroutine destroy(dipolar_interactions_dynamic, dipolar_interactions_static)
+    subroutine destroy_all(dipolar_interactions_dynamic, dipolar_interactions_static)
         type(Dipolar_Interactions_Dynamic_Wrapper), allocatable, intent(inout) :: &
             dipolar_interactions_dynamic(:)
         type(Dipolar_Interactions_Static_Wrapper), allocatable, intent(inout) :: &
@@ -123,7 +128,7 @@ contains
         if (.not.allocated(dipolar_interactions_static) .or. &
             .not.allocated(dipolar_interactions_dynamic)) then
             call warning_continue("procedures_dipolar_interactions_factory: destroy:"//&
-                "dipolar_interactions_static and dipolar_interactions_static were not allocated.")
+                "dipolar_interactions_static or dipolar_interactions_static were not allocated.")
         end if
 
         do i_box = size(dipolar_interactions_static), 1, -1
@@ -155,7 +160,23 @@ contains
             call des_convergence_parameter_destroy(dipolar_interactions_dynamic(i_box)%alpha)
         end do
         deallocate(dipolar_interactions_dynamic)
-    end subroutine destroy
+    end subroutine destroy_all
+
+    !> @note This subroutine should not be necessary,
+    !> cf. [[classes_box_volume_change:Abstract_try]].
+    subroutine destroy_static(dipolar_interactions_static)
+        type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
+
+        call dlc_destroy(dipolar_interactions_static%dlc_structures)
+        call dlc_destroy(dipolar_interactions_static%dlc_weight)
+
+        call des_reci_destroy(dipolar_interactions_static%reci_structure)
+        call des_reci_destroy(dipolar_interactions_static%reci_weight)
+        call boxes_destroy(dipolar_interactions_static%box_size_memento_reci)
+
+        call des_real_destroy(dipolar_interactions_static%real_pair)
+        call boxes_destroy(dipolar_interactions_static%box_size_memento_real)
+    end subroutine destroy_static
 
     subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice

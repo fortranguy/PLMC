@@ -13,14 +13,13 @@ use procedures_hard_core_factory, only: hard_core_create => create, hard_core_de
 use procedures_mixture_total_moments_factory, only: mixture_total_moments_create => create, &
     mixture_total_moments_destroy => destroy
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_mixture_inquirers, only: component_has_positions, component_has_orientations, &
-    property_num_components => num_components, mixture_can_exchange
+use procedures_mixture_inquirers, only: component_exists, component_has_positions, &
+    component_has_orientations, property_num_components => num_components, mixture_can_exchange
 
 implicit none
 
 private
-public :: create, destroy, set_nums_particles, set_have_positions, &
-    set_have_orientations
+public :: create, destroy, set_exist, set_nums_particles, set_have_positions, set_have_orientations
 
 interface create
     module procedure :: create_all
@@ -106,6 +105,20 @@ contains
             deallocate(components)
         end if
     end subroutine destroy_components
+
+    subroutine set_exist(components_exist, components)
+        logical, intent(inout) :: components_exist(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
+
+        integer :: i_box, i_component
+
+        do i_box = 1, size(components_exist, 2)
+            do i_component = 1, size(components_exist, 1)
+                components_exist(i_component, i_box) = &
+                    component_exists(components(i_component, i_box)%num_particles)
+            end do
+        end do
+    end subroutine set_exist
 
     subroutine set_nums_particles(nums_particles, components)
         integer, intent(inout) :: nums_particles(:)

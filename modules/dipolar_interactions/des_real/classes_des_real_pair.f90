@@ -158,7 +158,7 @@ contains
         this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         this%domain%delta = domain%delta
         selector%check_max = .false.
-        selector%check_max_over_box_edge = .false.
+        selector%check_max_over_box_edge = .true.
         selector%check_delta = .true.
         call check_potential_domain("Tabulated_DES_Real_Pair: set_domain", this%domain, selector)
     end subroutine Tabulated_set_domain
@@ -252,7 +252,7 @@ contains
         this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
         this%domain%delta = 0._DP
         selector%check_max = .false.
-        selector%check_max_over_box_edge = .false.
+        selector%check_max_over_box_edge = .true.
         selector%check_delta = .false.
         call check_potential_domain("Raw_DES_Real_Pair: set_domain", this%domain, selector)
     end subroutine Raw_set_domain

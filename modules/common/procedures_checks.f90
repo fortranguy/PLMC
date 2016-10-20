@@ -2,7 +2,7 @@ module procedures_checks
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
-use data_strings, only: max_word_length
+use classes_number_to_string, only: Concrete_Number_to_String
 use procedures_errors, only: warning_continue, error_exit
 use types_potential_domain, only: Concrete_Potential_Domain
 use types_potential_domain_selector, only: Concrete_Potential_Domain_Selector
@@ -62,11 +62,10 @@ contains
         character(len=*), intent(in) :: context, integer_name
         integer, intent(in) :: integer_max, integer_value
 
-        character(len=max_word_length) :: string_i
+        type(Concrete_Number_to_String) :: string
 
-        write(string_i, *) integer_value
         if (integer_value < 1 .or. integer_max < integer_value) then
-            call error_exit(context//": "//integer_name//"="//trim(adjustl(string_i))//&
+            call error_exit(context//": "//integer_name//"="//string%get(integer_value)//&
                             " is out of range.")
         end if
     end subroutine check_in_range
@@ -100,11 +99,10 @@ contains
         character(len=*), intent(in) :: context, integer_name
         integer, intent(in) :: integer_scalar
 
-        character(len=max_word_length) :: string_i
+        type(Concrete_Number_to_String) :: string
 
-        write(string_i, *) integer_scalar
         if (integer_scalar < 0) then
-            call error_exit(context//": "//integer_name//"="//trim(adjustl(string_i))//&
+            call error_exit(context//": "//integer_name//"="//string%get(integer_scalar)//&
                             " is negative.")
         end if
         if (integer_scalar == 0) then
@@ -117,12 +115,11 @@ contains
         integer, intent(in) :: integer_array(:)
 
         integer :: i_dimension
-        character(len=max_word_length) :: string_i
+        type(Concrete_Number_to_String) :: string
 
         do i_dimension = 1, size(integer_array)
-            write(string_i, *) i_dimension
             call check_positive_integer_scalar(context, &
-                                               integer_name//"("//trim(adjustl(string_i))//")", &
+                                               integer_name//"("//string%get(i_dimension)//")", &
                                                integer_array(i_dimension))
         end do
     end subroutine check_positive_integer_array
@@ -131,12 +128,10 @@ contains
         character(len=*), intent(in) :: context, real_name
         real(DP), intent(in) :: real_scalar
 
-        character(len=max_word_length) :: string_real
-
-        write(string_real, *) real_scalar
+        type(Concrete_Number_to_String) :: string
 
         if (real_scalar < 0._DP) then
-            call error_exit(context//": "//real_name//"="//trim(adjustl(string_real))//&
+            call error_exit(context//": "//real_name//"="//string%get(real_scalar)//&
                             " is negative.")
         end if
         if (real_scalar < real_zero) then
@@ -149,12 +144,11 @@ contains
         real(DP), intent(in) :: real_array(:)
 
         integer :: i_dimension
-        character(len=max_word_length) :: string_i
+        type(Concrete_Number_to_String) :: string
 
         do i_dimension = 1, size(real_array)
-            write(string_i, *) i_dimension
             call check_positive_real_scalar(context, &
-                                            real_name//"("//trim(adjustl(string_i))//")", &
+                                            real_name//"("//string%get(i_dimension)//")", &
                                             real_array(i_dimension))
         end do
     end subroutine check_positive_real_array
@@ -165,12 +159,11 @@ contains
         character(len=*), intent(in) :: context, vector_name
         real(DP), intent(in) :: vector(:)
 
-        character(len=max_word_length) :: string_vector
+        type(Concrete_Number_to_String) :: string
 
         if (abs(norm2(vector) - 1.0_DP) > real_zero) then
-            write(string_vector, *) norm2(vector)
             call warning_continue(context//": "//vector_name//" may not be normed "//&
-            "("//trim(adjustl(string_vector))//").")
+            "("//string%get(norm2(vector))//").")
         end if
     end subroutine check_norm
 
@@ -212,10 +205,14 @@ contains
             call check_positive(context, "max_over_box_edge", domain%max_over_box_edge)
         end if
 
-        if (.not.(selector%check_max .and. selector%check_delta)) return
-        call check_positive(context, "domain%delta", domain%delta)
-        if (distance_range / domain%delta < 1._DP) then
-            call warning_continue(context//": delta may be too big.")
+        if (selector%check_delta) then
+            call check_positive(context, "domain%delta", domain%delta)
+        end if
+
+        if (selector%check_max .and. selector%check_delta) then
+            if (distance_range / domain%delta < 1._DP) then
+                call warning_continue(context//": delta may be too big.")
+            end if
         end if
     end subroutine check_potential_domain
 

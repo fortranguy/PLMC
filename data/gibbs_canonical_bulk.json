@@ -3,7 +3,7 @@
         "Boxes": {
             "number": 3,
             "periodicity": "XYZ",
-            "initial size": [[18.0, 18.0, 18.0], [18.0, 18.0, 18.0], [18.0, 18.0, 18.0]],
+            "initial size": [[11.0, 11.0, 11.0], [12.0, 12.0, 12.0], [13.0, 13.0, 13.0]],
             "total volume can change": false
         },
         "Thermostat": {
@@ -28,18 +28,18 @@
         "number of components": 3,
         "can exchange with reservoir": false,
         "Component 1": {
-            "initial number": [200, 200, 200],
+            "initial number": [190, 200, 210],
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0
         },
         "Component 2": {
-            "initial number": [1000, 1000, 1000],
+            "initial number": [950, 1000, 1050],
             "minimum distance": 0.8,
             "is dipolar": false
         },
         "Component 3": {
-            "initial number": [300, 300, 300],
+            "initial number": [275, 300, 325],
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 0.25
@@ -104,8 +104,7 @@
     "Dipolar Interactions": {
         "alpha times box edge": 7.0,
         "Real": {
-            "tabulated": true,
-            "delta distance": 1.0e-4,
+            "tabulated": false,
             "max distance / box edge": 0.5
         }
     },
@@ -115,15 +114,30 @@
     "Changes": {
         "number of tuning steps": 1000,
         "Boxes": {
-            "number": 10,
-            "initial delta": 0.01,
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
             "wanted success ratio": 0.75,
-            "tolerance": 0.01
+            "tolerance": 0.01,
+            "Boxes 12": {
+                "frequency ratio": 0.01,
+                "initial delta": 0.01
+            },
+            "Boxes 13": {
+                "frequency ratio": 0.01,
+                "initial delta": 0.01
+            },
+            "Boxes 23": {
+                "frequency ratio": 0.01,
+                "initial delta": 0.01
+            }
         },
-        "Mixture": {
+        "Components": {
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 100,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01,
             "Component 1": {
                 "Small Move": {
                     "initial delta": [0.3, 0.3, 0.3]
@@ -144,12 +158,7 @@
                 "Small Rotation": {
                     "initial delta": 1.0
                 }
-            },
-            "increase factor": 1.05,
-            "maximum increase factor": 1.5,
-            "accumulation period": 100,
-            "wanted success ratio": 0.75,
-            "tolerance": 0.01
+            }
         }
     },
     "Monte Carlo": {
@@ -162,6 +171,10 @@
         "Coordinates": {
             "write": true,
             "period": 10
+        },
+        "Shell": {
+            "make directory command": "mkdir -p",
+            "path separator": "/"
         }
     }
 }

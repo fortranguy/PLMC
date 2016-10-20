@@ -80,13 +80,13 @@ contains
 
         some_components_have_coordinates = any(have_positions) .or. any(have_orientations)
         call set_tuning_parameters(components_tuning_parameters, num_tuning_steps, &
-            some_components_have_coordinates, generating_data, changes_prefix//"Mixture.")
+            some_components_have_coordinates, generating_data, changes_prefix//"Components.")
         call set_tuner_parameters(components_tuner_parameters, num_tuning_steps, &
-            some_components_have_coordinates, generating_data, changes_prefix//"Mixture.")
+            some_components_have_coordinates, generating_data, changes_prefix//"Components.")
 
         call create(changes%components, environment%periodic_boxes, components, &
             components_tuning_parameters, components_tuner_parameters, num_tuning_steps, &
-            generating_data, changes_prefix//"Mixture.")
+            generating_data, changes_prefix//"Components.")
 
         call set_can_exchange(can_exchange, components)
         call random_coordinates_create(changes%random_positions, environment%accessible_domains, &

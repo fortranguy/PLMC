@@ -44,7 +44,7 @@ contains
                 allocate(Concrete_Average_Num_Particles :: average_num_particles)
             end if
 
-            data_field = changes_prefix//"Mixture.accumulation period"
+            data_field = changes_prefix//"Components.accumulation period"
             call generating_data%get(data_field, accumulation_period, data_found)
             call check_data_found(data_field, data_found)
         else

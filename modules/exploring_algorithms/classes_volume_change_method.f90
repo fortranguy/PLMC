@@ -17,10 +17,11 @@ use procedures_short_interactions_resetter, only: short_interactions_reset => re
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit, &
     short_interactions_visit_cells => visit_cells
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
+use procedures_dipolar_interactions_factory, only: dipolar_interactions_destroy => destroy
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
-use procedures_triangle_observables, only: operator(-)
+use procedures_triangle_observables, only: triangle_observables_diff
 use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
@@ -95,6 +96,8 @@ contains
         this%environment => null()
     end subroutine Abstract_destroy
 
+    !> @todo Test if [[procedures_dipolar_interactions_factory:destroy_static]] is needed,
+    !> cf. [[classes_box_volume_change:Abstract_try]].
     subroutine Abstract_try(this, observables)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Exploring_Observables_Wrapper), intent(inout) :: observables !too much?
@@ -149,6 +152,7 @@ contains
                     i_box)
                 call this%dipolar_interactions_facades(i_box)%restore(dipolar_interactions_static, &
                     reset_real_pair)
+                call dipolar_interactions_destroy(dipolar_interactions_static)
             end do
             observables%beta_pressures_excess(i_box) = this%short_interactions%&
                 beta_pressures_excess(i_box)%get(contacts) + &
@@ -178,14 +182,16 @@ contains
         call short_interactions_visit_cells(overlap, new_energies%short_energies, &
             this%components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
         if (overlap) return
-        deltas%short_energies = new_energies%short_energies - energies%short_energies
+        call triangle_observables_diff(deltas%short_energies, new_energies%short_energies, &
+            energies%short_energies)
         call dipolar_interactions_visit(new_energies%field_energies, this%environment%&
             external_fields(i_box), this%components(:, i_box))
         deltas%field_energies = new_energies%field_energies - energies%field_energies
         call this%dipolar_interactions_facades(i_box)%visit(new_energies%dipolar_energies, &
             new_energies%dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies,&
             energies%dipolar_shared_energy)
-        deltas%dipolar_energies = new_energies%dipolar_energies - energies%dipolar_energies
+        call triangle_observables_diff(deltas%dipolar_energies, new_energies%dipolar_energies, &
+            energies%dipolar_energies)
         deltas%dipolar_shared_energy = new_energies%dipolar_shared_energy - energies%&
             dipolar_shared_energy
 

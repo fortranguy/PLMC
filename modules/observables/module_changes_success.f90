@@ -33,10 +33,10 @@ end interface set_successes
     end type Concrete_Changes_Counter
 
     type, public :: Concrete_Changes_Success
-        real(DP) :: translation
-        real(DP) :: rotation
-        real(DP) :: add
-        real(DP) :: remove
+        real(DP) :: translation = 0._DP
+        real(DP) :: rotation = 0._DP
+        real(DP) :: add = 0._DP
+        real(DP) :: remove = 0._DP
     end type Concrete_Changes_Success
 
     type, public :: Concrete_Change_Counters_Line

@@ -28,6 +28,7 @@ public :: create, destroy
 
 contains
 
+    !> @note cf. [[procedures_generating_writers_factory:create]] for a comment about box_stat_i.
     subroutine create(writers, environment, wall_pairs, components, short_pairs, &
         volume_change_method, particle_insertion_method, visit_energies, generating_data)
         type(Exploring_Writers_Wrapper), intent(out) :: writers
@@ -54,6 +55,7 @@ contains
         data_field = writers_prefix//"Shell.path separator"
         call generating_data%get(data_field, separator, data_found)
         call check_data_found(data_field, data_found)
+        box_stat_i = 1
         do i_box = 1, size(boxes_path)
             boxes_path(i_box)%string = "exploration_box_"//string%get(i_box)//separator
             call execute_command_line(make_directory_cmd//" "//boxes_path(i_box)%string, &

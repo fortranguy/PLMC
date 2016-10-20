@@ -120,7 +120,7 @@
     },
     "Changes": {
         "number of tuning steps": 1000,
-        "Mixture": {
+        "Components": {
             "increase factor": 1.05,
             "maximum increase factor": 1.5,
             "accumulation period": 100,
