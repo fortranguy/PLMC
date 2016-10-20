@@ -1,7 +1,7 @@
 module procedures_reals_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 
 implicit none
 
@@ -19,7 +19,7 @@ end interface destroy
 contains
 
     pure subroutine create_triangle_reals(triangle, num_elements)
-        type(Reals_Line), allocatable, intent(out) :: triangle(:)
+        type(Real_Line), allocatable, intent(out) :: triangle(:)
         integer, intent(in) :: num_elements
 
         integer :: i_element
@@ -32,7 +32,7 @@ contains
     end subroutine create_triangle_reals
 
     pure subroutine destroy_triangle_reals(triangle)
-        type(Reals_Line), allocatable, intent(inout) :: triangle(:)
+        type(Real_Line), allocatable, intent(inout) :: triangle(:)
 
         integer :: i_element
 

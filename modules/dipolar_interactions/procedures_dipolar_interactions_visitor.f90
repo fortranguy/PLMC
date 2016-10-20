@@ -9,7 +9,7 @@ use procedures_dipoles_field_interaction, only: dipoles_field_visit_component =>
 use classes_des_real_component, only: DES_Real_Component_Wrapper
 use classes_des_self_component, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 use procedures_triangle_observables, only: triangle_observables_init, triangle_observables_add
 
@@ -40,12 +40,12 @@ contains
     end subroutine visit_field
 
     subroutine visit_dipolar(energies, shared_energy, components, dipolar_interactions_dynamic)
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         real(DP), intent(out) :: shared_energy
         type(Component_Wrapper), intent(in) :: components(:)
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
 
-        type(Reals_Line), allocatable :: real_energies(:)
+        type(Real_Line), allocatable :: real_energies(:)
         real(DP) :: self_energies(size(components))
 
         call triangle_observables_init(energies)
@@ -64,7 +64,7 @@ contains
     end subroutine visit_dipolar
 
     subroutine visit_des_real(energies, components, real_components)
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(DES_Real_Component_Wrapper), intent(in) :: real_components(:, :)
 

@@ -6,7 +6,7 @@ use procedures_checks, only: check_data_found
 use types_potential_domain, only: Concrete_Potential_Domain
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_permittivity, only: Abstract_Permittivity
-use classes_min_distance, only: Min_Distances_Line
+use classes_min_distance, only: Min_Distance_Line
 use classes_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 use classes_des_real_pair, only: Abstract_DES_Real_Pair, Tabulated_DES_Real_Pair, &
     Raw_DES_Real_Pair, Null_DES_Real_Pair
@@ -23,7 +23,7 @@ contains
         class(Abstract_DES_Real_Pair), allocatable, intent(out) :: pair
         class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento
         class(Abstract_Permittivity), intent(in) :: permittivity
-        type(Min_Distances_Line), intent(in) :: min_distances(:)
+        type(Min_Distance_Line), intent(in) :: min_distances(:)
         logical, intent(in) :: dipoles_exist
         class(Abstract_DES_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: generating_data

@@ -11,7 +11,7 @@ use types_component_wrapper, only: Component_Wrapper
 use procedures_des_real_factory, only: des_real_destroy => destroy
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 use procedures_dipolar_interactions_resetter, only: dipolar_interactions_reset => reset, &
     dipolar_interactions_reset_real => reset_real
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
@@ -78,12 +78,12 @@ private
 
         subroutine Abstract_visit(this, new_energies, new_shared_energy, box_volume_ratio, &
             energies, shared_energy)
-        import :: DP, Reals_Line, Abstract_Dipolar_Interactions_Facade
+        import :: DP, Real_Line, Abstract_Dipolar_Interactions_Facade
             class(Abstract_Dipolar_Interactions_Facade), intent(in) :: this
-            type(Reals_Line), intent(inout) :: new_energies(:)
+            type(Real_Line), intent(inout) :: new_energies(:)
             real(DP), intent(out) :: new_shared_energy
             real(DP), intent(in) :: box_volume_ratio !! \( \frac{V^\prime}{V} \)
-            type(Reals_Line), intent(in) :: energies(:)
+            type(Real_Line), intent(in) :: energies(:)
             real(DP), intent(in) :: shared_energy
         end subroutine Abstract_visit
 
@@ -252,10 +252,10 @@ contains
     subroutine Scalable_visit(this, new_energies, new_shared_energy, box_volume_ratio, energies, &
         shared_energy)
         class(Scalable_Dipolar_Interactions_Facade), intent(in) :: this
-        type(Reals_Line), intent(inout) :: new_energies(:)
+        type(Real_Line), intent(inout) :: new_energies(:)
         real(DP), intent(out) :: new_shared_energy
         real(DP), intent(in) :: box_volume_ratio
-        type(Reals_Line), intent(in) :: energies(:)
+        type(Real_Line), intent(in) :: energies(:)
         real(DP), intent(in) :: shared_energy
 
         integer :: i_component
@@ -361,10 +361,10 @@ contains
     subroutine Unscalable_visit(this, new_energies, new_shared_energy, box_volume_ratio, energies, &
         shared_energy)
         class(Unscalable_Dipolar_Interactions_Facade), intent(in) :: this
-        type(Reals_Line), intent(inout) :: new_energies(:)
+        type(Real_Line), intent(inout) :: new_energies(:)
         real(DP), intent(out) :: new_shared_energy
         real(DP), intent(in) :: box_volume_ratio
-        type(Reals_Line), intent(in) :: energies(:)
+        type(Real_Line), intent(in) :: energies(:)
         real(DP), intent(in) :: shared_energy
 
         call dipolar_interactions_visit(new_energies, new_shared_energy, this%components, this%&
@@ -408,10 +408,10 @@ contains
     subroutine Null_visit(this, new_energies, new_shared_energy, box_volume_ratio, energies, &
         shared_energy)
         class(Null_Dipolar_Interactions_Facade), intent(in) :: this
-        type(Reals_Line), intent(inout) :: new_energies(:)
+        type(Real_Line), intent(inout) :: new_energies(:)
         real(DP), intent(out) :: new_shared_energy
         real(DP), intent(in) :: box_volume_ratio
-        type(Reals_Line), intent(in) :: energies(:)
+        type(Real_Line), intent(in) :: energies(:)
         real(DP), intent(in) :: shared_energy
         integer :: i_component
         do i_component = 1, size(new_energies)

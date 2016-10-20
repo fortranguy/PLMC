@@ -3,8 +3,8 @@ module classes_triangle_writer
 use data_strings, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use classes_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
-use types_reals_line, only: Reals_Line
-use types_logical_line, only: Concrete_Logical_Line
+use types_real_line, only: Real_Line
+use types_logical_line, only: Logical_Line
 use types_string_wrapper, only: Number_to_String_Line
 use procedures_string_factory, only: string_destroy => destroy
 
@@ -41,7 +41,7 @@ contains
     subroutine Abstract_construct(this, filename, selectors)
         class(Abstract_Triangle_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
-        type(Concrete_Logical_Line), intent(in) :: selectors(:)
+        type(Logical_Line), intent(in) :: selectors(:)
 
         character(len=:), allocatable :: legend
         integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
@@ -57,7 +57,7 @@ contains
     subroutine Abstract_allocate_strings(this, legend, selectors)
         class(Abstract_Triangle_Writer), intent(inout) :: this
         character(len=:), allocatable, intent(inout) :: legend
-        type(Concrete_Logical_Line), intent(in) :: selectors(:)
+        type(Logical_Line), intent(in) :: selectors(:)
 
         type(Concrete_Number_to_String) :: string
         integer :: i_element, j_element
@@ -88,7 +88,7 @@ contains
     subroutine Abstract_write(this, i_step, observables)
         class(Abstract_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Reals_Line), intent(in) :: observables(:)
+        type(Real_Line), intent(in) :: observables(:)
 
         character(len=:), allocatable :: string
         integer :: i_element, j_element
@@ -112,7 +112,7 @@ contains
     subroutine Null_construct(this, filename, selectors)
         class(Null_Triangle_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
-        type(Concrete_Logical_Line), intent(in) :: selectors(:)
+        type(Logical_Line), intent(in) :: selectors(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
@@ -122,7 +122,7 @@ contains
     subroutine Null_write(this, i_step, observables)
         class(Null_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Reals_Line), intent(in) :: observables(:)
+        type(Real_Line), intent(in) :: observables(:)
     end subroutine Null_write
 
 !end implementation Null_Triangle_Writer

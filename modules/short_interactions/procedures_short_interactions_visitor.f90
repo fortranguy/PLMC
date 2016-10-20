@@ -4,11 +4,11 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_component_wrapper, only: Component_Wrapper
-use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use classes_walls_visitor, only: Abstract_Walls_Visitor
 use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 
 implicit none
 
@@ -47,10 +47,10 @@ contains
 
     pure subroutine visit_short(overlap, energies, components, components_visitor, components_pairs)
         logical, intent(out) :: overlap
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Short_Pairs_Visitor), intent(in) :: components_visitor
-        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: components_pairs(:)
 
         call visit_short_intra(overlap, energies, components, components_visitor, components_pairs)
         if (overlap) return
@@ -60,10 +60,10 @@ contains
     pure subroutine visit_short_intra(overlap, energies, components, components_visitor, &
         components_pairs)
         logical, intent(out) :: overlap
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Short_Pairs_Visitor), intent(in) :: components_visitor
-        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: components_pairs(:)
 
         integer :: i_component
 
@@ -81,10 +81,10 @@ contains
     pure subroutine visit_short_inter(overlap, energies, components, components_visitor, &
         components_pairs)
         logical, intent(out) :: overlap
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Short_Pairs_Visitor), intent(in) :: components_visitor
-        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: components_pairs(:)
 
         integer :: i_component, j_component
 
@@ -105,7 +105,7 @@ contains
 
     subroutine visit_cells_energies(overlap, energies, components, visitable_cells)
         logical, intent(out) :: overlap
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells(:, :)
 

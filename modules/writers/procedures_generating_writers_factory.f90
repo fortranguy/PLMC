@@ -10,7 +10,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_complete_coordinates_writer_factory, only: complete_coordinates_writer_create => &
     create, complete_coordinates_writer_destroy => destroy
-use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use classes_changed_box_size, only: Changed_Box_Size_Line
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_factory, only: set_can_exchange
@@ -43,7 +43,7 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
-        type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: short_pairs(:)
         type(Changes_Component_Wrapper), intent(in) :: changes_components(:, :)
         type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
         type(json_file), intent(inout) :: generating_data

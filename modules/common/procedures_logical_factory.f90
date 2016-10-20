@@ -1,6 +1,6 @@
 module procedures_logical_factory
 
-use types_logical_line, only: Concrete_Logical_Line
+use types_logical_line, only: Logical_Line
 
 implicit none
 
@@ -14,7 +14,7 @@ end interface create
 contains
 
     subroutine create_triangle(triangle, num_components)
-        type(Concrete_Logical_Line), allocatable, intent(out) :: triangle(:)
+        type(Logical_Line), allocatable, intent(out) :: triangle(:)
         integer, intent(in) :: num_components
 
         integer :: i_component

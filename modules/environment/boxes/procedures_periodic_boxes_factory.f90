@@ -25,13 +25,13 @@ contains
         logical :: data_found
 
         num_boxes = property_num_boxes(generating_data, prefix)
+        if (num_boxes < 1) then
+            call error_exit("procedures_periodic_boxes_factory: create: num_boxes < 1.")
+        end if
         if (present(unique)) then
             if (unique) num_boxes = 1
         end if
 
-        if (num_boxes < 1) then
-            call error_exit("procedures_periodic_boxes_factory: create: num_boxes < 1.")
-        end if
         data_field = prefix//"Boxes.periodicity"
         call generating_data%get(data_field, boxes_periodicity, data_found)
         call check_data_found(data_field, data_found)

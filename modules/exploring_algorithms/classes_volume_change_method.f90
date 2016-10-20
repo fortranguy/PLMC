@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
-use types_logical_line, only: Concrete_Logical_Line
+use types_logical_line, only: Logical_Line
 use procedures_logical_factory, only: logical_create => create
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
@@ -108,7 +108,7 @@ contains
         real(DP) :: contacts, delta_energy, delta_volume
         real(DP), dimension(num_dimensions) :: new_box_size, box_size, box_size_ratio
         type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
-        type(Concrete_Logical_Line), allocatable :: only_resized_triangle(:)
+        type(Logical_Line), allocatable :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
         type(Dipolar_Interactions_Static_Wrapper) :: dipolar_interactions_static
         logical :: reset_real_pair
@@ -218,7 +218,7 @@ contains
         i_box)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(inout) ::only_resized_triangle(:)
+        type(Logical_Line), intent(inout) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
         integer, intent(in) :: i_box
 
@@ -246,7 +246,7 @@ contains
         visitable_cells, i_box)
         class(Abstract_Volume_Change_Method), intent(in) :: this
         type(Neighbour_Cells_Line), allocatable, intent(inout) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
+        type(Logical_Line), intent(in) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells(:, :)
         integer, intent(in) :: i_box
 

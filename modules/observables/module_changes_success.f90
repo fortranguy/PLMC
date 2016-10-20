@@ -1,7 +1,7 @@
 module module_changes_success
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 
 implicit none
 
@@ -39,9 +39,9 @@ end interface set_successes
         real(DP) :: remove = 0._DP
     end type Concrete_Changes_Success
 
-    type, public :: Concrete_Change_Counters_Line
+    type, public :: Concrete_Change_Counter_Line
         type(Concrete_Change_Counter), allocatable :: line(:)
-    end type Concrete_Change_Counters_Line
+    end type Concrete_Change_Counter_Line
 
 contains
 
@@ -55,7 +55,7 @@ contains
     end subroutine changes_counter_reset
 
     elemental subroutine change_counters_reset(counters)
-        type(Concrete_Change_Counters_Line), intent(inout) :: counters
+        type(Concrete_Change_Counter_Line), intent(inout) :: counters
 
         call reset_counters(counters%line)
     end subroutine change_counters_reset
@@ -78,8 +78,8 @@ contains
     end subroutine changes_success_set
 
     elemental subroutine change_successes_set(successes, counters)
-        type(Reals_Line), intent(inout) :: successes
-        type(Concrete_Change_Counters_Line), intent(in) :: counters
+        type(Real_Line), intent(inout) :: successes
+        type(Concrete_Change_Counter_Line), intent(in) :: counters
 
         successes%line = calculate_ratio(counters%line)
     end subroutine change_successes_set

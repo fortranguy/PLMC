@@ -1,7 +1,7 @@
 module types_observables_energies
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 
 implicit none
 
@@ -21,7 +21,7 @@ private
 
     type, public :: Concrete_Observables_Energies
         real(DP), allocatable :: walls_energies(:), field_energies(:)
-        type(Reals_Line), allocatable :: short_energies(:), dipolar_energies(:)
+        type(Real_Line), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_shared_energy = 0._DP
     end type Concrete_Observables_Energies
 

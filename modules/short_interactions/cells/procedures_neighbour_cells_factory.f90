@@ -5,7 +5,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_environment_inquirers, only: periodicity_is_xyz, periodicity_is_xy
 use classes_hard_contact, only: Abstract_Hard_Contact
-use classes_pair_potential, only: Abstract_Pair_Potential, Pair_Potentials_Line
+use classes_pair_potential, only: Abstract_Pair_Potential, Pair_Potential_Line
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells, XYZ_PBC_Neighbour_Cells, &
     XY_PBC_Neighbour_Cells, Null_Neighbour_Cells, Neighbour_Cells_Line
 
@@ -22,7 +22,7 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domain
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
-        type(Pair_Potentials_Line), intent(in) :: components_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: components_pairs(:)
         logical, intent(in) :: interact
 
         integer :: i_component, j_component

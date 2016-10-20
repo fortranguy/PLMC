@@ -1,6 +1,6 @@
 module classes_visitable_cells_memento
 
-use types_logical_line, only: Concrete_Logical_Line
+use types_logical_line, only: Logical_Line
 use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells, Null_Visitable_Cells
 use procedures_visitable_cells_factory, only: visitable_cells_destroy => destroy
@@ -28,11 +28,11 @@ private
 
         subroutine Abstract_restore(visitable_cells_target, neighbour_cells, only_resized_triangle,&
             visitable_cells_source)
-        import :: Concrete_Logical_Line, Neighbour_Cells_Line, Abstract_Visitable_Cells
+        import :: Logical_Line, Neighbour_Cells_Line, Abstract_Visitable_Cells
             class(Abstract_Visitable_Cells), allocatable, intent(inout) :: &
                 visitable_cells_target(:, :)
             type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
-            type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
+            type(Logical_Line), intent(in) ::only_resized_triangle(:)
             class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
         end subroutine Abstract_restore
 
@@ -75,7 +75,7 @@ contains
         visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
+        type(Logical_Line), intent(in) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
         integer :: i_component, j_component
@@ -109,7 +109,7 @@ contains
         visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:) !useful?
+        type(Logical_Line), intent(in) ::only_resized_triangle(:) !useful?
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
 
         integer :: i_component, j_component
@@ -149,7 +149,7 @@ contains
         visitable_cells_source)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells_target(:, :)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(in) ::only_resized_triangle(:)
+        type(Logical_Line), intent(in) ::only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells_source(:, :)
     end subroutine Null_restore
 

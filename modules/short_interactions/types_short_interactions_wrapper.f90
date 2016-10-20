@@ -3,7 +3,7 @@ module types_short_interactions_wrapper
 use classes_beta_pressure_excess, only: Abstract_Beta_Pressure_Excess
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_walls_visitor, only: Abstract_Walls_Visitor
-use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use types_cells_wrapper, only: Cells_Wrapper
 use classes_visitable_cells_memento, only: Abstract_Visitable_Cells_Memento
 use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
@@ -18,7 +18,7 @@ private
         class(Abstract_Walls_Visitor), allocatable :: walls_visitors(:)
         type(Pair_Potential_Wrapper), allocatable :: wall_pairs(:)
         class(Abstract_Short_Pairs_Visitor), allocatable :: components_visitors(:)
-        type(Pair_Potentials_Line), allocatable :: components_pairs(:)
+        type(Pair_Potential_Line), allocatable :: components_pairs(:)
         type(Cells_Wrapper), allocatable :: cells(:)
         class(Abstract_Visitable_Cells_Memento), allocatable :: visitable_cells_memento
     end type Short_Interactions_Wrapper

@@ -1,7 +1,7 @@
 module procedures_observables_energies_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_reals_line, only: Reals_Line
+use types_real_line, only: Real_Line
 use types_observables_energies, only: Concrete_Single_Energies, Concrete_Double_Energies, &
     Concrete_Observables_Energies
 use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
@@ -112,7 +112,7 @@ contains
     end subroutine add_double
 
     pure subroutine add_energies(energies, deltas, i_component)
-        type(Reals_Line), intent(inout) :: energies(:)
+        type(Real_Line), intent(inout) :: energies(:)
         real(DP), intent(in) :: deltas(:)
         integer, intent(in) :: i_component
 
@@ -139,8 +139,8 @@ contains
     end subroutine set_energies
 
     pure subroutine set_energies_triangle(energies_target, energies_source)
-        type(Reals_Line), intent(inout) :: energies_target(:)
-        type(Reals_Line), intent(in) :: energies_source(:)
+        type(Real_Line), intent(inout) :: energies_target(:)
+        type(Real_Line), intent(in) :: energies_source(:)
 
         integer :: i_component
 

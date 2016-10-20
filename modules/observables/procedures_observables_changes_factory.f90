@@ -3,7 +3,7 @@ module procedures_observables_changes_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 use module_changes_success, only: Concrete_Change_Counter, Concrete_Changes_Counter, &
-    Concrete_Changes_Success, Concrete_Change_Counters_Line, reset_counters
+    Concrete_Changes_Success, Concrete_Change_Counter_Line, reset_counters
 use types_observables_changes, only: Concrete_Observables_Changes
 
 implicit none
@@ -102,7 +102,7 @@ contains
     end subroutine destroy_changes_counters
 
     pure subroutine create_triangle_counters(counters, num_elements)
-        type(Concrete_Change_Counters_Line), allocatable, intent(out) :: counters(:)
+        type(Concrete_Change_Counter_Line), allocatable, intent(out) :: counters(:)
         integer, intent(in) :: num_elements
 
         integer :: i_counter
@@ -115,7 +115,7 @@ contains
     end subroutine create_triangle_counters
 
     pure subroutine destroy_triangle_counters(counters)
-        type(Concrete_Change_Counters_Line), allocatable, intent(inout) :: counters(:)
+        type(Concrete_Change_Counter_Line), allocatable, intent(inout) :: counters(:)
 
         integer :: i_counter
 

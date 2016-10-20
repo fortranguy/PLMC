@@ -1,6 +1,6 @@
 module procedures_short_interactions_resetter
 
-use types_logical_line, only: Concrete_Logical_Line
+use types_logical_line, only: Logical_Line
 use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 
@@ -43,7 +43,7 @@ contains
 
     subroutine box_size_change_reset_cells(neighbour_cells, only_resized_triangle, visitable_cells)
         type(Neighbour_Cells_Line), intent(inout) :: neighbour_cells(:)
-        type(Concrete_Logical_Line), intent(in) :: only_resized_triangle(:)
+        type(Logical_Line), intent(in) :: only_resized_triangle(:)
         class(Abstract_Visitable_Cells), intent(inout) :: visitable_cells(:, :)
 
         integer :: i_component, j_component

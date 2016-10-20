@@ -29,9 +29,9 @@ private
         class(Abstract_Min_Distance), allocatable :: distance
     end type Min_Distance_Wrapper
 
-    type, public :: Min_Distances_Line
+    type, public :: Min_Distance_Line
         type(Min_Distance_Wrapper), allocatable :: line(:)
-    end type Min_Distances_Line
+    end type Min_Distance_Line
 
 contains
 

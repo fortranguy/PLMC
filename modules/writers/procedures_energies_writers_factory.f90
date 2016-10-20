@@ -4,7 +4,7 @@ use types_string_wrapper, only: String_Wrapper
 use classes_external_field, only: Abstract_External_Field
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_total_moments_factory, only: set_are_dipolar
-use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy
 use procedures_line_writer_factory, only: line_writer_create => create, &
@@ -37,7 +37,7 @@ contains
         class(Abstract_External_Field), intent(in) :: external_fields(:)
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
-        type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: short_pairs(:)
         logical, intent(in) :: visit_energies
 
         logical :: are_dipolar(size(components, 1), size(components, 2))
@@ -72,7 +72,7 @@ contains
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
-        type(Pair_Potentials_Line), intent(in) :: short_pairs(:)
+        type(Pair_Potential_Line), intent(in) :: short_pairs(:)
         logical, intent(in) :: visit_energies
 
         call line_writer_create(energies%walls_energies, path//"walls_energies.out", wall_pairs, &

@@ -2,11 +2,11 @@ module procedures_pairs_factory
 
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
-use classes_min_distance, only: Min_Distance_Wrapper, Min_Distances_Line
+use classes_min_distance, only: Min_Distance_Wrapper, Min_Distance_Line
 use classes_potential_expression, only: Abstract_Potential_Expression
 use procedures_potential_expression_factory, only: potential_expression_create => create, &
     potential_expression_destroy => destroy
-use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potentials_Line
+use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use procedures_pair_potential_factory, only: pair_potential_create => create, &
     pair_potential_destroy => destroy
 use procedures_short_pairs_visitors_factory, only: short_pairs_visitors_create => create, &
@@ -64,9 +64,9 @@ contains
     end subroutine create_walls
 
     subroutine create_components(pairs, interact, min_distances, generating_data, prefix)
-        type(Pair_Potentials_Line), allocatable, intent(out) :: pairs(:)
+        type(Pair_Potential_Line), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
-        type(Min_Distances_Line), intent(in) :: min_distances(:)
+        type(Min_Distance_Line), intent(in) :: min_distances(:)
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
@@ -100,7 +100,7 @@ contains
     end subroutine create_components
 
     subroutine destroy_components(pairs)
-        type(Pair_Potentials_Line), allocatable, intent(inout) :: pairs(:)
+        type(Pair_Potential_Line), allocatable, intent(inout) :: pairs(:)
 
         integer :: i_component
 
