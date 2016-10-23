@@ -1,5 +1,6 @@
 module procedures_line_writer_factory
 
+use procedures_errors, only: error_exit
 use types_string_wrapper, only: String_Wrapper
 use classes_number_to_string, only: Concrete_Number_to_String
 use classes_external_field, only: Abstract_External_Field
@@ -32,15 +33,24 @@ end interface
 contains
 
     !> @todo any(can_translate(:, i_box)): better condition?
-    subroutine create_teleportations_successes(successes, basename, can_translate)
+    subroutine create_teleportations_successes(successes, make_directory_cmd, separator, directory,&
+        can_translate)
         type(Line_Writer_Wrapper), allocatable, intent(out) :: successes(:, :)
-        character(len=*), intent(in) :: basename
+        character(len=*), intent(in) :: make_directory_cmd, separator, directory
         logical, intent(in) :: can_translate(:, :)
 
         type(Concrete_Number_to_String) :: string
         integer :: num_boxes, i_box, j_box
+        integer :: teleporation_stat
 
         num_boxes = size(can_translate, 2)
+        if (num_boxes > 1 .and. any(can_translate)) then
+            call execute_command_line(make_directory_cmd//" "//directory, &
+                exitstat=teleporation_stat)
+            if (teleporation_stat /= 0) call error_exit("procedures_line_writer_factory: "//&
+                "create_teleportations_successes: "//directory//" directory can't be created.")
+        end if
+
         allocate(successes(num_boxes, num_boxes))
         do j_box = 1, size(successes, 2)
             do i_box = 1, size(successes, 1)
@@ -49,8 +59,8 @@ contains
                 else
                     allocate(Null_Line_Writer :: successes(i_box, j_box)%writer)
                 end if
-                call successes(i_box, j_box)%writer%construct(basename//"_"//string%get(i_box)//&
-                    "_to_"//string%get(j_box)//".out", can_translate(:, i_box))
+                call successes(i_box, j_box)%writer%construct(directory//separator//"successes_"//&
+                    string%get(i_box)//"_to_"//string%get(j_box)//".out", can_translate(:, i_box))
             end do
         end do
     end subroutine create_teleportations_successes

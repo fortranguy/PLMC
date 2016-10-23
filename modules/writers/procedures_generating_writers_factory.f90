@@ -57,7 +57,7 @@ contains
         logical :: data_found
         character(len=:), allocatable :: data_field
         type(Concrete_Number_to_String) :: string
-        integer :: i_box, box_stat_i, teleporation_stat
+        integer :: i_box, box_stat_i
 
         write_coordinates = property_write_coordinates(generating_data, writers_prefix)
         data_field = writers_prefix//"Shell.make directory command"
@@ -84,11 +84,8 @@ contains
         call real_writer_create(writers%accessible_domains_size, boxes_path, &
             "accessible_domain_size.out", changed_boxes_size)
         call set_can_translate(can_translate, changes_components)
-        call execute_command_line(make_directory_cmd//" teleportations", exitstat=teleporation_stat)
-        if (teleporation_stat /= 0) call error_exit("procedures_generating_writers_factory: "//&
-            "create: teleportations directory can't be created.")
-        call line_writer_create(writers%teleportations_successes, "teleportations"//separator//&
-            "successes", can_translate)
+        call line_writer_create(writers%teleportations_successes, make_directory_cmd, separator, &
+            "teleportations", can_translate)
         call triangle_writer_create(writers%volumes_change_success, "volumes_change_success.out", &
             changed_boxes_size)
 

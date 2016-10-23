@@ -28,5 +28,4 @@
 - BetaPressure: one value?
 - Add SemiGrand Canonical ensemble
 + GeneratingAlgorithms:
-    - BoxParticleMove: new, old -> particles(2)
     - acceptationProbability(): uniformise comment notation
