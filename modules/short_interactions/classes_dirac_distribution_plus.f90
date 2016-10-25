@@ -109,17 +109,16 @@ contains
     end function Gaussian_get_width
 
     !> \[
-    !>      \frac{1}{\sigma \sqrt{2\pi}}
-    !>          \exp\left( -\frac{\left( r - \frac{\mathsf{n}_\sigma}{2}\sigma \right)^2}
-    !>          {2 \sigma^2} \right)
+    !>      r \mapsto \frac{1}{\sigma} \sqrt{\frac{2}{\pi}}
+    !>          \exp\left( -\frac{r^2}{2 \sigma^2} \right)
     !> \]
     pure real(DP) function Gaussian_get(this, distance) result(distribution)
         class(Gaussian_Dirac_Distribution_Plus), intent(in) :: this
         real(DP), intent(in) :: distance
 
         if (distance <= this%max_distance) then
-            distribution = 1._DP / this%std_dev/sqrt(2._DP*PI) * &
-                exp(-(distance - this%max_distance/2._DP)**2 / 2._DP/this%std_dev**2)
+            distribution = sqrt(2._DP / PI) / this%std_dev * &
+                exp(-distance**2 / 2._DP / this%std_dev**2)
         else
             distribution = 0._DP
         end if

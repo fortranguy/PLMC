@@ -6,6 +6,7 @@ use procedures_checks, only: check_data_found
 use procedures_command_arguments, only: create_filename_from_argument
 use classes_number_to_string, only: Concrete_Number_to_String
 use types_string_wrapper, only: String_Wrapper
+use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_complete_coordinates_reader_factory, only: complete_coordinates_reader_create => &
@@ -24,13 +25,14 @@ end interface
 
 contains
 
-    subroutine create(readers, environment, components)
+    subroutine create(readers, environment, components, particle_insertion_domains)
         type(Readers_Wrapper), intent(out) :: readers
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:, :)
+        class(Abstract_Parallelepiped_Domain), optional, intent(in) ::particle_insertion_domains(:)
 
-        call complete_coordinates_reader_create(readers%complete_coordinates, environment%&
-            periodic_boxes, environment%boxes_size_checker, components)
+        call complete_coordinates_reader_create(readers%complete_coordinates, environment, &
+            components, particle_insertion_domains)
     end subroutine create
 
     subroutine destroy(readers)

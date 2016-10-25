@@ -50,8 +50,10 @@ implicit none
         call plmc_set(io%readers, i_snap)
         call plmc_reset(physical_model)
         call plmc_visit(observables%energies, physical_model, visit_energies)
-        call markov_chain_explorer%maximum_box_compression_explorer%try(observables)
         do i_box = 1, size(markov_chain_explorer%changed_boxes_size_ratio)
+            call markov_chain_explorer%maximum_boxes_compression_explorer(i_box)%reset()
+            call markov_chain_explorer%maximum_boxes_compression_explorer(i_box)%&
+                try(observables%maximum_boxes_compression_delta(i_box))
             call markov_chain_explorer%changed_boxes_size_ratio(i_box)%&
                 set(observables%maximum_boxes_compression_delta(i_box))
         end do

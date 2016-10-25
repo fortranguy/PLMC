@@ -11,7 +11,7 @@ contains
 
     !> \[
     !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} -
-    !>     3\frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r^5}
+    !>      3\frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r^5}
     !> \]
     pure function dipolar_pair_energy(orientation_i, orientation_j, vector_ij)
         real(DP) :: dipolar_pair_energy

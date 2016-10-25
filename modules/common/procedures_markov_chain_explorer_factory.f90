@@ -15,9 +15,9 @@ use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
 use procedures_maximum_box_compression_factory, only: maximum_box_compression_create => create, &
     maximum_box_compression_destroy => destroy
 use classes_random_coordinates, only: Abstract_Random_Coordinates
-use procedures_maximum_box_compression_explorer_factory, only: &
-    maximum_box_compression_explorer_create => create, &
-    maximum_box_compression_explorer_destroy => destroy
+use procedures_maximum_boxes_compression_explorer_factory, only: &
+    maximum_boxes_compression_explorer_create => create, &
+    maximum_boxes_compression_explorer_destroy => destroy
 use procedures_volume_change_method_factory, only: volume_change_method_create => create, &
     volume_change_method_destroy => destroy
 use procedures_particle_insertion_method_factory, only: particle_insertion_method_create => create,&
@@ -53,8 +53,8 @@ contains
         end if
         call maximum_box_compression_create(maximum_box_compression, physical_model%environment%&
             periodic_boxes, measure_pressure_excess)
-        call maximum_box_compression_explorer_create(markov_chain_explorer%&
-            maximum_box_compression_explorer, physical_model, maximum_box_compression, &
+        call maximum_boxes_compression_explorer_create(markov_chain_explorer%&
+            maximum_boxes_compression_explorer, physical_model, maximum_box_compression, &
             measure_pressure_excess)
         call maximum_box_compression_destroy(maximum_box_compression)
         boxes_size_can_change = measure_pressure_excess
@@ -90,8 +90,8 @@ contains
         call boxes_destroy(markov_chain_explorer%particle_insertion_domains)
         call volume_change_method_destroy(markov_chain_explorer%volume_change_method)
         call changed_boxes_size_ratio_destroy(markov_chain_explorer%changed_boxes_size_ratio)
-        call maximum_box_compression_explorer_destroy(markov_chain_explorer%&
-            maximum_box_compression_explorer)
+        call maximum_boxes_compression_explorer_destroy(markov_chain_explorer%&
+            maximum_boxes_compression_explorer)
     end subroutine destroy
 
 end module procedures_markov_chain_explorer_factory

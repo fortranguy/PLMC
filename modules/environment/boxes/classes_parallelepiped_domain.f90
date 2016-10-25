@@ -119,7 +119,7 @@ contains
 
         this%periodic_box => periodic_box
         call check_array_size("Concrete_Parallelepiped_Domain", "origin", origin, num_dimensions)
-        this%origin = this%periodic_box%folded(origin)
+        this%origin = origin
         call check_array_size("Concrete_Parallelepiped_Domain", "size", size, num_dimensions)
         call check_positive("Concrete_Parallelepiped_Domain", "size", size)
         this%size = size
@@ -135,7 +135,7 @@ contains
         class(Concrete_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: origin(num_dimensions)
 
-        origin = this%origin
+        origin = this%periodic_box%folded(this%origin)
     end function Parallelepiped_get_origin
 
     pure function Parallelepiped_get_size(this) result(size)

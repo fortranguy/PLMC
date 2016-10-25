@@ -8,6 +8,7 @@ use procedures_checks, only: check_file_exists
 use types_string_wrapper, only: String_Wrapper
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_checker, only: Abstract_Box_Size_Checker
+use procedures_boxes_size_checker_factory, only: boxes_size_checker_destroy => destroy
 use classes_component_coordinates_reader, only: Component_Coordinates_Reader_wrapper
 use procedures_component_coordinates_reader_factory, only: component_coordinates_reader_destroy => &
     destroy
@@ -19,7 +20,7 @@ private
     type, abstract, public :: Abstract_Complete_Coordinates_Reader
     private
         class(Abstract_Periodic_Box), pointer :: periodic_boxes(:) => null()
-        class(Abstract_Box_Size_Checker), pointer :: boxes_size_checker(:) => null()
+        class(Abstract_Box_Size_Checker), allocatable :: boxes_size_checker(:)
         type(Component_Coordinates_Reader_wrapper), allocatable :: components_coordinates(:, :)
     contains
         procedure :: construct => Abstract_construct
@@ -36,11 +37,11 @@ contains
     subroutine Abstract_construct(this, periodic_boxes, boxes_size_checker, components_coordinates)
         class(Abstract_Complete_Coordinates_Reader), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_boxes(:)
-        class(Abstract_Box_Size_Checker), target, intent(in) :: boxes_size_checker(:)
+        class(Abstract_Box_Size_Checker), intent(in) :: boxes_size_checker(:)
         type(Component_Coordinates_Reader_wrapper), intent(in) :: components_coordinates(:, :)
 
         this%periodic_boxes => periodic_boxes
-        this%boxes_size_checker => boxes_size_checker
+        allocate(this%boxes_size_checker, source=boxes_size_checker)
         allocate(this%components_coordinates, source=components_coordinates)
     end subroutine Abstract_construct
 
@@ -48,7 +49,7 @@ contains
         class(Abstract_Complete_Coordinates_Reader), intent(out) :: this
 
         call component_coordinates_reader_destroy(this%components_coordinates)
-        this%boxes_size_checker => null()
+        call boxes_size_checker_destroy(this%boxes_size_checker)
         this%periodic_boxes => null()
     end subroutine Abstract_destroy
 

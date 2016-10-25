@@ -26,13 +26,12 @@ use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_triangle_observables, only: triangle_observables_sum
 use procedures_observables_energies_factory, only: observables_energies_create => create
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
-use classes_exploring_algorithm, only: Abstract_Exploring_Algorithm
 
 implicit none
 
 private
 
-    type, extends(Abstract_Exploring_Algorithm), abstract, public :: Abstract_Volume_Change_Method
+    type, abstract, public :: Abstract_Volume_Change_Method
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:, :) => null()

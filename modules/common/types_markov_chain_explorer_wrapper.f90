@@ -12,7 +12,7 @@ private
 
     type, public :: Markov_Chain_Explorer_Wrapper
         class(Abstract_Maximum_Box_Compression_Explorer), allocatable :: &
-            maximum_box_compression_explorer
+            maximum_boxes_compression_explorer(:)
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: changed_boxes_size_ratio(:)
         class(Abstract_Volume_Change_Method), allocatable :: volume_change_method
         class(Abstract_Parallelepiped_Domain), allocatable :: particle_insertion_domains(:)

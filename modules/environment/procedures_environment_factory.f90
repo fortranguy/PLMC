@@ -4,7 +4,6 @@ use data_input_prefixes, only: environment_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use classes_periodic_box, only: Abstract_Periodic_Box
-use classes_box_size_checker, only: Abstract_Box_Size_Checker
 use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
 use procedures_beta_pressure_factory, only: beta_pressure_create => create, &
     beta_pressure_destroy => destroy
@@ -73,8 +72,6 @@ contains
             call error_exit("procedures_environment_factory: create: "//&
                 "box periodicity is unknown.")
         end if
-        call boxes_create(environment%boxes_size_checker, environment%accessible_domains, &
-            environment%fields_domain, environment%reciprocal_lattices, environment%visitable_walls)
 
         call check(environment%periodic_boxes, environment%visitable_walls)
     end subroutine create
@@ -97,7 +94,6 @@ contains
         type(Environment_Wrapper), intent(inout) :: environment
 
         call boxes_destroy(environment%accessible_domains)
-        call boxes_destroy(environment%boxes_size_checker)
         call boxes_destroy(environment%reciprocal_lattices)
         call fields_destroy(environment%external_fields)
         call boxes_destroy(environment%fields_domain)

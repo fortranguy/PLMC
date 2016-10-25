@@ -25,7 +25,6 @@ private
         class(Abstract_Reciprocal_Lattice), allocatable :: reciprocal_lattices(:)
         class(Abstract_Min_Distance), allocatable :: wall_min_distance
         class(Abstract_Visitable_Walls), allocatable :: visitable_walls(:)
-        class(Abstract_Box_Size_Checker), allocatable :: boxes_size_checker(:)
         class(Abstract_Parallelepiped_Domain), allocatable :: accessible_domains(:)
             !!for a point particle
     end type Environment_Wrapper
