@@ -23,7 +23,6 @@
 - NeighbourCells: HS shortcut
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
-- DiracDistributionPlus: gaussian -> halfGaussian
 - BetaPressure: one value?
 - Add SemiGrand Canonical ensemble
 + GeneratingAlgorithms:

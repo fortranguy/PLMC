@@ -13,18 +13,15 @@ use types_real_line, only: Real_Line
 implicit none
 
 private
-public :: visit, visit_cells
+public :: visit
 
 interface visit
     module procedure :: visit_walls
     module procedure :: visit_short
-end interface visit
-
-interface visit_cells
     module procedure :: visit_cells_energies
     module procedure :: visit_cells_contacts
     module procedure :: visit_cells_min_distance
-end interface visit_cells
+end interface visit
 
 contains
 

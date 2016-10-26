@@ -7,7 +7,6 @@ use procedures_errors, only: error_exit
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
-use procedures_neighbour_cells_micro, only: pbc_3d_index
 
 implicit none
 
@@ -249,6 +248,14 @@ contains
     end function Abstract_index
 
 !end implementation Abstract_Neighbour_Cells
+
+    !> @note Periodic index, found heuristically.
+    pure function pbc_3d_index(ijk_cell, nums_cells)
+        integer, intent(in) :: ijk_cell(:), nums_cells(:)
+        integer :: pbc_3d_index(3)
+
+        pbc_3d_index = modulo(ijk_cell + nums_cells/2, nums_cells) - nums_cells/2
+    end function pbc_3d_index
 
 !implementation XYZ_PBC_Neighbour_Cells
 

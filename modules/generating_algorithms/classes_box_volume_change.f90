@@ -15,8 +15,7 @@ use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_tri
     allocate_triangle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
-use procedures_short_interactions_visitor, only: short_interactions_visit => visit, &
-    short_interactions_visit_cells => visit_cells
+use procedures_short_interactions_visitor, only: short_interactions_visit => visit
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
 use procedures_dipolar_interactions_factory, only: dipolar_interactions_destroy => destroy
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
@@ -187,7 +186,7 @@ contains
             short_interactions%wall_pairs)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
-        call short_interactions_visit_cells(overlap, new_energies%short_energies, this%mixture%&
+        call short_interactions_visit(overlap, new_energies%short_energies, this%mixture%&
             components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
         call triangle_observables_diff(deltas%short_energies, new_energies%short_energies, &
             energies%short_energies)

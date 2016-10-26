@@ -6,7 +6,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
 use classes_pair_potential, only: Pair_Potential_Line
 use types_cells_wrapper, only: Cells_Wrapper
-use procedures_short_interactions_visitor, only: short_interactions_visit_cells => visit_cells
+use procedures_short_interactions_visitor, only: short_interactions_visit => visit
 use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
 use procedures_maximum_box_compression_factory, only: maximum_box_compression_destroy => destroy
 
@@ -96,10 +96,10 @@ contains
         real(DP) :: min_distance_ratio, max_distance_ratio
 
         max_distance_ratio = this%periodic_box%get_max_distance() / this%min_distance
-        call short_interactions_visit_cells(overlap, min_distance_ratio, max_distance_ratio, &
+        call short_interactions_visit(overlap, min_distance_ratio, max_distance_ratio, &
             this%components, this%cells%visitable_cells)
         if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&
-            "short_interactions_visit_cells: overlap")
+            "short_interactions_visit: overlap")
         maximum_box_compression_delta = this%maximum_box_compression%get_delta(min_distance_ratio)
     end subroutine Abstract_try
 

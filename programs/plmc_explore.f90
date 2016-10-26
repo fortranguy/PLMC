@@ -6,6 +6,7 @@
 program plmc_explore
 
 use, intrinsic :: iso_fortran_env, only: output_unit
+use procedures_property_inquirers, only: logical_from_json
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
@@ -14,7 +15,7 @@ use procedures_markov_chain_explorer_factory, markov_chain_explorer_create => cr
     markov_chain_explorer_destroy => destroy
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
 use procedures_plmc_resetter, only: plmc_reset
-use procedures_plmc_visitor, only: plmc_visit_set, plmc_visit
+use procedures_plmc_visitor, only: plmc_visit
 use procedures_plmc_writer, only: plmc_write
 use procedures_plmc_help, only: plmc_catch_exploring_help
 
@@ -34,7 +35,7 @@ implicit none
     call plmc_create(physical_model, io%generating_data, io%exploring_data, unique_box=.true.)
     call plmc_set(io%generating_data)
     call plmc_set(num_snaps, io%generating_data)
-    call plmc_visit_set(visit_energies, io%exploring_data, "Check.")
+    visit_energies = logical_from_json(io%exploring_data, "Check.visit energies")
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, visit_energies, io%&
         exploring_data)
     call plmc_create(observables, physical_model%mixture%components)
@@ -49,7 +50,9 @@ implicit none
     do i_snap = 1, num_snaps
         call plmc_set(io%readers, i_snap)
         call plmc_reset(physical_model)
-        call plmc_visit(observables%energies, physical_model, visit_energies)
+        if (visit_energies) then
+            call plmc_visit(observables%energies, physical_model, use_cells=.true.)
+        end if
         do i_box = 1, size(markov_chain_explorer%changed_boxes_size_ratio)
             call markov_chain_explorer%maximum_boxes_compression_explorer(i_box)%reset()
             call markov_chain_explorer%maximum_boxes_compression_explorer(i_box)%&

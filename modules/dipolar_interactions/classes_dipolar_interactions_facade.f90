@@ -34,7 +34,6 @@ private
         procedure(Abstract_visit), deferred :: visit
         procedure(Abstract_set_real_pair_flag), private, deferred :: set_real_pair_flag
         procedure(Abstract_clone), deferred, private :: clone
-        procedure, private :: clone_real => Abstract_clone_real
         procedure(Abstract_target), deferred, private :: target
         procedure, private :: target_real => Abstract_target_real
     end type Abstract_Dipolar_Interactions_Facade
@@ -150,23 +149,6 @@ contains
         call this%target(reset_real_pair)
     end subroutine Abstract_restore
 
-    subroutine Abstract_clone_real(this, box_size_memento_target, des_real_pair_target, &
-        box_size_memento_source, des_real_pair_source, reset_real_pair)
-        class(Abstract_Dipolar_Interactions_Facade), intent(in) :: this
-        class(Abstract_Box_Size_Memento), allocatable, intent(inout) :: box_size_memento_target
-        class(Abstract_DES_Real_Pair), allocatable, intent(inout) :: des_real_pair_target
-        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento_source
-        class(Abstract_DES_Real_Pair), intent(in) :: des_real_pair_source
-        logical, intent(in) :: reset_real_pair
-
-        if (reset_real_pair) then
-            call des_real_destroy(des_real_pair_target)
-            call boxes_destroy(box_size_memento_target)
-            allocate(box_size_memento_target, source=box_size_memento_source)
-            allocate(des_real_pair_target, source=des_real_pair_source)
-        end if
-    end subroutine Abstract_clone_real
-
     subroutine Abstract_target_real(this, reset_real_pair)
         class(Abstract_Dipolar_Interactions_Facade), intent(in) :: this
         logical, intent(in) :: reset_real_pair
@@ -236,9 +218,10 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static_source
         logical, intent(in) :: reset_real_pair
 
-        call this%clone_real(dipolar_interactions_static_target%box_size_memento_real, &
+        if (.not.reset_real_pair) return
+        call clone_real(dipolar_interactions_static_target%box_size_memento_real, &
             dipolar_interactions_static_target%real_pair, dipolar_interactions_static_source%&
-            box_size_memento_real, dipolar_interactions_static_source%real_pair, reset_real_pair)
+            box_size_memento_real, dipolar_interactions_static_source%real_pair)
     end subroutine Scalable_clone
 
     subroutine Scalable_reset(this, reset_real_pair)
@@ -331,9 +314,11 @@ contains
         type(Dipolar_Interactions_Static_Wrapper), intent(in) :: dipolar_interactions_static_source
         logical, intent(in) :: reset_real_pair
 
-        call this%clone_real(dipolar_interactions_static_target%box_size_memento_real, &
-            dipolar_interactions_static_target%real_pair, dipolar_interactions_static_source%&
-            box_size_memento_real, dipolar_interactions_static_source%real_pair, reset_real_pair)
+        if (reset_real_pair) then
+            call clone_real(dipolar_interactions_static_target%box_size_memento_real, &
+                dipolar_interactions_static_target%real_pair, dipolar_interactions_static_source%&
+                box_size_memento_real, dipolar_interactions_static_source%real_pair)
+        end if
         call boxes_destroy(dipolar_interactions_static_target%box_size_memento_reci)
         allocate(dipolar_interactions_static_target%box_size_memento_reci, &
             source=dipolar_interactions_static_source%box_size_memento_reci)
@@ -372,6 +357,19 @@ contains
     end subroutine Unscalable_visit
 
 !end implementation Unscalable_Dipolar_Interactions_Facade
+
+    subroutine clone_real(box_size_memento_target, des_real_pair_target, box_size_memento_source, &
+        des_real_pair_source)
+        class(Abstract_Box_Size_Memento), allocatable, intent(inout) :: box_size_memento_target
+        class(Abstract_DES_Real_Pair), allocatable, intent(inout) :: des_real_pair_target
+        class(Abstract_Box_Size_Memento), intent(in) :: box_size_memento_source
+        class(Abstract_DES_Real_Pair), intent(in) :: des_real_pair_source
+
+        call des_real_destroy(des_real_pair_target)
+        call boxes_destroy(box_size_memento_target)
+        allocate(box_size_memento_target, source=box_size_memento_source)
+        allocate(des_real_pair_target, source=des_real_pair_source)
+    end subroutine clone_real
 
 !implementation Null_Dipolar_Interactions_Facade
 
