@@ -39,8 +39,8 @@ contains
 
         do j_component = 1, size(cells, 2)
             do i_component = 1, size(cells, 1)
-                j_pair = maxval([i_component, j_component])
-                i_pair = minval([i_component, j_component])
+                j_pair = max(i_component, j_component)
+                i_pair = min(i_component, j_component)
                 associate (pair_ij => components_pairs(j_pair)%line(i_pair)%potential, &
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &

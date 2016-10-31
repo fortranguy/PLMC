@@ -70,35 +70,14 @@
 		<Unit filename="modules/changes/module_move_tuning.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/changes/move_tuner/classes_move_tuner.f90">
+		<Unit filename="modules/changes/move_tuners/classes_move_tuner.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="modules/changes/move_tuner/procedures_move_tuner_factory.f90">
+		<Unit filename="modules/changes/move_tuners/procedures_move_tuner_factory.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/changes/move_tuner/types_move_tuner_parameters.f90">
+		<Unit filename="modules/changes/move_tuners/types_move_tuner_parameters.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/classes_changed_box_size.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/classes_moved_component_coordinates.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/classes_moved_coordinates.f90">
-			<Option weight="0" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/classes_rotated_orientations.f90">
-			<Option weight="5" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/classes_translated_positions.f90">
-			<Option weight="5" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/procedures_changed_boxes_size_factory.f90">
-			<Option weight="10" />
-		</Unit>
-		<Unit filename="modules/changes/moved_coordinates/procedures_moved_component_coordinates_factory.f90">
-			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/changes/procedures_changed_boxes_size_ratio_factory.f90">
 			<Option weight="9" />
@@ -114,6 +93,30 @@
 		</Unit>
 		<Unit filename="modules/changes/procedures_maximum_box_compression_factory.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/classes_changed_box_size.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/classes_exchanged_boxes_size.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/classes_moved_coordinates.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/classes_rotated_orientations.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/classes_translated_positions.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/classes_tunable_move.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/procedures_changed_boxes_size_factory.f90">
+			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/changes/tunable_moves/procedures_moved_coordinates_factory.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/changes/types_changes_component_wrapper.f90">
 			<Option weight="4" />
@@ -508,6 +511,9 @@
 		<Unit filename="modules/generating_algorithms/classes_boxes_particle_teleportation.f90">
 			<Option weight="13" />
 		</Unit>
+		<Unit filename="modules/generating_algorithms/classes_boxes_volume_exchange.f90">
+			<Option weight="14" />
+		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_generating_algorithm.f90">
 			<Option weight="4" />
 		</Unit>
@@ -720,6 +726,9 @@
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/procedures_cells_factory.f90">
 			<Option weight="12" />
+		</Unit>
+		<Unit filename="modules/short_interactions/cells/procedures_cells_memento.f90">
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/procedures_neighbour_cells_factory.f90">
 			<Option weight="9" />

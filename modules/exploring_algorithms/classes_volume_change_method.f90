@@ -8,10 +8,9 @@ use types_logical_line, only: Logical_Line
 use procedures_logical_factory, only: logical_create => create
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use classes_neighbour_cells, only: Neighbour_Cells_Line
-use classes_visitable_cells, only: Abstract_Visitable_Cells
-use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_triangle => &
-    allocate_triangle
+use procedures_mixture_factory, only: mixture_rescale_positions => rescale_positions
+use types_cells_wrapper, only: Cells_Wrapper
+use procedures_cells_memento, only: cells_memento_save => save, cells_memento_restore => restore
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit
@@ -44,9 +43,6 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: try => Abstract_try
         procedure, private :: set_delta_energy => Abstract_set_delta_energy
-        procedure, private :: rescale_positions => Abstract_rescale_positions
-        procedure, private :: save_cells => Abstract_save_cells
-        procedure, private :: restore_cells => Abstract_restore_cells
     end type Abstract_Volume_Change_Method
 
     type, extends(Abstract_Volume_Change_Method), public :: Concrete_Volume_Change_Method
@@ -105,9 +101,8 @@ contains
         real(DP) :: beta_pressure_excess_sum
         real(DP) :: contacts, delta_energy, delta_volume
         real(DP), dimension(num_dimensions) :: new_box_size, box_size, box_size_ratio
-        type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
         type(Logical_Line), allocatable :: only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
+        type(Cells_Wrapper) :: cells
         type(Dipolar_Interactions_Static_Wrapper) :: dipolar_interactions_static
         logical :: reset_real_pair
         integer :: i_change
@@ -129,9 +124,10 @@ contains
                     reset_real_pair, new_box_size)
 
                 call this%environment%periodic_boxes(i_box)%set(box_size * box_size_ratio)
-                call this%rescale_positions(i_box, box_size_ratio)
+                call mixture_rescale_positions(this%components(:, i_box), box_size_ratio)
                 call logical_create(only_resized_triangle, size(this%components, 1))
-                call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
+                call cells_memento_save(cells, only_resized_triangle, this%short_interactions%&
+                    visitable_cells_memento, this%short_interactions%cells(i_box))
                 call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells,&
                     only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
                 call this%dipolar_interactions_facades(i_box)%reset(reset_real_pair)
@@ -145,9 +141,9 @@ contains
                     this%environment%temperature%get()
 
                 call this%environment%periodic_boxes(i_box)%set(box_size)
-                call this%rescale_positions(i_box, 1._DP / box_size_ratio)
-                call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells, &
-                    i_box)
+                call mixture_rescale_positions(this%components(:, i_box), 1._DP / box_size_ratio)
+                call cells_memento_restore(this%short_interactions%cells(i_box), &
+                    only_resized_triangle, this%short_interactions%visitable_cells_memento, cells)
                 call this%dipolar_interactions_facades(i_box)%restore(dipolar_interactions_static, &
                     reset_real_pair)
                 call dipolar_interactions_destroy(dipolar_interactions_static)
@@ -197,80 +193,6 @@ contains
             triangle_observables_sum(deltas%short_energies) + &
             triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_shared_energy
     end subroutine Abstract_set_delta_energy
-
-    subroutine Abstract_rescale_positions(this, i_box, box_size_ratio)
-        class(Abstract_Volume_Change_Method), intent(in) :: this
-        integer, intent(in) :: i_box
-        real(DP), intent(in) :: box_size_ratio(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(this%components, 1)
-            call this%components(i_component, i_box)%positions%rescale_all(box_size_ratio)
-        end do
-    end subroutine Abstract_rescale_positions
-
-    !> @note
-    !> cf. [[classes_box_volume_change:Abstract_save_cells]]
-    subroutine Abstract_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells, &
-        i_box)
-        class(Abstract_Volume_Change_Method), intent(in) :: this
-        type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
-        type(Logical_Line), intent(inout) ::only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
-        integer, intent(in) :: i_box
-
-        integer :: i_component, j_component
-
-        call cells_allocate_triangle(neighbour_cells, size(this%components, 1))
-        do j_component = 1, size(neighbour_cells)
-            do i_component = 1, size(neighbour_cells(j_component)%line)
-                only_resized_triangle(j_component)%line(i_component) = this%short_interactions%&
-                    cells(i_box)%neighbour_cells(j_component)%line(i_component)%cells%resize_only()
-                if (.not. only_resized_triangle(j_component)%line(i_component)) then
-                    allocate(neighbour_cells(j_component)%line(i_component)%cells, source=this%&
-                        short_interactions%cells(i_box)%neighbour_cells(j_component)%&
-                        line(i_component)%cells)
-                end if
-            end do
-        end do
-        call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
-            short_interactions%cells(i_box)%visitable_cells)
-    end subroutine Abstract_save_cells
-
-    !> @note
-    !> cf. [[classes_box_volume_change:Abstract_restore_cells]]
-    subroutine Abstract_restore_cells(this, neighbour_cells, only_resized_triangle, &
-        visitable_cells, i_box)
-        class(Abstract_Volume_Change_Method), intent(in) :: this
-        type(Neighbour_Cells_Line), allocatable, intent(inout) :: neighbour_cells(:)
-        type(Logical_Line), intent(in) ::only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells(:, :)
-        integer, intent(in) :: i_box
-
-        integer :: i_component, j_component
-
-        do j_component = 1, size(this%short_interactions%cells(i_box)%neighbour_cells)
-            do i_component = 1, size(this%short_interactions%cells(i_box)%&
-                neighbour_cells(j_component)%line)
-                if (only_resized_triangle(j_component)%line(i_component)) then
-                    call this%short_interactions%cells(i_box)%neighbour_cells(j_component)%&
-                        line(i_component)%cells%reset()
-                else
-                    call cells_destroy(this%short_interactions%cells(i_box)%&
-                        neighbour_cells(j_component)%line(i_component)%cells)
-                    allocate(this%short_interactions%cells(i_box)%neighbour_cells(j_component)%&
-                        line(i_component)%cells, source=neighbour_cells(j_component)%&
-                        line(i_component)%cells)
-                end if
-            end do
-        end do
-        call cells_destroy(neighbour_cells)
-        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
-            cells(i_box)%visitable_cells, this%short_interactions%cells(i_box)%&
-            neighbour_cells, only_resized_triangle, visitable_cells)
-        call cells_destroy(visitable_cells)
-    end subroutine Abstract_restore_cells
 
 !end implementation Abstract_Volume_Change_Method
 

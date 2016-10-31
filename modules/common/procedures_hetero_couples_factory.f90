@@ -14,8 +14,8 @@ interface create_full
 end interface create_full
 
 interface destroy
-    module procedure :: destroy_line
     module procedure :: destroy_element
+    module procedure :: destroy_line
 end interface destroy
 
 contains

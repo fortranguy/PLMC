@@ -17,7 +17,7 @@ private
     !> @note
     !> Only half structure factor is stored in [[Abstract_DES_Reci_Structure:structure]] (symmetry).
     !> Hence in [[classes_des_reci_structure:Abstract_update_translation]],
-    !> [[classes_des_reci_structure:Abstract_update_transmulation]],
+    !> [[classes_des_reci_structure:Abstract_update_transmutation]],
     !> [[classes_des_reci_structure:Abstract_update_switch]],
     !> [[classes_des_reci_structure:Abstract_update_exchange]]
     !> the updates only run over half wave vectors.
@@ -37,7 +37,7 @@ private
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get => Abstract_get
         procedure :: update_translation => Abstract_update_translation
-        procedure :: update_transmutation => Abstract_update_transmulation
+        procedure :: update_transmutation => Abstract_update_transmutation
         procedure :: update_rotation => Abstract_update_rotation
         procedure :: update_add => Abstract_update_add
         procedure :: update_remove => Abstract_update_remove
@@ -59,7 +59,7 @@ private
         procedure :: is_dipolar => Null_is_dipolar
         procedure :: get => Null_get
         procedure :: update_translation => Null_update_translation
-        procedure :: update_transmutation => Null_update_transmulation
+        procedure :: update_transmutation => Null_update_transmutation
         procedure :: update_switch => Null_update_switch
         procedure, private :: update_exchange => Null_update_exchange
     end type Null_DES_Reci_Structure
@@ -210,7 +210,7 @@ contains
     !>  \[
     !>      \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
     !>  \]
-    pure subroutine Abstract_update_transmulation(this, ij_components, new_dipole_moment, old)
+    pure subroutine Abstract_update_transmutation(this, ij_components, new_dipole_moment, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
@@ -254,7 +254,7 @@ contains
                 end do
             end do
         end do
-    end subroutine Abstract_update_transmulation
+    end subroutine Abstract_update_transmutation
 
     pure subroutine Abstract_update_rotation(this, i_component, new_dipole_moment, old)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
@@ -443,19 +443,12 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_translation
 
-    pure subroutine Null_update_transmulation(this, ij_components, new_dipole_moment, old)
+    pure subroutine Null_update_transmutation(this, ij_components, new_dipole_moment, old)
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
-    end subroutine Null_update_transmulation
-
-    pure subroutine Null_update_rotation(this, i_component, new_dipole_moment, old)
-        class(Null_DES_Reci_Structure), intent(inout) :: this
-        integer, intent(in) :: i_component
-        real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
-    end subroutine Null_update_rotation
+    end subroutine Null_update_transmutation
 
     pure subroutine Null_update_exchange(this, i_component, particle, signed)
         class(Null_DES_Reci_Structure), intent(inout) :: this

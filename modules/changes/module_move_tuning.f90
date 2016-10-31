@@ -9,8 +9,8 @@ private
 public :: set_increase_factor
 
     type, public :: Concrete_Move_Tuning_Parameters
-        real(DP) :: increase_factor
-        real(DP) :: increase_factor_max
+        real(DP) :: increase_factor = 1._DP
+        real(DP) :: increase_factor_max = 1._DP
     end type Concrete_Move_Tuning_Parameters
 
 contains

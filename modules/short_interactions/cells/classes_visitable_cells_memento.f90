@@ -83,8 +83,8 @@ contains
 
         do j_component = 1, size(visitable_cells_source, 2)
             do i_component = 1, size(visitable_cells_source, 1)
-                j_pair = maxval([i_component, j_component])
-                i_pair = minval([i_component, j_component])
+                j_pair = max(i_component, j_component)
+                i_pair = min(i_component, j_component)
                 call visitable_cells_target(i_component, j_component)%&
                     target(neighbour_cells(j_pair)%line(i_pair)%cells)
                 if (only_resized_triangle(j_pair)%line(i_pair)) cycle
@@ -127,8 +127,8 @@ contains
         end if
         do j_component = 1, size(visitable_cells_target, 2)
             do i_component = 1, size(visitable_cells_target, 1)
-                j_pair = maxval([i_component, j_component])
-                i_pair = minval([i_component, j_component])
+                j_pair = max(i_component, j_component)
+                i_pair = min(i_component, j_component)
                 call visitable_cells_target(i_component, j_component)%&
                     target(neighbour_cells(j_pair)%line(i_pair)%cells)
             end do

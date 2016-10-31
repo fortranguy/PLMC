@@ -41,6 +41,14 @@
         \end{scope}
 
         \begin{scope}[shift={($(StructureVisitor.north) + (9 cm, 0 cm)$)}]
+            \coordinate (Import) at (0, 0);
+            \umlnote[text width=\largeTextWidth]{\import{}:: \\
+                \namespace{Environment} :: PeriodicBox, BoxSizeMemento, ReciprocalLattice,
+                    Permittivity \\
+                \namespace{Mixture} :: Component, TemporaryParticle};
+        \end{scope}
+
+        \begin{scope}[shift={($(Import.south) - (0 cm, 3.25 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DLCweight}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity}}}
@@ -100,7 +108,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DLCweight.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(StructureFactor.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DLCvisitor}{0, 0}
                 \inherit{StructureVisitor}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},

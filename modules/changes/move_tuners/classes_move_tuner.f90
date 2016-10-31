@@ -3,7 +3,7 @@ module classes_move_tuner
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_positive, check_ratio
-use classes_moved_coordinates, only: Abstract_Moved_Coordinates
+use classes_tunable_move, only: Abstract_Tunable_Move
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
 
 implicit none
@@ -12,7 +12,7 @@ private
 
     type, abstract, public :: Abstract_Move_Tuner
     private
-        class(Abstract_Moved_Coordinates), pointer :: moved_coordinates => null()
+        class(Abstract_Tunable_Move), pointer :: tunable_move => null()
         integer :: accumulation_period = 0
         real(DP) :: accumulated_success_ratio = 0._DP
         real(DP) :: success_ratio_min = 0._DP, success_ratio_max = 0._DP
@@ -45,13 +45,13 @@ contains
 
 !implementation Abstract_Move_Tuner
 
-    subroutine Abstract_construct(this, moved_coordinates, parameters, num_tuning_steps)
+    subroutine Abstract_construct(this, tunable_move, parameters, num_tuning_steps)
         class(Abstract_Move_Tuner), intent(out) :: this
-        class(Abstract_Moved_Coordinates), target, intent(in) :: moved_coordinates
+        class(Abstract_Tunable_Move), target, intent(in) :: tunable_move
         type(Concrete_Move_Tuner_Parameters), intent(in) :: parameters
         integer, intent(in) :: num_tuning_steps
 
-        this%moved_coordinates => moved_coordinates
+        this%tunable_move => tunable_move
         call check_positive("Abstract_Move_Tuner: construct", "parameters%accumulation_period", &
             parameters%accumulation_period)
         if (num_tuning_steps < parameters%accumulation_period) then
@@ -71,7 +71,7 @@ contains
     subroutine Abstract_destroy(this)
         class(Abstract_Move_Tuner), intent(inout) :: this
 
-        this%moved_coordinates => null()
+        this%tunable_move => null()
     end subroutine Abstract_destroy
 
     subroutine Abstract_tune(this, tuned, i_step, success_ratio)
@@ -88,9 +88,9 @@ contains
             averaged_success_ratio = this%accumulated_success_ratio / &
                 real(this%accumulation_period, DP) ! assuming i_step++;
             if (averaged_success_ratio < this%success_ratio_min) then
-                call this%moved_coordinates%decrease_delta()
+                call this%tunable_move%decrease_delta()
             else if (this%success_ratio_max < averaged_success_ratio) then
-                call this%moved_coordinates%increase_delta()
+                call this%tunable_move%increase_delta()
             else
                 tuned = .true. ! sufficient condition?
                 return
@@ -103,9 +103,9 @@ contains
 
 !implementation Null_Move_Tuner
 
-    subroutine Null_construct(this, moved_coordinates, parameters, num_tuning_steps)
+    subroutine Null_construct(this, tunable_move, parameters, num_tuning_steps)
         class(Null_Move_Tuner), intent(out) :: this
-        class(Abstract_Moved_Coordinates), target, intent(in) :: moved_coordinates
+        class(Abstract_Tunable_Move), target, intent(in) :: tunable_move
         type(Concrete_Move_Tuner_Parameters), intent(in) :: parameters
         integer, intent(in) :: num_tuning_steps
     end subroutine Null_construct

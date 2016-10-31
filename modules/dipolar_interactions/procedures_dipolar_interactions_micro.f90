@@ -27,7 +27,7 @@ contains
 
     !> \[
     !>      B_\alpha(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
-    !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}
+    !>          \frac{2\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]
     pure function des_real_B(alpha, r)
         real(DP) :: des_real_B
@@ -39,7 +39,7 @@ contains
 
     !> \[
     !>      C_\alpha(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
-    !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
+    !>          \frac{2\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]
     pure function des_real_C(alpha, r)

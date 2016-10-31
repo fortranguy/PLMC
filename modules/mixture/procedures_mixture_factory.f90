@@ -1,5 +1,6 @@
 module procedures_mixture_factory
 
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_input_prefixes, only: mixture_prefix
 use json_module, only: json_file
 use classes_number_to_string, only: Concrete_Number_to_String
@@ -19,7 +20,8 @@ use procedures_mixture_inquirers, only: component_exists, component_has_position
 implicit none
 
 private
-public :: create, destroy, set_exist, set_nums_particles, set_have_positions, set_have_orientations
+public :: create, destroy, set_exist, set_nums_particles, set_have_positions, &
+    set_have_orientations, rescale_positions
 
 interface create
     module procedure :: create_all
@@ -158,5 +160,16 @@ contains
             end do
         end do
     end subroutine set_have_orientations
+
+    subroutine rescale_positions(components, box_size_ratio)
+        type(Component_Wrapper), intent(inout) :: components(:)
+        real(DP), intent(in) :: box_size_ratio(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(components)
+            call components(i_component)%positions%rescale_all(box_size_ratio)
+        end do
+    end subroutine rescale_positions
 
 end module procedures_mixture_factory

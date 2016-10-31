@@ -92,7 +92,7 @@ contains
             allocate(Null_Changed_Box_Size :: changed_box_size)
             frequency_ratio = 0._DP
         end if
-        call changed_box_size%construct(changed_box_size_ratio, frequency_ratio, tuning_parameters)
+        call changed_box_size%construct(frequency_ratio, changed_box_size_ratio, tuning_parameters)
     end subroutine create_element
 
     subroutine destroy_triangle(changed_boxes_size)

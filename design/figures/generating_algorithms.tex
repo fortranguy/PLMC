@@ -45,7 +45,8 @@
                 \namespace{ShortInteractions} :: ShortInteractions \\
                 \namespace{DipolarInteractions} :: DipolarInteractionsDynamic,
                     DipolarInteractionsStatic, DipolarInteractionsFacade \\
-                \namespace{Changes} :: ChangesComponent, Changes, ChangedBoxSize \\
+                \namespace{Changes} :: ChangesComponent, Changes, ChangedBoxSize,
+                    ExchangedBoxesSize \\
                 \namespace{Observables} :: Observables};
         \end{scope}
 
@@ -53,12 +54,13 @@
             \begin{class}[text width=\largeTextWidth]{BoxVolumeChange}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
-                    $\mathAggregation$ mixture: \type{Mixture},
+                    $\mathAggregation$ components: \type{Component[\numComponents, \numBoxes]},
                     $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                     $\mathAggregation$ dipolarInteractionsFacade:
                         \type{DipolarInteractionsFacade[\numBoxes]},
-                    $\mathAggregation$ changedBoxSize: \type{ChangedBoxSize},
-                    havePositions: \type{bool[\numComponents]},
+                    $\mathAggregation$ changedBoxesSize:
+                            \type{ChangedBoxSize[\numBoxes, numBoxes]\textsubscript{\sym}},
+                    havePositions: \type{bool[\numComponents, \numBoxes]},
                     $\mathComposition$ selectors: \type{TowerSampler[\numBoxes]}}}
             \end{class}
         \end{scope}
@@ -104,13 +106,21 @@
         \end{scope}
 
         \begin{scope}[shift={($(BoxVolumeChange.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{BoxesVolumeChange}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{BoxesVolumeExchange}{0, 0}
                 \inherit{GeneratingAlgorithm}
-                \operation{\procedure{construct}{}}
+                \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
+                $\mathAggregation$ mixture: \type{Mixture},
+                $\mathAggregation$ shortInteractions: \type{ShortInteractions},
+                $\mathAggregation$ dipolarInteractionsFacade:
+                    \type{DipolarInteractionsFacade[\numBoxes]},
+                $\mathAggregation$ exchangedBoxesSize: \type{ExchangedBoxesSize},
+                havePositions: \type{bool[\numComponents, \numBoxes]},
+                $\mathComposition$ couples: \type{HeteroCouples},
+                $\mathComposition$ selector: \type{TowerSampler}}}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxesParticlesSwitch.north)!0.5!(BoxesVolumeChange.north) -
+        \begin{scope}[shift={($(BoxesParticlesSwitch.north)!0.5!(BoxesVolumeExchange.north) -
             (0 cm, 0 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{BoxesParticleTeleportation}{0, 0}
                 \inherit{GeneratingAlgorithm}

@@ -64,7 +64,7 @@ interface plmc_set
     module procedure :: plmc_set_num_steps, plmc_set_num_snaps
     module procedure :: set_initial_observables
     module procedure :: set_coordinates_from_json, set_coordinates_from_snap
-    module procedure :: tune_moved_coordinates
+    module procedure :: tune_moves
     module procedure :: set_success_and_reset_counter_generating, &
         set_success_and_reset_counter_exploring
 end interface plmc_set
@@ -141,7 +141,7 @@ contains
     end subroutine destroy_exploring_data
 
     !> @note Beware of inertia
-    subroutine tune_moved_coordinates(tuned, i_step, changes, observables)
+    subroutine tune_moves(tuned, i_step, changes, observables)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
         type(Changes_Wrapper), intent(inout) :: changes
@@ -174,7 +174,7 @@ contains
         end do
 
         tuned = all_boxes_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
-    end subroutine tune_moved_coordinates
+    end subroutine tune_moves
 
     subroutine set_success_and_reset_counter_generating(observables)
         type(Generating_Observables_Wrapper), intent(inout) :: observables

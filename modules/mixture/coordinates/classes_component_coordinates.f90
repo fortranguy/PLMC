@@ -122,9 +122,9 @@ contains
     end function Abstract_get_num
 
     pure function Abstract_get(this, i_particle) result(vector)
+        real(DP) :: vector(num_dimensions)
         class(Abstract_Component_Coordinates), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: vector(num_dimensions)
 
         vector = this%coordinates(:, i_particle)
     end function Abstract_get
@@ -265,11 +265,11 @@ contains
         num_coordinates = 0
     end function Null_get_num
 
-    pure function Null_get(this, i_particle) result(position)
+    pure function Null_get(this, i_particle) result(vector)
+        real(DP) :: vector(num_dimensions)
         class(Null_Component_Coordinates), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: position(num_dimensions)
-        position = 0._DP
+        vector = 0._DP
     end function Null_get
 
     subroutine Null_add(this, vector)

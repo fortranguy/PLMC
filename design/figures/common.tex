@@ -21,30 +21,37 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PLMCpropagator.north) + (8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(PLMCpropagator.north) - (9 cm, 0 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{PhysicalModel}{0, 0}
+                \UMLattribute{environment: \type{Environment}}
+                \UMLattribute{mixture: \type{Mixture}}
+                \UMLattribute{shortInteractions: \type{ShortInteractions}}
+                \UMLattribute{dipolarInteractionsDynamic: \type{DipolarInteractionsDynamic}}
+                \UMLattribute{dipolarInteractionsStatic: \type{DipolarInteractionsStatic}}
+                \UMLattribute{dipolarInteractionsFacades: \type{DipolarInteractionsFacade}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(PLMCpropagator.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
-            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+            \umlnote[text width=\largeTextWidth]{\import{}:\\
                 \namespace{Random} :: TowerSampler \\
-                \namespace{Mixture} :: Component \\
+                \namespace{Environment} :: environment \\
+                \namespace{Mixture} :: Component, Mixture \\
+                \namespace{ShortInteractions} :: ShortInteractions \\
+                \namespace{DipolarInteractions} :: DipolarInteractionsDynamic,
+                    DipolarInteractionsStatic, DipolarInteractionsFacade \\
                 \namespace{GeneratingAlgorithm} :: GeneratingAlgorithm \\
                 \namespace{Observables} :: GeneratingObservables};
         \end{scope}
 
-        \begin{scope}[shift={($(PLMCpropagator.north) - (8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(Import.south) - (0 cm, 6 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{HeteroCouples}{0, 0}
-                \operation[0]{\procedure{construct}{numPartners: \type{int}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{getNum}{}: \type{int}}
-                \operation{\procedure{get}{index: \type{int}}: \type{int[2]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(HeteroCouples.south) - (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(HeteroCouples.south) - (0 cm, 1  cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{PotentialDomain}{0, 0}
-                \UMLattribute{min: \type{real}}
-                \UMLattribute{maxOverBoxEdge: \type{real}}
-                \UMLattribute{max: \type{real}}
-                \UMLattribute{delta: \type{real}}
             \end{class}
         \end{scope}
 

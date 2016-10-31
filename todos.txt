@@ -27,3 +27,5 @@
 - Add SemiGrand Canonical ensemble
 + GeneratingAlgorithms:
     - acceptationProbability(): uniformise comment notation
++ ChangedBoxSizeRatio: can't be used for GEMC: to simplify
+- rewrite modules/index.md

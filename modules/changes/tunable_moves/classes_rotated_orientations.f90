@@ -6,13 +6,13 @@ use procedures_checks, only: check_positive, check_increase_factor
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use procedures_random_number, only: markov_orientation
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters, set_increase_factor
-use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 
 implicit none
 
 private
 
-    type, extends(Abstract_Moved_Component_Coordinates), public :: Concrete_Rotated_Orientations
+    type, extends(Abstract_Moved_Coordinates), public :: Concrete_Rotated_Orientations
     private
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
         real(DP) :: delta = 0._DP
@@ -39,6 +39,7 @@ contains
         call check_positive("Concrete_Rotated_Orientations: construct", "initial_delta", &
             initial_delta)
         this%delta = initial_delta
+
         call check_increase_factor("Concrete_Rotated_Orientations: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor

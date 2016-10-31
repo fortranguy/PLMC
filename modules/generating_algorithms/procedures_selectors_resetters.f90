@@ -5,6 +5,7 @@ use classes_hetero_couples, only: Abstract_Hetero_Couples
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use types_component_wrapper, only: Component_Wrapper
 use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_exchanged_boxes_size, only: Abstract_Exchanged_Boxes_Size
 
 implicit none
 
@@ -12,9 +13,8 @@ private
 public :: reset
 
 interface reset
-    module procedure :: reset_one_particle
-    module procedure :: reset_two_particles
-    module procedure :: reset_volume
+    module procedure :: reset_one_particle, reset_two_particles
+    module procedure :: reset_volumes_homo, reset_volumes_hetero
 end interface reset
 
 contains
@@ -36,7 +36,7 @@ contains
         end do
     end subroutine reset_one_particle
 
-    !> @todo What is the best compromise between minval(), maxval() and average()?
+    !> @todo What is the best compromise between minval(), maxval(), average() or sum()?
     subroutine reset_two_particles(selectors, couples, components, can_swap)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
         class(Abstract_Hetero_Couples), intent(in) :: couples(:)
@@ -58,8 +58,7 @@ contains
         end do
     end subroutine reset_two_particles
 
-    !> @note what if volume exchange?
-    subroutine reset_volume(selectors, changed_boxes_size, components, have_positions)
+    subroutine reset_volumes_homo(selectors, changed_boxes_size, components, have_positions)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
         type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
@@ -84,6 +83,42 @@ contains
 
             call selectors(i_box)%reset(nums_candidates)
         end do
-    end subroutine reset_volume
+    end subroutine reset_volumes_homo
+
+    !> @note The weight of a couple of boxes nums_candidates(i_couple) is the number of particles
+    !> inside the 2 boxes.
+    !> @todo Test any(have_positions(:, ij_couple)) condition with gfortran
+    subroutine reset_volumes_hetero(selector, couples, exchanged_boxes_size, components, &
+        have_positions)
+        class(Abstract_Tower_Sampler), intent(inout) :: selector
+        class(Abstract_Hetero_Couples), intent(in) :: couples
+        class(Abstract_Exchanged_Boxes_Size), intent(in) :: exchanged_boxes_size
+        type(Component_Wrapper), intent(in) :: components(:, :)
+        logical, intent(in) :: have_positions(:, :)
+
+        integer :: nums_candidates(couples%get_num()), i_couple, ij_couple(2)
+        integer :: i_component
+
+        do i_couple = 1, size(nums_candidates)
+            ij_couple = couples%get(i_couple)
+            if (any(have_positions(:, ij_couple(1))) .and. any(have_positions(:, ij_couple(2)))) &
+            then
+                nums_candidates(i_couple) = 0
+                do i_component = 1, size(have_positions, 1)
+                    nums_candidates(i_couple) = nums_candidates(i_couple) + &
+                        components(i_component, ij_couple(1))%average_num_particles%get() + &
+                        components(i_component, ij_couple(2))%average_num_particles%get()
+                end do
+                nums_candidates(i_couple) = ceiling(exchanged_boxes_size%get_frequency_ratio() * &
+                    real(nums_candidates(i_couple), DP))
+                nums_candidates(i_couple) = merge(nums_candidates(i_couple), 1, &
+                    nums_candidates(i_couple) > 0)
+            else
+                nums_candidates(i_couple) = 0
+            end if
+        end do
+
+        call selector%reset(nums_candidates)
+    end subroutine reset_volumes_hetero
 
 end module procedures_selectors_resetters

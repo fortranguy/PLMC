@@ -3,7 +3,7 @@ module procedures_move_tuner_factory
 use classes_changed_box_size, only: Abstract_Changed_Box_Size, Changed_Box_Size_Line
 use procedures_environment_inquirers, only: box_size_can_change
 use procedures_mixture_inquirers, only: component_can_translate, component_can_rotate
-use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
 use classes_move_tuner, only: Abstract_Move_Tuner, Concrete_Move_Tuner, Null_Move_Tuner, &
     Move_Tuner_Line
@@ -58,7 +58,7 @@ contains
     subroutine create_translation(translation_tuner, translated_positions, tuner_parameters, &
         num_tuning_steps)
         class(Abstract_Move_Tuner), allocatable, intent(out) :: translation_tuner
-        class(Abstract_Moved_Component_Coordinates), intent(in) :: translated_positions
+        class(Abstract_Moved_Coordinates), intent(in) :: translated_positions
         type(Concrete_Move_Tuner_Parameters), intent(in) :: tuner_parameters
         integer, intent(in) :: num_tuning_steps
 
@@ -73,7 +73,7 @@ contains
     subroutine create_rotation(rotation_tuner, rotated_orientations, tuner_parameters, &
         num_tuning_steps)
         class(Abstract_Move_Tuner), allocatable, intent(out) :: rotation_tuner
-        class(Abstract_Moved_Component_Coordinates), intent(in) :: rotated_orientations
+        class(Abstract_Moved_Coordinates), intent(in) :: rotated_orientations
         type(Concrete_Move_Tuner_Parameters), intent(in) :: tuner_parameters
         integer, intent(in) :: num_tuning_steps
 

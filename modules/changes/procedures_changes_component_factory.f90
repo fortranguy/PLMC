@@ -3,8 +3,8 @@ module procedures_changes_component_factory
 use json_module, only: json_file
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
-use procedures_moved_component_coordinates_factory, only: moved_component_coordinates_create => &
-    create, moved_component_coordinates_destroy => destroy
+use procedures_moved_coordinates_factory, only: moved_coordinates_create => create, &
+    moved_coordinates_destroy => destroy
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
 use procedures_move_tuner_factory, only: move_tuner_create_translation => create_translation, &
@@ -29,11 +29,11 @@ contains
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call moved_component_coordinates_create(component%translated_positions, periodic_box, &
+        call moved_coordinates_create(component%translated_positions, periodic_box, &
             mixture_component%positions, tuning_parameters, generating_data, prefix)
         call move_tuner_create_translation(component%translation_tuner, component%&
             translated_positions, tuner_parameters, num_tuning_steps)
-        call moved_component_coordinates_create(component%rotated_orientations, mixture_component%&
+        call moved_coordinates_create(component%rotated_orientations, mixture_component%&
             orientations, tuning_parameters, generating_data, prefix)
         call move_tuner_create_rotation(component%rotation_tuner, component%&
             rotated_orientations, tuner_parameters, num_tuning_steps)
@@ -43,9 +43,9 @@ contains
         type(Changes_Component_Wrapper), intent(inout) :: component
 
         call move_tuner_destroy(component%rotation_tuner)
-        call moved_component_coordinates_destroy(component%rotated_orientations)
+        call moved_coordinates_destroy(component%rotated_orientations)
         call move_tuner_destroy(component%translation_tuner)
-        call moved_component_coordinates_destroy(component%translated_positions)
+        call moved_coordinates_destroy(component%translated_positions)
     end subroutine destroy
 
 end module procedures_changes_component_factory

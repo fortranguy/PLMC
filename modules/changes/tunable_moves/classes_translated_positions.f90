@@ -7,13 +7,13 @@ use procedures_checks, only: check_array_size, check_positive, check_increase_fa
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters, set_increase_factor
-use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 
 implicit none
 
 private
 
-    type, extends(Abstract_Moved_Component_Coordinates), public :: Concrete_Translated_Positions
+    type, extends(Abstract_Moved_Coordinates), public :: Concrete_Translated_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
@@ -45,6 +45,7 @@ contains
         call check_positive("Concrete_Translated_Positions: construct", "initial_delta", &
             initial_delta)
         this%delta = initial_delta
+
         call check_increase_factor("Concrete_Translated_Positions: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor

@@ -10,7 +10,7 @@ use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments, &
     Concrete_Component_Dipole_Moments
 use classes_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential
-use classes_moved_component_coordinates, only: Abstract_Moved_Component_Coordinates
+use classes_moved_coordinates, only: Abstract_Moved_Coordinates
 use classes_translated_positions, only: Concrete_Translated_Positions
 use classes_rotated_orientations, only: Concrete_Rotated_Orientations
 
@@ -94,7 +94,7 @@ contains
     end function component_has_orientations
 
     pure logical function component_can_translate(translated_positions)
-        class(Abstract_Moved_Component_Coordinates), intent(in) :: translated_positions
+        class(Abstract_Moved_Coordinates), intent(in) :: translated_positions
 
         select type (translated_positions)
             type is (Concrete_Translated_Positions)
@@ -105,7 +105,7 @@ contains
     end function component_can_translate
 
     pure logical function component_can_rotate(rotated_orientations)
-        class(Abstract_Moved_Component_Coordinates), intent(in) :: rotated_orientations
+        class(Abstract_Moved_Coordinates), intent(in) :: rotated_orientations
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)

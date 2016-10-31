@@ -3,7 +3,7 @@ module classes_changed_box_size
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
-use classes_moved_coordinates, only: Abstract_Moved_Coordinates
+use classes_tunable_move, only: Abstract_Tunable_Move
 use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters, set_increase_factor
 
@@ -11,7 +11,7 @@ implicit none
 
 private
 
-    type, extends(Abstract_Moved_Coordinates), abstract, public :: Abstract_Changed_Box_Size
+    type, extends(Abstract_Tunable_Move), abstract, public :: Abstract_Changed_Box_Size
     private
         real(DP) :: frequency_ratio = 0._DP
         class(Abstract_Changed_Box_Size_Ratio), allocatable :: ratio
@@ -54,16 +54,17 @@ contains
 
 !implementation Abstract_Changed_Box_Size
 
-    subroutine Abstract_construct(this, ratio, frequency_ratio, tuning_parameters)
+    subroutine Abstract_construct(this, frequency_ratio, ratio, tuning_parameters)
         class(Abstract_Changed_Box_Size), intent(out) :: this
-        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
         real(DP), intent(in) :: frequency_ratio
+        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
 
-        allocate(this%ratio, source=ratio)
         call check_positive("Abstract_Changed_Box_Size: construct", "frequency_ratio", &
             frequency_ratio)
         this%frequency_ratio = frequency_ratio
+        allocate(this%ratio, source=ratio)
+
         call check_increase_factor("Abstract_Changed_Box_Size: construct", "increase_factor", &
             tuning_parameters%increase_factor)
         this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
@@ -111,10 +112,10 @@ contains
 
 !implementation Null_Changed_Box_Size
 
-    subroutine Null_construct(this, ratio, frequency_ratio, tuning_parameters)
+    subroutine Null_construct(this, frequency_ratio, ratio, tuning_parameters)
         class(Null_Changed_Box_Size), intent(out) :: this
-        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
         real(DP), intent(in) :: frequency_ratio
+        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: ratio
         type(Concrete_Move_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_construct
 

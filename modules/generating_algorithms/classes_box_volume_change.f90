@@ -8,11 +8,10 @@ use procedures_random_number, only: random_integer
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use types_mixture_wrapper, only: Mixture_Wrapper
-use classes_neighbour_cells, only: Neighbour_Cells_Line
-use classes_visitable_cells, only: Abstract_Visitable_Cells
-use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_triangle => &
-    allocate_triangle
+use types_component_wrapper, only: Component_Wrapper
+use procedures_mixture_factory, only: mixture_rescale_positions => rescale_positions
+use types_cells_wrapper, only: Cells_Wrapper
+use procedures_cells_memento, only: cells_memento_save => save, cells_memento_restore => restore
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit
@@ -21,11 +20,10 @@ use procedures_dipolar_interactions_factory, only: dipolar_interactions_destroy 
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
 use classes_changed_box_size, only: Changed_Box_Size_Line
-use procedures_triangle_observables, only: triangle_observables_diff
+use procedures_triangle_observables, only: triangle_observables_diff, triangle_observables_sum
 use types_observables_energies, only: Concrete_Observables_Energies
-use procedures_observables_energies_factory, only: observables_energies_set => set
-use procedures_triangle_observables, only: triangle_observables_sum
-use procedures_observables_energies_factory, only: observables_energies_create => create
+use procedures_observables_energies_factory, only: observables_energies_create => create, &
+    observables_energies_set => set
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_selectors_resetters, only: selectors_reset => reset
@@ -38,7 +36,7 @@ private
     type, extends(Abstract_Generating_Algorithm), public :: Box_Volume_Change
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Mixture_Wrapper), pointer :: mixture => null()
+        type(Component_Wrapper), pointer :: components(:, :) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facades(:) => &
             null()
@@ -53,18 +51,15 @@ private
         procedure :: try => Concrete_try
         procedure, private :: metropolis_algorithm => Concrete_metropolis_algorithm
         procedure, private :: acceptation_probability => Concrete_acceptation_probability
-        procedure, private :: rescale_positions => Concrete_rescale_positions
-        procedure, private :: save_cells => Concrete_save_cells
-        procedure, private :: restore_cells => Concrete_restore_cells
     end type Box_Volume_Change
 
 contains
 
-    subroutine Concrete_construct(this, environment, mixture, short_interactions, &
+    subroutine Concrete_construct(this, environment, components, short_interactions, &
         dipolar_interactions_facades, changed_boxes_size, have_positions, selectors)
         class(Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Mixture_Wrapper), target, intent(in) :: mixture
+        type(Component_Wrapper), target, intent(in) :: components(:, :)
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facades(:)
@@ -73,7 +68,7 @@ contains
         class(Abstract_Tower_Sampler), intent(in) :: selectors(:)
 
         this%environment => environment
-        this%mixture => mixture
+        this%components => components
         this%short_interactions => short_interactions
         this%dipolar_interactions_facades => dipolar_interactions_facades
         this%changed_boxes_size => changed_boxes_size
@@ -89,15 +84,15 @@ contains
         this%changed_boxes_size => null()
         this%dipolar_interactions_facades => null()
         this%short_interactions => null()
-        this%mixture => null()
+        this%components => null()
         this%environment => null()
     end subroutine Concrete_destroy
 
     subroutine Concrete_reset_selectors(this)
         class(Box_Volume_Change), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%changed_boxes_size, this%mixture%components,&
-            this%have_positions)
+        call selectors_reset(this%selectors, this%changed_boxes_size, this%components, this%&
+            have_positions)
     end subroutine Concrete_reset_selectors
 
     pure integer function Concrete_get_num_choices(this) result(num_choices)
@@ -122,9 +117,8 @@ contains
         type(Concrete_Observables_Energies) :: new_energies
         real(DP), dimension(num_dimensions) :: new_box_size, box_size, box_size_ratio
         integer :: i_box
-        type(Neighbour_Cells_Line), allocatable :: neighbour_cells(:)
         type(Logical_Line), allocatable :: only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), allocatable :: visitable_cells(:, :)
+        type(Cells_Wrapper) :: cells
         type(Dipolar_Interactions_Static_Wrapper) :: dipolar_interactions_static
         logical :: reset_real_pair
 
@@ -138,13 +132,15 @@ contains
             reset_real_pair, new_box_size)
 
         call this%environment%periodic_boxes(i_box)%set(new_box_size)
-        call this%rescale_positions(i_box, box_size_ratio)
-        call logical_create(only_resized_triangle, size(this%mixture%components, 1))
-        call this%save_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
+        call mixture_rescale_positions(this%components(:, i_box), box_size_ratio)
+        call logical_create(only_resized_triangle, size(this%components, 1))
+        call cells_memento_save(cells, only_resized_triangle, this%short_interactions%&
+            visitable_cells_memento, this%short_interactions%cells(i_box))
         call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells, &
             only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
         call this%dipolar_interactions_facades(i_box)%reset(reset_real_pair)
-        call observables_energies_create(new_energies, size(this%mixture%components, 1))
+        call observables_energies_create(new_energies, size(this%components, 1))
+
         call this%metropolis_algorithm(success, new_energies, i_box, box_size_ratio, &
             observables%energies(i_box))
 
@@ -156,8 +152,9 @@ contains
                 volumes_change_counter(i_box)%line(i_box)%num_successes + 1
         else
             call this%environment%periodic_boxes(i_box)%set(box_size)
-            call this%rescale_positions(i_box, 1._DP / box_size_ratio)
-            call this%restore_cells(neighbour_cells, only_resized_triangle, visitable_cells, i_box)
+            call mixture_rescale_positions(this%components(:, i_box), 1._DP / box_size_ratio)
+            call cells_memento_restore(this%short_interactions%cells(i_box), only_resized_triangle,&
+                this%short_interactions%visitable_cells_memento, cells)
             call this%dipolar_interactions_facades(i_box)%restore(dipolar_interactions_static, &
                 reset_real_pair)
         end if
@@ -180,19 +177,19 @@ contains
         logical :: overlap
 
         success = .false.
-        call observables_energies_create(deltas, size(this%mixture%components, 1))
-        call short_interactions_visit(overlap, new_energies%walls_energies, this%mixture%&
+        call observables_energies_create(deltas, size(this%components, 1))
+        call short_interactions_visit(overlap, new_energies%walls_energies, this%&
             components(:, i_box), this%short_interactions%walls_visitors(i_box), this%&
             short_interactions%wall_pairs)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
-        call short_interactions_visit(overlap, new_energies%short_energies, this%mixture%&
+        call short_interactions_visit(overlap, new_energies%short_energies, this%&
             components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
         call triangle_observables_diff(deltas%short_energies, new_energies%short_energies, &
             energies%short_energies)
         if (overlap) return
         call dipolar_interactions_visit(new_energies%field_energies, this%environment%&
-            external_fields(i_box), this%mixture%components(:, i_box))
+            external_fields(i_box), this%components(:, i_box))
         deltas%field_energies = new_energies%field_energies - energies%field_energies
         call this%dipolar_interactions_facades(i_box)%visit(new_energies%dipolar_energies, &
             new_energies%dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies,&
@@ -225,9 +222,8 @@ contains
         integer :: i_component, num_particles
 
         num_particles = 0._DP
-        do i_component = 1, size(this%mixture%components, 1)
-            num_particles = num_particles + this%mixture%components(i_component, i_box)%&
-                num_particles%get()
+        do i_component = 1, size(this%components, 1)
+            num_particles = num_particles + this%components(i_component, i_box)%num_particles%get()
         end do
         volume_ratio = product(box_size_ratio)
 
@@ -237,82 +233,5 @@ contains
             exp(-delta_energy / this%environment%temperature%get())
         probability = min(1._DP, probability)
     end function Concrete_acceptation_probability
-
-    subroutine Concrete_rescale_positions(this, i_box, box_size_ratio)
-        class(Box_Volume_Change), intent(in) :: this
-        integer, intent(in) :: i_box
-        real(DP), intent(in) :: box_size_ratio(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(this%mixture%components, 1)
-            call this%mixture%components(i_component, i_box)%positions%rescale_all(box_size_ratio)
-        end do
-    end subroutine Concrete_rescale_positions
-
-    !> @note The methods [[classes_box_volume_change:Concrete_save_cells]] and
-    !> [[classes_volume_change_method:Concrete_save_cells]]
-    !> should be factorised. However, this would create a memory leak.
-    !> @todo Send a bug report to gfortran.
-    subroutine Concrete_save_cells(this, neighbour_cells, only_resized_triangle, visitable_cells, &
-        i_box)
-        class(Box_Volume_Change), intent(in) :: this
-        type(Neighbour_Cells_Line), allocatable, intent(out) :: neighbour_cells(:)
-        type(Logical_Line), intent(inout) ::only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
-        integer, intent(in) :: i_box
-
-        integer :: i_component, j_component
-
-        call cells_allocate_triangle(neighbour_cells, size(this%mixture%components, 1))
-        do j_component = 1, size(neighbour_cells)
-            do i_component = 1, size(neighbour_cells(j_component)%line)
-                only_resized_triangle(j_component)%line(i_component) = this%short_interactions%&
-                    cells(i_box)%neighbour_cells(j_component)%line(i_component)%cells%resize_only()
-                if (.not. only_resized_triangle(j_component)%line(i_component)) then
-                    allocate(neighbour_cells(j_component)%line(i_component)%cells, source=this%&
-                        short_interactions%cells(i_box)%neighbour_cells(j_component)%&
-                        line(i_component)%cells)
-                end if
-            end do
-        end do
-        call this%short_interactions%visitable_cells_memento%save(visitable_cells, this%&
-            short_interactions%cells(i_box)%visitable_cells)
-    end subroutine Concrete_save_cells
-
-    !> @note The methods [[classes_box_volume_change:Concrete_restore_cells]] and
-    !> [[classes_volume_change_method:Concrete_restore_cells]]
-    !> should be factorised. cf. [[classes_box_volume_change:Concrete_save_cells]].
-    subroutine Concrete_restore_cells(this, neighbour_cells, only_resized_triangle, &
-        visitable_cells, i_box)
-        class(Box_Volume_Change), intent(in) :: this
-        type(Neighbour_Cells_Line), allocatable, intent(inout) :: neighbour_cells(:)
-        type(Logical_Line), intent(in) ::only_resized_triangle(:)
-        class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells(:, :)
-        integer, intent(in) :: i_box
-
-        integer :: i_component, j_component
-
-        do j_component = 1, size(this%short_interactions%cells(i_box)%neighbour_cells)
-            do i_component = 1, size(this%short_interactions%cells(i_box)%&
-                neighbour_cells(j_component)%line)
-                if (only_resized_triangle(j_component)%line(i_component)) then
-                    call this%short_interactions%cells(i_box)%neighbour_cells(j_component)%&
-                        line(i_component)%cells%reset()
-                else
-                    call cells_destroy(this%short_interactions%cells(i_box)%&
-                        neighbour_cells(j_component)%line(i_component)%cells)
-                    allocate(this%short_interactions%cells(i_box)%neighbour_cells(j_component)%&
-                        line(i_component)%cells, source=neighbour_cells(j_component)%&
-                        line(i_component)%cells)
-                end if
-            end do
-        end do
-        call cells_destroy(neighbour_cells)
-        call this%short_interactions%visitable_cells_memento%restore(this%short_interactions%&
-            cells(i_box)%visitable_cells, this%short_interactions%cells(i_box)%neighbour_cells, &
-            only_resized_triangle, visitable_cells)
-        call cells_destroy(visitable_cells)
-    end subroutine Concrete_restore_cells
 
 end module classes_box_volume_change

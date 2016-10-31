@@ -20,7 +20,7 @@ private
     abstract interface
 
         !> Box size change such that:
-        !> \[ \frac{V^\prime}{V} = e^{\mathrm{rand}[-1/2, +1/2] \delta} \]
+        !> \[ \ln(V^\prime) = \ln(V) + \mathrm{rand}[-1/2, +1/2] \delta \]
         function Abstract_get(this) result(ratio)
         import :: DP, num_dimensions, Abstract_Changed_Box_Size_Ratio
             class(Abstract_Changed_Box_Size_Ratio), intent(in) :: this
@@ -68,7 +68,7 @@ contains
 
 !implementation XYZ_Changed_Box_Size_Ratio
 
-    !> \[ \frac{L_{1:3}^\prime}{L_{1:3}} = e^{\mathrm{rand}[-1/2, +1/2] \delta / 3} \]
+    !> \[ \frac{V^\prime}{V} = e^{\mathrm{rand}[-1/2, +1/2] \delta} \]
     function XYZ_get(this) result(ratio)
         real(DP) :: ratio(num_dimensions)
         class(XYZ_Changed_Box_Size_Ratio), intent(in) :: this
@@ -83,10 +83,7 @@ contains
 
 !implementation XY_Changed_Box_Size_Ratio
 
-    !> \[
-    !>      \left( \frac{L_{1:2}^\prime}{L_{1:2}}, \frac{L_3^\prime}{L_3} \right) =
-    !>          \left( e^{\mathrm{rand}[-1/2, +1/2] \delta / 2}, 1 \right)
-    !> \]
+    !> \[ \frac{S^\prime}{S} = e^{\mathrm{rand}[-1/2, +1/2] \delta} \]
     function XY_get(this) result(ratio)
         real(DP) :: ratio(num_dimensions)
         class(XY_Changed_Box_Size_Ratio), intent(in) :: this
@@ -115,7 +112,7 @@ contains
     function Null_get(this) result(ratio)
         real(DP) :: ratio(num_dimensions)
         class(Null_Changed_Box_Size_Ratio), intent(in) :: this
-        ratio = 0._DP
+        ratio = 1._DP
     end function Null_get
 
 !end implementation Null_Changed_Box_Size_Ratio

@@ -119,8 +119,8 @@ contains
         integer :: j_component, i_observable, j_observable
 
         do j_component = 1, size(deltas)
-            j_observable = maxval([i_component, j_component])
-            i_observable = minval([i_component, j_component])
+            j_observable = max(i_component, j_component)
+            i_observable = min(i_component, j_component)
             energies(j_observable)%line(i_observable) = energies(j_observable)%&
                 line(i_observable) + deltas(j_component)
         end do
