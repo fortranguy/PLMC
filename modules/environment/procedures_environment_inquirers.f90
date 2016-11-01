@@ -11,8 +11,6 @@ use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reci
 use classes_external_field, only: Abstract_External_Field, Null_External_Field
 use classes_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
 use classes_visitable_walls, only: Abstract_Visitable_Walls, Concrete_Visitable_Walls
-use classes_changed_box_size_ratio, only: Abstract_Changed_Box_Size_Ratio, &
-    Null_Changed_Box_Size_Ratio
 use classes_changed_box_size, only: Abstract_Changed_Box_Size, Concrete_Changed_Box_Size
 
 implicit none
@@ -32,7 +30,6 @@ interface total_volume_can_change
 end interface total_volume_can_change
 
 interface box_size_can_change
-    module procedure :: box_size_can_change_from_ratio
     module procedure :: box_size_can_change_from_changed
 end interface box_size_can_change
 
@@ -114,17 +111,17 @@ contains
         end select
     end function total_volume_can_change_from_beta_pressure
 
-    pure logical function box_size_can_change_from_ratio(changed_box_size_ratio) &
+    elemental logical function box_size_can_change_from_changed(changed_box_size) &
         result(box_size_can_change)
-        class(Abstract_Changed_Box_Size_Ratio), intent(in) :: changed_box_size_ratio
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_box_size
 
-        select type (changed_box_size_ratio)
-            type is (Null_Changed_Box_Size_Ratio)
-                box_size_can_change = .false.
-            class default
+        select type (changed_box_size)
+            type is (Concrete_Changed_Box_Size)
                 box_size_can_change = .true.
+            class default
+                box_size_can_change = .false.
         end select
-    end function box_size_can_change_from_ratio
+    end function box_size_can_change_from_changed
 
     elemental logical function use_domain(parallelepiped_domain)
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
@@ -136,18 +133,6 @@ contains
                 use_domain = .true.
         end select
     end function use_domain
-
-    pure logical function box_size_can_change_from_changed(changed_box_size) &
-        result(box_size_can_change)
-        class(Abstract_Changed_Box_Size), intent(in) :: changed_box_size
-
-        select type (changed_box_size)
-            type is (Concrete_Changed_Box_Size)
-                box_size_can_change = .true.
-            class default
-                box_size_can_change = .false.
-        end select
-    end function box_size_can_change_from_changed
 
     logical function apply_external_field_from_json(generating_data, prefix) &
         result(apply_external_field)

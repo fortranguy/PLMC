@@ -19,7 +19,7 @@ use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static
 use procedures_dipolar_interactions_factory, only: dipolar_interactions_destroy => destroy
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit
 use classes_dipolar_interactions_facade, only: Abstract_Dipolar_Interactions_Facade
-use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use procedures_triangle_observables, only: triangle_observables_diff, triangle_observables_sum
 use types_observables_energies, only: Concrete_Observables_Energies
 use procedures_observables_energies_factory, only: observables_energies_create => create, &
@@ -40,7 +40,7 @@ private
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facades(:) => &
             null()
-        type(Changed_Box_Size_Line), pointer :: changed_boxes_size(:) => null()
+        class(Abstract_Changed_Box_Size), pointer :: changed_boxes_size(:) => null()
         logical, allocatable :: have_positions(:, :)
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
     contains
@@ -63,7 +63,7 @@ contains
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facades(:)
-        type(Changed_Box_Size_Line), target, intent(in) :: changed_boxes_size(:)
+        class(Abstract_Changed_Box_Size), target, intent(in) :: changed_boxes_size(:)
         logical, intent(in) :: have_positions(:, :)
         class(Abstract_Tower_Sampler), intent(in) :: selectors(:)
 
@@ -123,10 +123,10 @@ contains
         logical :: reset_real_pair
 
         i_box = random_integer(size(this%environment%periodic_boxes))
-        observables%volumes_change_counter(i_box)%line(i_box)%num_hits = observables%&
-            volumes_change_counter(i_box)%line(i_box)%num_hits + 1
+        observables%volumes_change_counter(i_box)%num_hits = observables%&
+            volumes_change_counter(i_box)%num_hits + 1
         box_size = this%environment%periodic_boxes(i_box)%get_size()
-        box_size_ratio = this%changed_boxes_size(i_box)%line(i_box)%changed%get_ratio()
+        box_size_ratio = this%changed_boxes_size(i_box)%get_ratio()
         new_box_size = box_size * box_size_ratio
         call this%dipolar_interactions_facades(i_box)%save(dipolar_interactions_static, &
             reset_real_pair, new_box_size)
@@ -148,8 +148,8 @@ contains
             observables%accessible_domains_size(:, i_box) = this%environment%&
                 accessible_domains(i_box)%get_size()
             call observables_energies_set(observables%energies(i_box), new_energies)
-            observables%volumes_change_counter(i_box)%line(i_box)%num_successes = observables%&
-                volumes_change_counter(i_box)%line(i_box)%num_successes + 1
+            observables%volumes_change_counter(i_box)%num_successes = observables%&
+                volumes_change_counter(i_box)%num_successes + 1
         else
             call this%environment%periodic_boxes(i_box)%set(box_size)
             call mixture_rescale_positions(this%components(:, i_box), 1._DP / box_size_ratio)

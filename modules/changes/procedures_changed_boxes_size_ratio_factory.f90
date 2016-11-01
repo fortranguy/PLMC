@@ -40,7 +40,7 @@ contains
                 allocate(XY_Changed_Box_Size_Ratio :: &
                     changed_boxes_size_ratio(size(periodic_boxes)))
             else
-                call error_exit("procedures_changed_box_size_ratio_factory: allocate: "//&
+                call error_exit("procedures_changed_boxes_size_ratio_factory: create_line: "//&
                         "box periodicity is unknown.")
             end if
         else
@@ -55,30 +55,30 @@ contains
         if (allocated(changed_boxes_size_ratio)) deallocate(changed_boxes_size_ratio)
     end subroutine destroy_line
 
-    subroutine create_element(changed_box_size_ratio, periodic_boxes, box_size_can_change, &
+    subroutine create_element(changed_box_size_ratio, periodic_box, box_size_can_change, &
         generating_data, prefix)
         class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: changed_box_size_ratio
-        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: box_size_can_change
         type(json_file), intent(inout) :: generating_data
         character(len=*), intent(in) :: prefix
 
-        call allocate(changed_box_size_ratio, periodic_boxes, box_size_can_change)
+        call allocate(changed_box_size_ratio, periodic_box, box_size_can_change)
         call construct(changed_box_size_ratio, generating_data, prefix)
     end subroutine create_element
 
-    subroutine allocate(changed_box_size_ratio, periodic_boxes, box_size_can_change)
+    subroutine allocate(changed_box_size_ratio, periodic_box, box_size_can_change)
         class(Abstract_Changed_Box_Size_Ratio), allocatable, intent(out) :: changed_box_size_ratio
-        class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: box_size_can_change
 
         if (box_size_can_change) then
-            if (all(periodicity_is_xyz(periodic_boxes))) then
+            if (periodicity_is_xyz(periodic_box)) then
                 allocate(XYZ_Changed_Box_Size_Ratio :: changed_box_size_ratio)
-            else if (all(periodicity_is_xy(periodic_boxes))) then
+            else if (periodicity_is_xy(periodic_box)) then
                 allocate(XY_Changed_Box_Size_Ratio :: changed_box_size_ratio)
             else
-                call error_exit("procedures_changed_box_size_ratio_factory: allocate: "//&
+                call error_exit("procedures_changed_boxes_size_ratio_factory: allocate: "//&
                         "box periodicity is unknown.")
             end if
         else
@@ -104,7 +104,7 @@ contains
             type is (Null_Changed_Box_Size_Ratio)
                 is_xyz_or_xy = .false.
             class default
-                call error_exit("procedures_changed_box_size_ratio_factory: construct: "//&
+                call error_exit("procedures_changed_boxes_size_ratio_factory: construct: "//&
                     "changed_box_size: type unknown.")
         end select
         if (is_xyz_or_xy) then

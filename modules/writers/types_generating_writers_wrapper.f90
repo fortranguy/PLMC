@@ -15,7 +15,7 @@ private
     type, public :: Generating_Writers_Wrapper
         class(Abstract_Real_Writer), allocatable :: accessible_domains_size(:)
         type(Line_Writer_Wrapper), allocatable :: teleportations_successes(:, :)
-        class(Abstract_Triangle_Writer), allocatable :: volumes_change_success
+        class(Abstract_Line_Writer), allocatable :: volumes_change_success
         class(Abstract_Line_Writer), allocatable :: nums_particles(:)
         class(Abstract_Complete_Coordinates_Writer), allocatable :: complete_coordinates
         type(Concrete_Energies_Writers), allocatable :: energies(:)

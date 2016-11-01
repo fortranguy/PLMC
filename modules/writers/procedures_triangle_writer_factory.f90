@@ -7,7 +7,6 @@ use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only: component_exists, component_can_exchange
 use classes_pair_potential, only: Pair_Potential_Line
 use procedures_short_interactions_inquirers, only: components_interact
-use classes_changed_box_size, only: Changed_Box_Size_Line
 use classes_triangle_writer, only: Abstract_Triangle_Writer, Concrete_Triangle_Writer, &
     Null_Triangle_Writer
 
@@ -17,7 +16,6 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_volumes_change_success
     module procedure :: create_short_energies
     module procedure :: create_dipolar_energies
     module procedure :: create_switches_successes
@@ -29,33 +27,6 @@ interface destroy
 end interface destroy
 
 contains
-
-    subroutine create_volumes_change_success(successes, filename, changed_boxes_size)
-        class(Abstract_Triangle_Writer), allocatable, intent(out) :: successes
-        character(len=*), intent(in) :: filename
-        type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
-
-        type(Logical_Line) :: selectors(size(changed_boxes_size))
-        logical :: some_boxes_can_change, can_change_ij
-        integer :: i_box, j_box
-
-        some_boxes_can_change = .false.
-        do j_box = 1, size(selectors)
-            allocate(selectors(j_box)%line(j_box))
-            do i_box = 1, size(selectors(j_box)%line)
-                can_change_ij = box_size_can_change(changed_boxes_size(j_box)%line(i_box)%changed)
-                some_boxes_can_change = some_boxes_can_change .or. can_change_ij
-                selectors(j_box)%line(i_box) = can_change_ij
-            end do
-        end do
-
-        if (some_boxes_can_change) then
-            allocate(Concrete_Triangle_Writer :: successes)
-        else
-            allocate(Null_Triangle_Writer :: successes)
-        end if
-        call successes%construct(filename, selectors)
-    end subroutine create_volumes_change_success
 
     subroutine create_short_energies(energies, filename, pairs, visit_energies)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies

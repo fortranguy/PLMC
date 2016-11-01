@@ -41,15 +41,6 @@ private
         procedure :: decrease_delta => Null_decrease_delta
     end type Null_Changed_Box_Size
 
-    type, public :: Changed_Box_Size_Wrapper
-        class(Abstract_Changed_Box_Size), allocatable :: changed
-    end type Changed_Box_Size_Wrapper
-
-    type, public :: Changed_Box_Size_Line
-        class(Changed_Box_Size_Wrapper), allocatable :: line(:)
-    end type Changed_Box_Size_Line
-
-
 contains
 
 !implementation Abstract_Changed_Box_Size

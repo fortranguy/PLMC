@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use types_component_wrapper, only: Component_Wrapper
-use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use classes_exchanged_boxes_size, only: Abstract_Exchanged_Boxes_Size
 
 implicit none
@@ -60,7 +60,7 @@ contains
 
     subroutine reset_volumes_homo(selectors, changed_boxes_size, components, have_positions)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
-        type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         logical, intent(in) :: have_positions(:, :)
 
@@ -74,8 +74,8 @@ contains
                     nums_candidates = nums_candidates + components(i_component, i_box)%&
                         average_num_particles%get()
                 end do
-                nums_candidates = ceiling(changed_boxes_size(i_box)%line(i_box)%changed%&
-                    get_frequency_ratio() * real(nums_candidates, DP))
+                nums_candidates = ceiling(changed_boxes_size(i_box)%get_frequency_ratio() * &
+                    real(nums_candidates, DP))
                 nums_candidates = merge(nums_candidates, 1, nums_candidates > 0)
             else
                 nums_candidates = 0

@@ -7,13 +7,14 @@ inputData = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
 for iBox = 1:inputData["Environment"]["Boxes"]["number"]
     boxSize, components, interMinDistances = PLMC.set(iBox, inputData)
-
+    boxSizeSave = boxSize
     numParticles = 0
     for iComponent = 1:size(components, 1)
         numParticles += components[iComponent].num
     end
 
     minDistanceDelta = 1e-6
+    boxSize -= minDistanceDelta
     minDistanceMax = maximum(interMinDistances) + minDistanceDelta
     edge = sqrt(2) * minDistanceMax
     numbers = floor(Int64, 2 * boxSize / edge)
@@ -66,5 +67,5 @@ for iBox = 1:inputData["Environment"]["Boxes"]["number"]
         components[iComponent].positions = positions[:, iParticleMin:iParticleMax]
         iParticleMin = iParticleMax + 1
     end
-    PLMC.write(iBox, components, boxSize, inputData)
+    PLMC.write(iBox, components, boxSizeSave, inputData)
 end

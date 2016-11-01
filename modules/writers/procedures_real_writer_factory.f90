@@ -2,7 +2,7 @@ module procedures_real_writer_factory
 
 use types_string_wrapper, only: String_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
-use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use classes_real_writer, only: Abstract_Real_Writer, Concrete_Real_Writer, Null_Real_Writer
 
 implicit none
@@ -23,27 +23,17 @@ end interface destroy
 
 contains
 
-    !> @todo The condition is suboptimal. Is all(boxes_size_can_change) too strict?
+    !> @todo Generalise for GEMC
+    !> @todo Is all(...) to strict?
     subroutine create_accessible_domains_size(domains_size, paths, filename, changed_boxes_size)
         class(Abstract_Real_Writer), allocatable, intent(out) :: domains_size(:)
         type(String_Wrapper), intent(in) :: paths(:)
         character(len=*), intent(in) :: filename
-        type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
 
-        logical :: boxes_size_can_change(size(changed_boxes_size))
-        integer :: j_box, i_box
+        integer :: i_box
 
-        boxes_size_can_change = .false.
-        do j_box = 1, size(boxes_size_can_change)
-            do i_box = 1, j_box
-                if (box_size_can_change(changed_boxes_size(j_box)%line(i_box)%changed)) then
-                    boxes_size_can_change(i_box) = .true.
-                    boxes_size_can_change(j_box) = .true.
-                end if
-            end do
-        end do
-
-        if (all(boxes_size_can_change)) then
+        if (all(box_size_can_change(changed_boxes_size))) then
             allocate(Concrete_Real_Writer :: domains_size(size(paths)))
         else
             allocate(Null_Real_Writer :: domains_size(size(paths)))

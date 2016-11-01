@@ -7,7 +7,7 @@ use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower
     destroy
 use procedures_mixture_factory, only: set_have_positions
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
-use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
 use classes_box_volume_change, only: Box_Volume_Change
 use procedures_environment_inquirers, only: box_size_can_change
@@ -20,24 +20,20 @@ public :: create
 contains
 
     !> @note All particles of a box are considered together. Therefore num_candidates = 1.
-    !> @todo all(boxes_size_can_change): too strict?
     subroutine create(volume_change, physical_model, changed_boxes_size)
         class(Abstract_Generating_Algorithm), allocatable, intent(out) :: volume_change
         type(Physical_Model_Wrapper), intent(in) :: physical_model
-        type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selectors(:)
-        integer :: i_box, num_candidates
-        logical :: boxes_size_can_change(size(physical_model%environment%periodic_boxes))
+        integer :: num_candidates
+        logical :: boxes_size_can_change
         logical :: have_positions(size(physical_model%mixture%components, 1), &
             size(physical_model%mixture%components, 2))
 
-        do i_box = 1, size(changed_boxes_size)
-            boxes_size_can_change(i_box) = box_size_can_change(changed_boxes_size(i_box)%&
-                line(i_box)%changed)
-        end do
+        boxes_size_can_change = all(box_size_can_change(changed_boxes_size))
         call set_have_positions(have_positions, physical_model%mixture%components)
-        if (all(boxes_size_can_change)) then
+        if (boxes_size_can_change .and. any(have_positions)) then
             allocate(Box_Volume_Change :: volume_change)
         else
             allocate(Null_Generating_Algorithm :: volume_change)
@@ -45,7 +41,7 @@ contains
 
         num_candidates = 1
         call tower_sampler_create(selectors, size(changed_boxes_size), num_candidates, &
-            all(boxes_size_can_change))
+            boxes_size_can_change)
         select type (volume_change)
             type is (Box_Volume_Change)
                 call volume_change%construct(physical_model%environment, physical_model%mixture%&

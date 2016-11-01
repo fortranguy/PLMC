@@ -3,12 +3,14 @@ module procedures_line_writer_factory
 use procedures_errors, only: error_exit
 use types_string_wrapper, only: String_Wrapper
 use classes_number_to_string, only: Concrete_Number_to_String
+use procedures_environment_inquirers, only: box_size_can_change
 use classes_external_field, only: Abstract_External_Field
 use procedures_environment_inquirers, only: apply_external_field
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_inquirers, only: component_is_dipolar
 use classes_pair_potential, only: Pair_Potential_Wrapper
 use procedures_short_interactions_inquirers, only: component_interacts_with_wall
+use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use classes_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer, &
     Line_Writer_Wrapper
 
@@ -19,6 +21,7 @@ public :: create, destroy
 
 interface create
     module procedure :: create_teleportations_successes
+    module procedure :: create_volumes_change_success
     module procedure :: create_walls_energies
     module procedure :: create_field_energies
     module procedure :: create_line
@@ -79,6 +82,23 @@ contains
             deallocate(successes)
         end if
     end subroutine destroy_teleportations_successes
+
+    subroutine create_volumes_change_success(successes, filename, changed_boxes_size)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: successes
+        character(len=*), intent(in) :: filename
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
+
+        logical :: selector(size(changed_boxes_size))
+
+        selector = box_size_can_change(changed_boxes_size)
+
+        if (any(selector)) then
+            allocate(Concrete_Line_Writer :: successes)
+        else
+            allocate(Null_Line_Writer :: successes)
+        end if
+        call successes%construct(filename, selector)
+    end subroutine create_volumes_change_success
 
     subroutine create_walls_energies(energies, filename, wall_pairs, visit_energies)
         class(Abstract_Line_Writer), allocatable, intent(out) :: energies

@@ -121,8 +121,8 @@ contains
         j_box = maxval(ij_boxes)
         i_box = minval(ij_boxes)
 
-        observables%volumes_change_counter(j_box)%line(i_box)%num_hits = observables%&
-            volumes_change_counter(j_box)%line(i_box)%num_hits + 1
+        !observables%volumes_change_counter(j_box)%line(i_box)%num_hits = observables%&
+        !    volumes_change_counter(j_box)%line(i_box)%num_hits + 1
 
         do i_partner = 1, size(new_boxes_size, 2)
             boxes_size(:, i_partner) = this%environment%periodic_boxes(ij_boxes(i_partner))%&

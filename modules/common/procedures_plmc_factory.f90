@@ -147,19 +147,14 @@ contains
         type(Changes_Wrapper), intent(inout) :: changes
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
-        logical :: all_boxes_size_tuned,  box_size_tuned
+        logical :: boxes_size_tuned(size(changes%boxes_size_change_tuner))
         logical, dimension(size(changes%components, 1), size(changes%components, 2)) :: &
             translation_tuned, rotation_tuned
-        integer :: i_box, j_box, i_component
+        integer :: i_box, i_component
 
-        all_boxes_size_tuned = .true.
-        do j_box = 1, size(changes%boxes_size_change_tuner)
-            do i_box = 1, size(changes%boxes_size_change_tuner(j_box)%line)
-                call changes%boxes_size_change_tuner(j_box)%line(i_box)%tuner%&
-                    tune(box_size_tuned, i_step, observables%volumes_change_success(j_box)%&
-                        line(i_box))
-                all_boxes_size_tuned = all_boxes_size_tuned .and. box_size_tuned
-            end do
+        do i_box = 1, size(boxes_size_tuned)
+            call changes%boxes_size_change_tuner(i_box)%&
+                tune(boxes_size_tuned(i_box), i_step, observables%volumes_change_success(i_box))
         end do
 
         do i_box = 1, size(changes%components, 2)
@@ -173,7 +168,7 @@ contains
             end do
         end do
 
-        tuned = all_boxes_size_tuned .and. all(translation_tuned) .and. all(rotation_tuned)
+        tuned = all(boxes_size_tuned) .and. all(translation_tuned) .and. all(rotation_tuned)
     end subroutine tune_moves
 
     subroutine set_success_and_reset_counter_generating(observables)

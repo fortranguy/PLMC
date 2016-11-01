@@ -11,7 +11,7 @@ use types_component_wrapper, only: Component_Wrapper
 use procedures_complete_coordinates_writer_factory, only: complete_coordinates_writer_create => &
     create, complete_coordinates_writer_destroy => destroy
 use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
-use classes_changed_box_size, only: Changed_Box_Size_Line
+use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_changes_factory, only: set_can_translate, set_can_exchange
 use procedures_real_writer_factory, only: real_writer_create => create, &
@@ -45,7 +45,7 @@ contains
         type(Component_Wrapper), intent(in) :: components(:, :)
         type(Pair_Potential_Line), intent(in) :: short_pairs(:)
         type(Changes_Component_Wrapper), intent(in) :: changes_components(:, :)
-        type(Changed_Box_Size_Line), intent(in) :: changed_boxes_size(:)
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
         type(json_file), intent(inout) :: generating_data
 
         type(String_Wrapper), dimension(size(environment%periodic_boxes)) :: boxes_path, &
@@ -86,7 +86,7 @@ contains
         call set_can_translate(can_translate, changes_components)
         call line_writer_create(writers%teleportations_successes, make_directory_cmd, separator, &
             "teleportations", can_translate)
-        call triangle_writer_create(writers%volumes_change_success, "volumes_change_success.out", &
+        call line_writer_create(writers%volumes_change_success, "volumes_change_success.out", &
             changed_boxes_size)
 
         call set_can_exchange(can_exchange, components)
@@ -117,7 +117,7 @@ contains
         call complete_coordinates_writer_destroy(writers%complete_coordinates)
         call line_writer_destroy(writers%nums_particles)
 
-        call triangle_writer_destroy(writers%volumes_change_success)
+        call line_writer_destroy(writers%volumes_change_success)
         call line_writer_destroy(writers%teleportations_successes)
         call real_writer_destroy(writers%accessible_domains_size)
     end subroutine destroy
