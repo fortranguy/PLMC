@@ -11,14 +11,16 @@
         \begin{scope}
             \begin{class}[text width=\largeTextWidth]{GeneratingObservables}{0, 0}
                 \UMLattribute{accessibleDomainsSize: \type{real[\numDimensions, \numBoxes]}}
+                \UMLattribute{volumesChangeCounter: \type{ChangeCounter[\numBoxes]}}
+                \UMLattribute{volumesChangeSuccess: \type{real[\numBoxes]}}
+                \UMLattribute{volumesExchangeCounter:
+                    \type{ChangeCounter[\numBoxes, \numBoxes]\textsubscript{\sym}}}
+                \UMLattribute{volumesExchangeSuccess:
+                    \type{real[\numBoxes, \numBoxes]\textsubscript{\sym}}}
                 \UMLattribute{teleportationsCounters:
                     \type{ChangeCounter[\numComponents, \numBoxes, \numBoxes]}}
                 \UMLattribute{teleportationsSuccesses:
                     \type{real[\numComponents, \numBoxes, \numBoxes]}}
-                \UMLattribute{volumesChangeCounter:
-                    \type{ChangeCounter[\numBoxes, \numBoxes]\textsubscript{\sym}}}
-                \UMLattribute{volumesChangeSuccess:
-                    \type{real[\numBoxes, \numBoxes]\textsubscript{\sym}}}
                 \UMLattribute{numsParticles: \type{int[\numComponents, \numBoxes]}}
                 \UMLattribute{energies: \type{ObservablesEnergies[\numBoxes]}}
                 \UMLattribute{changes: \type{ObservablesChanges[\numBoxes]}}

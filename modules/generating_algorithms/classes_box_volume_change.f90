@@ -141,7 +141,7 @@ contains
         call this%dipolar_interactions_facades(i_box)%reset(reset_real_pair)
         call observables_energies_create(new_energies, size(this%components, 1))
 
-        call this%metropolis_algorithm(success, new_energies, i_box, box_size_ratio, &
+        call this%metropolis_algorithm(success, new_energies, i_box, product(box_size_ratio), &
             observables%energies(i_box))
 
         if (success) then
@@ -162,18 +162,17 @@ contains
         call dipolar_interactions_destroy(dipolar_interactions_static)
     end subroutine Concrete_try
 
-    subroutine Concrete_metropolis_algorithm(this, success, new_energies, i_box, box_size_ratio, &
+    subroutine Concrete_metropolis_algorithm(this, success, new_energies, i_box, box_volume_ratio, &
         energies)
         class(Box_Volume_Change), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Observables_Energies), intent(inout) :: new_energies
         integer, intent(in) :: i_box
-        real(DP), intent(in) :: box_size_ratio(:)
+        real(DP), intent(in) :: box_volume_ratio
         type(Concrete_Observables_Energies), intent(in) :: energies
 
         real(DP) :: delta_energy
         type(Concrete_Observables_Energies) :: deltas
-
         logical :: overlap
 
         success = .false.
@@ -185,14 +184,14 @@ contains
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
         call short_interactions_visit(overlap, new_energies%short_energies, this%&
             components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
+        if (overlap) return
         call triangle_observables_diff(deltas%short_energies, new_energies%short_energies, &
             energies%short_energies)
-        if (overlap) return
         call dipolar_interactions_visit(new_energies%field_energies, this%environment%&
             external_fields(i_box), this%components(:, i_box))
         deltas%field_energies = new_energies%field_energies - energies%field_energies
         call this%dipolar_interactions_facades(i_box)%visit(new_energies%dipolar_energies, &
-            new_energies%dipolar_shared_energy, product(box_size_ratio), energies%dipolar_energies,&
+            new_energies%dipolar_shared_energy, box_volume_ratio, energies%dipolar_energies,&
             energies%dipolar_shared_energy)
         call triangle_observables_diff(deltas%dipolar_energies, new_energies%dipolar_energies, &
             energies%dipolar_energies)
@@ -202,7 +201,7 @@ contains
         delta_energy = sum(deltas%walls_energies + deltas%field_energies) + &
             triangle_observables_sum(deltas%short_energies) + &
             triangle_observables_sum(deltas%dipolar_energies) + deltas%dipolar_shared_energy
-        success = metropolis_algorithm(this%acceptation_probability(i_box, box_size_ratio, &
+        success = metropolis_algorithm(this%acceptation_probability(i_box, box_volume_ratio, &
             delta_energy))
     end subroutine Concrete_metropolis_algorithm
 
@@ -211,25 +210,23 @@ contains
     !>          \left( \frac{V^\prime}{V} \right)^{N+1}
     !>          e^{-\beta [U(\vec{s}^N, V^\prime) - U(\vec{s}^N, V)]} \right)
     !> \]
-    pure real(DP) function Concrete_acceptation_probability(this, i_box, box_size_ratio, &
+    pure real(DP) function Concrete_acceptation_probability(this, i_box, box_volume_ratio, &
         delta_energy) result(probability)
         class(Box_Volume_Change), intent(in) :: this
         integer, intent(in) :: i_box
-        real(DP), intent(in) :: box_size_ratio(:)
+        real(DP), intent(in) :: box_volume_ratio
         real(DP), intent(in) :: delta_energy
 
-        real(DP) :: volume_ratio
         integer :: i_component, num_particles
 
         num_particles = 0._DP
         do i_component = 1, size(this%components, 1)
             num_particles = num_particles + this%components(i_component, i_box)%num_particles%get()
         end do
-        volume_ratio = product(box_size_ratio)
 
         probability = exp(-this%environment%beta_pressure%get() * &
             product(this%environment%accessible_domains(i_box)%get_size()) * &
-            (volume_ratio - 1._DP)) * volume_ratio**(num_particles + 1) * &
+            (box_volume_ratio - 1._DP)) * box_volume_ratio**(num_particles + 1) * &
             exp(-delta_energy / this%environment%temperature%get())
         probability = min(1._DP, probability)
     end function Concrete_acceptation_probability

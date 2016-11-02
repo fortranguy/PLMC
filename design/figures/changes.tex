@@ -47,16 +47,18 @@
         \begin{scope}[shift={($(ChangesComponent.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth]{\import{}:\\
-                \namespace{Random} :: RandomCoordinates};
+                \namespace{Random} :: RandomCoordinates \\
+                \namespace{Environment} :: PeriodicBox};
         \end{scope}
 
         \begin{scope}[shift={($(ChangesComponent.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{ExchangedBoxesSize}{0, 0}
                 \inherit{TunableMove}
-                \operation{\procedure{set}{frequencyRatio: \type{real}, initialDelta: \type{real},
-                    tuningParameters: \type{MoveTuningParameters}}}
+                \operation{\procedure{set}{frequencyRatio: \type{real},
+                    initialDelta: \type{real}, tuningParameters: \type{MoveTuningParameters}}}
                 \operation{\procedure{getFrequencyRatio}{}: \type{real}}
-                \operation[0]{\procedure{getRatios}{}: \type{real[\numDimensions, 2]}}
+                \operation[0]{\procedure{getRatios}{boxesSizeRatio: \type{real[\numDimensions]}}:
+                    \type{real[\numDimensions, 2]}}
             \end{abstractclass}
         \end{scope}
 
@@ -97,6 +99,10 @@
             \begin{class}[text width=\largeTextWidth]{Changes}{0, 0}
                 \UMLattribute{changedBoxesSize: \type{ChangedBoxSize[\numBoxes]}}
                 \UMLattribute{boxesSizeChangeTuner: \type{MoveTuner[\numBoxes]}}
+                \UMLattribute{exchangedBoxesSize:
+                    \type{ExchangedBoxesSize[\numBoxes, \numBoxes]\textsubscript{\sym}}}
+                \UMLattribute{boxesSizeExchangeTuner:
+                    \type{MoveTuner[\numBoxes, \numBoxes]\textsubscript{\sym}}}
                 \UMLattribute{randomPositions: \type{RandomCoordinates[\numBoxes]}}
                 \UMLattribute{randomOrientation: \type{RandomCoordinates}}
                 \UMLattribute{positionCopiers: \type{CoordinatesCopier[\numBoxes]}}
@@ -105,7 +111,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(MoveTuner.north-|Changes)$)}]
+        \begin{scope}[shift={($(Changes.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{CoordinatesCopier}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
@@ -114,7 +120,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MaximumBoxCompression.north-|CoordinatesCopier)$)}]
+        \begin{scope}[shift={($(CoordinatesCopier.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{MoveTuningParameters}{0, 0}
                 \UMLattribute{increaseFactor: \type{real}}
                 \UMLattribute{increaseFactorMax: \type{real}}

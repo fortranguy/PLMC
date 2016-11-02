@@ -682,24 +682,18 @@ contains
         type(Concrete_Observables_Changes), intent(inout) :: changes
         integer, intent(in) :: ij_components(:)
 
-        integer :: i_component, j_component
-
-        j_component = maxval(ij_components)
-        i_component = minval(ij_components)
-        changes%switches_counters(j_component)%line(i_component)%num_hits = changes%&
-            switches_counters(j_component)%line(i_component)%num_hits + 1
+        changes%switches_counters(maxval(ij_components))%line(minval(ij_components))%num_hits = &
+        changes%switches_counters(maxval(ij_components))%line(minval(ij_components))%num_hits + 1
     end subroutine Switch_increment_hit
 
     subroutine Switch_increment_success(changes, ij_components)
         type(Concrete_Observables_Changes), intent(inout) :: changes
         integer, intent(in) :: ij_components(:)
 
-        integer :: i_component, j_component
-
-        j_component = maxval(ij_components)
-        i_component = minval(ij_components)
-        changes%switches_counters(j_component)%line(i_component)%num_successes = changes%&
-            switches_counters(j_component)%line(i_component)%num_successes + 1
+        changes%switches_counters(maxval(ij_components))%line(minval(ij_components))%&
+            num_successes = &
+        changes%switches_counters(maxval(ij_components))%line(minval(ij_components))%&
+            num_successes + 1
     end subroutine Switch_increment_success
 
 !end implementation Box_Particles_Switch

@@ -20,8 +20,8 @@ private
 public :: create, destroy
 
 interface create
-    module procedure :: create_teleportations_successes
     module procedure :: create_volumes_change_success
+    module procedure :: create_teleportations_successes
     module procedure :: create_walls_energies
     module procedure :: create_field_energies
     module procedure :: create_line
@@ -35,7 +35,26 @@ end interface
 
 contains
 
+    subroutine create_volumes_change_success(successes, filename, changed_boxes_size)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: successes
+        character(len=*), intent(in) :: filename
+        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
+
+        logical :: selector(size(changed_boxes_size))
+
+        selector = box_size_can_change(changed_boxes_size)
+
+        if (any(selector)) then
+            allocate(Concrete_Line_Writer :: successes)
+        else
+            allocate(Null_Line_Writer :: successes)
+        end if
+        call successes%construct(filename, selector)
+    end subroutine create_volumes_change_success
+
     !> @todo any(can_translate(:, i_box)): better condition?
+    !> @note cf. [[procedures_generating_writers_factory:create]] for a comment about
+    !> teleporation_stat.
     subroutine create_teleportations_successes(successes, make_directory_cmd, separator, directory,&
         can_translate)
         type(Line_Writer_Wrapper), allocatable, intent(out) :: successes(:, :)
@@ -46,6 +65,7 @@ contains
         integer :: num_boxes, i_box, j_box
         integer :: teleporation_stat
 
+        teleporation_stat = 1
         num_boxes = size(can_translate, 2)
         if (num_boxes > 1 .and. any(can_translate)) then
             call execute_command_line(make_directory_cmd//" "//directory, &
@@ -82,23 +102,6 @@ contains
             deallocate(successes)
         end if
     end subroutine destroy_teleportations_successes
-
-    subroutine create_volumes_change_success(successes, filename, changed_boxes_size)
-        class(Abstract_Line_Writer), allocatable, intent(out) :: successes
-        character(len=*), intent(in) :: filename
-        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
-
-        logical :: selector(size(changed_boxes_size))
-
-        selector = box_size_can_change(changed_boxes_size)
-
-        if (any(selector)) then
-            allocate(Concrete_Line_Writer :: successes)
-        else
-            allocate(Null_Line_Writer :: successes)
-        end if
-        call successes%construct(filename, selector)
-    end subroutine create_volumes_change_success
 
     subroutine create_walls_energies(energies, filename, wall_pairs, visit_energies)
         class(Abstract_Line_Writer), allocatable, intent(out) :: energies

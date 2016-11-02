@@ -33,6 +33,14 @@ private
         procedure :: tune => Null_tune
     end type Null_Move_Tuner
 
+    type, public :: Move_Tuner_Wrapper
+        class(Abstract_Move_Tuner), allocatable :: tuner
+    end type Move_Tuner_Wrapper
+
+    type, public :: Move_Tuner_Line
+        type(Move_Tuner_Wrapper), allocatable :: line(:)
+    end type Move_Tuner_Line
+
 contains
 
 !implementation Abstract_Move_Tuner

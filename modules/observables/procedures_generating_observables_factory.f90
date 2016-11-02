@@ -2,6 +2,7 @@ module procedures_generating_observables_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
+use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use procedures_observables_changes_factory, only: observables_changes_create => create, &
     observables_changes_destroy => destroy
@@ -21,13 +22,15 @@ contains
 
         allocate(observables%accessible_domains_size(num_dimensions, num_boxes))
         observables%accessible_domains_size = 0._DP
+        call observables_changes_create(observables%volumes_change_counter, num_boxes)
+        allocate(observables%volumes_change_success(num_boxes))
+        observables%volumes_change_success = 0._DP
+        call observables_changes_create(observables%volumes_exchange_counter, num_boxes)
+        call reals_create(observables%volumes_exchange_success, num_boxes)
         call observables_changes_create(observables%teleportations_counters, num_boxes, &
             num_components)
         allocate(observables%teleportations_successes(num_components, num_boxes, num_boxes))
         observables%teleportations_successes = 0._DP
-        call observables_changes_create(observables%volumes_change_counter, num_boxes)
-        allocate(observables%volumes_change_success(num_boxes))
-        observables%volumes_change_success = 0._DP
 
         allocate(observables%nums_particles(num_components, num_boxes))
         observables%nums_particles = 0
@@ -42,12 +45,14 @@ contains
         call observables_energies_destroy(observables%energies)
         if (allocated(observables%nums_particles)) deallocate(observables%nums_particles)
 
-        if (allocated(observables%volumes_change_success)) &
-            deallocate(observables%volumes_change_success)
-        call observables_changes_destroy(observables%volumes_change_counter)
         if (allocated(observables%teleportations_successes)) &
             deallocate(observables%teleportations_successes)
         call observables_changes_destroy(observables%teleportations_counters)
+        call reals_destroy(observables%volumes_exchange_success)
+        call observables_changes_destroy(observables%volumes_exchange_counter)
+        if (allocated(observables%volumes_change_success)) &
+            deallocate(observables%volumes_change_success)
+        call observables_changes_destroy(observables%volumes_change_counter)
         if (allocated(observables%accessible_domains_size)) &
             deallocate(observables%accessible_domains_size)
     end subroutine destroy

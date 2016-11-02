@@ -12,7 +12,7 @@ use procedures_complete_coordinates_writer_factory, only: complete_coordinates_w
     create, complete_coordinates_writer_destroy => destroy
 use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
-use types_changes_component_wrapper, only: Changes_Component_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: set_can_translate, set_can_exchange
 use procedures_real_writer_factory, only: real_writer_create => create, &
     real_writer_destroy => destroy
@@ -20,7 +20,7 @@ use procedures_line_writer_factory, only: line_writer_create => create, &
     line_writer_destroy => destroy
 use procedures_triangle_writer_factory, only: triangle_writer_create => create, &
     triangle_writer_destroy => destroy
-use procedures_rectangle_writer_factory, only: rectangle_writer_create => create_transmutations, &
+use procedures_rectangle_writer_factory, only: rectangle_writer_create => create, &
     rectangle_writer_destroy => destroy
 use procedures_changes_success_writer_factory, only: changes_success_writer_create => create, &
     changes_success_writer_destroy => destroy
@@ -37,21 +37,20 @@ public :: create, destroy
 contains
 
     !> @note Valgrind seems to suggest to initialise box_stat_i.
-    subroutine create(writers, environment, wall_pairs, components, short_pairs, &
-        changes_components, changed_boxes_size, generating_data)
+    subroutine create(writers, environment, wall_pairs, components, short_pairs, changes, &
+        generating_data)
         type(Generating_Writers_Wrapper), intent(out) :: writers
         type(Environment_Wrapper), intent(in) :: environment
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         type(Pair_Potential_Line), intent(in) :: short_pairs(:)
-        type(Changes_Component_Wrapper), intent(in) :: changes_components(:, :)
-        class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
+        type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: generating_data
 
         type(String_Wrapper), dimension(size(environment%periodic_boxes)) :: boxes_path, &
             coordinates_path
         logical :: write_coordinates
-        logical :: can_translate(size(changes_components, 1), size(changes_components, 2))
+        logical :: can_translate(size(changes%components, 1), size(changes%components, 2))
         logical :: can_exchange(size(components, 1), size(components, 2))
         character(len=:), allocatable :: make_directory_cmd, separator
         logical :: data_found
@@ -82,12 +81,14 @@ contains
         end do
 
         call real_writer_create(writers%accessible_domains_size, boxes_path, &
-            "accessible_domain_size.out", changed_boxes_size)
-        call set_can_translate(can_translate, changes_components)
+            "accessible_domain_size.out", changes%changed_boxes_size)
+        call set_can_translate(can_translate, changes%components)
         call line_writer_create(writers%teleportations_successes, make_directory_cmd, separator, &
             "teleportations", can_translate)
         call line_writer_create(writers%volumes_change_success, "volumes_change_success.out", &
-            changed_boxes_size)
+            changes%changed_boxes_size)
+        call triangle_writer_create(writers%volumes_exchange_success, &
+            "volumes_exchange_success.out", changes%exchanged_boxes_size)
 
         call set_can_exchange(can_exchange, components)
         call line_writer_create(writers%nums_particles, boxes_path, "nums_particles.out", &
@@ -98,7 +99,7 @@ contains
         call energies_writers_create(writers%energies, boxes_path, environment%external_fields, &
             wall_pairs, components, short_pairs, visit_energies=.true.)
         call changes_success_writer_create(writers%components_changes, boxes_path, &
-            changes_components, components)
+            changes%components, components)
         call triangle_writer_create(writers%switches_successes, boxes_path, &
             "switches_successes.out", components)
         call rectangle_writer_create(writers%transmutations_successes, boxes_path, &
@@ -117,6 +118,7 @@ contains
         call complete_coordinates_writer_destroy(writers%complete_coordinates)
         call line_writer_destroy(writers%nums_particles)
 
+        call triangle_writer_destroy(writers%volumes_exchange_success)
         call line_writer_destroy(writers%volumes_change_success)
         call line_writer_destroy(writers%teleportations_successes)
         call real_writer_destroy(writers%accessible_domains_size)

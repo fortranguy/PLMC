@@ -4,9 +4,10 @@ use types_logical_line, only: Logical_Line
 use types_string_wrapper, only: String_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_inquirers, only: component_exists, component_can_exchange
+use procedures_mixture_factory, only: set_have_positions
 use classes_pair_potential, only: Pair_Potential_Line
 use procedures_short_interactions_inquirers, only: components_interact
+use classes_exchanged_boxes_size, only: Exchanged_Boxes_Size_Line
 use classes_triangle_writer, only: Abstract_Triangle_Writer, Concrete_Triangle_Writer, &
     Null_Triangle_Writer
 
@@ -16,6 +17,7 @@ private
 public :: create, destroy
 
 interface create
+    module procedure :: create_volumes_exchange_success
     module procedure :: create_short_energies
     module procedure :: create_dipolar_energies
     module procedure :: create_switches_successes
@@ -27,6 +29,33 @@ interface destroy
 end interface destroy
 
 contains
+
+    subroutine create_volumes_exchange_success(successes, filename, exchanged_boxes_size)
+        class(Abstract_Triangle_Writer), allocatable, intent(out) :: successes
+        character(len=*), intent(in) :: filename
+        type(Exchanged_Boxes_Size_Line), intent(in) ::exchanged_boxes_size(:)
+
+        type(Logical_Line) :: selectors(size(exchanged_boxes_size))
+        logical :: some_boxes_exchange_volume, exchange_ij
+        integer :: i_box, j_box
+
+        some_boxes_exchange_volume = .false.
+        do j_box = 1, size(selectors)
+            allocate(selectors(j_box)%line(j_box))
+            do i_box = 1, size(selectors(j_box)%line)
+                exchange_ij = i_box /= j_box
+                some_boxes_exchange_volume = some_boxes_exchange_volume .or. exchange_ij
+                selectors(j_box)%line(i_box) = exchange_ij
+            end do
+        end do
+
+        if (some_boxes_exchange_volume) then
+            allocate(Concrete_Triangle_Writer :: successes)
+        else
+            allocate(Null_Triangle_Writer :: successes)
+        end if
+        call successes%construct(filename, selectors)
+    end subroutine create_volumes_exchange_success
 
     subroutine create_short_energies(energies, filename, pairs, visit_energies)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
@@ -100,24 +129,26 @@ contains
         type(Component_Wrapper), intent(in) :: components(:, :)
 
         type(Logical_Line) :: selectors(size(components, 1), size(components, 2))
-        logical :: some_couples_exist(size(selectors, 2)), exist_ij
+        logical :: have_positions(size(components, 1), size(components, 2)), have_positions_ij
+        logical :: some_couples_have_positions(size(selectors, 2))
         integer :: i_box, i_component, j_component
 
-        some_couples_exist = .false.
+        call set_have_positions(have_positions, components)
+        some_couples_have_positions = .false.
         do i_box = 1, size(selectors, 2)
             do j_component = 1, size(selectors, 1)
                 allocate(selectors(j_component, i_box)%line(j_component))
                 do i_component = 1, size(selectors(j_component, i_box)%line)
-                    exist_ij = component_exists(components(i_component, i_box)%num_particles) .and.&
-                        component_exists(components(j_component, i_box)%num_particles) .and. &
-                        i_component /= j_component
-                    some_couples_exist(i_box) = some_couples_exist(i_box) .or. exist_ij
-                    selectors(j_component, i_box)%line(i_component) = exist_ij
+                    have_positions_ij = have_positions(i_component, i_box) .and. &
+                        have_positions(j_component, i_box) .and. i_component /= j_component
+                    some_couples_have_positions(i_box) = some_couples_have_positions(i_box) .or. &
+                        have_positions_ij
+                    selectors(j_component, i_box)%line(i_component) = have_positions_ij
                 end do
             end do
         end do
 
-        if (all(some_couples_exist)) then
+        if (all(some_couples_have_positions)) then
             allocate(Concrete_Triangle_Writer :: successes(size(paths)))
         else
             allocate(Null_Triangle_Writer :: successes(size(paths)))

@@ -109,11 +109,12 @@
             \begin{class}[text width=\largeTextWidth]{BoxesVolumeExchange}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
-                $\mathAggregation$ mixture: \type{Mixture},
+                $\mathAggregation$ components: \type{Component[\numComponents, \numBoxes]},
                 $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                 $\mathAggregation$ dipolarInteractionsFacade:
                     \type{DipolarInteractionsFacade[\numBoxes]},
-                $\mathAggregation$ exchangedBoxesSize: \type{ExchangedBoxesSize},
+                $\mathAggregation$ exchangedBoxesSize:
+                    \type{ExchangedBoxesSize[\numBoxes, \numBoxes]},
                 havePositions: \type{bool[\numComponents, \numBoxes]},
                 $\mathComposition$ couples: \type{HeteroCouples},
                 $\mathComposition$ selector: \type{TowerSampler}}}

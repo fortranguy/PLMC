@@ -5,7 +5,7 @@ use classes_hetero_couples, only: Abstract_Hetero_Couples
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use types_component_wrapper, only: Component_Wrapper
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
-use classes_exchanged_boxes_size, only: Abstract_Exchanged_Boxes_Size
+use classes_exchanged_boxes_size, only: Exchanged_Boxes_Size_Line
 
 implicit none
 
@@ -44,15 +44,16 @@ contains
         logical, intent(in) :: can_swap(:, :)
 
         integer :: i_box
-        integer :: nums_candidates(couples(1)%get_num()), i_couple, ij_couple(2)
+        integer :: nums_candidates(couples(1)%get_num()), i_couple, ij_components(2)
 
         do i_box = 1, size(selectors)
             do i_couple = 1, size(nums_candidates)
-                ij_couple = couples(i_box)%get(i_couple)
-                nums_candidates(i_couple) = merge(minval([components(ij_couple(1), i_box)%&
-                    average_num_particles%get(), &
-                    components(ij_couple(2), i_box)%average_num_particles%get()]), 0, &
-                    can_swap(ij_couple(1), i_box) .and. can_swap(ij_couple(2), i_box))
+                ij_components = couples(i_box)%get(i_couple)
+                nums_candidates(i_couple) = &
+                    merge(minval([components(ij_components(1), i_box)%&
+                        average_num_particles%get(), components(ij_components(2), i_box)%&
+                        average_num_particles%get()]), 0, &
+                        can_swap(ij_components(1), i_box) .and. can_swap(ij_components(2), i_box))
             end do
             call selectors(i_box)%reset(nums_candidates)
         end do
@@ -87,30 +88,33 @@ contains
 
     !> @note The weight of a couple of boxes nums_candidates(i_couple) is the number of particles
     !> inside the 2 boxes.
-    !> @todo Test any(have_positions(:, ij_couple)) condition with gfortran
+    !> @todo Test any(have_positions(:, ij_boxes)) condition with gfortran
+    !> @note direct feed of maxval / minval causes a bug.
+    !> @todo Send a bug report to gfortran
     subroutine reset_volumes_hetero(selector, couples, exchanged_boxes_size, components, &
         have_positions)
         class(Abstract_Tower_Sampler), intent(inout) :: selector
         class(Abstract_Hetero_Couples), intent(in) :: couples
-        class(Abstract_Exchanged_Boxes_Size), intent(in) :: exchanged_boxes_size
+        type(Exchanged_Boxes_Size_Line), intent(in) :: exchanged_boxes_size(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         logical, intent(in) :: have_positions(:, :)
 
-        integer :: nums_candidates(couples%get_num()), i_couple, ij_couple(2)
+        integer :: nums_candidates(couples%get_num()), i_couple, ij_boxes(2), i_box, j_box
         integer :: i_component
 
         do i_couple = 1, size(nums_candidates)
-            ij_couple = couples%get(i_couple)
-            if (any(have_positions(:, ij_couple(1))) .and. any(have_positions(:, ij_couple(2)))) &
-            then
+            ij_boxes = couples%get(i_couple)
+            j_box = maxval(ij_boxes)
+            i_box = minval(ij_boxes)
+            if (any(have_positions(:, i_box)) .and. any(have_positions(:, j_box))) then
                 nums_candidates(i_couple) = 0
                 do i_component = 1, size(have_positions, 1)
                     nums_candidates(i_couple) = nums_candidates(i_couple) + &
-                        components(i_component, ij_couple(1))%average_num_particles%get() + &
-                        components(i_component, ij_couple(2))%average_num_particles%get()
+                        components(i_component, ij_boxes(1))%average_num_particles%get() + &
+                        components(i_component, ij_boxes(2))%average_num_particles%get()
                 end do
-                nums_candidates(i_couple) = ceiling(exchanged_boxes_size%get_frequency_ratio() * &
-                    real(nums_candidates(i_couple), DP))
+                nums_candidates(i_couple) = ceiling(exchanged_boxes_size(j_box)%line(i_box)%&
+                    exchanged%get_frequency_ratio() * real(nums_candidates(i_couple), DP))
                 nums_candidates(i_couple) = merge(nums_candidates(i_couple), 1, &
                     nums_candidates(i_couple) > 0)
             else

@@ -83,8 +83,7 @@ contains
             components)
         call generating_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
-            short_interactions%components_pairs, changes%components, changes%changed_boxes_size, &
-            generating_data)
+            short_interactions%components_pairs, changes, generating_data)
     end subroutine create_generating_readers_writers
 
     subroutine destroy_generating_readers_writers(readers, writers)
@@ -147,14 +146,23 @@ contains
         type(Changes_Wrapper), intent(inout) :: changes
         type(Generating_Observables_Wrapper), intent(in) :: observables
 
-        logical :: boxes_size_tuned(size(changes%boxes_size_change_tuner))
+        logical :: volumes_change_tuned(size(changes%boxes_size_change_tuner))
+        logical :: volumes_exchange_tuned, tuned_ij
         logical, dimension(size(changes%components, 1), size(changes%components, 2)) :: &
             translation_tuned, rotation_tuned
-        integer :: i_box, i_component
+        integer :: i_box, j_box, i_component
 
-        do i_box = 1, size(boxes_size_tuned)
+        do i_box = 1, size(volumes_change_tuned)
             call changes%boxes_size_change_tuner(i_box)%&
-                tune(boxes_size_tuned(i_box), i_step, observables%volumes_change_success(i_box))
+                tune(volumes_change_tuned(i_box), i_step, observables%volumes_change_success(i_box))
+        end do
+        volumes_exchange_tuned = .true.
+        do j_box = 1, size(changes%boxes_size_exchange_tuner)
+            do i_box = 1, size(changes%boxes_size_exchange_tuner(j_box)%line)
+                call changes%boxes_size_exchange_tuner(j_box)%line(i_box)%tuner%&
+                    tune(tuned_ij, i_step, observables%volumes_exchange_success(j_box)%line(i_box))
+                volumes_exchange_tuned = volumes_exchange_tuned .and. tuned_ij
+            end do
         end do
 
         do i_box = 1, size(changes%components, 2)
@@ -168,7 +176,8 @@ contains
             end do
         end do
 
-        tuned = all(boxes_size_tuned) .and. all(translation_tuned) .and. all(rotation_tuned)
+        tuned = all(volumes_change_tuned) .and. volumes_exchange_tuned .and. &
+            all(translation_tuned) .and. all(rotation_tuned)
     end subroutine tune_moves
 
     subroutine set_success_and_reset_counter_generating(observables)
@@ -176,11 +185,14 @@ contains
 
         integer :: i_box
 
+        call set_successes(observables%volumes_change_success, observables%volumes_change_counter)
+        call reset_counters(observables%volumes_change_counter)
+        call set_successes(observables%volumes_exchange_success, observables%&
+            volumes_exchange_counter)
+        call reset_counters(observables%volumes_exchange_counter)
         call set_successes(observables%teleportations_successes, observables%&
             teleportations_counters)
         call reset_counters(observables%teleportations_counters)
-        call set_successes(observables%volumes_change_success, observables%volumes_change_counter)
-        call reset_counters(observables%volumes_change_counter)
 
         do i_box = 1, size(observables%changes)
             call set_successes(observables%changes(i_box)%changes_sucesses, observables%&

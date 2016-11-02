@@ -13,6 +13,11 @@ interface create_full
     module procedure :: create_full_element
 end interface create_full
 
+interface create_half
+    module procedure :: create_half_line
+    module procedure :: create_half_element
+end interface create_half
+
 interface destroy
     module procedure :: destroy_element
     module procedure :: destroy_line
@@ -20,7 +25,7 @@ end interface destroy
 
 contains
 
-    subroutine create_half(couples, num_elements, num_partners)
+    subroutine create_half_line(couples, num_elements, num_partners)
         class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples(:)
         integer, intent(in) :: num_elements, num_partners
 
@@ -35,7 +40,20 @@ contains
         do i_element = 1, size(couples)
             call couples(i_element)%construct(num_partners)
         end do
-    end subroutine create_half
+    end subroutine create_half_line
+
+    subroutine create_half_element(couples, num_partners)
+        class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples
+        integer, intent(in) :: num_partners
+
+        if (num_partners > 1) then
+            allocate(Half_Hetero_Couples :: couples)
+        else
+            allocate(Null_Hetero_Couples :: couples)
+        end if
+
+        call couples%construct(num_partners)
+    end subroutine create_half_element
 
     subroutine create_full_line(couples, num_elements, num_partners)
         class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples(:)

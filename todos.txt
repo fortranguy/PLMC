@@ -25,7 +25,8 @@
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
 - BetaPressure: one value?
 - Add SemiGrand Canonical ensemble
+- Changes: exchangedBoxesSize: square -> triangle
 + GeneratingAlgorithms:
     - acceptationProbability(): uniformise comment notation
-+ ChangedBoxSizeRatio: can't be used for GEMC: to simplify
+    - BoxesVolumeExchange: optimise overlap
 - rewrite modules/index.md

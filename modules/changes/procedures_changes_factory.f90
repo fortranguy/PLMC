@@ -16,9 +16,11 @@ use procedures_mixture_factory, only: set_have_positions, set_have_orientations
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
 use procedures_changed_boxes_size_factory, only: changed_boxes_size_create => create, &
     changed_boxes_size_destroy => destroy
+use procedures_exchanged_boxes_size_factory, only: exchanged_boxes_size_create => create, &
+    exchanged_boxes_size_destroy => destroy
 use types_move_tuner_parameters, only: Concrete_Move_Tuner_Parameters
-use procedures_move_tuner_factory, only: move_tuner_create_boxes_size_change => &
-    create_boxes_size_change, move_tuner_destroy => destroy
+use procedures_move_tuner_factory, only: move_tuner_create_boxes_size => create_boxes_size, &
+    move_tuner_destroy => destroy
 use procedures_random_coordinates_factory, only: random_coordinates_create => create, &
     random_coordinates_destroy => destroy
 use procedures_coordinates_copier_factory, only: coordinates_copier_create_position => &
@@ -71,10 +73,14 @@ contains
         call changed_boxes_size_create(changes%changed_boxes_size, environment%periodic_boxes, &
             box_size_tuning_parameters, total_volume_can_change, generating_data, changes_prefix//&
             "Boxes.")
+        call exchanged_boxes_size_create(changes%exchanged_boxes_size, environment%periodic_boxes, &
+            box_size_tuning_parameters, generating_data, changes_prefix//"Boxes.")
         call set_tuner_parameters(box_size_tuner_parameters, num_tuning_steps, &
             some_boxes_size_can_change, generating_data, changes_prefix//"Boxes.")
-        call move_tuner_create_boxes_size_change(changes%boxes_size_change_tuner, changes%&
+        call move_tuner_create_boxes_size(changes%boxes_size_change_tuner, changes%&
             changed_boxes_size, box_size_tuner_parameters, num_tuning_steps)
+        call move_tuner_create_boxes_size(changes%boxes_size_exchange_tuner, changes%&
+            exchanged_boxes_size, box_size_tuner_parameters, num_tuning_steps)
 
         call set_have_positions(have_positions, components)
         call set_have_orientations(have_orientations, components)
@@ -226,7 +232,9 @@ contains
         call random_coordinates_destroy(changes%random_orientation)
         call random_coordinates_destroy(changes%random_positions)
         call destroy_components(changes%components)
+        call move_tuner_destroy(changes%boxes_size_exchange_tuner)
         call move_tuner_destroy(changes%boxes_size_change_tuner)
+        call exchanged_boxes_size_destroy(changes%exchanged_boxes_size)
         call changed_boxes_size_destroy(changes%changed_boxes_size)
     end subroutine destroy_all
 

@@ -9,12 +9,20 @@ use classes_rectangle_writer, only: Abstract_Rectangle_Writer, Concrete_Rectangl
 implicit none
 
 private
-public :: create_transmutations, destroy
+public :: create, destroy
+
+interface create
+    module procedure :: create_transmutations_successes
+end interface create
+
+interface destroy
+    module procedure :: destroy_line
+end interface destroy
 
 contains
 
-    subroutine create_transmutations(transmutations, paths, filename, components)
-        class(Abstract_Rectangle_Writer), allocatable, intent(out) :: transmutations(:)
+    subroutine create_transmutations_successes(successes, paths, filename, components)
+        class(Abstract_Rectangle_Writer), allocatable, intent(out) :: successes(:)
         type(String_Wrapper), intent(in) :: paths(:)
         character(len=*), intent(in) :: filename
         type(Component_Wrapper), intent(in) :: components(:, :)
@@ -39,18 +47,17 @@ contains
         end do
 
         if (all(some_couples_can_exchange)) then
-            allocate(Concrete_Rectangle_Writer :: transmutations(size(paths)))
+            allocate(Concrete_Rectangle_Writer :: successes(size(paths)))
         else
-            allocate(Null_Rectangle_Writer :: transmutations(size(paths)))
+            allocate(Null_Rectangle_Writer :: successes(size(paths)))
         end if
 
-        do i_box = 1, size(transmutations)
-            call transmutations(i_box)%construct(paths(i_box)%string//filename, &
-                selectors(:, :, i_box))
+        do i_box = 1, size(successes)
+            call successes(i_box)%construct(paths(i_box)%string//filename, selectors(:, :, i_box))
         end do
-    end subroutine create_transmutations
+    end subroutine create_transmutations_successes
 
-    subroutine destroy(rectangles)
+    subroutine destroy_line(rectangles)
         class(Abstract_Rectangle_Writer), allocatable, intent(out) :: rectangles(:)
 
         integer :: i_element
@@ -61,6 +68,6 @@ contains
             end do
             deallocate(rectangles)
         end if
-    end subroutine destroy
+    end subroutine destroy_line
 
 end module procedures_rectangle_writer_factory

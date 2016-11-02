@@ -46,13 +46,15 @@ contains
         end do
 
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
+            call writers%volumes_change_success%write(i_step, observables%volumes_change_success)
+            call writers%volumes_exchange_success%write(i_step, observables%&
+                volumes_exchange_success)
             do j_box = 1, size(writers%teleportations_successes, 2)
                 do i_box = 1, size(writers%teleportations_successes, 1)
                     call writers%teleportations_successes(i_box, j_box)%writer%&
                         write(i_step, observables%teleportations_successes(:, i_box, j_box))
                 end do
             end do
-            call writers%volumes_change_success%write(i_step, observables%volumes_change_success)
 
             do i_box = 1, size(writers%components_changes, 2)
                 do i_component = 1, size(writers%components_changes, 1)

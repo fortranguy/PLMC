@@ -23,7 +23,6 @@ end interface destroy
 
 contains
 
-    !> @todo Generalise for GEMC
     !> @todo Is all(...) to strict?
     subroutine create_accessible_domains_size(domains_size, paths, filename, changed_boxes_size)
         class(Abstract_Real_Writer), allocatable, intent(out) :: domains_size(:)
@@ -33,7 +32,7 @@ contains
 
         integer :: i_box
 
-        if (all(box_size_can_change(changed_boxes_size))) then
+        if (all(box_size_can_change(changed_boxes_size)) .or. size(changed_boxes_size) > 1) then
             allocate(Concrete_Real_Writer :: domains_size(size(paths)))
         else
             allocate(Null_Real_Writer :: domains_size(size(paths)))
