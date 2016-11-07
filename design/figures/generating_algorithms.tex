@@ -99,7 +99,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(BoxParticlesSwap.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{BoxesParticlesSwitch}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{BoxesParticlesSwap}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
                     $\mathAggregation$ mixture: \type{Mixture},
@@ -116,7 +116,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxesParticlesSwitch.north -| BoxVolumeChange)$)}]
+        \begin{scope}[shift={($(BoxesParticlesSwap.north -| BoxVolumeChange)$)}]
             \begin{class}[text width=\largeTextWidth]{BoxesVolumeExchange}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
@@ -132,7 +132,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxesParticlesSwitch.north)!0.5!(BoxesVolumeExchange.north) -
+        \begin{scope}[shift={($(BoxesParticlesSwap.north)!0.5!(BoxesVolumeExchange.north) -
             (0 cm, 0 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{BoxesParticleTeleportation}{0, 0}
                 \inherit{GeneratingAlgorithm}

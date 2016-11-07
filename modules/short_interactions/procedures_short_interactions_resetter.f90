@@ -1,6 +1,6 @@
 module procedures_short_interactions_resetter
 
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells
 

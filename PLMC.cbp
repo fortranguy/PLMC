@@ -134,7 +134,7 @@
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/common/classes_plmc_propagator.f90">
-			<Option weight="9" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/common/data_arguments.f90">
 			<Option weight="0" />
@@ -223,14 +223,14 @@
 		<Unit filename="modules/common/types_generating_io.f90">
 			<Option weight="12" />
 		</Unit>
-		<Unit filename="modules/common/types_logical_line.f90">
+		<Unit filename="modules/common/types_logical_wrapper.f90">
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_explorer_wrapper.f90">
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/common/types_markov_chain_generator_wrapper.f90">
-			<Option weight="10" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/common/types_physical_model_wrapper.f90">
 			<Option weight="14" />
@@ -517,7 +517,7 @@
 		<Unit filename="modules/generating_algorithms/classes_boxes_particle_teleportation.f90">
 			<Option weight="13" />
 		</Unit>
-		<Unit filename="modules/generating_algorithms/classes_boxes_particles_switch.f90">
+		<Unit filename="modules/generating_algorithms/classes_boxes_particles_swap.f90">
 			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_boxes_volume_exchange.f90">
@@ -541,6 +541,9 @@
 		<Unit filename="modules/generating_algorithms/procedures_boxes_particle_teleportation_factory.f90">
 			<Option weight="15" />
 		</Unit>
+		<Unit filename="modules/generating_algorithms/procedures_boxes_particles_swap_factory.f90">
+			<Option weight="15" />
+		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_boxes_volume_exchange_factory.f90">
 			<Option weight="15" />
 		</Unit>
@@ -559,7 +562,10 @@
 		<Unit filename="modules/generating_algorithms/procedures_selectors_resetters.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="modules/generating_algorithms/procedures_swap_visitors.f90">
+		<Unit filename="modules/generating_algorithms/procedures_transmutation_updaters.f90">
+			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/generating_algorithms/procedures_transmutation_visitors.f90">
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/mixture/classes_mixture_total_moment.f90">

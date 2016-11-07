@@ -10,9 +10,8 @@
 
         \begin{scope}
             \begin{abstractclass}[text width=\largeTextWidth]{PLMCpropagator}{0, 0}
-                \operation{\procedure{construct}{$\mathAggregation$ components:
-                    \type{Component[\numComponents, \numBoxes]},
-                    $\mathAggregation$ generatingAlgorithms: \type{GeneratingAlgorithm[:]},
+                \operation{\procedure{construct}{$\mathAggregation$ generatingAlgorithms:
+                    \type{GeneratingAlgorithm[:]},
                     $\mathComposition$ selector: \type{TowerSampler}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}

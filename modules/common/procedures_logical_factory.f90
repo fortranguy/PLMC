@@ -1,6 +1,6 @@
 module procedures_logical_factory
 
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 
 implicit none
 

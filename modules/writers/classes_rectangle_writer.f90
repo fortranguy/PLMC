@@ -32,6 +32,10 @@ private
         procedure :: write => Null_write
     end type Null_Rectangle_Writer
 
+    type, public :: Rectangle_Writer_Wrapper
+        class(Abstract_Rectangle_Writer), allocatable :: writer
+    end type Rectangle_Writer_Wrapper
+
 contains
 
 !implementation Abstract_Rectangle_Writer

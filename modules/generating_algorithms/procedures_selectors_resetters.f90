@@ -13,7 +13,7 @@ private
 public :: reset
 
 interface reset
-    module procedure :: reset_box_particle, reset_box_particles_swap, reset_boxes_particles_switch
+    module procedure :: reset_box_particle, reset_box_particles_swap, reset_boxes_particles_swap
     module procedure :: reset_box_volume_change, reset_boxes_volume_exchange
 end interface reset
 
@@ -59,12 +59,12 @@ contains
         end do
     end subroutine reset_box_particles_swap
 
-    subroutine reset_boxes_particles_switch(selectors, box_couples, component_couples, components, &
-        can_switch)
+    subroutine reset_boxes_particles_swap(selectors, box_couples, component_couples, components, &
+        can_translate)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
         class(Abstract_Hetero_Couples), intent(in) :: box_couples, component_couples(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
-        logical, intent(in) :: can_switch(:, :)
+        logical, intent(in) :: can_translate(:, :)
 
         integer :: box_i_couple, ij_boxes(2)
         integer :: component_i_couple, ij_components(2), i_component
@@ -83,12 +83,12 @@ contains
                 nums_particles = [boxes_nums_particles(ij_components(1)), &
                     boxes_nums_particles(ij_components(2))]
                 nums_candidates(component_i_couple) = merge(minval(nums_particles), 0, &
-                    can_switch(ij_components(1), ij_boxes(1)) .and. &
-                    can_switch(ij_components(2), ij_boxes(2)))
+                    can_translate(ij_components(1), ij_boxes(1)) .and. &
+                    can_translate(ij_components(2), ij_boxes(2)))
             end do
             call selectors(box_i_couple)%reset(nums_candidates)
         end do
-    end subroutine reset_boxes_particles_switch
+    end subroutine reset_boxes_particles_swap
 
     subroutine reset_box_volume_change(selectors, changed_boxes_size, components, have_positions)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)

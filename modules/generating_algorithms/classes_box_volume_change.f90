@@ -2,7 +2,7 @@ module classes_box_volume_change
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 use procedures_logical_factory, only: logical_create => create
 use procedures_random_number, only: random_integer
 use classes_tower_sampler, only: Abstract_Tower_Sampler

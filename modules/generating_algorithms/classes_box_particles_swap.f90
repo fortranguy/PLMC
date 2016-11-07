@@ -24,9 +24,10 @@ use types_observables_changes, only: Concrete_Observables_Changes
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_selectors_resetters, only: selectors_reset => reset
-use procedures_swap_visitors, only: swap_transmutation_visit_short => transmutation_visit_short, &
-    swap_transmutation_visit_dipolar => transmutation_visit_dipolar, i_exclude_particle
+use procedures_transmutation_visitors, only: visit_short_transmutation => visit_short, &
+    visit_dipolar_transmutation => visit_dipolar, i_exclude_particle
 use procedures_metropolis_algorithm, only: metropolis_algorithm
+use procedures_transmutation_updaters, only: update_transmutation => update
 
 implicit none
 
@@ -236,15 +237,21 @@ contains
 
         logical :: success
         type(Concrete_Double_Energies) :: deltas
-        integer :: i_box, ij_components(2)
+        integer :: i_box, ij_components(2), i_partner
 
         i_box = random_integer(size(this%environment%periodic_boxes))
         ij_components = this%couples(i_box)%get(this%selectors(i_box)%get())
         call this%increment_hit(observables%changes(i_box), ij_components)
         allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies), 2))
         allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies), 2))
+
         call this%metropolis_algorithm(success, deltas, i_box, ij_components)
+        
         if (success) then
+            do i_partner = 1, size(ij_components)
+                observables%nums_particles(ij_components(i_partner), i_box) = this%mixture%&
+                    components(ij_components(i_partner), i_box)%num_particles%get()
+            end do
             call observables_energies_set(observables%energies(i_box), deltas, ij_components)
             call this%increment_success(observables%changes(i_box), ij_components)
         end if
@@ -348,7 +355,7 @@ contains
         integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Particle), intent(in) :: particles(:)
 
-        call swap_transmutation_visit_short(overlap, delta_energies, this%environment%&
+        call visit_short_transmutation(overlap, delta_energies, this%environment%&
             visitable_walls(i_box), this%short_interactions%wall_pairs, ij_components, particles)
     end subroutine Transmutation_visit_walls
 
@@ -360,7 +367,7 @@ contains
         integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Particle), intent(in) :: particles(:)
 
-        call swap_transmutation_visit_short(overlap, delta_energies, this%short_interactions%&
+        call visit_short_transmutation(overlap, delta_energies, this%short_interactions%&
             cells(i_box), ij_components, particles)
     end subroutine Transmutation_visit_short
 
@@ -370,8 +377,8 @@ contains
         integer, intent(in) :: i_box
         type(Concrete_Particle), intent(in) :: particles(:)
 
-        call swap_transmutation_visit_dipolar(delta_energies, this%environment%&
-            external_fields(i_box), particles)
+        call visit_dipolar_transmutation(delta_energies, this%environment%external_fields(i_box), &
+            particles)
     end subroutine Transmutation_visit_field
 
     pure subroutine Transmutation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
@@ -382,7 +389,7 @@ contains
         integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Particle), intent(in) :: particles(:)
 
-        call swap_transmutation_visit_dipolar(delta_energies, delta_shared_energy, this%&
+        call visit_dipolar_transmutation(delta_energies, delta_shared_energy, this%&
             dipolar_interactions_dynamic(i_box), ij_components, particles)
     end subroutine Transmutation_visit_dipolar
 
@@ -391,35 +398,9 @@ contains
         integer, intent(in) :: i_box, ij_components(:)
         type(Concrete_Particle), intent(in) ::  particles(:)
 
-        integer :: k_component
-
-        do k_component = size(this%short_interactions%cells(i_box)%visitable_cells, 2), 1, -1
-            call this%short_interactions%cells(i_box)%&
-                visitable_cells(ij_components(1), k_component)%remove(particles(1))
-        end do
-
-        call this%mixture%total_moments(i_box)%remove(ij_components(1), particles(1)%dipole_moment)
-        call this%mixture%components(ij_components(1), i_box)%orientations%remove(particles(1)%i)
-        call this%mixture%components(ij_components(1), i_box)%positions%remove(particles(1)%i)
-        call this%mixture%components(ij_components(1), i_box)%num_particles%set(this%mixture%&
-            components(ij_components(1), i_box)%num_particles%get() - 1)
-
-        call this%mixture%components(ij_components(2), i_box)%num_particles%set(this%mixture%&
-            components(ij_components(2), i_box)%num_particles%get() + 1)
-        call this%mixture%components(ij_components(2), i_box)%positions%add(particles(2)%position)
-        call this%mixture%components(ij_components(2), i_box)%orientations%add(particles(2)%&
-            orientation)
-        call this%mixture%total_moments(i_box)%add(ij_components(2), particles(2)%dipole_moment)
-
-        do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 2)
-            call this%short_interactions%cells(i_box)%&
-                visitable_cells(ij_components(2), k_component)%add(particles(2))
-        end do
-
-        call this%dipolar_interactions_static(i_box)%reci_structure%&
-            update_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
-        call this%dipolar_interactions_static(i_box)%dlc_structures%&
-            update_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
+        call update_transmutation(this%mixture%components(:, i_box), this%mixture%&
+            total_moments(i_box), this%short_interactions%cells(i_box), this%&
+            dipolar_interactions_static(i_box), ij_components, particles)
     end subroutine Transmutation_update_components
 
     subroutine Transmutation_increment_hit(changes, ij_components)

@@ -2,7 +2,7 @@ module classes_boxes_volume_exchange
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use types_logical_line, only: Logical_Triangle
+use types_logical_wrapper, only: Logical_Triangle
 use procedures_logical_factory, only: logical_create => create
 use classes_hetero_couples, only: Abstract_Hetero_Couples
 use procedures_hetero_couples_factory, only: hetero_couples_destroy => destroy

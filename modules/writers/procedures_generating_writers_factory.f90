@@ -83,12 +83,14 @@ contains
         call real_writer_create(writers%accessible_domains_size, boxes_path, &
             "accessible_domain_size.out", changes%changed_boxes_size)
         call set_can_translate(can_translate, changes%components)
-        call line_writer_create(writers%teleportations_successes, make_directory_cmd, separator, &
-            "teleportations", can_translate)
         call line_writer_create(writers%volumes_change_success, "volumes_change_success.out", &
             changes%changed_boxes_size)
         call triangle_writer_create(writers%volumes_exchange_success, &
             "volumes_exchange_success.out", changes%exchanged_boxes_size)
+        call line_writer_create(writers%teleportations_successes, make_directory_cmd, separator, &
+            "teleportations", can_translate)
+        call rectangle_writer_create(writers%swaps_successes, make_directory_cmd, separator, &
+            "swaps", can_translate)
 
         call set_can_exchange(can_exchange, components)
         call line_writer_create(writers%nums_particles, boxes_path, "nums_particles.out", &
@@ -118,9 +120,10 @@ contains
         call complete_coordinates_writer_destroy(writers%complete_coordinates)
         call line_writer_destroy(writers%nums_particles)
 
+        call rectangle_writer_destroy(writers%swaps_successes)
+        call line_writer_destroy(writers%teleportations_successes)
         call triangle_writer_destroy(writers%volumes_exchange_success)
         call line_writer_destroy(writers%volumes_change_success)
-        call line_writer_destroy(writers%teleportations_successes)
         call real_writer_destroy(writers%accessible_domains_size)
     end subroutine destroy
 

@@ -10,7 +10,7 @@ private
 
     type, public :: Markov_Chain_Generator_Wrapper
         type(Changes_Wrapper) :: changes
-        type(Generating_Algorithm_Wrapper) :: generating_algorithms(9)
+        type(Generating_Algorithm_Wrapper) :: generating_algorithms(10)
         class(Abstract_PLMC_Propagator), allocatable :: plmc_propagator
     end type Markov_Chain_Generator_Wrapper
 

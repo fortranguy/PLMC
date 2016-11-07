@@ -62,12 +62,12 @@ contains
         logical, intent(in) :: can_translate(:, :)
 
         type(Concrete_Number_to_String) :: string
-        integer :: num_boxes, i_box, j_box
         integer :: teleporation_stat
-
-        teleporation_stat = 1
+        integer :: num_boxes, i_box, j_box
+        
         num_boxes = size(can_translate, 2)
         if (num_boxes > 1 .and. any(can_translate)) then
+            teleporation_stat = 1
             call execute_command_line(make_directory_cmd//" "//directory, &
                 exitstat=teleporation_stat)
             if (teleporation_stat /= 0) call error_exit("procedures_line_writer_factory: "//&
@@ -77,7 +77,7 @@ contains
         allocate(successes(num_boxes, num_boxes))
         do j_box = 1, size(successes, 2)
             do i_box = 1, size(successes, 1)
-                if (num_boxes > 1 .and. i_box /= j_box .and. any(can_translate(:, i_box))) then
+                if (i_box /= j_box .and. any(can_translate(:, i_box))) then
                     allocate(Concrete_Line_Writer :: successes(i_box, j_box)%writer)
                 else
                     allocate(Null_Line_Writer :: successes(i_box, j_box)%writer)

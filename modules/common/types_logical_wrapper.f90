@@ -1,4 +1,4 @@
-module types_logical_line
+module types_logical_wrapper
 
 implicit none
 
@@ -12,4 +12,4 @@ private
         type(Logical_Line), allocatable :: triangle(:)
     end type Logical_Triangle
 
-end module types_logical_line
+end module types_logical_wrapper

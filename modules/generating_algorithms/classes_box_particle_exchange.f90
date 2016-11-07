@@ -230,7 +230,9 @@ contains
         call this%increment_hit(observables%changes(i_box)%changes_counters(i_component))
         allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies)))
         allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies)))
+
         call this%metropolis_algorithm(success, deltas, i_box, i_component)
+
         if (success) then
             observables%nums_particles(i_component, i_box) = this%mixture%components(i_component, &
                 i_box)%num_particles%get()

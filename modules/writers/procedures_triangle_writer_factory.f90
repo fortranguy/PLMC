@@ -1,6 +1,6 @@
 module procedures_triangle_writer_factory
 
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 use types_string_wrapper, only: String_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
 use types_component_wrapper, only: Component_Wrapper

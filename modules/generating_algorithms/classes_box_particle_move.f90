@@ -221,7 +221,9 @@ contains
         call this%increment_hit(observables%changes(i_box)%changes_counters(i_component))
         allocate(deltas%short_energies(size(observables%energies(i_box)%short_energies)))
         allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies)))
+
         call this%metropolis_algorithm(success, deltas, i_box, i_component)
+        
         if (success) then
             call observables_energies_set(observables%energies(i_box), deltas, i_component)
             call this%increment_success(observables%changes(i_box)%changes_counters(i_component))

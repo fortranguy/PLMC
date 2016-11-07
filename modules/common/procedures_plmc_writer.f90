@@ -53,6 +53,8 @@ contains
                 do i_box = 1, size(writers%teleportations_successes, 1)
                     call writers%teleportations_successes(i_box, j_box)%writer%&
                         write(i_step, observables%teleportations_successes(:, i_box, j_box))
+                    call writers%swaps_successes(i_box, j_box)%writer%&
+                        write(i_step, observables%swaps_successes(:, :, i_box, j_box))
                 end do
             end do
 

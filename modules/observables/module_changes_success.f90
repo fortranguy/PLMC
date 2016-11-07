@@ -43,14 +43,6 @@ end interface set_successes
         type(Concrete_Change_Counter), allocatable :: line(:)
     end type Concrete_Change_Counter_Line
 
-    type, public :: Concrete_Change_Counter_Triangle
-        type(Concrete_Change_Counter_Line), allocatable :: triangle(:)
-    end type Concrete_Change_Counter_Triangle
-
-    type, public :: Concrete_Change_Counter_Triangle_Line
-        type(Concrete_Change_Counter_Triangle), allocatable :: line(:)
-    end type Concrete_Change_Counter_Triangle_Line
-
 contains
 
     elemental subroutine changes_counter_reset(counter)

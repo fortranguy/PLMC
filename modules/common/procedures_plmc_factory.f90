@@ -195,6 +195,8 @@ contains
         call set_successes(observables%teleportations_successes, observables%&
             teleportations_counters)
         call reset_counters(observables%teleportations_counters)
+        call set_successes(observables%swaps_successes, observables%swaps_counters)
+        call reset_counters(observables%swaps_counters)
 
         do i_box = 1, size(observables%changes)
             call set_successes(observables%changes(i_box)%changes_sucesses, observables%&

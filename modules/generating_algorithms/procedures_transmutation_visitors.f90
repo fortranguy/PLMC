@@ -1,4 +1,4 @@
-module procedures_swap_visitors
+module procedures_transmutation_visitors
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: visit_different
@@ -14,21 +14,21 @@ use types_particle_wrapper, only: Concrete_Particle
 implicit none
 
 private
-public :: transmutation_visit_short, transmutation_visit_dipolar, i_exclude_particle
+public :: visit_short, visit_dipolar, i_exclude_particle
 
-interface transmutation_visit_short
-    module procedure :: visit_walls
-    module procedure :: visit_short
-end interface transmutation_visit_short
+interface visit_short
+    module procedure :: transmutation_visit_walls
+    module procedure :: transmutation_visit_short
+end interface visit_short
 
-interface transmutation_visit_dipolar
-    module procedure :: visit_field
-    module procedure :: visit_dipolar
-end interface transmutation_visit_dipolar
+interface visit_dipolar
+    module procedure :: transmutation_visit_field
+    module procedure :: transmutation_visit_dipolar
+end interface visit_dipolar
 
 contains
 
-    pure subroutine visit_walls(overlap, delta_energies, visitable_walls, wall_pairs, &
+    pure subroutine transmutation_visit_walls(overlap, delta_energies, visitable_walls, wall_pairs,&
         ij_components,  particles)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
@@ -45,9 +45,9 @@ contains
             if (overlap) return
         end do
         delta_energies(1) = -delta_energies(1)
-    end subroutine visit_walls
+    end subroutine transmutation_visit_walls
 
-    subroutine visit_short(overlap, delta_energies, cells, ij_components, particles)
+    subroutine transmutation_visit_short(overlap, delta_energies, cells, ij_components, particles)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
         type(Cells_Wrapper), intent(in) :: cells
@@ -66,9 +66,9 @@ contains
             end do
         end do
         delta_energies(:, 1) = -delta_energies(:, 1)
-    end subroutine visit_short
+    end subroutine transmutation_visit_short
 
-    pure subroutine visit_field(delta_energies, external_field, particles)
+    pure subroutine transmutation_visit_field(delta_energies, external_field, particles)
         real(DP), intent(out) :: delta_energies(:)
         class(Abstract_External_Field), intent(in) :: external_field
         type(Concrete_Particle), intent(in) :: particles(:)
@@ -76,9 +76,9 @@ contains
         delta_energies = &
             [dipoles_field_visit_remove(external_field, particles(1)), &
             dipoles_field_visit_add(external_field, particles(2))]
-    end subroutine visit_field
+    end subroutine transmutation_visit_field
 
-    pure subroutine visit_dipolar(delta_energies, delta_shared_energy, &
+    pure subroutine transmutation_visit_dipolar(delta_energies, delta_shared_energy, &
         dipolar_interactions_dynamic, ij_components, particles)
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
@@ -110,7 +110,7 @@ contains
                     dipole_moment) - &
             dipolar_interactions_dynamic%dlc_visitor%&
                 visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
-    end subroutine visit_dipolar
+    end subroutine transmutation_visit_dipolar
 
     !> @note The i_actor <-> j_actor term is ignored.
     pure integer function i_exclude_particle(k_component, ij_components, particles) &
@@ -127,4 +127,4 @@ contains
         end if
     end function i_exclude_particle
 
-end module procedures_swap_visitors
+end module procedures_transmutation_visitors

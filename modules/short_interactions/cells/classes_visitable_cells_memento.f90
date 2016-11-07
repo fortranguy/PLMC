@@ -1,6 +1,6 @@
 module classes_visitable_cells_memento
 
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_cells, only: Abstract_Visitable_Cells, Null_Visitable_Cells
 use procedures_visitable_cells_factory, only: visitable_cells_destroy => destroy

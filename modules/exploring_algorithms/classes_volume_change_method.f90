@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 use procedures_logical_factory, only: logical_create => create
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper

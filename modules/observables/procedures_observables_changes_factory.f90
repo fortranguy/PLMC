@@ -3,8 +3,7 @@ module procedures_observables_changes_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 use module_changes_success, only: Concrete_Change_Counter, Concrete_Changes_Counter, &
-    Concrete_Changes_Success, Concrete_Change_Counter_Line, Concrete_Change_Counter_Triangle_Line, &
-    reset_counters
+    Concrete_Changes_Success, Concrete_Change_Counter_Line, reset_counters
 use types_observables_changes, only: Concrete_Observables_Changes
 
 implicit none
@@ -19,7 +18,7 @@ interface create
     module procedure :: create_triangle_counters
     module procedure :: create_square_counters, create_rectangle_counters
     module procedure :: create_teleportations_counters
-    module procedure :: create_switches_counters
+    module procedure :: create_swaps_counters
     module procedure :: create_change_counters
     module procedure :: create_changes_successes
 end interface create
@@ -27,7 +26,7 @@ end interface create
 interface destroy
     module procedure :: destroy_changes_successes
     module procedure :: destroy_changes_counters
-    module procedure :: destroy_switches_counters
+    module procedure :: destroy_swaps_counters
     module procedure :: destroy_teleportations_counters
     module procedure :: destroy_rectangle_counters
     module procedure :: destroy_triangle_counters
@@ -170,38 +169,19 @@ contains
         if (allocated(counters)) deallocate(counters)
     end subroutine destroy_teleportations_counters
 
-    pure subroutine create_switches_counters(counters, num_boxes, num_components)
-        type(Concrete_Change_Counter_Triangle_Line), allocatable, intent(out) :: counters(:)
+    pure subroutine create_swaps_counters(counters, num_boxes, num_components)
+        type(Concrete_Change_Counter), allocatable, intent(out) :: counters(:, :, :, :)
         integer, intent(in) :: num_boxes, num_components
 
-        integer :: i_box, j_box
+        allocate(counters(num_components, num_components, num_boxes, num_boxes))
+        call reset_counters(counters)
+    end subroutine create_swaps_counters
 
-        allocate(counters(num_boxes))
-        do j_box = 1, size(counters)
-            allocate(counters(j_box)%line(j_box))
-            do i_box = 1, size(counters(j_box)%line)
-                call create(counters(j_box)%line(i_box)%triangle, num_components)
-            end do
-        end do
-    end subroutine create_switches_counters
+    pure subroutine destroy_swaps_counters(counters)
+        type(Concrete_Change_Counter), allocatable, intent(inout) :: counters(:, :, :, :)
 
-    pure subroutine destroy_switches_counters(counters)
-        type(Concrete_Change_Counter_Triangle_Line), allocatable, intent(inout) :: counters(:)
-
-        integer :: i_box, j_box
-
-        if (allocated(counters)) then
-            do j_box = size(counters), 1, -1
-                if (allocated(counters(j_box)%line)) then
-                    do i_box = size(counters(j_box)%line), 1, -1
-                        call destroy(counters(j_box)%line(i_box)%triangle)
-                    end do
-                    deallocate(counters(j_box)%line)
-                end if
-            end do
-            deallocate(counters)
-        end if
-    end subroutine destroy_switches_counters
+        if (allocated(counters)) deallocate(counters)
+    end subroutine destroy_swaps_counters
 
     pure subroutine create_change_counters(counters, num_elements)
         type(Concrete_Change_Counter), allocatable, intent(out) :: counters(:)

@@ -1,6 +1,6 @@
 module procedures_cells_memento
 
-use types_logical_line, only: Logical_Line
+use types_logical_wrapper, only: Logical_Line
 use classes_visitable_cells_memento, only: Abstract_Visitable_Cells_Memento
 use types_cells_wrapper, only: Cells_Wrapper
 use procedures_cells_factory, only: cells_destroy => destroy, cells_allocate_triangle => &

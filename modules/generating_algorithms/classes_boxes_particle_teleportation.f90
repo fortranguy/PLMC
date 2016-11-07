@@ -140,7 +140,9 @@ contains
             allocate(deltas(i_partner)%&
                 dipolar_energies(size(observables%energies(ij_boxes(i_partner))%dipolar_energies)))
         end do
+
         call this%metropolis_algorithm(success, deltas, ij_boxes, i_component)
+        
         if (success) then
             do i_partner = 1, size(deltas)
                 observables%nums_particles(i_component, ij_boxes(i_partner)) = this%mixture%&
@@ -234,7 +236,6 @@ contains
             product(this%environment%accessible_domains(ij_boxes(2))%get_size()) / &
             product(this%environment%accessible_domains(ij_boxes(1))%get_size()) * &
             exp(-delta_energy / this%environment%temperature%get())
-
         probability = min(1._DP, probability)
     end function Concrete_acceptation_probability
 
