@@ -3,13 +3,13 @@ module procedures_dipolar_interactions_visitor
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
 use classes_external_field, only: Abstract_External_Field
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_component_wrapper, only: Component_Wrapper
 use procedures_dipoles_field_interaction, only: dipoles_field_visit_component => visit_component
 use classes_des_real_component, only: DES_Real_Component_Wrapper
 use classes_des_self_component, only: DES_Self_Component_Wrapper
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
-use types_real_line, only: Real_Line
+use types_real_wrapper, only: Real_Line
 use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy
 use procedures_triangle_observables, only: triangle_observables_init, triangle_observables_add
 
@@ -71,7 +71,7 @@ contains
         real(DP) :: energy_ij, energy_j
         integer :: i_component, j_component, i_particle, i_exclude
         logical :: same_component
-        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Particle) :: particle
         procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
         do j_component = 1, size(energies)

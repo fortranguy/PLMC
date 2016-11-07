@@ -1,6 +1,6 @@
 module procedures_exchange_updaters
 
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_component_wrapper, only: Component_Wrapper
 use classes_mixture_total_moment, only: Abstract_Mixture_Total_Moment
 use types_cells_wrapper, only: Cells_Wrapper
@@ -20,7 +20,7 @@ contains
         type(Cells_Wrapper), intent(inout) :: cells
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         integer :: j_component
 
@@ -44,7 +44,7 @@ contains
         type(Cells_Wrapper), intent(inout) :: cells
         type(Dipolar_Interactions_Static_Wrapper), intent(inout) :: dipolar_interactions_static
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         integer :: j_component
 

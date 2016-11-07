@@ -8,7 +8,7 @@ use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
@@ -54,7 +54,7 @@ private
         procedure, private :: acceptation_probability => Concrete_acceptation_probability
         procedure, private :: visit_walls => Concrete_visit_walls
         procedure, private :: visit_short => Concrete_visit_short
-        procedure, private :: visit_field => Concrete_visit_field
+        procedure, private :: visit_fields => Concrete_visit_fields
         procedure, private :: visit_dipolar => Concrete_visit_dipolar
         procedure, private :: update_components => Concrete_update_components
     end type Boxes_Particle_Teleportation
@@ -162,7 +162,7 @@ contains
         integer, intent(in) :: ij_boxes(:), i_component
 
         real(DP) :: delta_energy
-        type(Concrete_Temporary_Particle) :: particles(2)
+        type(Concrete_Particle) :: particles(2)
         logical :: abort, overlap
         integer :: i_partner
 
@@ -174,7 +174,7 @@ contains
         if (overlap) return
         call this%visit_short(overlap, deltas, ij_boxes, i_component, particles)
         if (overlap) return
-        call this%visit_field(deltas, ij_boxes, particles)
+        call this%visit_fields(deltas, ij_boxes, particles)
         call this%visit_dipolar(deltas, ij_boxes, i_component, particles)
 
         delta_energy = sum(deltas%walls_energy + deltas%field_energy) + &
@@ -191,7 +191,7 @@ contains
     subroutine Concrete_define_teleportation(this, abort, particles, ij_boxes, i_component)
         class(Boxes_Particle_Teleportation), intent(in) :: this
         logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+        type(Concrete_Particle), intent(out) :: particles(:)
         integer, intent(in) :: ij_boxes(:), i_component
 
         if (this%mixture%components(i_component, ij_boxes(1))%num_particles%get() == 0) then
@@ -238,12 +238,12 @@ contains
         probability = min(1._DP, probability)
     end function Concrete_acceptation_probability
 
-    subroutine Concrete_visit_walls(this, overlap, deltas, ij_boxes, i_component, particles)
+    pure subroutine Concrete_visit_walls(this, overlap, deltas, ij_boxes, i_component, particles)
         class(Boxes_Particle_Teleportation), intent(in) :: this
         logical, intent(out) :: overlap
         type(Concrete_Single_Energies), intent(inout) :: deltas(:)
         integer, intent(in) :: ij_boxes(:), i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         integer :: i_partner
 
@@ -261,7 +261,7 @@ contains
         logical, intent(out) :: overlap
         type(Concrete_Single_Energies), intent(inout) :: deltas(:)
         integer, intent(in) :: ij_boxes(:), i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         call exchange_visit_add(overlap, deltas(2)%short_energies, i_component, particles(2), this%&
             short_interactions%cells(ij_boxes(2)))
@@ -270,23 +270,23 @@ contains
             this%short_interactions%cells(ij_boxes(1)))
     end subroutine Concrete_visit_short
 
-    subroutine Concrete_visit_field(this, deltas, ij_boxes, particles)
+    pure subroutine Concrete_visit_fields(this, deltas, ij_boxes, particles)
         class(Boxes_Particle_Teleportation), intent(in) :: this
         type(Concrete_Single_Energies), intent(inout) :: deltas(:)
         integer, intent(in) :: ij_boxes(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         deltas(1)%field_energy = dipoles_field_visit_remove(this%environment%&
             external_fields(ij_boxes(1)), particles(1))
         deltas(2)%field_energy = dipoles_field_visit_add(this%environment%&
             external_fields(ij_boxes(2)), particles(2))
-    end subroutine Concrete_visit_field
+    end subroutine Concrete_visit_fields
 
-    subroutine Concrete_visit_dipolar(this, deltas, ij_boxes, i_component, particles)
+    pure subroutine Concrete_visit_dipolar(this, deltas, ij_boxes, i_component, particles)
         class(Boxes_Particle_Teleportation), intent(in) :: this
         type(Concrete_Single_Energies), intent(inout) :: deltas(:)
         integer, intent(in) :: ij_boxes(:), i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         call exchange_visit_add(deltas(2)%dipolar_energies, deltas(2)%dipolar_shared_energy, &
             i_component, particles(2), this%dipolar_interactions_dynamic(ij_boxes(2)))
@@ -297,7 +297,7 @@ contains
     subroutine Concrete_update_components(this, ij_boxes, i_component, particles)
         class(Boxes_Particle_Teleportation), intent(in) :: this
         integer, intent(in) :: ij_boxes(:), i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         call exchange_update_remove(this%mixture%components(i_component, ij_boxes(1)), &
             this%mixture%total_moments(ij_boxes(1)), this%short_interactions%cells(ij_boxes(1)), &

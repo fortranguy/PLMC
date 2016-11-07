@@ -1,7 +1,7 @@
 module classes_structure_visitor
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 
 implicit none
 
@@ -26,49 +26,49 @@ private
         end function Abstract_visit
 
         pure real(DP) function Abstract_visit_translation(this, i_component, new_position, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        import :: DP, Concrete_Particle, Abstract_Structure_Visitor
             class(Abstract_Structure_Visitor), intent(in) :: this
             integer, intent(in) :: i_component
             real(DP), intent(in) :: new_position(:)
-            type(Concrete_Temporary_Particle), intent(in) :: old
+            type(Concrete_Particle), intent(in) :: old
         end function Abstract_visit_translation
 
         pure real(DP) function Abstract_visit_transmutation(this, ij_components,new_dipole_moment,&
             old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        import :: DP, Concrete_Particle, Abstract_Structure_Visitor
             class(Abstract_Structure_Visitor), intent(in) :: this
             integer, intent(in) :: ij_components(:)
             real(DP), intent(in) :: new_dipole_moment(:)
-            type(Concrete_Temporary_Particle), intent(in) :: old
+            type(Concrete_Particle), intent(in) :: old
         end function Abstract_visit_transmutation
 
         pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipole_moment, old)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        import :: DP, Concrete_Particle, Abstract_Structure_Visitor
             class(Abstract_Structure_Visitor), intent(in) :: this
             integer, intent(in) :: i_component
             real(DP), intent(in) :: new_dipole_moment(:)
-            type(Concrete_Temporary_Particle), intent(in) :: old
+            type(Concrete_Particle), intent(in) :: old
         end function Abstract_visit_rotation
 
         pure real(DP) function Abstract_visit_add(this, i_component, particle)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        import :: DP, Concrete_Particle, Abstract_Structure_Visitor
         class(Abstract_Structure_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         end function Abstract_visit_add
 
         pure real(DP) function Abstract_visit_remove(this, i_component, particle)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        import :: DP, Concrete_Particle, Abstract_Structure_Visitor
         class(Abstract_Structure_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         end function Abstract_visit_remove
 
         pure real(DP) function Abstract_visit_switch(this, ij_components, particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Structure_Visitor
+        import :: DP, Concrete_Particle, Abstract_Structure_Visitor
             class(Abstract_Structure_Visitor), intent(in) :: this
             integer, intent(in) :: ij_components(:)
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end function Abstract_visit_switch
 
     end interface

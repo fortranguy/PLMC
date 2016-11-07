@@ -3,6 +3,7 @@ module classes_maximum_box_compression_explorer
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
+use procedures_box_size, only: box_size_max_distance => max_distance
 use types_component_wrapper, only: Component_Wrapper
 use classes_pair_potential, only: Pair_Potential_Line
 use types_cells_wrapper, only: Cells_Wrapper
@@ -68,7 +69,7 @@ contains
         integer :: i_component, j_component
         real(DP) :: min_distance_ij
 
-        this%min_distance = this%periodic_box%get_max_distance()
+        this%min_distance = box_size_max_distance(this%periodic_box%get_size())
         do j_component = 1, size(this%components)
             do i_component = 1, j_component
                 min_distance_ij = this%components_pairs(j_component)%&
@@ -95,7 +96,7 @@ contains
         logical :: overlap
         real(DP) :: min_distance_ratio, max_distance_ratio
 
-        max_distance_ratio = this%periodic_box%get_max_distance() / this%min_distance
+        max_distance_ratio = box_size_max_distance(this%periodic_box%get_size()) / this%min_distance
         call short_interactions_visit(overlap, min_distance_ratio, max_distance_ratio, &
             this%components, this%cells%visitable_cells)
         if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&

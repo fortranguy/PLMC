@@ -6,7 +6,8 @@ use procedures_json_data_factory, only: json_data_create_input => create_input, 
     json_data_create_output => create_output, json_data_destroy_input => destroy_input, &
     json_data_destroy_output => destroy_output
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_factory, only: set_nums_particles
+use procedures_mixture_factory, only: mixture_set_nums_particles => set_nums_particles, &
+    mixture_average_num_particles => average_num_particles
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_physical_model_factory, only: physical_model_create_generating => create_generating,&
     physical_model_create_exploring => create_exploring, physical_model_destroy => destroy
@@ -62,6 +63,7 @@ end interface plmc_destroy
 interface plmc_set
     module procedure :: random_seed_set
     module procedure :: plmc_set_num_steps, plmc_set_num_snaps
+    module procedure :: mixture_average_num_particles
     module procedure :: set_initial_observables
     module procedure :: set_coordinates_from_json, set_coordinates_from_snap
     module procedure :: tune_moves
@@ -226,11 +228,11 @@ contains
         integer :: i_box
 
         do i_box = 1, size(observables%accessible_domains_size, 2)
-            call set_nums_particles(observables%nums_particles(:, i_box), physical_model%mixture%&
-                components(:, i_box))
             observables%accessible_domains_size(:, i_box) = physical_model%environment%&
                 accessible_domains(i_box)%get_size()
         end do
+        call mixture_set_nums_particles(observables%nums_particles, physical_model%mixture%&
+            components)
     end subroutine set_initial_observables
 
     subroutine set_coordinates_from_json(readers, generating_data)

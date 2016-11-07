@@ -34,7 +34,7 @@ contains
         end if
 
         call tower_sampler_create(selector, size(generating_algorithms), all(components_exist))
-        call propagator%construct(components, generating_algorithms, selector)
+        call propagator%construct(generating_algorithms, selector)
         call tower_sampler_destroy(selector)
     end subroutine create
 

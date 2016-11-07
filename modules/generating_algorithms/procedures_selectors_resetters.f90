@@ -13,13 +13,13 @@ private
 public :: reset
 
 interface reset
-    module procedure :: reset_one_particle, reset_two_particles
-    module procedure :: reset_volumes_homo, reset_volumes_hetero
+    module procedure :: reset_box_particle, reset_box_particles_swap, reset_boxes_particles_switch
+    module procedure :: reset_box_volume_change, reset_boxes_volume_exchange
 end interface reset
 
 contains
 
-    subroutine reset_one_particle(selectors, components, properties)
+    subroutine reset_box_particle(selectors, components, properties)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         logical, intent(in) :: properties(:, :) !! filters
@@ -34,32 +34,63 @@ contains
             end do
             call selectors(i_box)%reset(nums_candidates)
         end do
-    end subroutine reset_one_particle
+    end subroutine reset_box_particle
 
     !> @todo What is the best compromise between minval(), maxval(), average() or sum()?
-    subroutine reset_two_particles(selectors, couples, components, can_swap)
+    subroutine reset_box_particles_swap(selectors, couples, components, can_swap)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
         class(Abstract_Hetero_Couples), intent(in) :: couples(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         logical, intent(in) :: can_swap(:, :)
 
         integer :: i_box
-        integer :: nums_candidates(couples(1)%get_num()), i_couple, ij_components(2)
+        integer :: i_couple, ij_components(2)
+        integer :: nums_candidates(couples(1)%get_num()), nums_particles(size(ij_components))
 
         do i_box = 1, size(selectors)
             do i_couple = 1, size(nums_candidates)
                 ij_components = couples(i_box)%get(i_couple)
-                nums_candidates(i_couple) = &
-                    merge(minval([components(ij_components(1), i_box)%&
-                        average_num_particles%get(), components(ij_components(2), i_box)%&
-                        average_num_particles%get()]), 0, &
+                nums_particles = [components(ij_components(1), i_box)%average_num_particles%get(), &
+                    components(ij_components(2), i_box)%average_num_particles%get()]
+                nums_candidates(i_couple) = merge(minval(nums_particles), 0, &
                         can_swap(ij_components(1), i_box) .and. can_swap(ij_components(2), i_box))
             end do
             call selectors(i_box)%reset(nums_candidates)
         end do
-    end subroutine reset_two_particles
+    end subroutine reset_box_particles_swap
 
-    subroutine reset_volumes_homo(selectors, changed_boxes_size, components, have_positions)
+    subroutine reset_boxes_particles_switch(selectors, box_couples, component_couples, components, &
+        can_switch)
+        class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
+        class(Abstract_Hetero_Couples), intent(in) :: box_couples, component_couples(:)
+        type(Component_Wrapper), intent(in) :: components(:, :)
+        logical, intent(in) :: can_switch(:, :)
+
+        integer :: box_i_couple, ij_boxes(2)
+        integer :: component_i_couple, ij_components(2), i_component
+        integer :: boxes_nums_particles(size(components, 1)), nums_particles(2)
+        integer :: nums_candidates(component_couples(1)%get_num())
+
+        do box_i_couple = 1, box_couples%get_num()
+            ij_boxes = box_couples%get(box_i_couple)
+            do i_component = 1, size(boxes_nums_particles)
+                boxes_nums_particles(i_component) = &
+                    components(i_component, ij_boxes(1))%average_num_particles%get() + &
+                    components(i_component, ij_boxes(2))%average_num_particles%get()
+            end do
+            do component_i_couple = 1, component_couples(box_i_couple)%get_num()
+                ij_components = component_couples(box_i_couple)%get(component_i_couple)
+                nums_particles = [boxes_nums_particles(ij_components(1)), &
+                    boxes_nums_particles(ij_components(2))]
+                nums_candidates(component_i_couple) = merge(minval(nums_particles), 0, &
+                    can_switch(ij_components(1), ij_boxes(1)) .and. &
+                    can_switch(ij_components(2), ij_boxes(2)))
+            end do
+            call selectors(box_i_couple)%reset(nums_candidates)
+        end do
+    end subroutine reset_boxes_particles_switch
+
+    subroutine reset_box_volume_change(selectors, changed_boxes_size, components, have_positions)
         class(Abstract_Tower_Sampler), intent(inout) :: selectors(:)
         class(Abstract_Changed_Box_Size), intent(in) :: changed_boxes_size(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
@@ -84,14 +115,14 @@ contains
 
             call selectors(i_box)%reset(nums_candidates)
         end do
-    end subroutine reset_volumes_homo
+    end subroutine reset_box_volume_change
 
     !> @note The weight of a couple of boxes nums_candidates(i_couple) is the number of particles
     !> inside the 2 boxes.
     !> @todo Test any(have_positions(:, ij_boxes)) condition with gfortran
     !> @note direct feed of maxval / minval causes a bug.
     !> @todo Send a bug report to gfortran
-    subroutine reset_volumes_hetero(selector, couples, exchanged_boxes_size, components, &
+    subroutine reset_boxes_volume_exchange(selector, couples, exchanged_boxes_size, components, &
         have_positions)
         class(Abstract_Tower_Sampler), intent(inout) :: selector
         class(Abstract_Hetero_Couples), intent(in) :: couples
@@ -123,6 +154,6 @@ contains
         end do
 
         call selector%reset(nums_candidates)
-    end subroutine reset_volumes_hetero
+    end subroutine reset_boxes_volume_exchange
 
 end module procedures_selectors_resetters

@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions, PI
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use classes_des_reci_weight, only: Abstract_DES_Reci_Weight
 use classes_des_reci_structure, only: Abstract_DES_Reci_Structure
 use classes_structure_visitor, only: Abstract_Structure_Visitor
@@ -139,7 +139,7 @@ contains
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
@@ -215,7 +215,7 @@ contains
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
@@ -271,7 +271,7 @@ contains
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         delta_energy = this%visit_transmutation([i_component, i_component], new_dipole_moment, old)
     end function Abstract_visit_rotation
@@ -279,7 +279,7 @@ contains
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         delta_energy = this%visit_exchange(i_component, particle, +1._DP)
     end function Abstract_visit_add
@@ -287,7 +287,7 @@ contains
     pure real(DP) function Abstract_visit_remove(this, i_component, particle) result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         delta_energy = this%visit_exchange(i_component, particle, -1._DP)
     end function Abstract_visit_remove
@@ -304,7 +304,7 @@ contains
         result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
@@ -373,7 +373,7 @@ contains
         result(delta_energy)
         class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_vector
@@ -470,7 +470,7 @@ contains
         class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_translation
 
@@ -479,7 +479,7 @@ contains
         class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_transmutation
 
@@ -487,7 +487,7 @@ contains
         result(delta_energy)
         class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
         delta_energy = 0._DP
     end function Null_visit_exchange
@@ -495,7 +495,7 @@ contains
     pure real(DP) function Null_visit_switch(this, ij_components, particles) result(delta_energy)
         class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
         delta_energy = 0._DP
     end function Null_visit_switch
 

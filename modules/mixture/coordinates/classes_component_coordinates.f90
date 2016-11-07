@@ -71,7 +71,6 @@ private
 
     type, extends(Abstract_Component_Coordinates), public :: Null_Component_Coordinates
     contains
-        procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: set_all => Null_set_all
         procedure :: rescale_all => Null_rescale_all
@@ -235,10 +234,6 @@ contains
 !end implementation Concrete_Component_Orientations
 
 !implementation Null_Component_Coordinates
-
-    subroutine Null_construct(this)
-        class(Null_Component_Coordinates), intent(out) :: this
-    end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Component_Coordinates), intent(inout) :: this

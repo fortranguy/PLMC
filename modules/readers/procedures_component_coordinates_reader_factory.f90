@@ -105,7 +105,6 @@ contains
             type is (Concrete_Component_Orientations_Reader)
                 call coordinates%construct(num_particles, orientations)
             type is (Null_Component_Coordinates_Reader)
-                call coordinates%construct()
             class default
                 call error_exit("procedures_component_coordinates_reader_factory: construct: "//&
                     "coordinates type unknown.")

@@ -6,7 +6,7 @@ use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: visit_different
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
@@ -59,55 +59,56 @@ private
     abstract interface
 
         subroutine Abstract_define_move(this, abort, particles, i_box, i_component)
-        import :: Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+        import :: Concrete_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             logical, intent(out) :: abort
-            type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+            type(Concrete_Particle), intent(out) :: particles(:)
             integer, intent(in) :: i_box, i_component
         end subroutine Abstract_define_move
 
-        subroutine Abstract_visit_walls(this, overlap, delta_energy, i_box, i_component, particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+        pure subroutine Abstract_visit_walls(this, overlap, delta_energy, i_box, i_component, &
+            particles)
+        import :: DP, Concrete_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energy
             integer, intent(in) :: i_box, i_component
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_walls
 
         subroutine Abstract_visit_short(this, overlap, delta_energies, i_box, i_component, &
             particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+        import :: DP, Concrete_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energies(:)
             integer, intent(in) :: i_box, i_component
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_short
 
-        subroutine Abstract_visit_field(this, delta_energy, i_box, particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+        pure subroutine Abstract_visit_field(this, delta_energy, i_box, particles)
+        import :: DP, Concrete_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             real(DP), intent(out) :: delta_energy
             integer, intent(in) :: i_box
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_field
 
-        subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+        pure subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
             i_component, particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+        import :: DP, Concrete_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             real(DP), intent(out) :: delta_energies(:)
             real(DP), intent(out) :: delta_shared_energy
             integer, intent(in) :: i_box, i_component
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_dipolar
 
         subroutine Abstract_update_component(this, i_box, i_component, particles)
-        import :: Concrete_Temporary_Particle, Abstract_Box_Particle_Move
+        import :: Concrete_Particle, Abstract_Box_Particle_Move
             class(Abstract_Box_Particle_Move), intent(in) :: this
             integer, intent(in) :: i_box, i_component
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_update_component
 
         subroutine Abstract_increment_hit(changes_counters)
@@ -234,7 +235,7 @@ contains
         integer, intent(in) :: i_box, i_component
 
         real(DP) :: delta_energy
-        type(Concrete_Temporary_Particle) :: particles(2)
+        type(Concrete_Particle) :: particles(2)
         logical :: abort, overlap
 
         success = .false.
@@ -263,7 +264,7 @@ contains
     subroutine Translation_define_move(this, abort, particles, i_box, i_component)
         class(Box_Particle_Translation), intent(in) :: this
         logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+        type(Concrete_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, i_component
 
         if (this%mixture%components(i_component, i_box)%num_particles%get() == 0) then
@@ -289,12 +290,13 @@ contains
         particles(2)%dipole_moment = particles(1)%dipole_moment
     end subroutine Translation_define_move
 
-    subroutine Translation_visit_walls(this, overlap, delta_energy, i_box, i_component, particles)
+    pure subroutine Translation_visit_walls(this, overlap, delta_energy, i_box, i_component, &
+        particles)
         class(Box_Particle_Translation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP) :: energies(size(particles))
         integer :: i_partner
@@ -313,7 +315,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP) :: energies(size(delta_energies), size(particles))
         integer :: j_component, i_exclude, i_partner
@@ -331,23 +333,23 @@ contains
         delta_energies = energies(:, 2) - energies(:, 1)
     end subroutine Translation_visit_short
 
-    subroutine Translation_visit_field(this, delta_energy, i_box, particles)
+    pure subroutine Translation_visit_field(this, delta_energy, i_box, particles)
         class(Box_Particle_Translation), intent(in) :: this
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         delta_energy = dipoles_field_visit_translation(this%environment%external_fields(i_box), &
             particles(2)%position, particles(1))
     end subroutine Translation_visit_field
 
-    subroutine Translation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+    pure subroutine Translation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
         i_component, particles)
         class(Box_Particle_Translation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP) :: real_energies(size(delta_energies), size(particles))
         integer :: j_component, i_exclude, i_partner
@@ -373,7 +375,7 @@ contains
     subroutine Translation_update_component(this, i_box, i_component, particles)
         class(Box_Particle_Translation), intent(in) :: this
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         integer :: j_component
 
@@ -410,7 +412,7 @@ contains
     subroutine Rotation_define_move(this, abort, particles, i_box, i_component)
         class(Box_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+        type(Concrete_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, i_component
 
         if (this%mixture%components(i_component, i_box)%num_particles%get() == 0) then
@@ -437,12 +439,12 @@ contains
             get_norm() * particles(2)%orientation
     end subroutine Rotation_define_move
 
-    subroutine Rotation_visit_walls(this, overlap, delta_energy, i_box, i_component, particles)
+    pure subroutine Rotation_visit_walls(this, overlap, delta_energy, i_box, i_component, particles)
         class(Box_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
         overlap = .false.
         delta_energy = 0._DP
     end subroutine Rotation_visit_walls
@@ -452,28 +454,28 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
         overlap = .false.
         delta_energies = 0._DP
     end subroutine Rotation_visit_short
 
-    subroutine Rotation_visit_field(this, delta_energy, i_box, particles)
+    pure subroutine Rotation_visit_field(this, delta_energy, i_box, particles)
         class(Box_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: delta_energy
         integer, intent(in) :: i_box
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         delta_energy = dipoles_field_visit_rotation(this%environment%external_fields(i_box), &
             particles(2)%dipole_moment, particles(1))
     end subroutine Rotation_visit_field
 
-    subroutine Rotation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+    pure subroutine Rotation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
         i_component, particles)
         class(Box_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP) :: real_energies(size(delta_energies), size(particles))
         integer :: j_component, i_exclude, i_partner
@@ -502,7 +504,7 @@ contains
     subroutine Rotation_update_component(this, i_box, i_component, particles)
         class(Box_Particle_Rotation), intent(in) :: this
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         call this%mixture%components(i_component, i_box)%orientations%&
             set(particles(2)%i, particles(2)%orientation)

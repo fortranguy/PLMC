@@ -60,7 +60,6 @@ contains
             type is (Concrete_Average_Num_Particles)
                 call average_num_particles%construct(num_particles, accumulation_period)
             type is (Null_Average_Num_Particles)
-                call average_num_particles%construct()
             class default
                 call error_exit("procedures_average_num_particles_factory: create: "//&
                     "average_num_particles: type unknown.")

@@ -5,8 +5,9 @@ use data_constants, only: num_dimensions
 use data_cells, only: nums_local_cells
 use procedures_errors, only: error_exit
 use classes_periodic_box, only: Abstract_Periodic_Box
+use procedures_box_size, only: box_size_max_distance => max_distance
 use classes_component_coordinates, only: Abstract_Component_Coordinates
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use classes_hard_contact, only: Abstract_Hard_Contact
 use procedures_visit_condition, only: abstract_visit_condition
 use classes_visitable_list, only: Abstract_Visitable_List
@@ -121,7 +122,7 @@ contains
     subroutine Abstract_fill_with_particles(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Particle) :: particle
         integer :: i_particle
 
         do i_particle = 1, this%positions%get_num()
@@ -163,7 +164,7 @@ contains
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
@@ -196,7 +197,7 @@ contains
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
@@ -230,7 +231,7 @@ contains
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
@@ -240,7 +241,7 @@ contains
         integer :: local_i1, local_i2, local_i3
 
         min_distance = this%pair_potential%get_min_distance()
-        max_distance = this%periodic_box%get_max_distance()
+        max_distance = box_size_max_distance(this%periodic_box%get_size())
         ratio = max_distance / min_distance
         ijk_cell = this%neighbour_cells%index(particle%position)
         at_bottom_layer = (ijk_cell(3) == lbound(this%visitable_lists, 3))
@@ -265,7 +266,7 @@ contains
     subroutine Abstract_translate(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: to_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: from
+        type(Concrete_Particle), intent(in) :: from
 
         integer, dimension(num_dimensions) :: from_ijk_cell, to_ijk_cell
 
@@ -280,7 +281,7 @@ contains
 
     subroutine Abstract_add(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         integer :: ijk_cell(num_dimensions)
 
@@ -294,7 +295,7 @@ contains
 
     subroutine Abstract_remove(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         integer :: ijk_cell(num_dimensions)
 
@@ -340,7 +341,7 @@ contains
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.
@@ -351,7 +352,7 @@ contains
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.
@@ -362,7 +363,7 @@ contains
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.
@@ -372,17 +373,17 @@ contains
     subroutine Null_translate(this, to_position, from)
         class(Null_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: to_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: from
+        type(Concrete_Particle), intent(in) :: from
     end subroutine Null_translate
 
     subroutine Null_add(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
     end subroutine Null_add
 
     subroutine Null_remove(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
     end subroutine Null_remove
 
 !end implementation Null_Visitable_Cells

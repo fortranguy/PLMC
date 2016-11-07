@@ -1,7 +1,7 @@
 module procedures_triangle_observables
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_real_line, only: Real_Line
+use types_real_wrapper, only: Real_Line
 
 implicit none
 

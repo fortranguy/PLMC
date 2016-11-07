@@ -9,7 +9,7 @@ use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: visit_different
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
@@ -24,6 +24,8 @@ use types_observables_changes, only: Concrete_Observables_Changes
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm
 use procedures_selectors_resetters, only: selectors_reset => reset
+use procedures_swap_visitors, only: swap_transmutation_visit_short => transmutation_visit_short, &
+    swap_transmutation_visit_dipolar => transmutation_visit_dipolar, i_exclude_particle
 use procedures_metropolis_algorithm, only: metropolis_algorithm
 
 implicit none
@@ -64,10 +66,10 @@ private
     abstract interface
 
         subroutine Abstract_define_swap(this, abort, particles, i_box, ij_components)
-        import :: Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
+        import :: Concrete_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             logical, intent(out) :: abort
-            type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+            type(Concrete_Particle), intent(out) :: particles(:)
             integer, intent(in) :: i_box, ij_components(:)
         end subroutine Abstract_define_swap
 
@@ -81,47 +83,47 @@ private
 
         subroutine Abstract_visit_walls(this, overlap, delta_energies, i_box, ij_components, &
             particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
+        import :: DP, Concrete_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energies(:)
             integer, intent(in) :: i_box, ij_components(:)
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_walls
 
         subroutine Abstract_visit_short(this, overlap, delta_energies, i_box, ij_components, &
             particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
+        import :: DP, Concrete_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             logical, intent(out) :: overlap
             real(DP), intent(out) :: delta_energies(:, :)
             integer, intent(in) :: i_box, ij_components(:)
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_short
 
-        subroutine Abstract_visit_field(this, delta_energies, i_box, particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
+        pure subroutine Abstract_visit_field(this, delta_energies, i_box, particles)
+        import :: DP, Concrete_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             real(DP), intent(out) :: delta_energies(:)
             integer, intent(in) :: i_box
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_field
 
-        subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+        pure subroutine Abstract_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
             ij_components, particles)
-        import :: DP, Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
+        import :: DP, Concrete_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             real(DP), intent(out) :: delta_energies(:, :)
             real(DP), intent(out) :: delta_shared_energy
             integer, intent(in) :: i_box, ij_components(:)
-            type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+            type(Concrete_Particle), intent(in) :: particles(:)
         end subroutine Abstract_visit_dipolar
 
         subroutine Abstract_update_components(this, i_box, ij_components, particles)
-        import :: Concrete_Temporary_Particle, Abstract_Box_Particles_Swap
+        import :: Concrete_Particle, Abstract_Box_Particles_Swap
             class(Abstract_Box_Particles_Swap), intent(in) :: this
             integer, intent(in) :: i_box, ij_components(:)
-            type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
+            type(Concrete_Particle), intent(in) ::  particles(:)
         end subroutine Abstract_update_components
 
         subroutine Abstract_increment_hit(changes, ij_components)
@@ -255,7 +257,7 @@ contains
         integer, intent(in) :: i_box, ij_components(:)
 
         real(DP) :: delta_energy
-        type(Concrete_Temporary_Particle) :: particles(2)
+        type(Concrete_Particle) :: particles(2)
         logical :: abort, overlap
 
         success = .false.
@@ -277,21 +279,6 @@ contains
         if (success) call this%update_components(i_box, ij_components, particles)
     end subroutine Abstract_metropolis_algorithm
 
-    !> @note The i_actor <-> j_actor term is ignored.
-    pure integer function i_exclude_particle(k_component, ij_components, particles) &
-        result(i_exclude)
-        integer, intent(in) :: k_component, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
-
-        if (k_component == ij_components(1)) then
-            i_exclude = particles(1)%i
-        else if (k_component == ij_components(2)) then
-            i_exclude = particles(2)%i
-        else
-            i_exclude = 0
-        end if
-    end function i_exclude_particle
-
 !end implementation Abstract_Box_Particles_Swap
 
 !implementation Box_Particles_Transmutation
@@ -299,7 +286,7 @@ contains
     subroutine Transmutation_define_swap(this, abort, particles, i_box, ij_components)
         class(Box_Particles_Transmutation), intent(in) :: this
         logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+        type(Concrete_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, ij_components(:)
 
         if (this%mixture%components(ij_components(1), i_box)%num_particles%get() == 0) then
@@ -359,17 +346,10 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
-        integer :: i_partner
-
-        do i_partner = size(particles), 1, -1
-            call this%environment%visitable_walls(i_box)%visit(overlap, delta_energies(i_partner), &
-                particles(i_partner)%position, this%short_interactions%&
-                wall_pairs(ij_components(i_partner))%potential)
-            if (overlap) return
-        end do
-        delta_energies(1) = -delta_energies(1)
+        call swap_transmutation_visit_short(overlap, delta_energies, this%environment%&
+            visitable_walls(i_box), this%short_interactions%wall_pairs, ij_components, particles)
     end subroutine Transmutation_visit_walls
 
     subroutine Transmutation_visit_short(this, overlap, delta_energies, i_box, ij_components, &
@@ -378,72 +358,38 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
-        integer :: k_component, i_partner, i_exclude
-
-        do i_partner = size(particles), 1, -1
-            do k_component = 1, size(this%short_interactions%cells(i_box)%visitable_cells, 1)
-                i_exclude = i_exclude_particle(k_component, ij_components, particles)
-                call this%short_interactions%cells(i_box)%visitable_cells(k_component, &
-                    ij_components(i_partner))%&
-                    visit_energy(overlap, delta_energies(k_component, i_partner), &
-                        particles(i_partner), visit_different, i_exclude)
-                if (overlap) return
-            end do
-        end do
-        delta_energies(:, 1) = -delta_energies(:, 1)
+        call swap_transmutation_visit_short(overlap, delta_energies, this%short_interactions%&
+            cells(i_box), ij_components, particles)
     end subroutine Transmutation_visit_short
 
-    subroutine Transmutation_visit_field(this, delta_energies, i_box, particles)
+    pure subroutine Transmutation_visit_field(this, delta_energies, i_box, particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
-        delta_energies = &
-            [dipoles_field_visit_remove(this%environment%external_fields(i_box), particles(1)), &
-            dipoles_field_visit_add(this%environment%external_fields(i_box), particles(2))]
+        call swap_transmutation_visit_dipolar(delta_energies, this%environment%&
+            external_fields(i_box), particles)
     end subroutine Transmutation_visit_field
 
-    subroutine Transmutation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+    pure subroutine Transmutation_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
         ij_components, particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
-        integer :: k_component, i_partner, i_exclude
-
-        do i_partner = 1, size(particles)
-            do k_component = 1, size(this%dipolar_interactions_dynamic(i_box)%real_components, 1)
-                i_exclude = i_exclude_particle(k_component, ij_components, particles)
-                call this%dipolar_interactions_dynamic(i_box)%&
-                    real_components(k_component, ij_components(i_partner))%&
-                    component%visit(delta_energies(k_component, i_partner), particles(i_partner), &
-                    visit_different, i_exclude)
-            end do
-            delta_energies(ij_components(i_partner), i_partner) = &
-                delta_energies(ij_components(i_partner), i_partner) - &
-                this%dipolar_interactions_dynamic(i_box)%self_components(ij_components(i_partner))%&
-                component%meet(particles(i_partner)%dipole_moment)
-        end do
-        delta_energies(:, 1) = -delta_energies(:, 1)
-        delta_shared_energy = &
-            this%dipolar_interactions_dynamic(i_box)%reci_visitor%&
-                visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1)) + &
-            this%dipolar_interactions_dynamic(i_box)%surf_mixture%&
-                visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1)%&
-                    dipole_moment) - &
-            this%dipolar_interactions_dynamic(i_box)%dlc_visitor%&
-                visit_transmutation(ij_components, particles(2)%dipole_moment, particles(1))
+        call swap_transmutation_visit_dipolar(delta_energies, delta_shared_energy, this%&
+            dipolar_interactions_dynamic(i_box), ij_components, particles)
     end subroutine Transmutation_visit_dipolar
 
     subroutine Transmutation_update_components(this, i_box, ij_components, particles)
         class(Box_Particles_Transmutation), intent(in) :: this
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) ::  particles(:)
+        type(Concrete_Particle), intent(in) ::  particles(:)
 
         integer :: k_component
 
@@ -501,7 +447,7 @@ contains
     subroutine Switch_define_swap(this, abort, particles, i_box, ij_components)
         class(Box_Particles_Switch), intent(in) :: this
         logical, intent(out) :: abort
-        type(Concrete_Temporary_Particle), intent(out) :: particles(:)
+        type(Concrete_Particle), intent(out) :: particles(:)
         integer, intent(in) :: i_box, ij_components(:)
 
         integer :: i_partner
@@ -541,7 +487,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP) :: energies_new(size(particles)), energies_old(size(particles))
         integer :: i_partner
@@ -565,11 +511,11 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta_energies(:, :)
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP), dimension(size(delta_energies, 1), size(delta_energies, 2)) :: energies_new, &
             energies_old
-        type(Concrete_Temporary_Particle) :: swapped(size(particles))
+        type(Concrete_Particle) :: swapped(size(particles))
         integer :: k_component, i_partner
 
         swapped%i = particles%i
@@ -598,11 +544,11 @@ contains
         delta_energies = energies_new - energies_old
     end subroutine Switch_visit_short
 
-    subroutine Switch_visit_field(this, delta_energies, i_box, particles)
+    pure subroutine Switch_visit_field(this, delta_energies, i_box, particles)
         class(Box_Particles_Switch), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:)
         integer, intent(in) :: i_box
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         integer :: i_partner
 
@@ -613,17 +559,17 @@ contains
         end do
     end subroutine Switch_visit_field
 
-    subroutine Switch_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
+    pure subroutine Switch_visit_dipolar(this, delta_energies, delta_shared_energy, i_box, &
         ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
         real(DP), intent(out) :: delta_energies(:, :)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP), dimension(size(delta_energies, 1), size(delta_energies, 2)) :: real_energies_new,&
             real_energies_old
-        type(Concrete_Temporary_Particle) :: swapped(size(particles))
+        type(Concrete_Particle) :: swapped(size(particles))
         integer :: k_component, i_partner
 
         swapped%i = particles%i
@@ -656,7 +602,7 @@ contains
     subroutine Switch_update_components(this, i_box, ij_components, particles)
         class(Box_Particles_Switch), intent(in) :: this
         integer, intent(in) :: i_box, ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         integer :: k_component, i_partner
         real(DP) :: swapped_position(num_dimensions)

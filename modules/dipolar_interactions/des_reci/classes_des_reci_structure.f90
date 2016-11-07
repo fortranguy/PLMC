@@ -6,7 +6,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_component_wrapper, only: Component_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use classes_structure_factor, only: Abstract_Structure_Factor
 use procedures_dipolar_interactions_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
@@ -118,7 +118,7 @@ contains
     pure subroutine Abstract_set(this)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
 
-        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Particle) :: particle
         integer :: i_component, i_particle
 
         this%structure  = cmplx(0._DP, 0._DP, DP)
@@ -153,7 +153,7 @@ contains
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old, &
@@ -214,7 +214,7 @@ contains
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
@@ -260,7 +260,7 @@ contains
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         call this%update_transmutation([i_component, i_component], new_dipole_moment, old)
     end subroutine Abstract_update_rotation
@@ -269,7 +269,7 @@ contains
     pure subroutine Abstract_update_add(this, i_component, particle)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         call this%update_exchange(i_component, particle, +1._DP)
     end subroutine Abstract_update_add
@@ -278,7 +278,7 @@ contains
     pure subroutine Abstract_update_remove(this, i_component, particle)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         call this%update_exchange(i_component, particle, -1._DP)
     end subroutine Abstract_update_remove
@@ -291,7 +291,7 @@ contains
     pure subroutine Abstract_update_exchange(this, i_component, particle, signed)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
@@ -342,7 +342,7 @@ contains
     pure subroutine Abstract_update_switch(this, ij_components, particles)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP), dimension(num_dimensions) :: box_size, saved_box_size
         real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2, &
@@ -440,27 +440,27 @@ contains
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
     end subroutine Null_update_translation
 
     pure subroutine Null_update_transmutation(this, ij_components, new_dipole_moment, old)
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
     end subroutine Null_update_transmutation
 
     pure subroutine Null_update_exchange(this, i_component, particle, signed)
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
     end subroutine Null_update_exchange
 
     pure subroutine Null_update_switch(this, ij_components, particles)
         class(Null_DES_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
     end subroutine Null_update_switch
 
 !end implementation Null_DES_Reci_Structure

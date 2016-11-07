@@ -44,13 +44,14 @@ implicit none
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune propagator & changes..."
     do i_step = -num_tuning_steps + 1, 0
-        call markov_chain_generator%plmc_propagator%tune(i_step)
         call markov_chain_generator%plmc_propagator%try(observables)
+        call plmc_set(physical_model%mixture%components, i_step)
         call plmc_set(changes_tuned, i_step, markov_chain_generator%changes, observables)
         call plmc_set(observables)
         call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
         if (changes_tuned) exit
     end do
+    call markov_chain_generator%plmc_propagator%reset()
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call markov_chain_generator%plmc_propagator%try(observables)

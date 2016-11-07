@@ -67,7 +67,6 @@ private
     type, extends(Abstract_Component_Coordinates_Reader), public :: &
         Null_Component_Coordinates_Reader
     contains
-        procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: read => Null_read
     end type Null_Component_Coordinates_Reader
@@ -192,10 +191,6 @@ contains
 !end implementation Concrete_Component_Orientations_Reader
 
 !implementation Null_Component_Coordinates_Reader
-
-    subroutine Null_construct(this)
-        class(Null_Component_Coordinates_Reader), intent(out) :: this
-    end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Component_Coordinates_Reader), intent(inout) :: this

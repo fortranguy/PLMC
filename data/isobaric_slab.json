@@ -153,8 +153,8 @@
             "accumulation period": 100,
             "wanted success ratio": 0.75,
             "tolerance": 0.01,
+            "frequency ratio": 0.01,
             "Box 1": {
-                "frequency ratio": 0.01,
                 "initial delta": 0.01
             }
         },

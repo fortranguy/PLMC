@@ -28,7 +28,6 @@ contains
             type is (Concrete_Component_Positions)
                 call positions%construct(periodic_box, num_particles)
             type is (Null_Component_Coordinates)
-                call positions%construct()
             class default
                 call error_exit("procedures_component_coordinates_factory: create_positions: "//&
                     "positions: unknown type.")

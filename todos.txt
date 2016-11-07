@@ -10,23 +10,18 @@
 - doc: permittivity: \epsilon -> \varepsilon
 - VolumeChange: + or - in observable?
 - Generalise ParticleInsertionMethod (Widom) for other ensembles, cf. FS02
-- PeriodicBox: remove getMaxDistance() ?
 - Convert all explorations for multiples boxes & components
-- GEMC conversion: array by default: bad idea?
 - ExploringAlgorithms: warning if unexpected ensemble
-+ Multiple Boxes: ChangedBoxSizeRatio interdependance:
-    - I choose to use a unique delta for boxes i and j. It seems reasonable
-    since the same delta appears in the volume change acceptance probability.
 - There are at least two versions of GEMC: ``Canonical'' & ``Isobaric''. I will
     implement the first one.
-- [Data] Fortran code to update, cf. json
 - NeighbourCells: HS shortcut
 - realZero: relative if possible
 - PLMCgenerate: changesTuned -> changesTuned[:] to be stricter?
 - BetaPressure: one value?
 - Add SemiGrand Canonical ensemble
-- Changes: exchangedBoxesSize: square -> triangle
 + GeneratingAlgorithms:
     - acceptationProbability(): uniformise comment notation
     - BoxesVolumeExchange: optimise overlap
 - rewrite modules/index.md
+- [High Priority] reset selectors just once
+- [Bug] density doesn't differentiate components

@@ -5,7 +5,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use classes_num_particles, only: Abstract_Num_Particles
 use procedures_composition_factory, only: composition_destroy => destroy
 use types_component_wrapper, only: Component_Wrapper
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_visit_condition, only: visit_different
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
@@ -91,7 +91,7 @@ contains
 
         real(DP) :: inv_pow_activity_sum, delta_energy
         type(Concrete_Single_Energies) :: deltas
-        type(Concrete_Temporary_Particle) :: test
+        type(Concrete_Particle) :: test
         integer :: i_box, i_component, i_particle
         logical :: overlap
 
@@ -140,7 +140,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: delta
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: test
+        type(Concrete_Particle), intent(in) :: test
 
         call this%environment%visitable_walls(i_box)%visit(overlap, delta, test%position, this%&
             short_interactions%wall_pairs(i_component)%potential)
@@ -151,7 +151,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: deltas(:)
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: test
+        type(Concrete_Particle), intent(in) :: test
 
         integer :: j_component, i_exclude
 
@@ -167,7 +167,7 @@ contains
         class(Abstract_Particle_Insertion_Method), intent(in) :: this
         real(DP), intent(out) :: delta
         integer, intent(in) :: i_box
-        type(Concrete_Temporary_Particle), intent(in) :: test
+        type(Concrete_Particle), intent(in) :: test
 
         delta = dipoles_field_visit_add(this%environment%external_fields(i_box), test)
     end subroutine Abstract_visit_field
@@ -177,7 +177,7 @@ contains
         real(DP), intent(out) :: deltas(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_box, i_component
-        type(Concrete_Temporary_Particle), intent(in) :: test
+        type(Concrete_Particle), intent(in) :: test
 
         integer :: j_component, i_exclude
 

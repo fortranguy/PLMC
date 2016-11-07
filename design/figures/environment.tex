@@ -12,7 +12,6 @@
             \begin{abstractclass}[text width=\largeTextWidth]{PeriodicBox}{0, 0}
                 \operation{\procedure{set}{size: \type{real[3]}}}
                 \operation{\procedure{getSize}{}: \type{real[3]}}
-                \operation{\procedure{getMaxDistance}{}: \type{real}}
                 \operation{\procedure{distance}{position1: \type{real[3]},
                     position2: \type{real[3]}}: \type{real}}
                 \operation{\procedure{vector}{position1: \type{real[3]}, position2: \type{real[3]}}:
@@ -83,7 +82,6 @@
                 \operation{\procedure{target}{periodicBox: \type{PeriodicBox}}}
                 \operation{\procedure{save}{}}
                 \operation{\procedure{get}{}: \type{real[3]}}
-                \operation{\procedure{getEdge}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -125,7 +123,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox |- ReciprocalLattice.north) - (0 cm, 0.5 cm)$)}]
+        \begin{scope}[shift={($(PeriodicBox |- ReciprocalLattice.north)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{BoxSizeChecker}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ accessibleDomain:
                     \type{ParallelepipedDomain},

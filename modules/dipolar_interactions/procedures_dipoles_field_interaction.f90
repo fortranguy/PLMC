@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use classes_external_field, only: Abstract_External_Field
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 
 implicit none
 
@@ -31,7 +31,7 @@ contains
     pure real(DP) function visit_translation(external_field, new_position, old) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
         real(DP), dimension(:), intent(in) :: new_position
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         delta_energy = -dot_product(old%dipole_moment, external_field%get(new_position) - &
             external_field%get(old%position))
@@ -41,7 +41,7 @@ contains
         result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
         real(DP), dimension(:), intent(in) :: new_dipole_moment
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         delta_energy = -dot_product(new_dipole_moment - old%dipole_moment, external_field%&
             get(old%position))
@@ -49,7 +49,7 @@ contains
 
     pure real(DP) function visit_switch(external_field, particles) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         delta_energy = dot_product(particles(2)%dipole_moment - particles(1)%dipole_moment, &
             external_field%get(particles(2)%position) - external_field%get(particles(1)%position))
@@ -57,21 +57,21 @@ contains
 
     pure real(DP) function visit_add(external_field, particle) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         delta_energy = visit_exchange(external_field, particle, +1._DP)
     end function visit_add
 
     pure real(DP) function visit_remove(external_field, particle) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         delta_energy = visit_exchange(external_field, particle, -1._DP)
     end function visit_remove
 
     pure real(DP) function visit_exchange(external_field, particle, signed) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
         delta_energy = -signed * dot_product(particle%dipole_moment, external_field%get(particle%&

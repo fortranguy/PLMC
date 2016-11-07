@@ -15,7 +15,6 @@ private
     contains
         procedure :: set => Abstract_set
         procedure :: get_size => Abstract_get_size
-        procedure :: get_max_distance => Abstract_get_max_distance
         procedure :: distance => Abstract_distance
         procedure :: vector => Abstract_vector
         procedure(Abstract_folded), deferred :: folded
@@ -70,13 +69,6 @@ contains
 
         size = this%size
     end function Abstract_get_size
-
-    !> \[ r_\text{max} = \frac{\sqrt{3}}{2} L \]
-    pure real(DP) function Abstract_get_max_distance(this) result(max_distance)
-        class(Abstract_Periodic_Box), intent(in) :: this
-
-        max_distance = sqrt(3._DP) / 2._DP * this%size(1)
-    end function Abstract_get_max_distance
 
     pure real(DP) function Abstract_distance(this, position_1, position_2) result(distance)
         class(Abstract_Periodic_Box), intent(in) :: this

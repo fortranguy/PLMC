@@ -6,7 +6,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_component_dipole_moments, only: Abstract_Component_Dipole_Moments
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use classes_des_real_pair, only: Abstract_DES_Real_Pair
 use procedures_visit_condition, only: abstract_visit_condition
 
@@ -92,7 +92,7 @@ contains
     pure subroutine Abstract_visit(this, energy, particle, visit_condition, i_exclude)
         class(Abstract_DES_Real_Component), intent(in) :: this
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
@@ -139,7 +139,7 @@ contains
     pure subroutine Null_visit(this, energy, particle, visit_condition, i_exclude)
         class(Null_DES_Real_Component), intent(in) :: this
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         energy = 0._DP

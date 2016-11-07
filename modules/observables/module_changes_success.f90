@@ -1,7 +1,7 @@
 module module_changes_success
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_real_line, only: Real_Line
+use types_real_wrapper, only: Real_Line
 
 implicit none
 
@@ -42,6 +42,14 @@ end interface set_successes
     type, public :: Concrete_Change_Counter_Line
         type(Concrete_Change_Counter), allocatable :: line(:)
     end type Concrete_Change_Counter_Line
+
+    type, public :: Concrete_Change_Counter_Triangle
+        type(Concrete_Change_Counter_Line), allocatable :: triangle(:)
+    end type Concrete_Change_Counter_Triangle
+
+    type, public :: Concrete_Change_Counter_Triangle_Line
+        type(Concrete_Change_Counter_Triangle), allocatable :: line(:)
+    end type Concrete_Change_Counter_Triangle_Line
 
 contains
 

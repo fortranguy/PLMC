@@ -2,13 +2,13 @@ module procedures_short_interactions_visitor
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_component_wrapper, only: Component_Wrapper
 use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
 use classes_walls_visitor, only: Abstract_Walls_Visitor
 use classes_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use classes_visitable_cells, only: Abstract_Visitable_Cells
-use types_real_line, only: Real_Line
+use types_real_wrapper, only: Real_Line
 
 implicit none
 
@@ -109,7 +109,7 @@ contains
         real(DP) :: energy_ij, energy_j
         integer :: i_component, j_component, i_particle, i_exclude
         logical :: same_component
-        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Particle) :: particle
         procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
         overlap = .false.
@@ -145,7 +145,7 @@ contains
         real(DP) :: conctacts_j
         integer :: i_component, j_component, i_particle, i_exclude
         logical :: same_component
-        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Particle) :: particle
         procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
         overlap = .false.
@@ -182,7 +182,7 @@ contains
         real(DP) :: min_distance_ratio_j
         integer :: i_component, j_component, i_particle, i_exclude
         logical :: same_component
-        type(Concrete_Temporary_Particle) :: particle
+        type(Concrete_Particle) :: particle
         procedure(abstract_visit_condition), pointer :: visit_condition => null()
 
         overlap = .false.

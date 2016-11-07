@@ -31,6 +31,8 @@ contains
             num_components)
         allocate(observables%teleportations_successes(num_components, num_boxes, num_boxes))
         observables%teleportations_successes = 0._DP
+        call observables_changes_create(observables%switches_counters, num_boxes, num_components)
+        call reals_create(observables%switches_successes, num_boxes, num_components)
 
         allocate(observables%nums_particles(num_components, num_boxes))
         observables%nums_particles = 0
@@ -45,6 +47,8 @@ contains
         call observables_energies_destroy(observables%energies)
         if (allocated(observables%nums_particles)) deallocate(observables%nums_particles)
 
+        call reals_destroy(observables%switches_successes)
+        call observables_changes_destroy(observables%switches_counters)
         if (allocated(observables%teleportations_successes)) &
             deallocate(observables%teleportations_successes)
         call observables_changes_destroy(observables%teleportations_counters)

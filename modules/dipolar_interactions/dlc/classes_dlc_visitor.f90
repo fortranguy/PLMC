@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use classes_periodic_box, only: Abstract_Periodic_Box
 use classes_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use classes_dlc_weight, only: Abstract_DLC_Weight
 use classes_dlc_structures, only: Abstract_DLC_Structures
 use classes_structure_visitor, only: Abstract_Structure_Visitor
@@ -142,7 +142,7 @@ contains
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         real(DP) :: real_part_1, real_part_2, real_part_3
 
@@ -236,7 +236,7 @@ contains
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         real(DP) :: real_part_1, real_part_2, real_part_3
 
@@ -296,7 +296,7 @@ contains
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
 
         delta_energy = this%visit_transmutation([i_component, i_component], new_dipole_moment, old)
     end function Abstract_visit_rotation
@@ -304,7 +304,7 @@ contains
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         delta_energy = this%visit_exchange(i_component, particle, +1._DP)
     end function Abstract_visit_add
@@ -312,7 +312,7 @@ contains
     pure real(DP) function Abstract_visit_remove(this, i_component, particle) result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         delta_energy = this%visit_exchange(i_component, particle, -1._DP)
     end function Abstract_visit_remove
@@ -337,7 +337,7 @@ contains
         result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
 
         real(DP) :: real_part_1, real_part_2, real_part_3
@@ -433,7 +433,7 @@ contains
         result(delta_energy)
         class(Abstract_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
 
         real(DP) :: real_part_1, real_part_2, real_part_3
 
@@ -534,7 +534,7 @@ contains
         class(Null_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_translation
 
@@ -543,7 +543,7 @@ contains
         class(Null_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
         real(DP), intent(in) :: new_dipole_moment(:)
-        type(Concrete_Temporary_Particle), intent(in) :: old
+        type(Concrete_Particle), intent(in) :: old
         delta_energy = 0._DP
     end function Null_visit_transmutation
 
@@ -551,7 +551,7 @@ contains
         result(delta_energy)
         class(Null_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
         delta_energy = 0._DP
     end function Null_visit_exchange
@@ -559,7 +559,7 @@ contains
     pure real(DP) function Null_visit_switch(this, ij_components, particles) result(delta_energy)
         class(Null_DLC_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
-        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+        type(Concrete_Particle), intent(in) :: particles(:)
         delta_energy = 0._DP
     end function Null_visit_switch
 

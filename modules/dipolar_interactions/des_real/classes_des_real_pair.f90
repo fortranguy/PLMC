@@ -5,6 +5,7 @@ use data_constants, only: num_dimensions, PI
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive, check_potential_domain
 use classes_box_size_memento, only: Abstract_Box_Size_Memento
+use procedures_box_size, only: box_size_edge => edge
 use classes_permittivity, only: Abstract_Permittivity
 use procedures_dipolar_interactions_micro, only: des_real_B, des_real_C
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -155,7 +156,7 @@ contains
 
         this%domain%min = domain%min
         this%domain%max_over_box_edge = domain%max_over_box_edge
-        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
+        this%domain%max = this%domain%max_over_box_edge * box_size_edge(this%box_size_memento%get())
         this%domain%delta = domain%delta
         selector%check_max = .false.
         selector%check_max_over_box_edge = .true.
@@ -172,7 +173,7 @@ contains
         i_min = int(this%domain%min / this%domain%delta)
         i_max = int(this%domain%max / this%domain%delta) + 1
         allocate(this%tabulation(i_min:i_max, 2))
-        alpha = this%alpha_x_box_edge / this%box_size_memento%get_edge()
+        alpha = this%alpha_x_box_edge / box_size_edge(this%box_size_memento%get())
         do i_distance = i_min, i_max
             distance_i = real(i_distance, DP) * this%domain%delta
             this%tabulation(i_distance, 1) = des_real_B(alpha, distance_i)
@@ -192,7 +193,7 @@ contains
     subroutine Tabulated_reset(this)
         class(Tabulated_DES_Real_Pair), intent(inout) :: this
 
-        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
+        this%domain%max = this%domain%max_over_box_edge * box_size_edge(this%box_size_memento%get())
         if (this%domain%min > this%domain%max) then
             call error_exit("Tabulated_DES_Real_Pair: reset: domain: min > max.")
         end if
@@ -249,7 +250,7 @@ contains
 
         this%domain%min = domain%min
         this%domain%max_over_box_edge = domain%max_over_box_edge
-        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
+        this%domain%max = this%domain%max_over_box_edge * box_size_edge(this%box_size_memento%get())
         this%domain%delta = 0._DP
         selector%check_max = .false.
         selector%check_max_over_box_edge = .true.
@@ -266,11 +267,11 @@ contains
     subroutine Raw_reset(this)
         class(Raw_DES_Real_Pair), intent(inout) :: this
 
-        this%domain%max = this%domain%max_over_box_edge * this%box_size_memento%get_edge()
+        this%domain%max = this%domain%max_over_box_edge * box_size_edge(this%box_size_memento%get())
         if (this%domain%min > this%domain%max) then
             call error_exit("Raw_DES_Real_Pair: reset: domain: min > max.")
         end if
-        this%alpha = this%alpha_x_box_edge / this%box_size_memento%get_edge()
+        this%alpha = this%alpha_x_box_edge / box_size_edge(this%box_size_memento%get())
         this%expression_domain_max =  [des_real_B(this%alpha, this%domain%max), &
             des_real_C(this%alpha, this%domain%max)]
     end subroutine Raw_reset

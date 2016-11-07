@@ -2,7 +2,7 @@ module procedures_exchange_visitors
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_visit_condition, only: visit_different
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use types_cells_wrapper, only: Cells_Wrapper
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 
@@ -27,7 +27,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(inout) :: delta_energies(:)
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         type(Cells_Wrapper), intent(in) :: cells
 
         integer :: j_component, i_exclude
@@ -45,7 +45,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(inout) :: delta_energies(:)
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         type(Cells_Wrapper), intent(in) :: cells
 
         integer :: j_component, i_exclude
@@ -59,12 +59,12 @@ contains
         delta_energies = -delta_energies
     end subroutine visit_remove_short
 
-    subroutine visit_add_dipolar(delta_energies, delta_shared_energy, i_component, particle, &
+    pure subroutine visit_add_dipolar(delta_energies, delta_shared_energy, i_component, particle, &
         dipolar_interactions_dynamic)
         real(DP), intent(inout) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
 
         integer :: j_component, i_exclude
@@ -84,12 +84,12 @@ contains
             dipolar_interactions_dynamic%dlc_visitor%visit_add(i_component, particle)
     end subroutine visit_add_dipolar
 
-    subroutine visit_remove_dipolar(delta_energies, delta_shared_energy, i_component, particle, &
-        dipolar_interactions_dynamic)
+    pure subroutine visit_remove_dipolar(delta_energies, delta_shared_energy, i_component, &
+        particle, dipolar_interactions_dynamic)
         real(DP), intent(inout) :: delta_energies(:)
         real(DP), intent(out) :: delta_shared_energy
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         type(Dipolar_Interactions_Dynamic_Wrapper), intent(in) :: dipolar_interactions_dynamic
 
         integer :: j_component, i_exclude

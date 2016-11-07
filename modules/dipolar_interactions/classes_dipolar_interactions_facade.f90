@@ -11,7 +11,7 @@ use types_component_wrapper, only: Component_Wrapper
 use procedures_des_real_factory, only: des_real_destroy => destroy
 use types_dipolar_interactions_dynamic_wrapper, only: Dipolar_Interactions_Dynamic_Wrapper
 use types_dipolar_interactions_static_wrapper, only: Dipolar_Interactions_Static_Wrapper
-use types_real_line, only: Real_Line
+use types_real_wrapper, only: Real_Line
 use procedures_dipolar_interactions_resetter, only: dipolar_interactions_reset => reset, &
     dipolar_interactions_reset_real => reset_real
 use procedures_dipolar_interactions_visitor, only: dipolar_interactions_visit => visit

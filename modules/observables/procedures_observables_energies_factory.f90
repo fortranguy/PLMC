@@ -1,7 +1,7 @@
 module procedures_observables_energies_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_real_line, only: Real_Line
+use types_real_wrapper, only: Real_Line
 use types_observables_energies, only: Concrete_Single_Energies, Concrete_Double_Energies, &
     Concrete_Observables_Energies
 use procedures_reals_factory, only: reals_create => create, reals_destroy => destroy

@@ -15,7 +15,6 @@ private
     contains
         procedure(Abstract_destroy), deferred :: destroy
         procedure(Abstract_set), deferred :: set
-        procedure :: get_accumulation_period => Abstract_get_accumulation_period
         procedure(Abstract_accumulate), deferred :: accumulate
         procedure(Abstract_get), deferred :: get
         procedure, private :: set_accumulation_period => Abstract_set_accumulation_period
@@ -87,10 +86,8 @@ private
 
     type, extends(Abstract_Average_Num_Particles), public :: Null_Average_Num_Particles
     contains
-        procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: set => Null_set
-        procedure :: get_accumulation_period => Null_get_accumulation_period
         procedure :: accumulate => Null_accumulate
         procedure :: get => Null_get
     end type Null_Average_Num_Particles
@@ -107,13 +104,6 @@ contains
             accumulation_period)
         this%accumulation_period = accumulation_period
     end subroutine Abstract_set_accumulation_period
-
-    !> @note Essentially for [[classes_plmc_propagator:Abstract_set_accumulation_period]].
-    pure integer function Abstract_get_accumulation_period(this) result(accumulation_period)
-        class(Abstract_Average_Num_Particles), intent(in) :: this
-
-        accumulation_period = this%accumulation_period
-    end function Abstract_get_accumulation_period
 
 !end implementation Abstract_Average_Num_Particles
 
@@ -240,10 +230,6 @@ contains
 !end implementation Concrete_Average_Num_Particles
 
 !implementation Null_Average_Num_Particles
-
-    subroutine Null_construct(this)
-        class(Null_Average_Num_Particles), intent(out) :: this
-    end subroutine Null_construct
 
     subroutine Null_destroy(this)
         class(Null_Average_Num_Particles), intent(inout) :: this

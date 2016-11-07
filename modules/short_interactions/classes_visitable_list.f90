@@ -3,7 +3,7 @@ module classes_visitable_list
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use classes_periodic_box, only: Abstract_Periodic_Box
-use types_temporary_particle, only: Concrete_Temporary_Particle
+use types_particle_wrapper, only: Concrete_Particle
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
@@ -123,7 +123,7 @@ contains
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -154,7 +154,7 @@ contains
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -184,7 +184,7 @@ contains
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance, max_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -298,7 +298,7 @@ contains
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -323,7 +323,7 @@ contains
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -348,7 +348,7 @@ contains
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance, max_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -420,7 +420,7 @@ contains
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -433,7 +433,7 @@ contains
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: contacts
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
@@ -446,7 +446,7 @@ contains
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: ratio
-        type(Concrete_Temporary_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
         real(DP), intent(in) :: min_distance, max_distance
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude

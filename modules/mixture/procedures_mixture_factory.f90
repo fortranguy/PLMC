@@ -20,8 +20,8 @@ use procedures_mixture_inquirers, only: component_exists, component_has_position
 implicit none
 
 private
-public :: create, destroy, set_exist, set_nums_particles, set_have_positions, &
-    set_have_orientations, rescale_positions
+public :: create, destroy, set_exist, set_nums_particles, average_num_particles, &
+    set_have_positions, set_have_orientations, rescale_positions
 
 interface create
     module procedure :: create_all
@@ -123,15 +123,31 @@ contains
     end subroutine set_exist
 
     subroutine set_nums_particles(nums_particles, components)
-        integer, intent(inout) :: nums_particles(:)
-        type(Component_Wrapper), intent(in) :: components(:)
+        integer, intent(inout) :: nums_particles(:, :)
+        type(Component_Wrapper), intent(in) :: components(:, :)
 
-        integer :: i_component
+        integer :: i_box, i_component
 
-        do i_component = 1, size(nums_particles)
-            nums_particles(i_component) = components(i_component)%num_particles%get()
+        do i_box = 1, size(nums_particles, 2)
+            do i_component = 1, size(nums_particles, 1)
+                nums_particles(i_component, i_box) = components(i_component, i_box)%num_particles%&
+                    get()
+            end do
         end do
     end subroutine set_nums_particles
+
+    subroutine average_num_particles(components, i_step)
+        type(Component_Wrapper), intent(inout) :: components(:, :)
+        integer, intent(in) :: i_step
+
+        integer :: i_box, i_component
+
+        do i_box = 1, size(components, 2)
+            do i_component = 1, size(components, 1)
+                call components(i_component, i_box)%average_num_particles%accumulate(i_step)
+            end do
+        end do
+    end subroutine average_num_particles
 
     subroutine set_have_positions(have_positions, components)
         logical, intent(inout) :: have_positions(:, :)
