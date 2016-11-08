@@ -43,6 +43,7 @@ contains
                 i_particle = i_particle + 1
                 call read_coordinates(raw_coordinates, coordinates_unit, selector, i_particle)
             else
+                read(coordinates_unit, *)
             end if
         end do
         close(coordinates_unit)
