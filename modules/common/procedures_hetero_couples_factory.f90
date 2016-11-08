@@ -25,16 +25,17 @@ end interface destroy
 
 contains
 
+    !> @todo Null: What if num_elements is important?
     subroutine create_half_line(couples, num_elements, num_partners)
         class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples(:)
         integer, intent(in) :: num_elements, num_partners
 
         integer :: i_element
 
-        if (num_partners > 1) then
+        if (num_elements > 0 .and. num_partners > 1) then
             allocate(Half_Hetero_Couples :: couples(num_elements))
         else
-            allocate(Null_Hetero_Couples :: couples(num_elements))
+            allocate(Null_Hetero_Couples :: couples(1))
         end if
 
         do i_element = 1, size(couples)
@@ -55,16 +56,17 @@ contains
         call couples%construct(num_partners)
     end subroutine create_half_element
 
+    !> @todo cf. [[procedures_hetero_couples_factory:create_half_line]]
     subroutine create_full_line(couples, num_elements, num_partners)
         class(Abstract_Hetero_Couples), allocatable, intent(out) :: couples(:)
         integer, intent(in) :: num_elements, num_partners
 
         integer :: i_element
 
-        if (num_partners > 1) then
+        if (num_elements > 0 .and. num_partners > 1) then
             allocate(Full_Hetero_Couples :: couples(num_elements))
         else
-            allocate(Null_Hetero_Couples :: couples(num_elements))
+            allocate(Null_Hetero_Couples :: couples(1))
         end if
 
         do i_element = 1, size(couples)

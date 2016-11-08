@@ -3,7 +3,7 @@
         "Boxes": {
             "number": 3,
             "periodicity": "XY",
-            "initial size": [[12.0, 12.0, 18.0], [13.0, 13.0, 19.5], [14.0, 14.0, 21.0]],
+            "initial size": [[12.0, 12.0, 21.0], [13.0, 13.0, 21.0], [14.0, 14.0, 21.0]],
             "total volume can change": false
         },
         "Thermostat": {

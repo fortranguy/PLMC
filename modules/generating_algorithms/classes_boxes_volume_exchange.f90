@@ -12,6 +12,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: mixture_rescale_positions => rescale_positions
 use types_cells_wrapper, only: Cells_Wrapper
+use procedures_cells_factory, only: cells_destroy => destroy
 use procedures_cells_memento, only: cells_memento_save => save, cells_memento_restore => restore
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
@@ -169,6 +170,8 @@ contains
                     accessible_domains(ij_boxes(i_partner))%get_size()
                 call observables_energies_set(observables%energies(ij_boxes(i_partner)), &
                     new_energies(i_partner))
+                call cells_destroy(cells(i_partner)%visitable_cells)
+                call cells_destroy(cells(i_partner)%neighbour_cells)
             end do
             observables%volumes_exchange_counter(j_box)%line(i_box)%num_successes = &
                 observables%volumes_exchange_counter(j_box)%line(i_box)%num_successes + 1

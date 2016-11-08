@@ -12,9 +12,8 @@ public :: random_integer, markov_orientation
 
 contains
 
-    function random_integer(maximum)
+    integer function random_integer(maximum)
         integer, intent(in) :: maximum
-        integer :: random_integer
 
         real(DP) :: rand
 

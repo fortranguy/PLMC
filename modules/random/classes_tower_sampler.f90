@@ -70,10 +70,14 @@ contains
             this%i_unique_candidate = maxloc(nums_candidates, 1)
         else
             this%unique_candidate = .false.
-            do i_candidate = 1, this%num_candidates
-                cumulative_weight(i_candidate) = real(sum(nums_candidates(1:i_candidate)), DP) / &
-                    real(this%num_choices, DP)
-            end do
+            if (this%num_choices /= 0) then
+                do i_candidate = 1, this%num_candidates
+                    cumulative_weight(i_candidate) = real(sum(nums_candidates(1:i_candidate)), DP)/&
+                        real(this%num_choices, DP)
+                end do
+            else
+                cumulative_weight = 0._DP
+            end if
             this%limits(1) = 0._DP
             this%limits(2:size(this%limits)) = cumulative_weight
         end if

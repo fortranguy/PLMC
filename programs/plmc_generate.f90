@@ -1,3 +1,5 @@
+!> @note After thermalisation, plmc_propagator%reset() was removed because it may delay
+!> the search of the equilibrium (e.g. GEMC: DHS+HS at low temperature).
 program plmc_generate
 
 use, intrinsic :: iso_fortran_env, only: output_unit
@@ -42,7 +44,7 @@ implicit none
     call plmc_set(observables, physical_model) !in exploring too?
     call plmc_visit(observables%energies, physical_model, use_cells=.false.)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
-    if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune propagator & changes..."
+    if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call markov_chain_generator%plmc_propagator%try(observables)
         call plmc_set(physical_model%mixture%components, i_step)
@@ -51,7 +53,6 @@ implicit none
         call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
         if (changes_tuned) exit
     end do
-    call markov_chain_generator%plmc_propagator%reset()
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call markov_chain_generator%plmc_propagator%try(observables)

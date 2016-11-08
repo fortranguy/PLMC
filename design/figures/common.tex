@@ -36,17 +36,63 @@
         \begin{scope}[shift={($(PLMCpropagator.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth]{\import{}:\\
+                \namespace{JSON} :: JSONcore, JSONfile, JSONvalue \\
                 \namespace{Random} :: TowerSampler \\
-                \namespace{Environment} :: environment \\
+                \namespace{Environment} :: Environment, ParallelepipedDomain \\
                 \namespace{Mixture} :: Component, Mixture \\
                 \namespace{ShortInteractions} :: ShortInteractions \\
                 \namespace{DipolarInteractions} :: DipolarInteractionsDynamic,
                     DipolarInteractionsStatic, DipolarInteractionsFacade \\
+                \namespace{Changes} :: Changes, ChangedBoxSizeRatio \\
                 \namespace{GeneratingAlgorithm} :: GeneratingAlgorithm \\
-                \namespace{Observables} :: GeneratingObservables};
+                \namespace{ExploringAlgorithms} :: MaximumBoxCompressionExplorer, VolumeChangeMethod
+                    ParticleInsertionMethod \\
+                \namespace{Observables} :: GeneratingObservables \\
+                \namespace{Readers} :: Readers \\
+                \namespace{Writers} :: GeneratingWriters, ExploringWriters};
         \end{scope}
 
-        \begin{scope}[shift={($(Import.south) - (0 cm, 6 cm)$)}]
+        \begin{scope}[shift={($(PhysicalModel.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{MarkovChainGenerator}{0, 0}
+                \UMLattribute{changes: \type{Changes}}
+                \UMLattribute{generatingAlgorithms: \type{GeneratingAlgorithm[numAlgorithms]}}
+                \UMLattribute{plmcPropagator: \type{PLMCpropagator}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(MarkovChainGenerator.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{GeneratingIO}{0, 0}
+                \UMLattribute{json: \type{JSONcore}}
+                \UMLattribute{generatingData: \type{JSONfile}}
+                \UMLattribute{reportData: \type{JSONvalue}}
+                \UMLattribute{readers: \type{Readers}}
+                \UMLattribute{writers: \type{GeneratingWriters}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(PLMCpropagator.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{MarkovChainExplorer}{0, 0}
+                \UMLattribute{maximumBoxesCompressionExplorer:
+                    \type{MaximumBoxCompressionExplorer[\numBoxes]}}
+                \UMLattribute{changedBoxesSizeRatio: \type{ChangedBoxSizeRatio[\numBoxes]}}
+                \UMLattribute{volumeChangeMethod: \type{VolumeChangeMethod}}
+                \UMLattribute{particleInsertionDomains: \type{ParallelepipedDomain[\numBoxes]}}
+                \UMLattribute{particleInsertionMethod: \type{ParticleInsertionMethod}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(MarkovChainExplorer.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ExploringIO}{0, 0}
+                \UMLattribute{json: \type{JSONcore}}
+                \UMLattribute{generatingData: \type{JSONfile}}
+                \UMLattribute{exploringData: \type{JSONfile}}
+                \UMLattribute{reportData: \type{JSONvalue}}
+                \UMLattribute{readers: \type{Readers}}
+                \UMLattribute{writers: \type{ExploringWriters}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(Import.south) - (0 cm, 10 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{HeteroCouples}{0, 0}
             \end{abstractclass}
         \end{scope}

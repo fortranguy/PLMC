@@ -11,6 +11,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: mixture_rescale_positions => rescale_positions
 use types_cells_wrapper, only: Cells_Wrapper
+use procedures_cells_factory, only: cells_destroy => destroy
 use procedures_cells_memento, only: cells_memento_save => save, cells_memento_restore => restore
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_resetter, only: short_interactions_reset => reset
@@ -150,6 +151,8 @@ contains
             call observables_energies_set(observables%energies(i_box), new_energies)
             observables%volumes_change_counter(i_box)%num_successes = observables%&
                 volumes_change_counter(i_box)%num_successes + 1
+            call cells_destroy(cells%visitable_cells)
+            call cells_destroy(cells%neighbour_cells)
         else
             call this%environment%periodic_boxes(i_box)%set(box_size)
             call mixture_rescale_positions(this%components(:, i_box), 1._DP / box_size_ratio)
