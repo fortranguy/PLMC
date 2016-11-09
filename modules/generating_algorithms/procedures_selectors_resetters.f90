@@ -52,7 +52,7 @@ contains
                 ij_components = couples(i_box)%get(i_couple)
                 nums_particles = [components(ij_components(1), i_box)%average_num_particles%get(), &
                     components(ij_components(2), i_box)%average_num_particles%get()]
-                nums_candidates(i_couple) = merge(minval(nums_particles), 0, &
+                nums_candidates(i_couple) = merge(maxval(nums_particles), 0, &
                         can_swap(ij_components(1), i_box) .and. can_swap(ij_components(2), i_box))
             end do
             call selectors(i_box)%reset(nums_candidates)
@@ -68,7 +68,7 @@ contains
 
         integer :: box_i_couple, ij_boxes(2)
         integer :: component_i_couple, ij_components(2), i_component
-        integer :: boxes_nums_particles(size(components, 1)), nums_particles(2)
+        integer :: boxes_nums_particles(size(components, 1)), num_particles
         integer :: nums_candidates(component_couples(1)%get_num())
 
         do box_i_couple = 1, box_couples%get_num()
@@ -80,9 +80,9 @@ contains
             end do
             do component_i_couple = 1, component_couples(box_i_couple)%get_num()
                 ij_components = component_couples(box_i_couple)%get(component_i_couple)
-                nums_particles = [boxes_nums_particles(ij_components(1)), &
-                    boxes_nums_particles(ij_components(2))]
-                nums_candidates(component_i_couple) = merge(minval(nums_particles), 0, &
+                num_particles = boxes_nums_particles(ij_components(1)) + &
+                    boxes_nums_particles(ij_components(2))
+                nums_candidates(component_i_couple) = merge(num_particles, 0, &
                     can_translate(ij_components(1), ij_boxes(1)) .and. &
                     can_translate(ij_components(2), ij_boxes(2)))
             end do
