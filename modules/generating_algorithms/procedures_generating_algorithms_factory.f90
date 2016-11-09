@@ -1,9 +1,13 @@
 module procedures_generating_algorithms_factory
 
+use data_strings, only: max_word_length
+use data_output_objects, only: report_filename, generating_algorithms_object
+use json_module, only: json_core, json_value
 use procedures_errors, only: error_exit
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Generating_Algorithm_Wrapper
+use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm, &
+    Generating_Algorithm_Wrapper
 use procedures_box_volume_change_factory, only: box_volume_change_create => create
 use procedures_boxes_volume_exchange_factory, only: boxes_volume_exchange_create => create
 use procedures_boxes_particle_teleportation_factory, only: boxes_particle_teleportation_create => &
@@ -19,7 +23,7 @@ use procedures_box_particles_swap_factory, only: box_particles_transmutation_cre
 implicit none
 
 private
-public :: create, destroy
+public :: create, destroy, write
 
 contains
 
@@ -67,5 +71,52 @@ contains
             end if
         end do
     end subroutine destroy
+
+    !> @note The names must coherent with [[procedures_generating_algorithms_factory:create]].
+    !> @todo Find a better alternative?
+    subroutine write(json, output_data, generating_algorithms)
+        type(json_core), intent(inout) :: json
+        type(json_value), intent(inout), pointer :: output_data
+        type(Generating_Algorithm_Wrapper), intent(in) :: generating_algorithms(:)
+
+        type(json_value), pointer :: choices_data => null()
+        integer :: i_algorithm
+
+        character(len=max_word_length) :: algorithms_name(size(generating_algorithms))
+
+        algorithms_name(1) = "box volume change"
+        algorithms_name(2) = "boxes volume exchange"
+        algorithms_name(3) = "boxes particle teleportation"
+        algorithms_name(4) = "boxes particles swap"
+        algorithms_name(5) = "box particle translation"
+        algorithms_name(6) = "box particle rotation"
+        algorithms_name(7) = "box particle add"
+        algorithms_name(8) = "box particle remove"
+        algorithms_name(9) = "box particles transmutation"
+        algorithms_name(10) = "box particles switch"
+
+        call json%create_object(choices_data, generating_algorithms_object)
+        call json%add(output_data, choices_data)
+        do i_algorithm = 1, size(generating_algorithms)
+            if (is_used(generating_algorithms(i_algorithm)%algorithm)) then
+                call json%add(choices_data, algorithms_name(i_algorithm), &
+                    generating_algorithms(i_algorithm)%algorithm%get_num_choices())
+            end if
+        end do
+        choices_data => null()
+
+        call json%print(output_data, report_filename)
+    end subroutine write
+
+    pure logical function is_used(algorithm)
+        class(Abstract_Generating_Algorithm), intent(in) :: algorithm
+
+        select type(algorithm)
+            type is (Null_Generating_Algorithm)
+                is_used = .false.
+            class default
+                is_used = .true.
+        end select
+    end function is_used
 
 end module procedures_generating_algorithms_factory

@@ -24,4 +24,4 @@
     - BoxesVolumeExchange: optimise overlap
 - rewrite modules/index.md
 - [High Priority] reset selectors just once
-- [Bug] density doesn't differentiate components
+- data[JSON] to update

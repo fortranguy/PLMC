@@ -27,7 +27,7 @@ contains
         call generating_algorithms_create(markov_chain_generator%generating_algorithms, &
             physical_model, markov_chain_generator%changes)
         call plmc_propagator_create(markov_chain_generator%plmc_propagator, physical_model%mixture%&
-            components, markov_chain_generator%generating_algorithms)
+            components, markov_chain_generator%generating_algorithms, generating_data)
     end subroutine create
 
     subroutine destroy(markov_chain_generator)
