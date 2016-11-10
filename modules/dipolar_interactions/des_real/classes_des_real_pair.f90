@@ -112,8 +112,7 @@ contains
     !>      u(\vec{r}_{ij}, \vec{\mu}_i, \vec{\mu}_j) = \frac{1}{4\pi \epsilon}
     !>          \left[ (\vec{\mu}_i \cdot \vec{\mu}_j) B_\alpha(r_{ij}) -
     !>              (\vec{\mu}_i \cdot \vec{r}_{ij}) (\vec{\mu}_j \cdot \vec{r}_{ij})
-    !>                  C_\alpha(r_{ij})
-    !>          \right]
+    !>                  C_\alpha(r_{ij}) \right]
     !> \]
     !> cf. [[procedures_dipolar_interactions_micro:des_real_B]] &
     !> [[procedures_dipolar_interactions_micro:des_real_C]]
@@ -122,11 +121,11 @@ contains
         real(DP), dimension(:), intent(in) :: vector_ij
         real(DP), dimension(:), intent(in) :: moment_i, moment_j
 
-        real(DP), dimension(2) :: coefficient
+        real(DP) :: expression(2)
 
-        coefficient(1) = dot_product(moment_i, moment_j)
-        coefficient(2) =-dot_product(moment_i, vector_ij) * dot_product(moment_j, vector_ij)
-        energy = dot_product(coefficient, this%expression(norm2(vector_ij)))
+        expression = this%expression(norm2(vector_ij))
+        energy = dot_product(moment_i, moment_j) * expression(1) - &
+            dot_product(moment_i, vector_ij) * dot_product(moment_j, vector_ij) * expression(2)
     end function Abstract_meet
 
 !end implementation Abstract_DES_Real_Pair

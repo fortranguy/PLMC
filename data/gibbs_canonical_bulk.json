@@ -3,7 +3,7 @@
         "Boxes": {
             "number": 3,
             "periodicity": "XYZ",
-            "initial size": [[12.0, 12.0, 12.0], [13.0, 13.0, 13.0], [14.0, 14.0, 14.0]],
+            "initial size": [[12.0, 12.0, 12.0], [12.0, 12.0, 12.0], [12.0, 12.0, 12.0]],
             "total volume can change": false
         },
         "Thermostat": {
@@ -157,6 +157,9 @@
                     "initial delta": 1.0
                 }
             }
+        },
+        "Propagator": {
+            "tuning period": 1000
         }
     },
     "Monte Carlo": {

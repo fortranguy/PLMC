@@ -170,6 +170,9 @@
                     "initial delta": 1.0
                 }
             }
+        },
+        "Propagator": {
+            "tuning period": 1000
         }
     },
     "Monte Carlo": {

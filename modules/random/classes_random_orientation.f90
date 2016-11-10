@@ -2,7 +2,7 @@ module classes_random_orientation
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use procedures_normal_random_number, only: normal_random_number
+use procedures_random_number, only: normal_random_number
 use classes_random_coordinates, only: Abstract_Random_Coordinates
 
 implicit none

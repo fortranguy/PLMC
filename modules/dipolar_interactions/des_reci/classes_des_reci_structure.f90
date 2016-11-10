@@ -33,7 +33,7 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: target => Abstract_target
-        procedure :: reset => Abstract_set
+        procedure :: reset => Abstract_reset
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get => Abstract_get
         procedure :: update_translation => Abstract_update_translation
@@ -42,7 +42,6 @@ private
         procedure :: update_add => Abstract_update_add
         procedure :: update_remove => Abstract_update_remove
         procedure :: update_switch => Abstract_update_switch
-        procedure, private :: set => Abstract_set
         procedure, private :: update_exchange => Abstract_update_exchange
     end type Abstract_DES_Reci_Structure
 
@@ -55,7 +54,7 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: target => Null_target
-        procedure :: reset => Null_set
+        procedure :: reset => Null_reset
         procedure :: is_dipolar => Null_is_dipolar
         procedure :: get => Null_get
         procedure :: update_translation => Null_update_translation
@@ -84,7 +83,6 @@ contains
         allocate(this%structure(-this%reci_numbers(1):this%reci_numbers(1), &
                                 -this%reci_numbers(2):this%reci_numbers(2), &
                                                     0:this%reci_numbers(3)))
-        call this%set()
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -115,7 +113,7 @@ contains
         is_dipolar = this%are_dipolar(i_component)
     end function Abstract_is_dipolar
 
-    pure subroutine Abstract_set(this)
+    pure subroutine Abstract_reset(this)
         class(Abstract_DES_Reci_Structure), intent(inout) :: this
 
         type(Concrete_Particle) :: particle
@@ -130,7 +128,7 @@ contains
                 call this%update_add(i_component, particle)
             end do
         end do
-    end subroutine Abstract_set
+    end subroutine Abstract_reset
 
     !> Structure factor:
     !> \[
@@ -426,9 +424,9 @@ contains
         is_dipolar = .false.
     end function Null_is_dipolar
 
-    pure subroutine Null_set(this)
+    pure subroutine Null_reset(this)
         class(Null_DES_Reci_Structure), intent(inout) :: this
-    end subroutine Null_set
+    end subroutine Null_reset
 
     pure complex(DP) function Null_get(this, n_1, n_2, n_3) result(structure)
         class(Null_DES_Reci_Structure), intent(in) :: this

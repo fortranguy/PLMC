@@ -82,7 +82,7 @@ contains
                 ij_components = component_couples(box_i_couple)%get(component_i_couple)
                 num_particles = boxes_nums_particles(ij_components(1)) + &
                     boxes_nums_particles(ij_components(2))
-                nums_candidates(component_i_couple) = merge(num_particles, 0, &
+                nums_candidates(component_i_couple) = merge(num_particles/2, 0, &
                     can_translate(ij_components(1), ij_boxes(1)) .and. &
                     can_translate(ij_components(2), ij_boxes(2)))
             end do
