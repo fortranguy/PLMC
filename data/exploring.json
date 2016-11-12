@@ -40,5 +40,8 @@
     "Radial": {
         "delta": 0.1,
         "file name": "radial.out"
+    },
+    "Clusters": {
+        "maximum distance": 1.5
     }
 }

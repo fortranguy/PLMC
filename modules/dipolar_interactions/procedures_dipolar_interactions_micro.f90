@@ -10,22 +10,6 @@ public :: des_real_B, des_real_C, reci_number_1_sym, reci_number_2_sym, set_four
 contains
 
     !> \[
-    !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} -
-    !>      3\frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r^5}
-    !> \]
-    pure function dipolar_pair_energy(orientation_i, orientation_j, vector_ij)
-        real(DP) :: dipolar_pair_energy
-        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
-        real(DP), dimension(:), intent(in) :: vector_ij
-
-        real(DP) :: distance_ij
-        distance_ij = norm2(vector_ij)
-        dipolar_pair_energy = dot_product(orientation_i, orientation_j) / distance_ij**3 - &
-                              3._DP * dot_product(orientation_i, vector_ij) * &
-                                      dot_product(orientation_j, vector_ij) / distance_ij**5
-    end function dipolar_pair_energy
-
-    !> \[
     !>      B_\alpha(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>          \frac{2\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]

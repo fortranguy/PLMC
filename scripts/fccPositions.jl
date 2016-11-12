@@ -3,24 +3,27 @@ if size(ARGS, 1) != 1
 end
 import PLMC
 import JSON
-inputData = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
+generatingData = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
-for iBox = 1:inputData["Environment"]["Boxes"]["number"]
-    boxSize, components, interMinDistances = PLMC.set(iBox, inputData)
-    boxSizeSave = boxSize
+for i_box = 1:generatingData["Environment"]["Boxes"]["number"]
+    periodicBox = PLMC.newBox(i_box, generatingData)
+    boxSizeSave = periodicBox.edgesSize
+    components = PLMC.newComponents(i_box, generatingData)
+    minDistances = PLMC.newMinDistances(components, generatingData)
     numParticles = 0
-    for iComponent = 1:size(components, 1)
-        numParticles += components[iComponent].num
+    for i_component = 1:size(components, 1)
+        numParticles += components[i_component].num
     end
 
     minDistanceDelta = 1e-6
-    boxSize -= minDistanceDelta
-    minDistanceMax = maximum(interMinDistances) + minDistanceDelta
+    periodicBox.edgesSize -= minDistanceDelta
+    minDistanceMax = maximum(minDistances) + minDistanceDelta
     edge = sqrt(2) * minDistanceMax
-    numbers = floor(Int64, 2 * boxSize / edge)
+    numbers = floor(Int64, 2 * periodicBox.edgesSize / edge)
     for i = 1:size(numbers, 1)
         if isodd(numbers[i])
-            numbers[i] -= (boxSize[i] - (numbers[i] - 1) * edge / 2) < minDistanceMax ? 1 : 0
+            numbers[i] -=
+                (periodicBox.edgesSize[i] - (numbers[i] - 1) * edge / 2) < minDistanceMax ? 1 : 0
         end
     end
     numExcluded = 0
@@ -35,37 +38,37 @@ for iBox = 1:inputData["Environment"]["Boxes"]["number"]
     end
 
     toDelete = zeros(Int64, numParticlesMax - numParticles)
-    iDelete = 0
-    while iDelete < size(toDelete, 1)
+    i_delete = 0
+    while i_delete < size(toDelete, 1)
         iRand = rand(1:numParticlesMax)
         if !in(iRand, toDelete)
-            iDelete += 1
-            toDelete[iDelete] = iRand
+            i_delete += 1
+            toDelete[i_delete] = iRand
         end
     end
 
     positions = zeros(Float64, 3, numParticles)
-    iCounter = iParticle = 0
-    ijkOffset = map(i -> iseven(i) ? 1 : 0, numbers)
+    i_counter = i_particle = 0
+    ijk_offset = map(i -> iseven(i) ? 1 : 0, numbers)
     for k = 0:numbers[3]-1, j = 0:numbers[2]-1, i = 0:numbers[1]-1
         if isodd(i + j + k)
             continue
         end
-        iCounter += 1
-        if in(iCounter, toDelete)
+        i_counter += 1
+        if in(i_counter, toDelete)
             continue
         end
-        iParticle += 1
-        positions[:, iParticle] = PLMC.folded(boxSize,
-            ([i, j, k] + ijkOffset) * edge/2 - boxSize/2)
+        i_particle += 1
+        positions[:, i_particle] = PLMC.folded(periodicBox,
+            ([i, j, k] + ijk_offset) * edge/2 - periodicBox.edgesSize/2)
     end
     positions = positions[:, randperm(size(positions, 2))]
 
-    iParticleMin = 1
-    for iComponent = 1:size(components, 1)
-        iParticleMax = iParticleMin - 1 + components[iComponent].num
-        components[iComponent].positions = positions[:, iParticleMin:iParticleMax]
-        iParticleMin = iParticleMax + 1
+    i_particleMin = 1
+    for i_component = 1:size(components, 1)
+        i_particleMax = i_particleMin - 1 + components[i_component].num
+        components[i_component].positions = positions[:, i_particleMin:i_particleMax]
+        i_particleMin = i_particleMax + 1
     end
-    PLMC.write(iBox, components, boxSizeSave, inputData)
+    PLMC.writeCoordinates(i_box, components, boxSizeSave, generatingData)
 end

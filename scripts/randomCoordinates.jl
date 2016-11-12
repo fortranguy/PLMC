@@ -3,25 +3,28 @@ if size(ARGS, 1) != 1
 end
 import PLMC
 import JSON
-inputData = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
+generatingData = JSON.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 import ProgressMeter
 PM = ProgressMeter
 
-for iBox = 1:inputData["Environment"]["Boxes"]["number"]
-    boxSize, components, interMinDistances = PLMC.set(iBox, inputData)
+for i_box = 1:generatingData["Environment"]["Boxes"]["number"]
+    periodicBox = PLMC.newBox(i_box, generatingData)
+    components = PLMC.newComponents(i_box, generatingData)
+    minDistances = PLMC.newMinDistances(components, generatingData)
 
     testPosition = zeros(3, 0)
-    for iComponent = 1:size(components, 1)
-        prog = PM.Progress(components[iComponent].num, "Box $(iBox): Component $(iComponent): ")
-        while size(components[iComponent].positions, 2) < components[iComponent].num
+    for i_component = 1:size(components, 1)
+        prog = PM.Progress(components[i_component].num, "Box $(i_box): Component $(i_component): ")
+        while size(components[i_component].positions, 2) < components[i_component].num
             overlap = true
             while overlap
-                testPosition = rand(3) .* boxSize
+                testPosition = rand(3) .* periodicBox.edgesSize
                 overlap = false
-                for jComponent = iComponent:-1:1
-                    for iParticle = 1:size(components[jComponent].positions, 2)
-                        if (PLMC.distance(boxSize, testPosition, components[jComponent].
-                            positions[:, iParticle]) < interMinDistances[iComponent, jComponent])
+                for j_component = i_component:-1:1
+                    for iParticle = 1:size(components[j_component].positions, 2)
+                        if (PLMC.distance(periodicBox, testPosition,
+                            components[j_component].positions[:, iParticle]) <
+                            minDistances[i_component, j_component])
                             overlap = true
                             break
                         end
@@ -31,10 +34,10 @@ for iBox = 1:inputData["Environment"]["Boxes"]["number"]
                     end
                 end
             end
-            components[iComponent].positions = hcat(components[iComponent].positions, PLMC.
-                folded(boxSize, testPosition))
+            components[i_component].positions = hcat(components[i_component].positions, PLMC.
+                folded(periodicBox, testPosition))
             PM.next!(prog)
         end
     end
-    PLMC.write(iBox, components, boxSize, inputData)
+    PLMC.writeCoordinates(i_box, components, periodicBox.edgesSize, generatingData)
 end

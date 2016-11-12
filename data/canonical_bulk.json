@@ -28,18 +28,18 @@
         "number of components": 3,
         "can exchange with reservoir": false,
         "Component 1": {
-            "initial number": 200,
+            "initial number": [200],
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 1.0
         },
         "Component 2": {
-            "initial number": 1000,
+            "initial number": [1000],
             "minimum distance": 0.8,
             "is dipolar": false
         },
         "Component 3": {
-            "initial number": 300,
+            "initial number": [300],
             "minimum distance": 0.8,
             "is dipolar": true,
             "moment norm": 0.25
