@@ -1,4 +1,4 @@
-module procedures_geometry
+module procedures_elementary_geometry
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
@@ -17,4 +17,4 @@ contains
         sphere_surface = 4._DP*PI * radius**2
     end function sphere_surface
 
-end module procedures_geometry
+end module procedures_elementary_geometry

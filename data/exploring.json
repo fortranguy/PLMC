@@ -31,13 +31,15 @@
         "Parallelepiped Domain": {
             "name": "domain",
             "origin": [0.0, 0.0, 0.0],
-            "size": [12.0, 12.0, 12.0]
+            "size": [10.0, 10.0, 10.0]
         },
         "component number": 1,
-        "name": "z",
+        "name": "plain",
         "delta": 0.1
     },
     "Radial": {
+        "name": "inter",
+        "components couple": [1, 3],
         "delta": 0.1,
         "file name": "radial.out"
     },

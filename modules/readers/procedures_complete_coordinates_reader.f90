@@ -10,13 +10,18 @@ use types_component_coordinates_reader_selector, only: Component_Coordinates_Rea
 implicit none
 
 private
-public :: complete_coordinates_read, complete_coordinates_deallocate
+public :: read, deallocate
+
+interface read
+    module procedure :: read_complete_coordinates
+    module procedure :: read_box_size
+end interface read
 
 contains
 
-    subroutine complete_coordinates_read(box_size, raw_coordinates, num_components, i_component, &
+    subroutine read_complete_coordinates(box_size, raw_coordinates, num_components, i_component, &
         filename, selector)
-        real(DP), intent(inout) :: box_size(:)
+        real(DP), intent(out) :: box_size(:)
         type(Concrete_Raw_Coordinates), intent(out) :: raw_coordinates
         integer, intent(in) :: num_components, i_component
         character(len=*), intent(in) :: filename
@@ -47,7 +52,7 @@ contains
             end if
         end do
         close(coordinates_unit)
-    end subroutine complete_coordinates_read
+    end subroutine read_complete_coordinates
 
     pure subroutine set_bounds(nums_lbounds, nums_ubounds, nums_particles)
         integer, intent(inout) :: nums_lbounds(:), nums_ubounds(:)
@@ -101,11 +106,26 @@ contains
         end if
     end subroutine read_coordinates
 
-    subroutine complete_coordinates_deallocate(raw_coordinates)
+    subroutine read_box_size(box_size, filename)
+        real(DP), intent(out) :: box_size(:)
+        character(len=*), intent(in) :: filename
+
+        integer :: coordinates_unit
+        character(len=1) :: comment_character
+        character(len=max_word_length) :: field
+
+        call check_file_exists(filename)
+        open(newunit=coordinates_unit, recl=max_line_length, file=filename, status="old", &
+            action="read")
+        read(coordinates_unit, *) comment_character, field, box_size
+        close(coordinates_unit)
+    end subroutine read_box_size
+
+    subroutine deallocate(raw_coordinates)
         type(Concrete_Raw_Coordinates), intent(inout) :: raw_coordinates
 
         if (allocated(raw_coordinates%orientations)) deallocate(raw_coordinates%orientations)
         if (allocated(raw_coordinates%positions)) deallocate(raw_coordinates%positions)
-    end subroutine complete_coordinates_deallocate
+    end subroutine deallocate
 
 end module procedures_complete_coordinates_reader

@@ -14,7 +14,7 @@ use procedures_environment_inquirers, only: use_walls
 implicit none
 
 private
-public :: create_from_json, create_from_boxes, create_from_walls, destroy
+public :: create_from_json, create_from_boxes, create_from_walls, destroy_line, destroy_element
 
 contains
 
@@ -139,7 +139,7 @@ contains
         end select
     end subroutine create_from_walls
 
-    subroutine destroy(parallelepiped_domains)
+    subroutine destroy_line(parallelepiped_domains)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: &
             parallelepiped_domains(:)
 
@@ -151,6 +151,15 @@ contains
             end do
             deallocate(parallelepiped_domains)
         end if
-    end subroutine destroy
+    end subroutine destroy_line
+
+    subroutine destroy_element(parallelepiped_domain)
+        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: parallelepiped_domain
+
+        if (allocated(parallelepiped_domain)) then
+            call parallelepiped_domain%destroy()
+            deallocate(parallelepiped_domain)
+        end if
+    end subroutine destroy_element
 
 end module procedures_parallelepiped_domains_factory

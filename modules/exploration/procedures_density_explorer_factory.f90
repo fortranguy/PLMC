@@ -1,6 +1,7 @@
 module procedures_density_explorer_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_input_prefixes, only: density_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found
@@ -20,32 +21,31 @@ public :: create, destroy
 
 contains
 
-    subroutine create(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps, &
-        exploring_data, prefix)
+    subroutine create(density_explorer, periodic_boxes, max_box_size, visitable_walls, i_component,&
+        num_snaps, exploring_data)
         class(Abstract_Density_Explorer), allocatable, intent(out) :: density_explorer
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        real(DP), intent(in) :: max_box_size(:)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
         integer, intent(in) :: i_component, num_snaps
         type(json_file) :: exploring_data
-        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable:: density_type
 
-        call set_density_type(density_type, exploring_data, prefix)
+        call set_density_type(density_type, exploring_data)
         call allocate(density_explorer, density_type)
-        call construct(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps, &
-            exploring_data, prefix)
+        call construct(density_explorer, periodic_boxes, max_box_size, visitable_walls, &
+            i_component, num_snaps, exploring_data)
     end subroutine create
 
-    subroutine set_density_type(density_type, exploring_data, prefix)
+    subroutine set_density_type(density_type, exploring_data)
         character(len=:), allocatable, intent(out) :: density_type
         type(json_file), intent(inout) :: exploring_data
-        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        data_field = prefix//"name"
+        data_field = density_prefix//"name"
         call exploring_data%get(data_field, density_type, data_found)
         call check_data_found(data_field, data_found)
     end subroutine set_density_type
@@ -62,19 +62,19 @@ contains
             case ("xz")
                 allocate(XZ_Density_Explorer :: density_explorer)
             case default
-                call error_exit("procedures_density_explorer_factory: allocate: "//&
-                    "density_type unknown. Please choose between 'plain', 'z' or 'xz'.")
+                call error_exit("procedures_density_explorer_factory: allocate: "//density_type//&
+                    " unknown. Please choose between 'plain', 'z' and 'xz'.")
         end select
     end subroutine allocate
 
-    subroutine construct(density_explorer, periodic_boxes, visitable_walls, i_component, num_snaps,&
-        exploring_data, prefix)
+    subroutine construct(density_explorer, periodic_boxes, max_box_size, visitable_walls, &
+        i_component, num_snaps, exploring_data)
         class(Abstract_Density_Explorer), intent(inout) :: density_explorer
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
+        real(DP), intent(in) :: max_box_size(:)
         class(Abstract_Visitable_Walls), intent(in) :: visitable_walls(:)
         integer, intent(in) :: i_component, num_snaps
         type(json_file) :: exploring_data
-        character(len=*), intent(in) :: prefix
 
         class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domains(:)
         logical :: create_domain
@@ -85,31 +85,31 @@ contains
 
         create_domain = .true.
         call boxes_create(parallelepiped_domains, periodic_boxes, visitable_walls, create_domain, &
-            exploring_data, prefix)
+            exploring_data, density_prefix)
         select type (density_explorer)
             type is (Plain_Density_Explorer)
-                call density_explorer%construct(parallelepiped_domains, num_snaps)
+                call density_explorer%construct(parallelepiped_domains(1), num_snaps)
             type is (Z_Density_Explorer)
                 call check_periodicity_xy(periodic_boxes)
                 block
                     real(DP) :: delta_z
-                    data_field = prefix//"delta"
+                    data_field = density_prefix//"delta"
                     call exploring_data%get(data_field, delta_z, data_found)
                     call check_data_found(data_field, data_found)
                     filename = "z_density_"//string%get(i_component)//".out"
-                    call density_explorer%construct(parallelepiped_domains, delta_z, num_snaps, &
-                        filename)
+                    call density_explorer%construct(max_box_size, parallelepiped_domains(1), &
+                        delta_z, num_snaps, filename)
                 end block
             type is (XZ_Density_Explorer)
                 call check_periodicity_xy(periodic_boxes)
                 block
                     real(DP) :: delta_xz
-                    data_field = prefix//"delta"
+                    data_field = density_prefix//"delta"
                     call exploring_data%get(data_field, delta_xz, data_found)
                     call check_data_found(data_field, data_found)
                     filename = "xz_density_"//string%get(i_component)//".out"
-                    call density_explorer%construct(parallelepiped_domains, delta_xz, num_snaps, &
-                        filename)
+                    call density_explorer%construct(max_box_size, parallelepiped_domains(1), &
+                        delta_xz, num_snaps, filename)
                 end block
             class default
                 call error_exit("procedures_density_explorer_factory: construct: "//&

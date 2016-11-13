@@ -1,8 +1,6 @@
 + Exploration:
     - more decoupling?
     - multiple boxes configurations: merged or separate?
-- Radial: to factorise
-- BoxVolumeChange -> BoxSizeChange?
 - MaximumBoxCompression: avoid r_min /= min_distance confusion
 - HardContact: NeighbourCells size must be increased: drawback
 - DipolarVisitor: Self is scalable (instead of O(N)): is it worth it?
@@ -23,5 +21,3 @@
     - acceptationProbability(): uniformise comment notation
     - BoxesVolumeExchange: optimise overlap
 - rewrite modules/index.md
-- [High Priority] reset selectors just once
-- data[JSON] to update
