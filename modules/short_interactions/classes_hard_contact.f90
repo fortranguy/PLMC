@@ -102,12 +102,13 @@ contains
 
         real(DP) :: distance
 
-        overlap = .false.
         contact = 0._DP
         distance = norm2(vector)
         if (distance < min_distance) then
             overlap = .true.
             return
+        else
+            overlap = .false.
         end if
         contact = min_distance * this%dirac_plus%get(distance - min_distance)
     end subroutine XYZ_meet_contact
@@ -121,12 +122,13 @@ contains
         real(DP) :: distance
 
         can_overlap = .true.
-        overlap = .false.
         ratio = 0._DP
         distance = norm2(vector)
         if (distance < min_distance) then
             overlap = .true.
             return
+        else
+            overlap = .false.
         end if
         ratio = distance / min_distance
     end subroutine XYZ_meet_min_distance
@@ -147,12 +149,13 @@ contains
 
         real(DP) :: distance
 
-        overlap = .false.
         contact = 0._DP
         distance = norm2(vector)
         if (distance < min_distance) then
             overlap = .true.
             return
+        else
+            overlap = .false.
         end if
         contact = (min_distance**2 - vector(3)**2) / min_distance * this%dirac_plus%&
             get(distance - min_distance)
@@ -167,13 +170,14 @@ contains
         real(DP) :: distance
 
         can_overlap = abs(vector(3)) < min_distance
-        overlap = .false.
         ratio = 0._DP
         if (.not. can_overlap) return
         distance = norm2(vector)
         if (distance < min_distance) then
             overlap = .true.
             return
+        else
+            overlap = .false.
         end if
         ratio = distance / min_distance
     end subroutine XY_meet_min_distance

@@ -5,7 +5,8 @@ use data_constants, only: num_dimensions, PI
 
 implicit none
 private
-public :: des_real_B, des_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_kz
+public :: des_real_B, des_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_kz, &
+    dipolar_energy_is_negative
 
 contains
 
@@ -16,10 +17,9 @@ contains
     !>          3 \frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r_{ij}^5}
     !>      \right]
     !> \]
-    pure logical function dipolar_energy_is_negative(orientation_i, orientation_j, vector_ij) &
+    pure logical function dipolar_energy_is_negative(vector_ij, orientation_i, orientation_j) &
         result(is_negative)
-        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
-        real(DP), dimension(:), intent(in) :: vector_ij
+        real(DP), dimension(:), intent(in) :: vector_ij,  orientation_i, orientation_j
 
         real(DP) :: distance_ij
 

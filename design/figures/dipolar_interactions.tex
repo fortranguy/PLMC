@@ -19,7 +19,7 @@
                 \operation{\procedure{target}{boxSizeMemento: \type{BoxSizeMemento},
                     realPair: \type{DESrealPair}}}
                 \operation{\procedure{visit}{energy: \type{real}, particle:
-                    \type{TemporaryParticle}, iExclude: \type{int}}}
+                    \type{Particle}, iExclude: \type{int}}}
             \end{abstractclass}
         \end{scope}
 
@@ -41,7 +41,7 @@
                 \namespace{Common} :: PotentialDomain \\
                 \namespace{Environment} :: PeriodicBox, BoxSizeMemento, Permittivity \\
                 \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
-                    ComponentDipoleMoments, TemporaryParticle};
+                    ComponentDipoleMoments, Particle};
         \end{scope}
 
         \begin{scope}[shift={($(DESselfComponent.south) - (0 cm, 1.5 cm)$)}]
@@ -57,7 +57,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESrealComponent.south) - (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(DESrealComponent.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DESsurfMixture}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     permittivity: \type{Permittivity},
@@ -119,8 +119,24 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(DESsurfMixture.south)!0.5!(DipolarInteractionsStatic.south)
-            - (0 cm, 1.75 cm)$)}]
+        \begin{scope}[shift={($(DipolarInteractionsDynamic.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DipolarNeighbourhood}{0, 0}
+                \operation{\procedure{set}{maxDistance: \type{real}}}
+                \operation{\procedure{meet}{overlap: \type{bool}, areNeighbour: \type{bool},
+                    iToJ: \type{bool}, minDistance: \type{real}, vectorIJ: \type{real[3]},
+                    orientationI: \type{real[3]}, orientationJ: \type{real[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESsurfMixture.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESconvergenceParameter}{0, 0}
+                \operation{\procedure{set}{alphaXboxEdge: \type{real}}}
+                \operation{\procedure{getTimesBoxEdge}{}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESconvergenceParameter.south)!0.5!(DipolarInteractionsStatic.south)
+            - (0 cm, 2.25 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{StructureVisitor}{0, 0}
             \end{abstractclass}
         \end{scope}
@@ -161,13 +177,6 @@
         \begin{scope}[shift={($(DLCweight.south)!0.35!(DLCstructures.north)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{DLCvisitor}{0, 0}
                 \inherit{StructureVisitor}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(DipolarInteractionsDynamic.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{DESconvergenceParameter}{0, 0}
-                \operation{\procedure{set}{alphaXboxEdge: \type{real}}}
-                \operation{\procedure{getTimesBoxEdge}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 

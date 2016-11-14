@@ -48,7 +48,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(Coordinates.north) + (0 cm, 3.75 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{TemporaryParticle}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{Particle}{0, 0}
                 \UMLattribute{i: \type{int}}
                 \UMLattribute{position: \type{real[\numDimensions]}}
                 \UMLattribute{orientation: \type{real[\numDimensions]}}
@@ -56,7 +56,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(TemporaryParticle.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(Particle.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AverageNumParticles}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}

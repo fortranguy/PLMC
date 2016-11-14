@@ -12,35 +12,36 @@
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     $\mathAggregation$ positions: \type{ComponentCoordinates},
-                    hardContact: \type{HardContact},
-                    pairPotential: \type{PairPotential}, neighbourCells: \type{NeighbourCells},
-                    listMold: \type{VisitableList}}}
+                    $\mathAggregation$ orientations: \type{ComponentCoordinates},
+                    hardContact: \type{HardContact}, pairPotential: \type{PairPotential},
+                    $\mathAggregation$ dipolarNeighbourhood: \type{DipolarNeighbourhood},
+                    neighbourCells: \type{NeighbourCells}, listMold: \type{VisitableList}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{target}{neighbourCells: \type{NeighbourCells}}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
-                    particle: \type{TemporaryParticle},
+                    particle: \type{Particle},
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
-                    particle: \type{TemporaryParticle},
+                    particle: \type{Particle},
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{visitMinDistance}{overlap: \type{bool}, ratio: \type{real},
-                    particle: \type{TemporaryParticle},
+                    particle: \type{Particle},
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
                 \operation{\procedure{translate}{toPosition: \type{real[\numDimensions]},
-                    from: \type{TemporaryParticle}}}
-                \operation{\procedure{add}{particle: \type{TemporaryParticle}}}
-                \operation{\procedure{remove}{particle: \type{TemporaryParticle}}}
+                    from: \type{Particle}}}
+                \operation{\procedure{add}{particle: \type{Particle}}}
+                \operation{\procedure{remove}{particle: \type{Particle}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 6.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.north) + (0 cm, 6 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{HardContact}{0, 0}
                 \operation{\procedure{construct}{diracPlus: \type{DiracDistributionPlus}}}
                 \operation{\procedure{destroy}{}}
@@ -65,33 +66,38 @@
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     $\mathAggregation$ positions: \type{ComponentCoordinates},
-                    hardContact: \type{HardContact},
-                    $\mathAggregation$ pairPotential: \type{PairPotential}}}
+                    $\mathAggregation$ orientations: \type{ComponentCoordinates},
+                    hardContact: \type{HardContact}, pairPotential: \type{PairPotential},
+                    $\mathAggregation$ dipolarNeighbourhood: \type{DipolarNeighbourhood}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{set}{iTarger: \type{int}, iParticle: \type{int}}}
-                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
-                    particle: \type{TemporaryParticle},
-                    visitCondition: \procedure{visitCondition}
-                        {iInside: \type{int}, iOutside: \type{int}},
-                    iExclude: \type{int}}}
-                \operation{\procedure{visit}{overlap: \type{bool}, contacts: \type{real},
-                    particle: \type{TemporaryParticle},
-                    minDistance: \type{real},
-                    visitCondition: \procedure{visitCondition}
-                        {iInside: \type{int}, iOutside: \type{int}},
-                    iExclude: \type{int}}}
-                \operation{\procedure{visit}{overlap: \type{bool}, ratio: \type{real},
-                    particle: \type{TemporaryParticle},
-                    minDistance: \type{real}, maxDistance: \type{real},
-                    visitCondition: \procedure{visitCondition}
-                        {iInside: \type{int}, iOutside: \type{int}},
-                    iExclude: \type{int}}}
                 \operation{\procedure{add}{iParticle: \type{int}}}
                 \operation{\procedure{remove}{iParticle: \type{int}}}
+                \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
+                    particle: \type{Particle},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
+                \operation{\procedure{visitContacts}{overlap: \type{bool}, contacts: \type{real},
+                    particle: \type{Particle},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
+                \operation{\procedure{visitMinDistance}{overlap: \type{bool}, ratio: \type{real},
+                    particle: \type{Particle},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
+                \operation{\procedure{visitDipolarNeighbours}{overlap: \type{bool},
+                    adjacencyMatrix: \type{bool[\numParticles, \numParticles]},
+                    particle: \type{Particle},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableList.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{PairPotential}{0, 0}
                 \operation[0]{\procedure{construct}{domain: \type{PotentialDomain},
                     expression: \type{PotentialExpression}}}
@@ -109,10 +115,11 @@
                 \namespace{Common} :: PotentialDomain \\
                 \namespace{Environment} :: PeriodicBox, ParallelepipedDomain, WallsVisitor,
                     BetaPressureExcess \\
-                \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
+                \namespace{Mixture} :: ComponentCoordinates, Particle \\
+                \namespace{DipolarInteractions} :: DipolarNeighbourhood};
         \end{scope}
 
-        \begin{scope}[shift={($(VisitableList.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{NeighbourCells}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ accessibleDomain:
                     \type{ParallelepipedDomain}, hardContact: \type{HardContact},
@@ -133,13 +140,13 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(NeighbourCells.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(PairPotential.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
                 \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Import) - (0 cm, 4 cm)$)}]
+        \begin{scope}[shift={($(Import) - (0 cm, 4.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
                 \UMLattribute{betaPressuresExcess: \type{BetaPressureExcess[\numBoxes]}}
                 \UMLattribute{hardContact: \type{HardContact}}
@@ -148,6 +155,8 @@
                 \UMLattribute{componentsVisitors: \type{ShortPairsVisitor[\numBoxes]}}
                 \UMLattribute{componentsPairs:
                     \type{PairPotential[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{dipolarNeighbourhoods:
+                    \type{DipolarNeighbourhood[\numComponents, \numComponents]\textsubscript{\sym}}}
                 \UMLattribute{cells: \type{Cells}[\numBoxes]}
                 \UMLattribute{visitableCellsMemento: \type{VisitableCellsMemento}}
             \end{class}
@@ -193,6 +202,7 @@
             \composition{PairPotential}{\refName{potentialExpression}}{\numRef{1}}
                 {PotentialExpression}
             \aggregation{VisitableList}{\refName{hardContact}}{\numRef{1}}{HardContact}
+            \aggregation{VisitableList}{\refName{pairPotential}}{\numRef{1}}{PairPotential}
             \composition{HardContact}{\refName{diracPlus}}{\numRef{1}}{DiracDistributionPlus}
         \end{scope}
 

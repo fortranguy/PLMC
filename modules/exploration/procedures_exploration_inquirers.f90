@@ -9,7 +9,7 @@ use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method,
 implicit none
 
 private
-public :: measure_pressure, measure_chemical_potentials
+public :: measure_pressure, measure_chemical_potentials, make_dipolar_graph
 
 interface measure_pressure
     module procedure :: measure_pressure_from_json
@@ -20,6 +20,10 @@ interface measure_chemical_potentials
     module procedure :: measure_chemical_potentials_from_json
     module procedure :: measure_chemical_potentials_from_method
 end interface measure_chemical_potentials
+
+interface make_dipolar_graph
+    module procedure :: make_dipolar_graph_from_json
+end interface make_dipolar_graph
 
 contains
 
@@ -42,7 +46,7 @@ contains
         end select
     end function measure_pressure_from_method
 
-        logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
+    logical function measure_chemical_potentials_from_json(exploring_data, prefix)&
         result(measure_chemical_potentials)
         type(json_file), intent(inout) :: exploring_data
         character(len=*), intent(in) :: prefix
@@ -62,5 +66,12 @@ contains
                 measure_chemical_potentials = .false.
         end select
     end function measure_chemical_potentials_from_method
+
+    logical function make_dipolar_graph_from_json(exploring_data, prefix) result(make_dipolar_graph)
+        type(json_file), intent(inout) :: exploring_data
+        character(len=*), intent(in) :: prefix
+
+        make_dipolar_graph = logical_from_json(exploring_data, prefix//"make graph")
+    end function make_dipolar_graph_from_json
 
 end module procedures_exploration_inquirers

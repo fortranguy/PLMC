@@ -15,6 +15,7 @@ use procedures_visitable_cells_factory, only: visitable_cells_create => create, 
 use procedures_visitable_cells_memento_factory, only: visitable_cells_memento_create => create, &
     visitable_cells_memento_destroy => destroy
 use types_cells_wrapper, only: Cells_Wrapper
+use classes_dipoles_neighbourhood, only: Dipolar_Neighbourhood_Line
 
 implicit none
 
@@ -42,13 +43,14 @@ end interface allocate_triangle
 contains
 
     subroutine create_wrappers(cells, periodic_boxes, accessible_domains, components, hard_contact,&
-        components_pairs, list_mold, interact)
+        components_pairs, dipolar_neighbourhoods, list_mold, interact)
         type(Cells_Wrapper), allocatable, intent(out) :: cells(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_boxes(:)
         class(Abstract_Parallelepiped_Domain), intent(in) :: accessible_domains(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
         type(Pair_Potential_Line), intent(in) :: components_pairs(:)
+        type(Dipolar_Neighbourhood_Line), intent(in) :: dipolar_neighbourhoods(:)
         class(Abstract_Visitable_List), intent(in) :: list_mold
         logical, intent(in) :: interact
 
@@ -60,8 +62,8 @@ contains
                 periodic_boxes(i_box), accessible_domains(i_box), hard_contact, components_pairs, &
                 interact)
             call visitable_cells_create(cells(i_box)%visitable_cells, periodic_boxes(i_box), &
-                components(:, i_box), hard_contact, components_pairs, cells(i_box)%neighbour_cells,&
-                list_mold, interact)
+                components(:, i_box), hard_contact, components_pairs, dipolar_neighbourhoods, &
+                cells(i_box)%neighbour_cells, list_mold, interact)
         end do
     end subroutine create_wrappers
 

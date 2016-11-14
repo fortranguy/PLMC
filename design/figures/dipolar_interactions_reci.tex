@@ -12,18 +12,17 @@
             \begin{abstractclass}[text width=\largeTextWidth]{StructureVisitor}{0, 0}
                 \operation[0]{\procedure{visit}{}: \type{real}}
                 \operation[0]{\procedure{visitTranslation}{iComponent: \type{int},
-                    newPosition: \type{real[3]},
-                    old: \type{TemporaryParticle}}: \type{real}}
+                    newPosition: \type{real[3]}, old: \type{Particle}}: \type{real}}
                 \operation[0]{\procedure{visitTransmutation}{ijComponents: \type{int[2]},
-                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                    newDipoleMoment: \type{real[3]}, old: \type{Particle}}: \type{real}}
                 \operation[0]{\procedure{visitRotation}{iComponent: \type{int},
-                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                    newDipoleMoment: \type{real[3]}, old: \type{Particle}}: \type{real}}
                 \operation[0]{\procedure{visitAdd}{iComponent: \type{int},
-                    particle: \type{TemporaryParticle}}: \type{real}}
+                    particle: \type{Particle}}: \type{real}}
                 \operation[0]{\procedure{visitRemove}{iComponent: \type{int},
-                    particle: \type{TemporaryParticle}}: \type{real}}
+                    particle: \type{Particle}}: \type{real}}
                 \operation[0]{\procedure{visitSwitch}{ijComponents: \type{int[2]},
-                    particles: \type{TemporaryParticle[2]}}: \type{real}}
+                    particles: \type{Particle[2]}}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -45,7 +44,7 @@
             \umlnote[text width=\largeTextWidth]{\import{}:: \\
                 \namespace{Environment} :: PeriodicBox, BoxSizeMemento, ReciprocalLattice,
                     Permittivity \\
-                \namespace{Mixture} :: Component, TemporaryParticle};
+                \namespace{Mixture} :: Component, Particle};
         \end{scope}
 
         \begin{scope}[shift={($(Import.south) - (0 cm, 3.25 cm)$)}]
@@ -63,17 +62,17 @@
             \begin{abstractclass}[text width=\largeTextWidth]{StructureFactor}{0, 0}
                 \operation[0]{\procedure{isDipolar}{iComponent: \type{int}}: \type{bool}}
                 \operation[0]{\procedure{updateTranslation}{iComponent: \type{int},
-                    newPosition: \type{real[3]}, old: \type{TemporaryParticle}}}
+                    newPosition: \type{real[3]}, old: \type{Particle}}}
                 \operation[0]{\procedure{updateTransmutation}{ijComponents: \type{int[2]},
-                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                    newDipoleMoment: \type{real[3]}, old: \type{Particle}}}
                 \operation[0]{\procedure{updateRotation}{iComponent: \type{int},
-                    newDipoleMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                    newDipoleMoment: \type{real[3]}, old: \type{Particle}}}
                 \operation[0]{\procedure{updateAdd}{iComponent: \type{int},
-                    particle: \type{TemporaryParticle}}}
+                    particle: \type{Particle}}}
                 \operation[0]{\procedure{updateRemove}{iComponent: \type{int},
-                    particle: \type{TemporaryParticle}}}
+                    particle: \type{Particle}}}
                 \operation[0]{\procedure{updateSwitch}{ijComponents: \type{int[2]},
-                    particles: \type{TemporaryParticle[2]}}}
+                    particles: \type{Particle[2]}}}
             \end{abstractclass}
         \end{scope}
 

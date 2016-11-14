@@ -8,6 +8,7 @@ use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_visitable_cells, only: Abstract_Visitable_Cells, Concrete_Visitable_Cells, &
     Null_Visitable_Cells
+use classes_dipoles_neighbourhood, only: Dipolar_Neighbourhood_Line
 
 implicit none
 
@@ -17,12 +18,13 @@ public :: create, destroy
 contains
 
     subroutine create(cells, periodic_box, components, hard_contact, components_pairs, &
-        neighbour_cells, list_mold, interact)
+        dipolar_neighbourhoods, neighbour_cells, list_mold, interact)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Hard_Contact), intent(in) :: hard_contact
         type(Pair_Potential_Line), intent(in) :: components_pairs(:)
+        type(Dipolar_Neighbourhood_Line), intent(in) :: dipolar_neighbourhoods(:)
         type(Neighbour_Cells_Line), intent(in) :: neighbour_cells(:)
         class(Abstract_Visitable_List), intent(in) :: list_mold
         logical, intent(in) :: interact
@@ -42,10 +44,11 @@ contains
                 j_pair = max(i_component, j_component)
                 i_pair = min(i_component, j_component)
                 associate (pair_ij => components_pairs(j_pair)%line(i_pair)%potential, &
+                    neighbourhood_ij => dipolar_neighbourhoods(j_pair)%line(i_pair)%neighbourhood, &
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &
-                        components(i_component)%positions, hard_contact, pair_ij, neighbours_ij, &
-                        list_mold)
+                        components(i_component)%positions, components(i_component)%orientations, &
+                        hard_contact, pair_ij, neighbourhood_ij, neighbours_ij, list_mold)
                 end associate
             end do
         end do
