@@ -12,4 +12,8 @@ private
         type(Logical_Line), allocatable :: triangle(:)
     end type Logical_Triangle
 
+    type, public :: Logical_Rectangle
+        logical, allocatable :: rectangle(:, :)
+    end type Logical_Rectangle
+
 end module types_logical_wrapper

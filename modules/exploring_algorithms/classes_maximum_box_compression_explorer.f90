@@ -6,7 +6,7 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_size, only: box_size_max_distance => max_distance
 use types_component_wrapper, only: Component_Wrapper
 use classes_pair_potential, only: Pair_Potential_Line
-use types_cells_wrapper, only: Cells_Wrapper
+use classes_visitable_cells, only: Abstract_Visitable_Cells
 use procedures_short_interactions_visitor, only: short_interactions_visit => visit
 use classes_maximum_box_compression, only: Abstract_Maximum_Box_Compression
 use procedures_maximum_box_compression_factory, only: maximum_box_compression_destroy => destroy
@@ -20,7 +20,7 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Pair_Potential_Line), pointer :: components_pairs(:) => null()
-        type(Cells_Wrapper), pointer :: cells => null()
+        class(Abstract_Visitable_Cells), pointer :: visitable_cells(:, :) => null()
         class(Abstract_Maximum_Box_Compression), allocatable :: maximum_box_compression
         real(DP) :: min_distance = 0._DP
     contains
@@ -47,19 +47,19 @@ contains
 
 !implementation Abstract_Maximum_Box_Compression_Explorer
 
-    subroutine Abstract_construct(this, periodic_box, components, components_pairs, cells, &
-        maximum_box_compression)
+    subroutine Abstract_construct(this, periodic_box, components, components_pairs, &
+        visitable_cells, maximum_box_compression)
         class(Abstract_Maximum_Box_Compression_Explorer), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Pair_Potential_Line), target, intent(in) :: components_pairs(:)
-        type(Cells_Wrapper), target, intent(in) :: cells
+        class(Abstract_Visitable_Cells), target, intent(in) :: visitable_cells(:, :)
         class(Abstract_Maximum_Box_Compression), intent(in) :: maximum_box_compression
 
         this%periodic_box => periodic_box
         this%components => components
         this%components_pairs => components_pairs
-        this%cells => cells
+        this%visitable_cells => visitable_cells
         allocate(this%maximum_box_compression, source=maximum_box_compression)
     end subroutine Abstract_construct
 
@@ -83,7 +83,7 @@ contains
         class(Abstract_Maximum_Box_Compression_Explorer), intent(inout) :: this
 
         call maximum_box_compression_destroy(this%maximum_box_compression)
-        this%cells => null()
+        this%visitable_cells => null()
         this%components_pairs => null()
         this%components => null()
         this%periodic_box => null()
@@ -98,7 +98,7 @@ contains
 
         max_distance_ratio = box_size_max_distance(this%periodic_box%get_size()) / this%min_distance
         call short_interactions_visit(overlap, min_distance_ratio, max_distance_ratio, &
-            this%components, this%cells%visitable_cells)
+            this%components, this%visitable_cells)
         if (overlap) call error_exit("Abstract_Maximum_Box_Compression_Explorer: try: "//&
             "short_interactions_visit: overlap")
         maximum_box_compression_delta = this%maximum_box_compression%get_delta(min_distance_ratio)
@@ -108,13 +108,13 @@ contains
 
 !implementation Null_Maximum_Box_Compression_Explorer
 
-    subroutine Null_construct(this, periodic_box, components, components_pairs, cells, &
+    subroutine Null_construct(this, periodic_box, components, components_pairs, visitable_cells, &
         maximum_box_compression)
         class(Null_Maximum_Box_Compression_Explorer), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Pair_Potential_Line), target, intent(in) :: components_pairs(:)
-        type(Cells_Wrapper), target, intent(in) :: cells
+        class(Abstract_Visitable_Cells), target, intent(in) :: visitable_cells(:, :)
         class(Abstract_Maximum_Box_Compression), intent(in) :: maximum_box_compression
     end subroutine Null_construct
 

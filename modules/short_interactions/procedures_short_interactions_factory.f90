@@ -67,7 +67,7 @@ contains
         call pairs_create(short_interactions%components_visitors, environment%periodic_boxes, &
             interact)
         call dipolar_neighbourhoods_create(short_interactions%dipolar_neighbourhoods, mixture%&
-            components, make_dipolar_graph, generating_data, dipolar_graph_prefix)
+            components, make_dipolar_graph, exploring_data, dipolar_graph_prefix)
         call visitable_list_allocate(list_mold, interact, generating_data, &
             short_interactions_prefix)
         call cells_create(short_interactions%cells, environment%periodic_boxes, environment%&

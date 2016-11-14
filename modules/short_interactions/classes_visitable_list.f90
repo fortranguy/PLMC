@@ -133,6 +133,43 @@ contains
         end do
     end subroutine Abstract_set
 
+    subroutine Abstract_add(this, i_particle)
+        class(Abstract_Visitable_List), intent(inout) :: this
+        integer, intent(in) :: i_particle
+
+        type(Concrete_Linkable_Node), pointer :: previous => null(), new => null(), next => null()
+
+        previous => this%beginning
+        next => previous%next
+        allocate(new)
+        new%next => previous%next
+        previous%next => new
+        new%i = i_particle
+    end subroutine Abstract_add
+
+    subroutine Abstract_remove(this, i_particle)
+        class(Abstract_Visitable_List), intent(inout) :: this
+        integer, intent(in) :: i_particle
+
+        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), &
+            next => null()
+
+        previous => this%beginning
+        current => previous%next
+        do
+            next => current%next
+            if (current%i == i_particle) then
+                previous%next => current%next
+                deallocate(current)
+                current => next
+                return
+            else
+                previous => current
+            end if
+            current => next
+        end do
+    end subroutine Abstract_remove
+
     subroutine Abstract_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
@@ -207,10 +244,10 @@ contains
         real(DP) :: ratio_i
 
         overlap = .false.
-        current => this%beginning%next
-        if (.not.associated(current%next)) return
         min_distance = this%pair_potential%get_min_distance()
         ratio = box_size_max_distance(this%periodic_box%get_size()) / min_distance
+        current => this%beginning%next
+        if (.not.associated(current%next)) return
         do
             next => current%next
             if (visit_condition(current%i, i_exclude)) then
@@ -237,7 +274,6 @@ contains
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
         real(DP) :: min_distance
-        logical :: ij_are_neighbour, i_to_j
 
         overlap = .false.
         current => this%beginning%next
@@ -246,58 +282,16 @@ contains
         do
             next => current%next
             if (visit_condition(current%i, i_exclude)) then
-                call this%dipolar_neighbourhood%meet(overlap, ij_are_neighbour, i_to_j, &
-                    min_distance, this%periodic_box%&
-                        vector(this%positions%get(current%i), particle%position), &
+                call this%dipolar_neighbourhood%meet(overlap, &
+                    adjacency_matrix(current%i, particle%i), min_distance, &
+                    this%periodic_box%vector(this%positions%get(current%i), particle%position), &
                             this%orientations%get(current%i), particle%orientation)
                 if (overlap) return
-                if (ij_are_neighbour) then
-                    if (i_to_j) then
-                        adjacency_matrix(current%i, particle%i) = .true.
-                    else
-                        adjacency_matrix(particle%i, current%i) = .true.
-                    end if
-                end if
             end if
-        end do
-    end subroutine Abstract_visit_dipolar_neighbours
-
-    subroutine Abstract_add(this, i_particle)
-        class(Abstract_Visitable_List), intent(inout) :: this
-        integer, intent(in) :: i_particle
-
-        type(Concrete_Linkable_Node), pointer :: previous => null(), new => null(), next => null()
-
-        previous => this%beginning
-        next => previous%next
-        allocate(new)
-        new%next => previous%next
-        previous%next => new
-        new%i = i_particle
-    end subroutine Abstract_add
-
-    subroutine Abstract_remove(this, i_particle)
-        class(Abstract_Visitable_List), intent(inout) :: this
-        integer, intent(in) :: i_particle
-
-        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), &
-            next => null()
-
-        previous => this%beginning
-        current => previous%next
-        do
-            next => current%next
-            if (current%i == i_particle) then
-                previous%next => current%next
-                deallocate(current)
-                current => next
-                return
-            else
-                previous => current
-            end if
+            if (.not.associated(next%next)) return
             current => next
         end do
-    end subroutine Abstract_remove
+    end subroutine Abstract_visit_dipolar_neighbours
 
 !end implementation Abstract_Visitable_List
 
@@ -352,109 +346,6 @@ contains
         end do
     end subroutine Array_set
 
-    subroutine Array_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
-        class(Concrete_Visitable_Array), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
-        procedure(abstract_visit_condition) :: visit_condition
-        integer, intent(in) :: i_exclude
-
-        real(DP) :: energy_i
-        integer :: i_node
-
-        overlap = .false.
-        energy = 0._DP
-        do i_node = 1, this%num_nodes
-            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            call this%pair_potential%meet(overlap, energy_i, this%periodic_box%&
-                distance(particle%position, this%positions%get(this%nodes(i_node))))
-            if (overlap) return
-            energy = energy + energy_i
-        end do
-    end subroutine Array_visit_energy
-
-    subroutine Array_visit_contacts(this, overlap, contacts, particle, visit_condition, i_exclude)
-        class(Concrete_Visitable_Array), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: contacts
-        type(Concrete_Particle), intent(in) :: particle
-        procedure(abstract_visit_condition) :: visit_condition
-        integer, intent(in) :: i_exclude
-
-        real(DP) :: contact_i
-        real(DP) :: min_distance
-        integer :: i_node
-
-        min_distance = this%pair_potential%get_min_distance()
-        overlap = .false.
-        contacts = 0._DP
-        do i_node = 1, this%num_nodes
-            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            call this%hard_contact%meet(overlap, contact_i, min_distance, this%periodic_box%&
-                vector(particle%position, this%positions%get(this%nodes(i_node))))
-            if (overlap) return
-            contacts = contacts + contact_i
-        end do
-    end subroutine Array_visit_contacts
-
-    subroutine Array_visit_min_distance(this, overlap, ratio, particle, visit_condition, i_exclude)
-        class(Concrete_Visitable_Array), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: ratio
-        type(Concrete_Particle), intent(in) :: particle
-        procedure(abstract_visit_condition) :: visit_condition
-        integer, intent(in) :: i_exclude
-
-        logical :: can_overlap
-        real(DP) :: ratio_i, min_distance
-        integer :: i_node
-
-        overlap = .false.
-        min_distance = this%pair_potential%get_min_distance()
-        ratio = box_size_max_distance(this%periodic_box%get_size()) / min_distance
-        do i_node = 1, this%num_nodes
-            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, this%&
-                periodic_box%vector(particle%position, this%positions%get(this%nodes(i_node))))
-            if (.not. can_overlap) cycle
-            if (overlap) return
-            if (ratio_i < ratio) ratio = ratio_i
-        end do
-    end subroutine Array_visit_min_distance
-
-    subroutine Array_visit_dipolar_neighbours(this, overlap, adjacency_matrix, particle, &
-        visit_condition, i_exclude)
-        class(Concrete_Visitable_Array), intent(in) :: this
-        logical, intent(out) :: overlap
-        logical, intent(inout) :: adjacency_matrix(:, :)
-        type(Concrete_Particle), intent(in) :: particle
-        procedure(abstract_visit_condition) :: visit_condition
-        integer, intent(in) :: i_exclude
-
-        real(DP) :: min_distance
-        logical :: ij_are_neighbour, i_to_j
-        integer :: i_node
-
-        overlap = .false.
-        min_distance = this%pair_potential%get_min_distance()
-        do i_node = 1, this%num_nodes
-            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            call this%dipolar_neighbourhood%meet(overlap, ij_are_neighbour, i_to_j, min_distance, &
-                this%periodic_box%&
-                    vector(this%positions%get(this%nodes(i_node)), particle%position), &
-                    this%orientations%get(this%nodes(i_node)), particle%orientation)
-            if (overlap) return
-            if (ij_are_neighbour) then
-                if (i_to_j) then
-                    adjacency_matrix(this%nodes(i_node), particle%i) = .true.
-                else
-                    adjacency_matrix(particle%i, this%nodes(i_node)) = .true.
-                end if
-            end if
-        end do
-    end subroutine Array_visit_dipolar_neighbours
-
     subroutine Array_add(this, i_particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
         integer, intent(in) :: i_particle
@@ -478,6 +369,102 @@ contains
         end if
         this%num_nodes = this%num_nodes - 1
     end subroutine Array_remove
+
+    subroutine Array_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
+        class(Concrete_Visitable_Array), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+        type(Concrete_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        real(DP) :: energy_i
+        integer :: i_node
+
+        overlap = .false.
+        energy = 0._DP
+        do i_node = 1, this%num_nodes
+            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
+            call this%pair_potential%meet(overlap, energy_i, this%periodic_box%&
+                distance(this%positions%get(this%nodes(i_node)), particle%position))
+            if (overlap) return
+            energy = energy + energy_i
+        end do
+    end subroutine Array_visit_energy
+
+    subroutine Array_visit_contacts(this, overlap, contacts, particle, visit_condition, i_exclude)
+        class(Concrete_Visitable_Array), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: contacts
+        type(Concrete_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        real(DP) :: contact_i
+        real(DP) :: min_distance
+        integer :: i_node
+
+        min_distance = this%pair_potential%get_min_distance()
+        overlap = .false.
+        contacts = 0._DP
+        do i_node = 1, this%num_nodes
+            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
+            call this%hard_contact%meet(overlap, contact_i, min_distance, this%periodic_box%&
+                vector(this%positions%get(this%nodes(i_node)), particle%position))
+            if (overlap) return
+            contacts = contacts + contact_i
+        end do
+    end subroutine Array_visit_contacts
+
+    subroutine Array_visit_min_distance(this, overlap, ratio, particle, visit_condition, i_exclude)
+        class(Concrete_Visitable_Array), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: ratio
+        type(Concrete_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        logical :: can_overlap
+        real(DP) :: ratio_i, min_distance
+        integer :: i_node
+
+        overlap = .false.
+        min_distance = this%pair_potential%get_min_distance()
+        ratio = box_size_max_distance(this%periodic_box%get_size()) / min_distance
+        do i_node = 1, this%num_nodes
+            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
+            call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, this%&
+                periodic_box%vector(this%positions%get(this%nodes(i_node)), particle%position))
+            if (.not. can_overlap) cycle
+            if (overlap) return
+            if (ratio_i < ratio) ratio = ratio_i
+        end do
+    end subroutine Array_visit_min_distance
+
+    subroutine Array_visit_dipolar_neighbours(this, overlap, adjacency_matrix, particle, &
+        visit_condition, i_exclude)
+        class(Concrete_Visitable_Array), intent(in) :: this
+        logical, intent(out) :: overlap
+        logical, intent(inout) :: adjacency_matrix(:, :)
+        type(Concrete_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        real(DP) :: min_distance
+        integer :: i_node
+
+        overlap = .false.
+        min_distance = this%pair_potential%get_min_distance()
+        do i_node = 1, this%num_nodes
+            if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
+            call this%dipolar_neighbourhood%meet(overlap, &
+                adjacency_matrix(this%nodes(i_node), particle%i), min_distance, &
+                this%periodic_box%&
+                    vector(this%positions%get(this%nodes(i_node)), particle%position), &
+                    this%orientations%get(this%nodes(i_node)), particle%orientation)
+            if (overlap) return
+        end do
+    end subroutine Array_visit_dipolar_neighbours
 
 !end implementation Concrete_Visitable_Array
 

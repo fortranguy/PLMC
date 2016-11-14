@@ -21,3 +21,5 @@
     - acceptationProbability(): uniformise comment notation
     - BoxesVolumeExchange: optimise overlap
 - rewrite modules/index.md
+- docUML: Improve the type of adjacencyMatrices?
+        

@@ -33,8 +33,9 @@ contains
         do i_box = 1, size(maximum_boxes_compression_explorer)
             call maximum_boxes_compression_explorer(i_box)%&
                 construct(physical_model%environment%periodic_boxes(i_box), physical_model%mixture%&
-                components(:, i_box), physical_model%short_interactions%components_pairs, &
-                physical_model%short_interactions%cells(i_box), maximum_box_compression)
+                    components(:, i_box), physical_model%short_interactions%components_pairs, &
+                    physical_model%short_interactions%cells(i_box)%visitable_cells, &
+                    maximum_box_compression)
         end do
     end subroutine create
 

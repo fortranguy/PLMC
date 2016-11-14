@@ -338,7 +338,7 @@
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_neighbourhoods_factory.f90">
-			<Option weight="4" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipoles_field_interaction.f90">
 			<Option weight="8" />
@@ -487,6 +487,9 @@
 		<Unit filename="modules/exploration/procedures_radial_explorer_factory.f90">
 			<Option weight="7" />
 		</Unit>
+		<Unit filename="modules/exploring_algorithms/classes_dipolar_neighbourhoods_visitor.f90">
+			<Option weight="10" />
+		</Unit>
 		<Unit filename="modules/exploring_algorithms/classes_maximum_box_compression_explorer.f90">
 			<Option weight="10" />
 		</Unit>
@@ -495,6 +498,9 @@
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/classes_volume_change_method.f90">
 			<Option weight="14" />
+		</Unit>
+		<Unit filename="modules/exploring_algorithms/procedures_dipolar_neighbourhoods_visitors_factory.f90">
+			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/procedures_maximum_boxes_compression_explorer_factory.f90">
 			<Option weight="15" />

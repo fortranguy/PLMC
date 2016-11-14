@@ -18,7 +18,7 @@ with open(parser.parse_args().generatingFile) as file:
 
 with open(parser.parse_args().exploringFile) as file:
     exploringData = json.load(file)
-    maximumEdgeDistance = exploringData["Clusters"]["maximum distance"]
+    maximumEdgeDistance = exploringData["Dipolar Graph"]["maximum distance"]
 
 graph = nx.DiGraph()
 for snapshot in parser.parse_args().snapshots:

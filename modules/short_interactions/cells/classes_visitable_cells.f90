@@ -32,14 +32,15 @@ private
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
-        procedure :: target => Abstract_target
         procedure :: reset => Abstract_reset
-        procedure :: visit_energy => Abstract_visit_energy
-        procedure :: visit_contacts => Abstract_visit_contacts
-        procedure :: visit_min_distance => Abstract_visit_min_distance
+        procedure :: target => Abstract_target
         procedure :: translate => Abstract_translate
         procedure :: add => Abstract_add
         procedure :: remove => Abstract_remove
+        procedure :: visit_energy => Abstract_visit_energy
+        procedure :: visit_contacts => Abstract_visit_contacts
+        procedure :: visit_min_distance => Abstract_visit_min_distance
+        procedure :: visit_dipolar_neighbours => Abstract_visit_dipolar_neighbours
         procedure, private :: construct_visitable_lists => Abstract_construct_visitable_lists
         procedure, private :: destroy_visitable_lists => Abstract_destroy_visitable_lists
         procedure, private :: fill_with_particles => Abstract_fill_with_particles
@@ -53,14 +54,15 @@ private
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
-        procedure :: target => Null_target
         procedure :: reset => Null_reset
-        procedure :: visit_energy => Null_visit_energy
-        procedure :: visit_contacts => Null_visit_contacts
-        procedure :: visit_min_distance => Null_visit_min_distance
+        procedure :: target => Null_target
         procedure :: translate => Null_translate
         procedure :: add => Null_add
         procedure :: remove => Null_remove
+        procedure :: visit_energy => Null_visit_energy
+        procedure :: visit_contacts => Null_visit_contacts
+        procedure :: visit_min_distance => Null_visit_min_distance
+        procedure :: visit_dipolar_neighbours => Null_visit_dipolar_neighbours
     end type Null_Visitable_Cells
 
 contains
@@ -80,6 +82,7 @@ contains
 
         this%periodic_box => periodic_box
         this%positions => positions
+        this%orientations => orientations
         this%hard_contact => hard_contact
         this%pair_potential => pair_potential
         this%dipolar_neighbourhood => dipolar_neighbourhood
@@ -147,6 +150,7 @@ contains
         this%dipolar_neighbourhood => null()
         this%pair_potential => null()
         this%hard_contact => null()
+        this%orientations => null()
         this%positions => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
@@ -266,6 +270,37 @@ contains
         end do
     end subroutine Abstract_visit_min_distance
 
+    subroutine Abstract_visit_dipolar_neighbours(this, overlap, adjacency_matrix, particle, &
+        visit_condition, i_exclude)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        logical, intent(out) :: overlap
+        logical, intent(inout) :: adjacency_matrix(:, :)
+        type(Concrete_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+
+        integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
+        logical :: at_bottom_layer, at_top_layer
+        integer :: local_i1, local_i2, local_i3
+
+        ijk_cell = this%neighbour_cells%index(particle%position)
+        at_bottom_layer = (ijk_cell(3) == lbound(this%visitable_lists, 3))
+        at_top_layer = (ijk_cell(3) == ubound(this%visitable_lists, 3))
+        do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
+            if (this%neighbour_cells%skip(at_bottom_layer, at_top_layer, local_i3)) cycle
+        do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
+        do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
+            ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
+                ijk_cell(2), ijk_cell(3))
+            call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
+                visit_dipolar_neighbours(overlap, adjacency_matrix, particle, visit_condition, &
+                    i_exclude)
+            if (overlap) return
+        end do
+        end do
+        end do
+    end subroutine Abstract_visit_dipolar_neighbours
+
     !> No check: to_position & from%position are assumed to be within accessible_domain
     subroutine Abstract_translate(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -349,8 +384,7 @@ contains
         type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
-        overlap = .false.
-        energy = 0._DP
+        overlap = .false.; energy = 0._DP
     end subroutine Null_visit_energy
 
     subroutine Null_visit_contacts(this, overlap, contacts, particle, visit_condition, i_exclude)
@@ -360,8 +394,7 @@ contains
         type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
-        overlap = .false.
-        contacts = 0._DP
+        overlap = .false.; contacts = 0._DP
     end subroutine Null_visit_contacts
 
     subroutine Null_visit_min_distance(this, overlap, ratio, particle, visit_condition, i_exclude)
@@ -371,9 +404,19 @@ contains
         type(Concrete_Particle), intent(in) :: particle
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
-        overlap = .false.
-        ratio = 0._DP
+        overlap = .false.; ratio = 0._DP
     end subroutine Null_visit_min_distance
+
+    subroutine Null_visit_dipolar_neighbours(this, overlap, adjacency_matrix, particle, &
+        visit_condition, i_exclude)
+        class(Null_Visitable_Cells), intent(in) :: this
+        logical, intent(out) :: overlap
+        logical, intent(inout) :: adjacency_matrix(:, :)
+        type(Concrete_Particle), intent(in) :: particle
+        procedure(abstract_visit_condition) :: visit_condition
+        integer, intent(in) :: i_exclude
+        overlap = .false.; adjacency_matrix = .false.
+    end subroutine Null_visit_dipolar_neighbours
 
     subroutine Null_translate(this, to_position, from)
         class(Null_Visitable_Cells), intent(inout) :: this

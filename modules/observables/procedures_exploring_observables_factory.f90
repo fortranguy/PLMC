@@ -1,6 +1,7 @@
 module procedures_exploring_observables_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use procedures_logical_factory, only: logical_destroy => destroy
 use module_changes_success, only: Concrete_Change_Counter, reset_counters
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
 use procedures_reals_factory, only:reals_create => create, reals_destroy => destroy
@@ -16,6 +17,8 @@ public :: create, destroy
 
 contains
 
+    !> @note adjacency_matrices%rectangle will be allocated in
+    !> [[classes_dipolar_neighbourhoods_visitor:Abstract_try]]
     pure subroutine create(observables, num_boxes, num_components)
         type(Exploring_Observables_Wrapper), intent(out) ::observables
         integer, intent(in) :: num_boxes, num_components
@@ -31,11 +34,13 @@ contains
             num_boxes)
         allocate(observables%insertion_successes(num_components, num_boxes))
         observables%insertion_successes = 0._DP
+        allocate(observables%adjacency_matrices(num_components, num_components, num_boxes))
     end subroutine create
 
     pure subroutine destroy(observables)
         type(Exploring_Observables_Wrapper), intent(inout) ::observables
 
+        call logical_destroy(observables%adjacency_matrices)
         if (allocated(observables%insertion_successes)) &
             deallocate(observables%insertion_successes)
         call observables_changes_destroy(observables%insertion_counters)

@@ -19,6 +19,10 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{target}{neighbourCells: \type{NeighbourCells}}}
+                \operation{\procedure{translate}{toPosition: \type{real[\numDimensions]},
+                    from: \type{Particle}}}
+                \operation{\procedure{add}{particle: \type{Particle}}}
+                \operation{\procedure{remove}{particle: \type{Particle}}}
                 \operation{\procedure{visitEnergy}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{Particle},
                     visitCondition: \procedure{visitCondition}
@@ -34,10 +38,12 @@
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
-                \operation{\procedure{translate}{toPosition: \type{real[\numDimensions]},
-                    from: \type{Particle}}}
-                \operation{\procedure{add}{particle: \type{Particle}}}
-                \operation{\procedure{remove}{particle: \type{Particle}}}
+                \operation{\procedure{visitDipolarNeighbours}{overlap: \type{bool},
+                    adjacencyMatrix: \type{bool[\numParticles, \numParticles]},
+                    particle: \type{Particle},
+                    visitCondition: \procedure{visitCondition}
+                        {iInside: \type{int}, iOutside: \type{int}},
+                    iExclude: \type{int}}}
             \end{abstractclass}
         \end{scope}
 

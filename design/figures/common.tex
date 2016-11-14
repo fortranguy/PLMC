@@ -47,7 +47,7 @@
                 \namespace{Changes} :: Changes, ChangedBoxSizeRatio \\
                 \namespace{GeneratingAlgorithm} :: GeneratingAlgorithm \\
                 \namespace{ExploringAlgorithms} :: MaximumBoxCompressionExplorer, VolumeChangeMethod
-                    ParticleInsertionMethod \\
+                    ParticleInsertionMethod, DipolarNeighbourhoodsVisitor \\
                 \namespace{Observables} :: GeneratingObservables \\
                 \namespace{Readers} :: Readers \\
                 \namespace{Writers} :: GeneratingWriters, ExploringWriters};
@@ -79,6 +79,8 @@
                 \UMLattribute{volumeChangeMethod: \type{VolumeChangeMethod}}
                 \UMLattribute{particleInsertionDomains: \type{ParallelepipedDomain[\numBoxes]}}
                 \UMLattribute{particleInsertionMethod: \type{ParticleInsertionMethod}}
+                \UMLattribute{dipolarNeighbourhoodsVisitors:
+                    \type{DipolarNeighbourhoodsVisitor[\numBoxes]}}
             \end{class}
         \end{scope}
 

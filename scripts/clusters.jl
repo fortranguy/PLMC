@@ -12,7 +12,7 @@ i_box = 1 # data will be overridden when reading snap shots
 periodicBox = PLMC.newBox(i_box, generatingData)
 components = PLMC.newComponents(i_box, generatingData)
 exploringData = JSON.parsefile(ARGS[2]; dicttype=Dict, use_mmap=true)
-maximumEdgeDistance = exploringData["Clusters"]["maximum distance"]
+maximumEdgeDistance = exploringData["Dipolar Graph"]["maximum distance"]
 
 for i_snap=1:size(ARGS[3:end], 1)
 

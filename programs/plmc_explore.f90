@@ -62,6 +62,10 @@ implicit none
         end do
         call markov_chain_explorer%volume_change_method%try(observables)
         call markov_chain_explorer%particle_insertion_method%try(observables)
+        do i_box = 1, size(markov_chain_explorer%dipolar_neighbourhoods_visitors)
+            call markov_chain_explorer%dipolar_neighbourhoods_visitors(i_box)%&
+                try(observables%adjacency_matrices(:, :, i_box))
+        end do
         call plmc_set(observables)
         call plmc_write(io%writers, observables, i_snap)
     end do

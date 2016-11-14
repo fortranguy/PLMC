@@ -16,13 +16,12 @@ public :: create, destroy
 
 contains
 
-    subroutine create(neighbourhoods, components, needed, generating_data, prefix)
+    subroutine create(neighbourhoods, components, needed, exploring_data, prefix)
         type(Dipolar_Neighbourhood_Line), allocatable, intent(out) :: neighbourhoods(:)
         type(Component_Wrapper), intent(in) :: components(:, :)
         logical, intent(in) :: needed
-        type(json_file), intent(inout) :: generating_data
+        type(json_file), intent(inout) :: exploring_data
         character(len=*), intent(in) :: prefix
-
 
         logical :: are_dipolar(size(components, 1), size(components, 2))
         real(DP) :: max_distance
@@ -46,7 +45,7 @@ contains
                     allocate(Concrete_Dipolar_Neighbourhood :: neighbourhoods(j_component)%&
                         line(i_component)%neighbourhood)
                     data_field = prefix//"maximum distance"
-                    call generating_data%get(data_field, max_distance, data_found)
+                    call exploring_data%get(data_field, max_distance, data_found)
                     call check_data_found(data_field, data_found)
                 else
                     allocate(Null_Dipolar_Neighbourhood :: neighbourhoods(j_component)%&

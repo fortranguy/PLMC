@@ -29,7 +29,7 @@
                 \namespace{Random} :: RandomCoordinates \\
                 \namespace{Environment} :: PeriodicBox, Environment \\
                 \namespace{Mixture} :: NumParticles, Component \\
-                \namespace{ShortInteractions} :: PairPotential, Cells, ShortInteractions \\
+                \namespace{ShortInteractions} :: PairPotential, VisitableCells, ShortInteractions \\
                 \namespace{DipolarInteractions} :: DipolarInteractionsDynamic,
                     DipolarInteractionsStatic, DipolarInteractionsFacade \\
                 \namespace{Changes} :: ChangedBoxSizeRatio, MaximumBoxCompression \\
@@ -54,11 +54,23 @@
                     $\mathAggregation$ components: \type{Component[\numComponents]},
                     $\mathAggregation$ componentsPairs:
                         \type{PairPotential[\numComponents, \numComponents]\textsubscript{\sym}},
-                    $\mathAggregation$ cells: \type{Cells},
+                    $\mathAggregation$ visitableCells:
+                        \type{VisitableCells[\numComponents, \numComponents]},
                     $\mathComposition$ maximumBoxCompression: \type{MaximumBoxCompression}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{try}{maximumBoxCompressionDelta: \type{real}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ParticleInsertionMethod.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DipolarNeighbourhoodsVisitor}{0, 0}
+                \operation{\procedure{construct}{$\mathAggregation$ components:
+                    \type{Component[\numComponents]}, $\mathAggregation$ visitableCells:
+                    \type{VisitableCells[\numComponents, \numComponents]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{try}{adjacencyMatrices:
+                    \type{bool[\numParticles I, \numParticles J][\numComponents, \numComponents]}}}
             \end{abstractclass}
         \end{scope}
 

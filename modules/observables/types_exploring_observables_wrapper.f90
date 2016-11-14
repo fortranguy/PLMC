@@ -1,6 +1,7 @@
 module types_exploring_observables_wrapper
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use types_logical_wrapper, only: Logical_Rectangle
 use module_changes_success, only: Concrete_Change_Counter
 use types_observables_energies, only: Concrete_Observables_Energies
 
@@ -16,6 +17,7 @@ private
         type(Concrete_Observables_Energies), allocatable :: energies(:)
         type(Concrete_Change_Counter), allocatable :: insertion_counters(:, :)
         real(DP), allocatable :: insertion_successes(:, :)
+        type(Logical_Rectangle), allocatable ::adjacency_matrices(:, :, :)
     end type Exploring_Observables_Wrapper
 
 end module types_exploring_observables_wrapper

@@ -1,7 +1,9 @@
 module procedures_short_interactions_visitor
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use procedures_visit_condition, only: abstract_visit_condition, visit_lower, visit_all
+use types_logical_wrapper, only: Logical_Rectangle
+use procedures_visit_condition, only: abstract_visit_condition, visit_different, visit_lower, &
+    visit_all
 use types_particle_wrapper, only: Concrete_Particle
 use types_component_wrapper, only: Component_Wrapper
 use classes_pair_potential, only: Pair_Potential_Wrapper, Pair_Potential_Line
@@ -21,6 +23,7 @@ interface visit
     module procedure :: visit_cells_energies
     module procedure :: visit_cells_contacts
     module procedure :: visit_cells_min_distance
+    module procedure :: visit_dipolar_neighbours
 end interface visit
 
 contains
@@ -121,6 +124,7 @@ contains
                 else
                     visit_condition => visit_all
                 end if
+
                 energy_ij = 0._DP
                 do i_particle = 1, components(j_component)%positions%get_num()
                     particle%i = i_particle
@@ -158,6 +162,7 @@ contains
                 else
                     visit_condition => visit_all
                 end if
+
                 do i_particle = 1, components(j_component)%positions%get_num()
                     particle%i = i_particle
                     particle%position = components(j_component)%positions%get(particle%i)
@@ -195,6 +200,7 @@ contains
                 else
                     visit_condition => visit_all
                 end if
+
                 do i_particle = 1, components(j_component)%positions%get_num()
                     particle%i = i_particle
                     particle%position = components(j_component)%positions%get(particle%i)
@@ -209,5 +215,52 @@ contains
             end do
         end do
     end subroutine visit_cells_min_distance
+
+    !> @note particle%dipole_moment is useless for now (cf. underlying implementation)
+    subroutine visit_dipolar_neighbours(overlap, adjacency_matrices, components, visitable_cells)
+        logical, intent(out) :: overlap
+        type(Logical_Rectangle), intent(inout) :: adjacency_matrices(:, :)
+        type(Component_Wrapper), intent(in) :: components(:)
+        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells(:, :)
+
+        integer :: i_component, j_component, nums_dipoles(size(components))
+        integer :: i_particle, i_exclude
+        logical :: same_component
+        type(Concrete_Particle) :: particle
+        procedure(abstract_visit_condition), pointer :: visit_condition => null()
+
+        do i_component = 1, size(nums_dipoles)
+            nums_dipoles(i_component) = components(i_component)%orientations%get_num()
+        end do
+
+        overlap = .false.
+        do j_component = 1, size(visitable_cells, 2)
+            do i_component = 1, size(visitable_cells, 1)
+                if (nums_dipoles(i_component) == 0 .or. nums_dipoles(j_component) == 0) then
+                    adjacency_matrices(i_component, j_component)%rectangle = .false.
+                    cycle
+                end if
+
+                same_component = i_component == j_component
+                if (same_component) then
+                    visit_condition => visit_different
+                else
+                    visit_condition => visit_all
+                end if
+
+                do i_particle = 1, components(j_component)%orientations%get_num()
+                    particle%i = i_particle
+                    particle%position = components(j_component)%positions%get(particle%i)
+                    particle%orientation = components(j_component)%orientations%get(particle%i)
+                    i_exclude = merge(particle%i, 0, same_component)
+                    call visitable_cells(i_component, j_component)%&
+                        visit_dipolar_neighbours(overlap, &
+                            adjacency_matrices(i_component, j_component)%rectangle, particle, &
+                            visit_condition, i_exclude)
+                    if (overlap) return
+                end do
+            end do
+        end do
+    end subroutine visit_dipolar_neighbours
 
 end module procedures_short_interactions_visitor

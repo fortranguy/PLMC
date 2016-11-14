@@ -43,7 +43,8 @@
         "delta": 0.1,
         "file name": "radial.out"
     },
-    "Clusters": {
+    "Dipolar Graph": {
+        "make graph": true,
         "maximum distance": 1.5
     }
 }
