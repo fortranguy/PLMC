@@ -113,7 +113,7 @@ contains
         do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
         do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
             call this%visitable_lists(global_i1, global_i2, global_i3)%construct(this%periodic_box,&
-                this%positions, this%hard_contact)
+                this%positions, this%hard_contact, this%pair_potential)
         end do
         end do
         end do
@@ -184,7 +184,7 @@ contains
             ijk_local_cell = this%neighbour_cells%get(local_i1, local_i2, local_i3, ijk_cell(1), &
                 ijk_cell(2), ijk_cell(3))
             call this%visitable_lists(ijk_local_cell(1), ijk_local_cell(2), ijk_local_cell(3))%&
-                visit(overlap, energy_i, particle, this%pair_potential, visit_condition, i_exclude)
+                visit(overlap, energy_i, particle, visit_condition, i_exclude)
             if (overlap) return
             energy = energy + energy_i
         end do

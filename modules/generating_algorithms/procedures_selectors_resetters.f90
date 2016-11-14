@@ -45,14 +45,14 @@ contains
 
         integer :: i_box
         integer :: i_couple, ij_components(2)
-        integer :: nums_candidates(couples(1)%get_num()), nums_particles(size(ij_components))
+        integer :: nums_candidates(couples(1)%get_num()), num_particles
 
         do i_box = 1, size(selectors)
             do i_couple = 1, size(nums_candidates)
                 ij_components = couples(i_box)%get(i_couple)
-                nums_particles = [components(ij_components(1), i_box)%average_num_particles%get(), &
-                    components(ij_components(2), i_box)%average_num_particles%get()]
-                nums_candidates(i_couple) = merge(maxval(nums_particles), 0, &
+                num_particles = components(ij_components(1), i_box)%average_num_particles%get() + &
+                    components(ij_components(2), i_box)%average_num_particles%get()
+                nums_candidates(i_couple) = merge(num_particles/2, 0, &
                         can_swap(ij_components(1), i_box) .and. can_swap(ij_components(2), i_box))
             end do
             call selectors(i_box)%reset(nums_candidates)

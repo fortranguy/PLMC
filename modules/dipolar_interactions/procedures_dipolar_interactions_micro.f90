@@ -9,6 +9,26 @@ public :: des_real_B, des_real_C, reci_number_1_sym, reci_number_2_sym, set_four
 
 contains
 
+    !> From:
+    !> \[
+    !>      \frac{1}{4 \pi \varepsilon} \left[
+    !>          \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r_{ij}^3} -
+    !>          3 \frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r_{ij}^5}
+    !>      \right]
+    !> \]
+    pure logical function dipolar_energy_is_negative(orientation_i, orientation_j, vector_ij) &
+        result(is_negative)
+        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
+        real(DP), dimension(:), intent(in) :: vector_ij
+
+        real(DP) :: distance_ij
+
+        distance_ij = norm2(vector_ij)
+        is_negative = dot_product(orientation_i, orientation_j) / distance_ij**3 - &
+            3._DP * dot_product(orientation_i, vector_ij) * &
+            dot_product(orientation_j, vector_ij) / distance_ij**5 < 0._DP
+    end function dipolar_energy_is_negative
+
     !> \[
     !>      B_\alpha(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>          \frac{2\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}

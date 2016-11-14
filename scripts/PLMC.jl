@@ -58,7 +58,7 @@ import LightGraphs; LG = LightGraphs
             3 * dot(orientation_i, vector_ij) * dot(orientation_j, vector_ij) / distance_ij^5 < 0
     end
 
-    function newBox(i_box::Int64, generatingData::Dict{UTF8String, Any})
+    function newBox(i_box::Int64, generatingData::Dict{String, Any})
         periodicity = generatingData["Environment"]["Boxes"]["periodicity"]
         boxSize = map(Float64, generatingData["Environment"]["Boxes"]["initial size"][i_box])
         if periodicity == "XYZ"
@@ -77,7 +77,7 @@ import LightGraphs; LG = LightGraphs
         isDipolar :: Bool
     end
 
-    function newComponents(i_box::Int64, generatingData::Dict{UTF8String, Any})
+    function newComponents(i_box::Int64, generatingData::Dict{String, Any})
         components = Array{Component}(generatingData["Mixture"]["number of components"])
         if (size(components, 1) == 0)
             exit(0)
@@ -92,7 +92,7 @@ import LightGraphs; LG = LightGraphs
         components
     end
 
-    function newMinDistances(components::Array{Component, 1}, generatingData::Dict{UTF8String, Any})
+    function newMinDistances(components::Array{Component, 1}, generatingData::Dict{String, Any})
         interMinDistances = zeros(size(components, 1), size(components, 1)) # triangle?
         for i_component = 1:size(components, 1)
             for j_component = 1:i_component-1
@@ -106,7 +106,7 @@ import LightGraphs; LG = LightGraphs
     end
 
     function writeCoordinates(i_box::Int64, components::Array{Component, 1},
-        boxSize::Array{Float64, 1}, generatingData::Dict{UTF8String, Any})
+        boxSize::Array{Float64, 1}, generatingData::Dict{String, Any})
         outputFile = open(generatingData["Input"]["initial coordinates"][i_box], "w")
         println(outputFile, "# box_size    ", join(boxSize, "    "))
         println(outputFile, "# nums_particles    ",

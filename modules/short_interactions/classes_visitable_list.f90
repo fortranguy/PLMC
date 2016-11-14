@@ -1,7 +1,6 @@
 module classes_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: num_dimensions
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_particle_wrapper, only: Concrete_Particle
 use classes_component_coordinates, only: Abstract_Component_Coordinates
@@ -19,6 +18,7 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Hard_Contact), pointer :: hard_contact => null()
+        class(Abstract_Pair_Potential), pointer :: pair_potential => null()
         type(Concrete_Linkable_Node), pointer :: beginning => null()
     contains
         procedure :: construct => Abstract_construct
@@ -67,17 +67,19 @@ contains
 
 !implementation Abstract_Visitable_List
 
-    subroutine Abstract_construct(this, periodic_box, positions, hard_contact)
+    subroutine Abstract_construct(this, periodic_box, positions, hard_contact, pair_potential)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
         this%periodic_box => periodic_box
         this%positions => positions
         this%hard_contact => hard_contact
+        this%pair_potential => pair_potential
 
         allocate(this%beginning)
         current => this%beginning
@@ -92,6 +94,7 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
 
         call deallocate_list(this%beginning)
+        this%pair_potential => null()
         this%hard_contact => null()
         this%positions => null()
         this%periodic_box => null()
@@ -118,18 +121,16 @@ contains
         end do
     end subroutine Abstract_set
 
-    subroutine Abstract_visit_energy(this, overlap, energy, particle, pair_potential, &
-        visit_condition, i_exclude)
+    subroutine Abstract_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
-        real(DP) :: energy_i, distance
+        real(DP) :: energy_i
 
         overlap = .false.
         energy = 0._DP
@@ -138,9 +139,8 @@ contains
         do
             next => current%next
             if (visit_condition(current%i, i_exclude)) then
-                distance = this%periodic_box%distance(particle%position, this%positions%&
-                    get(current%i))
-                call pair_potential%meet(overlap, energy_i, distance)
+                call this%pair_potential%meet(overlap, energy_i, this%periodic_box%&
+                    distance(particle%position, this%positions%get(current%i)))
                 if (overlap) return
                 energy = energy + energy_i
             end if
@@ -160,7 +160,7 @@ contains
         integer, intent(in) :: i_exclude
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
-        real(DP) :: contact_i, vector(num_dimensions)
+        real(DP) :: contact_i
 
         overlap = .false.
         contacts = 0._DP
@@ -169,8 +169,8 @@ contains
         do
             next => current%next
             if (visit_condition(current%i, i_exclude)) then
-                vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
-                call this%hard_contact%meet(overlap, contact_i, min_distance, vector)
+                call this%hard_contact%meet(overlap, contact_i, min_distance, this%periodic_box%&
+                    vector(particle%position, this%positions%get(current%i)))
                 if (overlap) return
                 contacts = contacts + contact_i
             end if
@@ -189,10 +189,9 @@ contains
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
-        real(DP) :: ratio_i
-        real(DP) :: vector(num_dimensions)
-        logical :: can_overlap
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
+        logical :: can_overlap
+        real(DP) :: ratio_i
 
         overlap = .false.
         ratio = max_distance / min_distance
@@ -201,8 +200,8 @@ contains
         do
             next => current%next
             if (visit_condition(current%i, i_exclude)) then
-                vector = this%periodic_box%vector(particle%position, this%positions%get(current%i))
-                call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, vector)
+                call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, this%&
+                    periodic_box%vector(particle%position, this%positions%get(current%i)))
                 if (can_overlap) then
                     if (overlap) return
                     if (ratio_i < ratio) ratio = ratio_i
@@ -254,17 +253,20 @@ contains
 
 !implementation Concrete_Visitable_Array
 
-    subroutine Array_construct(this, periodic_box, positions, hard_contact)
+    subroutine Array_construct(this, periodic_box, positions, hard_contact, pair_potential)
         class(Concrete_Visitable_Array), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         integer :: initial_size
 
         this%periodic_box => periodic_box
         this%positions => positions
         this%hard_contact => hard_contact
+        this%pair_potential => pair_potential
+
         this%num_nodes = 0
         initial_size = 1
         allocate(this%nodes(initial_size))
@@ -274,6 +276,7 @@ contains
         class(Concrete_Visitable_Array), intent(inout) :: this
 
         if (allocated(this%nodes)) deallocate(this%nodes)
+        this%pair_potential => null()
         this%hard_contact => null()
         this%positions => null()
         this%periodic_box => null()
@@ -293,26 +296,23 @@ contains
         end do
     end subroutine Array_set
 
-    subroutine Array_visit_energy(this, overlap, energy, particle, pair_potential, visit_condition,&
-        i_exclude)
+    subroutine Array_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
-        real(DP) :: energy_i, distance
+        real(DP) :: energy_i
         integer :: i_node
 
         overlap = .false.
         energy = 0._DP
         do i_node = 1, this%num_nodes
             if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            distance = this%periodic_box%distance(particle%position, this%positions%&
-                get(this%nodes(i_node)))
-            call pair_potential%meet(overlap, energy_i, distance)
+            call this%pair_potential%meet(overlap, energy_i, this%periodic_box%&
+                distance(particle%position, this%positions%get(this%nodes(i_node))))
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -328,16 +328,15 @@ contains
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
-        real(DP) :: contact_i, vector(num_dimensions)
+        real(DP) :: contact_i
         integer :: i_node
 
         overlap = .false.
         contacts = 0._DP
         do i_node = 1, this%num_nodes
             if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            vector = this%periodic_box%vector(particle%position, this%positions%get(this%&
-                nodes(i_node)))
-            call this%hard_contact%meet(overlap, contact_i, min_distance, vector)
+            call this%hard_contact%meet(overlap, contact_i, min_distance, this%periodic_box%&
+                vector(particle%position, this%positions%get(this%nodes(i_node))))
             if (overlap) return
             contacts = contacts + contact_i
         end do
@@ -354,7 +353,6 @@ contains
         integer, intent(in) :: i_exclude
 
         real(DP) :: ratio_i
-        real(DP) :: vector(num_dimensions)
         logical :: can_overlap
         integer :: i_node
 
@@ -362,9 +360,8 @@ contains
         ratio = max_distance / min_distance
         do i_node = 1, this%num_nodes
             if (.not.visit_condition(this%nodes(i_node), i_exclude)) cycle
-            vector = this%periodic_box%vector(particle%position, this%positions%get(this%&
-                nodes(i_node)))
-            call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, vector)
+            call this%hard_contact%meet(can_overlap, overlap, ratio_i, min_distance, this%&
+                periodic_box%vector(particle%position, this%positions%get(this%nodes(i_node))))
             if (.not. can_overlap) cycle
             if (overlap) return
             if (ratio_i < ratio) ratio = ratio_i
@@ -399,11 +396,12 @@ contains
 
 !implementation Null_Visitable_List
 
-    subroutine Null_construct(this, periodic_box, positions, hard_contact)
+    subroutine Null_construct(this, periodic_box, positions, hard_contact, pair_potential)
         class(Null_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
@@ -415,13 +413,11 @@ contains
         integer, intent(in) :: i_target, i_source
     end subroutine Null_set
 
-    subroutine Null_visit_energy(this, overlap, energy, particle, pair_potential, visit_condition, &
-        i_exclude)
+    subroutine Null_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
         overlap = .false.

@@ -65,12 +65,12 @@
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     $\mathAggregation$ positions: \type{ComponentCoordinates},
-                    hardContact: \type{HardContact}}}
+                    hardContact: \type{HardContact},
+                    $\mathAggregation$ pairPotential: \type{PairPotential}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{set}{iTarger: \type{int}, iParticle: \type{int}}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
                     particle: \type{TemporaryParticle},
-                    pairPotential: \type{PairPotential},
                     visitCondition: \procedure{visitCondition}
                         {iInside: \type{int}, iOutside: \type{int}},
                     iExclude: \type{int}}}
