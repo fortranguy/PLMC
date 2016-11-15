@@ -47,10 +47,10 @@ contains
     end subroutine Abstract_set
 
     !> @todo Make \( \vec{r}_ij \cdot \mu_i > 0 \) stricter and symmetric?
-    pure subroutine Abstract_meet(this, overlap, i_is_connected_to_j, min_distance, vector_ij, &
+    pure subroutine Abstract_meet(this, overlap, ij_are_neighbour, min_distance, vector_ij, &
         orientation_i, orientation_j)
         class(Abstract_Dipolar_Neighbourhood), intent(in) :: this
-        logical, intent(out) :: overlap, i_is_connected_to_j
+        logical, intent(out) :: overlap, ij_are_neighbour
         real(DP), intent(in) :: min_distance
         real(DP), dimension(:), intent(in) :: vector_ij,  orientation_i, orientation_j
 
@@ -64,7 +64,7 @@ contains
             overlap = .false.
         end if
 
-        i_is_connected_to_j = distance_ij < this%max_distance .and. &
+        ij_are_neighbour = distance_ij < this%max_distance .and. &
             dipolar_energy_is_negative(vector_ij, orientation_i, orientation_j) .and. &
             dot_product(vector_ij, orientation_i) > 0._DP
     end subroutine Abstract_meet
@@ -78,13 +78,13 @@ contains
         real(DP), intent(in) :: max_distance
     end subroutine Null_set
 
-    pure subroutine Null_are_neighbour(this, overlap, i_is_connected_to_j, min_distance, vector_ij,&
+    pure subroutine Null_are_neighbour(this, overlap, ij_are_neighbour, min_distance, vector_ij,&
         orientation_i, orientation_j)
         class(Null_Dipolar_Neighbourhood), intent(in) :: this
-        logical, intent(out) :: overlap, i_is_connected_to_j
+        logical, intent(out) :: overlap, ij_are_neighbour
         real(DP), intent(in) :: min_distance
         real(DP), dimension(:), intent(in) :: vector_ij,  orientation_i, orientation_j
-        overlap = .false.; i_is_connected_to_j = .false.
+        overlap = .false.; ij_are_neighbour = .false.
     end subroutine Null_are_neighbour
 
 !end implementation Null_Dipolar_Neighbourhood

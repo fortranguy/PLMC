@@ -179,8 +179,8 @@ contains
     pure integer function Chemical_Potential_get(this) result(average_num_particles)
         class(Constant_Chemical_Potential_Num_Particles), intent(in) :: this
 
-        average_num_particles = this%chemical_potential%get_density() * &
-            product(this%accessible_domain%get_size())
+        average_num_particles = ceiling(this%chemical_potential%get_density() * &
+            product(this%accessible_domain%get_size()))
     end function Chemical_Potential_get
 
 !end implementation Constant_Chemical_Potential_Num_Particles
@@ -238,12 +238,6 @@ contains
     pure subroutine Null_set(this)
         class(Null_Average_Num_Particles), intent(inout) :: this
     end subroutine Null_set
-
-    !> @todo other value than 0?
-    pure integer function Null_get_accumulation_period(this) result(accumulation_period)
-        class(Null_Average_Num_Particles), intent(in) :: this
-        accumulation_period = 0
-    end function Null_get_accumulation_period
 
     pure subroutine Null_accumulate(this, i_step)
         class(Null_Average_Num_Particles), intent(inout) :: this

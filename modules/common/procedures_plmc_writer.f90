@@ -1,10 +1,8 @@
 module procedures_plmc_writer
 
-use procedures_random_seed_factory, only: random_seed_write => write
 use types_observables_energies, only: Concrete_Observables_Energies
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
-use procedures_generating_algorithms_factory, only: generating_algorithms_write => write
 use types_energies_writers, only: Concrete_Energies_Writers
 use types_generating_writers_wrapper, only: Generating_Writers_Wrapper
 use types_exploring_writers_wrapper, only: Exploring_Writers_Wrapper
@@ -15,8 +13,6 @@ private
 public :: plmc_write
 
 interface plmc_write
-    module procedure :: random_seed_write
-    module procedure :: generating_algorithms_write
     module procedure :: write_generating_observables, write_exploring_observables
 end interface plmc_write
 

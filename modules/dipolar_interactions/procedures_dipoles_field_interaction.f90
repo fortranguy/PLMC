@@ -47,14 +47,6 @@ contains
             get(old%position))
     end function visit_rotation
 
-    pure real(DP) function visit_switch(external_field, particles) result(delta_energy)
-        class(Abstract_External_Field), intent(in) :: external_field
-        type(Concrete_Particle), intent(in) :: particles(:)
-
-        delta_energy = dot_product(particles(2)%dipole_moment - particles(1)%dipole_moment, &
-            external_field%get(particles(2)%position) - external_field%get(particles(1)%position))
-    end function visit_switch
-
     pure real(DP) function visit_add(external_field, particle) result(delta_energy)
         class(Abstract_External_Field), intent(in) :: external_field
         type(Concrete_Particle), intent(in) :: particle

@@ -3,7 +3,16 @@
 program plmc_generate
 
 use, intrinsic :: iso_fortran_env, only: output_unit
+use data_output_objects, only: generating_report_filename
+use data_arguments, only: i_generating
+use json_module, only: json_core
+use procedures_json_data_factory, only: json_data_create => create, json_data_destroy => destroy
+use procedures_json_reports_factory, only: json_reports_create => create, json_reports_destroy => &
+    destroy
+use procedures_random_seed_factory, only: random_seed_add_to_report => add_to_report
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use procedures_generating_algorithms_factory, only: generating_algorithms_add_to_report => &
+    add_to_report
 use types_markov_chain_generator_wrapper, only: Markov_Chain_Generator_Wrapper
 use types_generating_observables_wrapper, only: Generating_Observables_Wrapper
 use types_generating_io, only: Generating_IO_Wrapper
@@ -18,6 +27,7 @@ implicit none
     type(Physical_Model_Wrapper) :: physical_model
     type(Markov_Chain_Generator_Wrapper) :: markov_chain_generator
     type(Generating_Observables_Wrapper) :: observables
+    type(json_core) :: json
     type(Generating_IO_Wrapper) :: io
 
     integer :: num_tuning_steps, num_steps, i_step
@@ -25,18 +35,21 @@ implicit none
 
     call plmc_catch_generating_help()
 
-    call plmc_create(io%generating_data)
-    call plmc_create(physical_model, io%generating_data)
-    call plmc_set(io%generating_data)
-    call plmc_set(num_tuning_steps, num_steps, io%generating_data)
-    call plmc_create(markov_chain_generator, physical_model, num_tuning_steps, io%generating_data)
+    call json_data_create(io%parameters, i_generating)
+    call plmc_create(physical_model, io%parameters)
+    call plmc_set(io%parameters)
+    call plmc_set(num_tuning_steps, num_steps, io%parameters)
+    call plmc_create(markov_chain_generator, physical_model, num_tuning_steps, io%parameters)
     call plmc_create(observables, physical_model%mixture%components)
-    call plmc_create(io%readers, io%writers, physical_model, markov_chain_generator%changes, &
-        io%generating_data)
-    call plmc_set(io%readers, io%generating_data)
-    call plmc_destroy(io%generating_data)
-    call plmc_create(io%json, io%report_data)
-    call plmc_write(io%json, io%report_data)
+    call plmc_create(io%readers, io%writers, physical_model, markov_chain_generator%changes, io%&
+        parameters)
+    call plmc_set(io%readers, io%parameters)
+    call json_data_destroy(io%parameters)
+    call json%initialize()
+    call json%create_object(io%report%root, "")
+    call json_reports_create(json, io%report)
+    call random_seed_add_to_report(json, io%report%random_seed, "initial seed")
+    call json%print(io%report%root, generating_report_filename)
 
     call plmc_reset(physical_model)
     call markov_chain_generator%plmc_propagator%reset()
@@ -53,7 +66,9 @@ implicit none
         call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
         if (changes_tuned) exit
     end do
-    call plmc_write(io%json, io%report_data, markov_chain_generator%generating_algorithms)
+    call generating_algorithms_add_to_report(json, io%report%algorithms_weight, &
+        markov_chain_generator%generating_algorithms)
+    call json%print(io%report%root, generating_report_filename)
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call markov_chain_generator%plmc_propagator%try(observables)
@@ -64,8 +79,10 @@ implicit none
     call plmc_reset(physical_model)
     call plmc_visit(observables%energies, physical_model, use_cells=.false.)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, num_steps)
+    call random_seed_add_to_report(json, io%report%random_seed, "final seed")
+    call json%print(io%report%root, generating_report_filename)
 
-    call plmc_destroy(io%json, io%report_data)
+    call json_reports_destroy(json, io%report)
     call plmc_destroy(io%readers, io%writers)
     call plmc_destroy(observables)
     call plmc_destroy(markov_chain_generator)

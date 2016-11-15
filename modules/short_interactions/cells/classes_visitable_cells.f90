@@ -8,10 +8,10 @@ use classes_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_size, only: box_size_max_distance => max_distance
 use classes_component_coordinates, only: Abstract_Component_Coordinates
 use types_particle_wrapper, only: Concrete_Particle
-use classes_hard_contact, only: Abstract_Hard_Contact
 use procedures_visit_condition, only: abstract_visit_condition
-use classes_visitable_list, only: Abstract_Visitable_List
 use classes_pair_potential, only: Abstract_Pair_Potential
+use classes_hard_contact, only: Abstract_Hard_Contact
+use classes_visitable_list, only: Abstract_Visitable_List
 use classes_neighbour_cells, only: Abstract_Neighbour_Cells
 use classes_dipoles_neighbourhood, only: Abstract_Dipolar_Neighbourhood
 
@@ -24,8 +24,8 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         class(Abstract_Component_Coordinates), pointer :: orientations => null()
-        class(Abstract_Hard_Contact), pointer :: hard_contact => null()
         class(Abstract_Pair_Potential), pointer :: pair_potential => null()
+        class(Abstract_Hard_Contact), pointer :: hard_contact => null()
         class(Abstract_Dipolar_Neighbourhood), pointer :: dipolar_neighbourhood => null()
         class(Abstract_Neighbour_Cells), pointer :: neighbour_cells => null()
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :), list_mold
@@ -69,13 +69,13 @@ contains
 
 !implementation Abstract_Visitable_Cells
 
-    subroutine Abstract_construct(this, periodic_box, positions, orientations, hard_contact, &
-        pair_potential, dipolar_neighbourhood, neighbour_cells, list_mold)
+    subroutine Abstract_construct(this, periodic_box, positions, orientations, pair_potential, &
+        hard_contact, dipolar_neighbourhood, neighbour_cells, list_mold)
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Dipolar_Neighbourhood), target, intent(in) :: dipolar_neighbourhood
         class(Abstract_Neighbour_Cells), intent(in) :: neighbour_cells
         class(Abstract_Visitable_List), intent(in) :: list_mold
@@ -83,8 +83,8 @@ contains
         this%periodic_box => periodic_box
         this%positions => positions
         this%orientations => orientations
-        this%hard_contact => hard_contact
         this%pair_potential => pair_potential
+        this%hard_contact => hard_contact
         this%dipolar_neighbourhood => dipolar_neighbourhood
         call this%target(neighbour_cells)
         allocate(this%list_mold, mold=list_mold)
@@ -121,8 +121,8 @@ contains
         do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
         do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
             call this%visitable_lists(global_i1, global_i2, global_i3)%&
-                construct(this%periodic_box,this%positions, this%orientations, this%hard_contact, &
-                    this%pair_potential, this%dipolar_neighbourhood)
+                construct(this%periodic_box,this%positions, this%orientations, this%pair_potential,&
+                     this%hard_contact, this%dipolar_neighbourhood)
         end do
         end do
         end do
@@ -148,8 +148,8 @@ contains
         if (allocated(this%list_mold)) deallocate(this%list_mold)
         this%neighbour_cells => null()
         this%dipolar_neighbourhood => null()
-        this%pair_potential => null()
         this%hard_contact => null()
+        this%pair_potential => null()
         this%orientations => null()
         this%positions => null()
         this%periodic_box => null()
@@ -245,7 +245,7 @@ contains
         procedure(abstract_visit_condition) :: visit_condition
         integer, intent(in) :: i_exclude
 
-        real(DP) :: ratio_i, max_distance
+        real(DP) :: ratio_i
         integer, dimension(num_dimensions) :: ijk_cell, ijk_local_cell
         logical :: at_bottom_layer, at_top_layer
         integer :: local_i1, local_i2, local_i3
@@ -352,13 +352,13 @@ contains
 
 !implementation Null_Visitable_Cells
 
-    subroutine Null_construct(this, periodic_box, positions, orientations, hard_contact, &
-        pair_potential, dipolar_neighbourhood, neighbour_cells, list_mold)
+    subroutine Null_construct(this, periodic_box, positions, orientations, pair_potential, &
+        hard_contact, dipolar_neighbourhood, neighbour_cells, list_mold)
         class(Null_Visitable_Cells), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
-        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+        class(Abstract_Hard_Contact), target, intent(in) :: hard_contact
         class(Abstract_Dipolar_Neighbourhood), target, intent(in) :: dipolar_neighbourhood
         class(Abstract_Neighbour_Cells), intent(in) :: neighbour_cells
         class(Abstract_Visitable_List), intent(in) :: list_mold

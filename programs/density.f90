@@ -5,8 +5,7 @@ use data_constants, only: num_dimensions
 use data_input_prefixes, only: environment_prefix, mixture_prefix, density_prefix
 use data_arguments, only: i_generating, i_exploring, num_json_arguments
 use json_module, only: json_file
-use procedures_json_data_factory, only: json_data_create_input => create_input, &
-    json_data_destroy_input => destroy_input
+use procedures_json_data_factory, only: json_data_create => create, json_data_destroy => destroy
 use procedures_checks, only: check_in_range
 use procedures_command_arguments, only: create_filename_from_argument
 use classes_periodic_box, only: Abstract_Periodic_Box
@@ -45,7 +44,7 @@ implicit none
     type(json_file) :: generating_data, exploring_data
 
     call plmc_catch_density_help()
-    call json_data_create_input(generating_data, i_generating)
+    call json_data_create(generating_data, i_generating)
     call plmc_set_num_snaps(num_snaps, generating_data)
     call boxes_create(periodic_boxes, generating_data, environment_prefix, unique=.true.)
     call walls_create(floor_penetration, generating_data, environment_prefix)
@@ -54,7 +53,7 @@ implicit none
     call walls_create(visitable_walls, periodic_boxes, floor_penetration, wall_min_distance, &
         generating_data, environment_prefix)
     num_components = property_num_components(generating_data, mixture_prefix)
-    call json_data_destroy_input(generating_data)
+    call json_data_destroy(generating_data)
 
     max_box_size = 0._DP
     do i_snap = 1, num_snaps
@@ -64,12 +63,12 @@ implicit none
         if (allocated(snap_filename)) deallocate(snap_filename)
     end do
 
-    call json_data_create_input(exploring_data, i_exploring)
+    call json_data_create(exploring_data, i_exploring)
     i_component = property_i_component(exploring_data, density_prefix)
     call check_in_range("density", num_components, "i_component", i_component)
     call density_explorer_create(density_explorer, periodic_boxes, max_box_size, visitable_walls, &
         i_component, num_snaps, exploring_data)
-    call json_data_destroy_input(exploring_data)
+    call json_data_destroy(exploring_data)
 
     selector%read_positions = .true.
     selector%read_orientations = .false.

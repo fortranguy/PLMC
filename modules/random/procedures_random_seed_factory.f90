@@ -1,7 +1,6 @@
 module procedures_random_seed_factory
 
 use data_input_prefixes, only: random_number_generator_prefix
-use data_output_objects, only: report_filename, random_number_generator_object
 use json_module, only: json_core, json_file, json_value
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_array_size, check_data_found
@@ -9,7 +8,7 @@ use procedures_checks, only: check_array_size, check_data_found
 implicit none
 
 private
-public :: set, write
+public :: set, add_to_report
 
 contains
 
@@ -70,24 +69,18 @@ contains
         call random_seed(put=custom_seed)
     end subroutine set_from_seed
 
-    subroutine write(json, output_data)
+    subroutine add_to_report(json, report_random_seed, seed_name)
         type(json_core), intent(inout) :: json
-        type(json_value), intent(inout), pointer :: output_data
+        type(json_value), intent(inout), pointer :: report_random_seed
+        character(len=*), intent(in) :: seed_name
 
-        type(json_value), pointer :: seed_data => null()
         integer, allocatable :: seed(:)
         integer :: seed_size
-
-        call json%create_object(seed_data, random_number_generator_object)
-        call json%add(output_data, seed_data)
 
         call random_seed(size=seed_size)
         allocate(seed(seed_size))
         call random_seed(get=seed)
-        call json%add(seed_data, "seed", seed)
-        seed_data => null()
-
-        call json%print(output_data, report_filename)
-    end subroutine write
+        call json%add(report_random_seed, seed_name, seed)
+    end subroutine add_to_report
 
 end module procedures_random_seed_factory

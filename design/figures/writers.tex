@@ -103,6 +103,7 @@
         \begin{scope}[shift={($(RectangleWriter.north) + (8 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\mediumTextWidth]{\import{}: \\
+                \namespace{JSON} :: JSONvalue \\
                 \namespace{Environment} :: PeriodicBox \\
                 \namespace{Mixture} :: ComponentCoordinates \\
                 \namespace{Observables} :: ChangesSuccess};
@@ -139,6 +140,21 @@
                 \UMLattribute{shortEnergies: \type{TriangleWriter}}
                 \UMLattribute{dipolarEnergies: \type{TriangleWriter}}
                 \UMLattribute{dipolarMixtureEnergy: \type{RealWriter}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(EnergiesWriters.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{GeneratingJSONReport}{0, 0}
+                \UMLattribute{root: \type{JSONvalue}}
+                \UMLattribute{randomSeed: \type{JSONvalue}}
+                \UMLattribute{algorithmsWeight: \type{JSONvalue}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(ExploringWriters.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ExploringJSONReport}{0, 0}
+                \UMLattribute{root: \type{JSONvalue}}
+                \UMLattribute{randomSeed: \type{JSONvalue}}
             \end{class}
         \end{scope}
 

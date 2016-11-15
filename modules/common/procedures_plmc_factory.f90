@@ -1,10 +1,7 @@
 module procedures_plmc_factory
 
-use data_arguments, only: i_generating, i_exploring, num_json_arguments
+use data_arguments, only: num_json_arguments
 use json_module, only: json_file
-use procedures_json_data_factory, only: json_data_create_input => create_input, &
-    json_data_create_output => create_output, json_data_destroy_input => destroy_input, &
-    json_data_destroy_output => destroy_output
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: mixture_set_nums_particles => set_nums_particles, &
     mixture_average_num_particles => average_num_particles
@@ -44,17 +41,11 @@ interface plmc_create
     module procedure :: physical_model_create_generating, physical_model_create_exploring
     module procedure :: markov_chain_generator_create, markov_chain_explorer_create
     module procedure :: observables_create_generating, observables_create_exploring
-    module procedure :: json_data_create_input
-    module procedure :: create_generating_data, create_exploring_data
     module procedure :: create_generating_readers_writers, create_exploring_readers_writers
-    module procedure :: json_data_create_output
 end interface plmc_create
 
 interface plmc_destroy
-    module procedure :: json_data_destroy_output
     module procedure :: destroy_generating_readers_writers, destroy_exploring_readers_writers
-    module procedure :: destroy_exploring_data
-    module procedure :: json_data_destroy_input
     module procedure :: observables_destroy_generating, observables_destroy_exploring
     module procedure :: markov_chain_generator_destroy, markov_chain_explorer_destroy
     module procedure :: physical_model_destroy
@@ -120,26 +111,6 @@ contains
         call readers_destroy(readers)
         call exploring_writers_destroy(writers)
     end subroutine destroy_exploring_readers_writers
-
-    subroutine create_generating_data(generating_data)
-        type(json_file), intent(out) :: generating_data
-
-        call json_data_create_input(generating_data, i_generating)
-    end subroutine create_generating_data
-
-    subroutine create_exploring_data(generating_data, exploring_data)
-        type(json_file), intent(out) :: generating_data, exploring_data
-
-        call json_data_create_input(generating_data, i_generating)
-        call json_data_create_input(exploring_data, i_exploring)
-    end subroutine create_exploring_data
-
-    subroutine destroy_exploring_data(generating_data, exploring_data)
-        type(json_file), intent(inout) :: generating_data, exploring_data
-
-        call json_data_destroy_input(exploring_data)
-        call json_data_destroy_input(generating_data)
-    end subroutine destroy_exploring_data
 
     !> @note Beware of inertia
     subroutine tune_moves(tuned, i_step, changes, observables)

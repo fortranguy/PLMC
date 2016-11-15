@@ -1,7 +1,6 @@
 module procedures_generating_algorithms_factory
 
 use data_strings, only: max_word_length
-use data_output_objects, only: report_filename, generating_algorithms_object
 use json_module, only: json_core, json_value
 use procedures_errors, only: error_exit
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
@@ -23,7 +22,7 @@ use procedures_box_particles_swap_factory, only: box_particles_transmutation_cre
 implicit none
 
 private
-public :: create, destroy, write
+public :: create, destroy, add_to_report
 
 contains
 
@@ -74,15 +73,13 @@ contains
 
     !> @note The names must coherent with [[procedures_generating_algorithms_factory:create]].
     !> @todo Find a better alternative?
-    subroutine write(json, output_data, generating_algorithms)
+    subroutine add_to_report(json, algorithms_weight, generating_algorithms)
         type(json_core), intent(inout) :: json
-        type(json_value), intent(inout), pointer :: output_data
+        type(json_value), intent(inout), pointer :: algorithms_weight
         type(Generating_Algorithm_Wrapper), intent(in) :: generating_algorithms(:)
 
-        type(json_value), pointer :: choices_data => null()
-        integer :: i_algorithm
-
         character(len=max_word_length) :: algorithms_name(size(generating_algorithms))
+        integer :: i_algorithm, weight_i
 
         algorithms_name(1) = "box volume change"
         algorithms_name(2) = "boxes volume exchange"
@@ -95,28 +92,11 @@ contains
         algorithms_name(9) = "box particles transmutation"
         algorithms_name(10) = "box particles switch"
 
-        call json%create_object(choices_data, generating_algorithms_object)
-        call json%add(output_data, choices_data)
         do i_algorithm = 1, size(generating_algorithms)
-            if (is_used(generating_algorithms(i_algorithm)%algorithm)) then
-                call json%add(choices_data, algorithms_name(i_algorithm), &
-                    generating_algorithms(i_algorithm)%algorithm%get_num_choices())
-            end if
+            weight_i = generating_algorithms(i_algorithm)%algorithm%get_num_choices()
+            if (weight_i == 0) cycle
+            call json%add(algorithms_weight, algorithms_name(i_algorithm), weight_i)
         end do
-        choices_data => null()
-
-        call json%print(output_data, report_filename)
-    end subroutine write
-
-    pure logical function is_used(algorithm)
-        class(Abstract_Generating_Algorithm), intent(in) :: algorithm
-
-        select type(algorithm)
-            type is (Null_Generating_Algorithm)
-                is_used = .false.
-            class default
-                is_used = .true.
-        end select
-    end function is_used
+    end subroutine add_to_report
 
 end module procedures_generating_algorithms_factory

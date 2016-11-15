@@ -1,12 +1,12 @@
 module procedures_radial_explorer_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_input_prefixes, only: mixture_prefix, radial_prefix
+use data_input_prefixes, only: radial_prefix
 use classes_number_to_string, only: Concrete_Number_to_String
 use json_module, only: json_file
 use procedures_errors, only: error_exit
-use procedures_mixture_inquirers, only: property_num_components => num_components, &
-    property_i_component => i_component, property_ij_components => ij_components
+use procedures_mixture_inquirers, only: property_i_component => i_component, &
+    property_ij_components => ij_components
 use types_component_coordinates_reader_selector, only: Component_Coordinates_Reader_Selector
 use classes_radial_explorer, only: Abstract_Radial_Explorer, Intra_Radial_Explorer, &
     Inter_Radial_Explorer
@@ -19,12 +19,12 @@ public :: create, destroy
 
 contains
 
-    subroutine create(radial_explorer, max_box_size, generating_data, exploring_data)
+    subroutine create(radial_explorer, max_box_size, num_components, exploring_data)
         class(Abstract_Radial_Explorer), allocatable, intent(out) :: radial_explorer
         real(DP), intent(in) :: max_box_size(:)
-        type(json_file) :: generating_data, exploring_data
+        integer, intent(in) :: num_components
+        type(json_file) :: exploring_data
 
-        integer :: num_components
         type(Component_Coordinates_Reader_Selector) :: selector
         real(DP) :: delta_distance
         character(len=:), allocatable :: radial_type, filename, data_field
@@ -33,7 +33,6 @@ contains
 
         selector%read_positions = .true.
         selector%read_orientations = .false.
-        num_components = property_num_components(generating_data, mixture_prefix)
         data_field = radial_prefix//"delta"
         call exploring_data%get(data_field, delta_distance, data_found)
         call check_data_found(data_field, data_found)

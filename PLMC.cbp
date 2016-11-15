@@ -154,9 +154,6 @@
 		<Unit filename="modules/common/procedures_hetero_couples_factory.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="modules/common/procedures_json_data_factory.f90">
-			<Option weight="4" />
-		</Unit>
 		<Unit filename="modules/common/procedures_logical_factory.f90">
 			<Option weight="1" />
 		</Unit>
@@ -191,7 +188,7 @@
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_writer.f90">
-			<Option weight="17" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="3" />
@@ -727,6 +724,9 @@
 		<Unit filename="modules/readers/procedures_coordinates_reader.f90">
 			<Option weight="3" />
 		</Unit>
+		<Unit filename="modules/readers/procedures_json_data_factory.f90">
+			<Option weight="4" />
+		</Unit>
 		<Unit filename="modules/readers/procedures_readers_factory.f90">
 			<Option weight="12" />
 		</Unit>
@@ -865,6 +865,9 @@
 		<Unit filename="modules/writers/procedures_generating_writers_factory.f90">
 			<Option weight="14" />
 		</Unit>
+		<Unit filename="modules/writers/procedures_json_reports_factory.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="modules/writers/procedures_line_writer_factory.f90">
 			<Option weight="9" />
 		</Unit>
@@ -891,6 +894,9 @@
 		</Unit>
 		<Unit filename="modules/writers/types_generating_writers_wrapper.f90">
 			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/writers/types_json_report.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="programs/density.f90">
 			<Option weight="13" />

@@ -22,4 +22,5 @@
     - BoxesVolumeExchange: optimise overlap
 - rewrite modules/index.md
 - docUML: Improve the type of adjacencyMatrices?
+- docUML to update
         

@@ -34,6 +34,13 @@ contains
             call warning_continue("procedures_dipolar_neighbourhoods_factory: "//&
                 "there are no dipoles.")
         end if
+        if (needed) then
+            data_field = prefix//"maximum distance"
+            call exploring_data%get(data_field, max_distance, data_found)
+            call check_data_found(data_field, data_found)
+        else
+            max_distance = 0._DP
+        end if
 
         i_box = 1
         allocate(neighbourhoods(size(components, 1)))
@@ -44,13 +51,9 @@ contains
                     are_dipolar(j_component, i_box)) then
                     allocate(Concrete_Dipolar_Neighbourhood :: neighbourhoods(j_component)%&
                         line(i_component)%neighbourhood)
-                    data_field = prefix//"maximum distance"
-                    call exploring_data%get(data_field, max_distance, data_found)
-                    call check_data_found(data_field, data_found)
                 else
                     allocate(Null_Dipolar_Neighbourhood :: neighbourhoods(j_component)%&
                         line(i_component)%neighbourhood)
-                    max_distance = 0._DP
                 end if
                 call neighbourhoods(j_component)%line(i_component)%neighbourhood%set(max_distance)
             end do

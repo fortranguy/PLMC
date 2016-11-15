@@ -2,8 +2,8 @@ module procedures_visitable_cells_factory
 
 use classes_periodic_box, only: Abstract_Periodic_Box
 use types_component_wrapper, only: Component_Wrapper
-use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Pair_Potential_Line
+use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_neighbour_cells, only: Neighbour_Cells_Line
 use classes_visitable_list, only: Abstract_Visitable_List
 use classes_visitable_cells, only: Abstract_Visitable_Cells, Concrete_Visitable_Cells, &
@@ -48,7 +48,7 @@ contains
                     neighbours_ij => neighbour_cells(j_pair)%line(i_pair)%cells)
                     call cells(i_component, j_component)%construct(periodic_box, &
                         components(i_component)%positions, components(i_component)%orientations, &
-                        hard_contact, pair_ij, neighbourhood_ij, neighbours_ij, list_mold)
+                        pair_ij, hard_contact, neighbourhood_ij, neighbours_ij, list_mold)
                 end associate
             end do
         end do

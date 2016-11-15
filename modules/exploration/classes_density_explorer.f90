@@ -142,8 +142,6 @@ contains
         integer, intent(in) :: num_snaps
         character(len=*), intent(in) :: filename
 
-        real(DP), dimension(num_dimensions) :: domain_origin, domain_size
-
         call check_positive("Z_Density_Explorer: construct: ", "max_box_size", max_box_size)
         allocate(this%parallelepiped_domain, source=parallelepiped_domain)
         call check_positive("Z_Density_Explorer: construct", "delta_z", delta_z)

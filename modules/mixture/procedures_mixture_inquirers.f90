@@ -136,14 +136,6 @@ contains
             prefix//"can exchange with reservoir")
     end function mixture_can_exchange_from_json
 
-    logical function component_can_exchange_from_json(generating_data, prefix) &
-        result(component_can_exchange)
-        type(json_file), intent(inout) :: generating_data
-        character(len=*), intent(in) :: prefix
-
-        component_can_exchange = logical_from_json(generating_data, prefix//"can exchange")
-    end function component_can_exchange_from_json
-
     pure logical function component_can_exchange_from_chemical_potential(&
         component_chemical_potential) result(component_can_exchange)
         class(Abstract_Component_Chemical_Potential), intent(in) :: component_chemical_potential

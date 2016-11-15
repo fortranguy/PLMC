@@ -37,7 +37,7 @@
         \begin{scope}[shift={($(PLMCpropagator.north) + (9 cm, 0 cm)$)}]
             \coordinate (Import) at (0, 0);
             \umlnote[text width=\largeTextWidth]{\import{}:\\
-                \namespace{JSON} :: JSONcore, JSONfile, JSONvalue \\
+                \namespace{JSON} :: JSONfile \\
                 \namespace{Random} :: TowerSampler \\
                 \namespace{Environment} :: Environment, ParallelepipedDomain \\
                 \namespace{Mixture} :: Component, Mixture \\
@@ -50,7 +50,8 @@
                     ParticleInsertionMethod, DipolarNeighbourhoodsVisitor \\
                 \namespace{Observables} :: GeneratingObservables \\
                 \namespace{Readers} :: Readers \\
-                \namespace{Writers} :: GeneratingWriters, ExploringWriters};
+                \namespace{Writers} :: GeneratingJSONreport, ExploringJSONreport, GeneratingWriters,
+                    ExploringWriters};
         \end{scope}
 
         \begin{scope}[shift={($(PhysicalModel.south) - (0 cm, 1.5 cm)$)}]
@@ -63,9 +64,8 @@
 
         \begin{scope}[shift={($(MarkovChainGenerator.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{GeneratingIO}{0, 0}
-                \UMLattribute{json: \type{JSONcore}}
-                \UMLattribute{generatingData: \type{JSONfile}}
-                \UMLattribute{reportData: \type{JSONvalue}}
+                \UMLattribute{parameters: \type{JSONfile}}
+                \UMLattribute{report: \type{GeneratingJSONreport}}
                 \UMLattribute{readers: \type{Readers}}
                 \UMLattribute{writers: \type{GeneratingWriters}}
             \end{class}
@@ -86,16 +86,14 @@
 
         \begin{scope}[shift={($(MarkovChainExplorer.south) - (0 cm, 1.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{ExploringIO}{0, 0}
-                \UMLattribute{json: \type{JSONcore}}
-                \UMLattribute{generatingData: \type{JSONfile}}
-                \UMLattribute{exploringData: \type{JSONfile}}
-                \UMLattribute{reportData: \type{JSONvalue}}
+                \UMLattribute{parameters: \type{JSONfile}}
+                \UMLattribute{report: \type{ExploringJSONreport}}
                 \UMLattribute{readers: \type{Readers}}
                 \UMLattribute{writers: \type{ExploringWriters}}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(Import.south) - (0 cm, 10 cm)$)}]
+        \begin{scope}[shift={($(Import.south) - (0 cm, 10.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{HeteroCouples}{0, 0}
             \end{abstractclass}
         \end{scope}

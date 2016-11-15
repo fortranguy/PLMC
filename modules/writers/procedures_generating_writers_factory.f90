@@ -67,7 +67,7 @@ contains
         call check_data_found(data_field, data_found)
         box_stat_i = 1
         do i_box = 1, size(boxes_path)
-            boxes_path(i_box)%string = "box_"//string%get(i_box)//separator
+            boxes_path(i_box)%string = "generating_box_"//string%get(i_box)//separator
             call execute_command_line(make_directory_cmd//" "//boxes_path(i_box)%string, &
                 exitstat=box_stat_i)
             if (box_stat_i /= 0) call error_exit("procedures_generating_writers_factory: create:"//&
