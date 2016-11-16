@@ -10,7 +10,7 @@ implicit none
 private
 
     type, public :: Exploring_IO_Wrapper
-        type(json_file) :: parameters
+        type(json_file) :: data
         type(Exploring_JSON_Report) :: report
         type(Readers_Wrapper) :: readers
         type(Exploring_Writers_Wrapper) :: writers

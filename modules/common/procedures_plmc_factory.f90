@@ -100,8 +100,8 @@ contains
             components, markov_chain_explorer%particle_insertion_domains)
         call exploring_writers_create(writers, physical_model%environment, physical_model%&
             short_interactions%wall_pairs, physical_model%mixture%components, physical_model%&
-            short_interactions%components_pairs, markov_chain_explorer%volume_change_method, &
-            markov_chain_explorer%particle_insertion_method, visit_energies, generating_data)
+            short_interactions%components_pairs, markov_chain_explorer, visit_energies, &
+            generating_data)
     end subroutine create_exploring_readers_writers
 
     subroutine destroy_exploring_readers_writers(readers, writers)

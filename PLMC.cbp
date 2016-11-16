@@ -826,6 +826,9 @@
 		<Unit filename="modules/writers/classes_changes_success_writer.f90">
 			<Option weight="3" />
 		</Unit>
+		<Unit filename="modules/writers/classes_directed_graph_writer.f90">
+			<Option weight="4" />
+		</Unit>
 		<Unit filename="modules/writers/classes_line_writer.f90">
 			<Option weight="4" />
 		</Unit>
@@ -855,6 +858,9 @@
 		</Unit>
 		<Unit filename="modules/writers/procedures_changes_success_writer_factory.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/writers/procedures_directed_graph_writer_factory.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_energies_writers_factory.f90">
 			<Option weight="13" />

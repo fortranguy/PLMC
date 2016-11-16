@@ -128,6 +128,7 @@ contains
         end do
     end subroutine Abstract_construct_visitable_lists
 
+    !> @todo To fold or not to fold?
     subroutine Abstract_fill_with_particles(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
@@ -136,7 +137,7 @@ contains
 
         do i_particle = 1, this%positions%get_num()
             particle%i = i_particle
-            particle%position = this%positions%get(particle%i)
+            particle%position = this%periodic_box%folded(this%positions%get(particle%i))
             call this%add(particle)
         end do
     end subroutine Abstract_fill_with_particles
@@ -161,15 +162,62 @@ contains
         integer :: global_i1, global_i2, global_i3
 
         if (.not. allocated(this%visitable_lists)) return
-        do global_i3 = lbound(this%visitable_lists, 3), ubound(this%visitable_lists, 3)
-        do global_i2 = lbound(this%visitable_lists, 2), ubound(this%visitable_lists, 2)
-        do global_i1 = lbound(this%visitable_lists, 1), ubound(this%visitable_lists, 1)
+        do global_i3 = ubound(this%visitable_lists, 3), lbound(this%visitable_lists, 3), -1
+        do global_i2 = ubound(this%visitable_lists, 2), lbound(this%visitable_lists, 2), -1
+        do global_i1 = ubound(this%visitable_lists, 1), lbound(this%visitable_lists, 1), -1
             call this%visitable_lists(global_i1, global_i2, global_i3)%destroy()
         end do
         end do
         end do
         deallocate(this%visitable_lists)
     end subroutine Abstract_destroy_visitable_lists
+
+    !> No check: to_position & from%position are assumed to be within accessible_domain
+    subroutine Abstract_translate(this, to_position, from)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+        real(DP), intent(in) :: to_position(:)
+        type(Concrete_Particle), intent(in) :: from
+
+        integer, dimension(num_dimensions) :: from_ijk_cell, to_ijk_cell
+
+        from_ijk_cell = this%neighbour_cells%index(from%position)
+        to_ijk_cell = this%neighbour_cells%index(to_position)
+        if (any(from_ijk_cell /= to_ijk_cell)) then
+            call this%visitable_lists(from_ijk_cell(1), from_ijk_cell(2), from_ijk_cell(3))%&
+                remove(from%i)
+            call this%visitable_lists(to_ijk_cell(1), to_ijk_cell(2), to_ijk_cell(3))%add(from%i)
+        end if
+    end subroutine Abstract_translate
+
+    subroutine Abstract_add(this, particle)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: particle
+
+        integer :: ijk_cell(num_dimensions)
+
+        if (.not.this%neighbour_cells%is_inside(particle%position)) then
+            call error_exit("Abstract_Visitable_Cells: add: particle%position is outside "//&
+                "accessible_domain.")
+        end if
+        ijk_cell = this%neighbour_cells%index(particle%position)
+        call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%add(particle%i)
+    end subroutine Abstract_add
+
+    subroutine Abstract_remove(this, particle)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: particle
+
+        integer :: ijk_cell(num_dimensions)
+
+        ijk_cell = this%neighbour_cells%index(particle%position)
+        call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%remove(particle%i)
+        if (particle%i < this%positions%get_num()) then
+            ijk_cell = this%neighbour_cells%index(this%positions%get(this%positions%&
+                get_num()))
+            call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%set(this%positions%&
+                get_num(), particle%i)
+        end if
+    end subroutine Abstract_remove
 
     subroutine Abstract_visit_energy(this, overlap, energy, particle, visit_condition, i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
@@ -300,53 +348,6 @@ contains
         end do
         end do
     end subroutine Abstract_visit_dipolar_neighbours
-
-    !> No check: to_position & from%position are assumed to be within accessible_domain
-    subroutine Abstract_translate(this, to_position, from)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
-        real(DP), intent(in) :: to_position(:)
-        type(Concrete_Particle), intent(in) :: from
-
-        integer, dimension(num_dimensions) :: from_ijk_cell, to_ijk_cell
-
-        from_ijk_cell = this%neighbour_cells%index(from%position)
-        to_ijk_cell = this%neighbour_cells%index(to_position)
-        if (any(from_ijk_cell /= to_ijk_cell)) then
-            call this%visitable_lists(from_ijk_cell(1), from_ijk_cell(2), from_ijk_cell(3))%&
-                remove(from%i)
-            call this%visitable_lists(to_ijk_cell(1), to_ijk_cell(2), to_ijk_cell(3))%add(from%i)
-        end if
-    end subroutine Abstract_translate
-
-    subroutine Abstract_add(this, particle)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
-
-        integer :: ijk_cell(num_dimensions)
-
-        if (.not.this%neighbour_cells%is_inside(particle%position)) then
-            call error_exit("Abstract_Visitable_Cells: add: particle%position is outside "//&
-                "accessible_domain.")
-        end if
-        ijk_cell = this%neighbour_cells%index(particle%position)
-        call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%add(particle%i)
-    end subroutine Abstract_add
-
-    subroutine Abstract_remove(this, particle)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
-
-        integer :: ijk_cell(num_dimensions)
-
-        ijk_cell = this%neighbour_cells%index(particle%position)
-        call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%remove(particle%i)
-        if (particle%i < this%positions%get_num()) then
-            ijk_cell = this%neighbour_cells%index(this%positions%get(this%positions%&
-                get_num()))
-            call this%visitable_lists(ijk_cell(1), ijk_cell(2), ijk_cell(3))%set(this%positions%&
-                get_num(), particle%i)
-        end if
-    end subroutine Abstract_remove
 
 !end implementation Abstract_Visitable_Cells
 

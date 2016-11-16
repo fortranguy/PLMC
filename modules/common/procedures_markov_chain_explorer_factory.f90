@@ -1,6 +1,6 @@
 module procedures_markov_chain_explorer_factory
 
-use data_input_prefixes, only: particle_insertion_prefix, volume_change_prefix, dipolar_graph_prefix
+use data_input_prefixes, only: particle_insertion_prefix, volume_change_prefix, dipoles_graph_prefix
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
 use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
@@ -27,7 +27,7 @@ use procedures_dipolar_neighbourhoods_visitors_factory, only: &
     destroy
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
 use procedures_exploration_inquirers, only: measure_pressure, measure_chemical_potentials, &
-    make_dipolar_graph
+    make_dipoles_graph
 
 implicit none
 
@@ -88,7 +88,7 @@ contains
 
         call dipolar_neighbourhoods_visitors_create(markov_chain_explorer%&
             dipolar_neighbourhoods_visitors, physical_model, &
-            make_dipolar_graph(exploring_data, dipolar_graph_prefix))
+            make_dipoles_graph(exploring_data, dipoles_graph_prefix))
     end subroutine create
 
     subroutine destroy(markov_chain_explorer)

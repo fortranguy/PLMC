@@ -5,11 +5,13 @@ use procedures_property_inquirers, only: logical_from_json
 use classes_volume_change_method, only: Abstract_Volume_Change_Method, Concrete_Volume_Change_Method
 use classes_particle_insertion_method, only: Abstract_Particle_Insertion_Method, &
     Concrete_Particle_Insertion_Method
+use classes_dipolar_neighbourhoods_visitor, only: Abstract_Dipolar_Neighbourhoods_Visitor, &
+    Concrete_Dipolar_Neighbourhoods_Visitor
 
 implicit none
 
 private
-public :: measure_pressure, measure_chemical_potentials, make_dipolar_graph
+public :: measure_pressure, measure_chemical_potentials, make_dipoles_graph
 
 interface measure_pressure
     module procedure :: measure_pressure_from_json
@@ -21,9 +23,10 @@ interface measure_chemical_potentials
     module procedure :: measure_chemical_potentials_from_method
 end interface measure_chemical_potentials
 
-interface make_dipolar_graph
-    module procedure :: make_dipolar_graph_from_json
-end interface make_dipolar_graph
+interface make_dipoles_graph
+    module procedure :: make_dipoles_graph_from_json
+    module procedure :: make_dipoles_graph_from_visitor
+end interface make_dipoles_graph
 
 contains
 
@@ -67,11 +70,23 @@ contains
         end select
     end function measure_chemical_potentials_from_method
 
-    logical function make_dipolar_graph_from_json(exploring_data, prefix) result(make_dipolar_graph)
+    logical function make_dipoles_graph_from_json(exploring_data, prefix) result(make_dipoles_graph)
         type(json_file), intent(inout) :: exploring_data
         character(len=*), intent(in) :: prefix
 
-        make_dipolar_graph = logical_from_json(exploring_data, prefix//"make graph")
-    end function make_dipolar_graph_from_json
+        make_dipoles_graph = logical_from_json(exploring_data, prefix//"make graph")
+    end function make_dipoles_graph_from_json
+
+    elemental logical function make_dipoles_graph_from_visitor(dipolar_neighbourhoods_visitor) &
+        result(make_dipoles_graph)
+        class(Abstract_Dipolar_Neighbourhoods_Visitor), intent(in) :: dipolar_neighbourhoods_visitor
+
+        select type (dipolar_neighbourhoods_visitor)
+            type is (Concrete_Dipolar_Neighbourhoods_Visitor)
+                make_dipoles_graph = .true.
+            class default
+                make_dipoles_graph = .false.
+        end select
+    end function make_dipoles_graph_from_visitor
 
 end module procedures_exploration_inquirers

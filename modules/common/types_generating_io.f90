@@ -10,7 +10,7 @@ implicit none
 private
 
     type, public :: Generating_IO_Wrapper
-        type(json_file) :: parameters
+        type(json_file) :: data
         type(Generating_JSON_Report) :: report
         type(Readers_Wrapper) :: readers
         type(Generating_Writers_Wrapper) :: writers

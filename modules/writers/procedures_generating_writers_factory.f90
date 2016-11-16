@@ -72,7 +72,7 @@ contains
                 exitstat=box_stat_i)
             if (box_stat_i /= 0) call error_exit("procedures_generating_writers_factory: create:"//&
                 " "//boxes_path(i_box)%string//" directory can't be created.")
-            if (.not. write_coordinates) cycle
+            if (.not.write_coordinates) cycle
             coordinates_path(i_box)%string = boxes_path(i_box)%string//"coordinates"//separator
             call execute_command_line(make_directory_cmd//" "//coordinates_path(i_box)%string, &
                 exitstat=box_stat_i)

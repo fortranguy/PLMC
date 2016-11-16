@@ -56,7 +56,8 @@ contains
         integer, intent(in) :: period
 
         allocate(this%paths, source=paths)
-        call check_string_not_empty("Abstract_Complete_Coordinates_Writer: basename", basename)
+        call check_string_not_empty("Abstract_Complete_Coordinates_Writer: construct: basename", &
+            basename)
         this%basename = basename
         this%periodic_boxes => periodic_boxes
         allocate(this%components_coordinates, source=components_coordinates)

@@ -1,7 +1,5 @@
 module PLMC
 
-import LightGraphs; LG = LightGraphs
-
     abstract PeriodicBox
 
     type XYZperiodicBox <: PeriodicBox
@@ -49,13 +47,6 @@ import LightGraphs; LG = LightGraphs
                 norm(orientations[:, i_particle])
         end
         return orientations
-    end
-
-    function dipolarEnergyIsNegative(vector_ij::Array{Float64, 1}, orientation_i::Array{Float64, 1},
-        orientation_j::Array{Float64, 1})
-        distance_ij = norm(vector_ij)
-        dot(orientation_i, orientation_j) / distance_ij^3 - 
-            3 * dot(orientation_i, vector_ij) * dot(orientation_j, vector_ij) / distance_ij^5 < 0
     end
 
     function newBox(i_box::Int64, generatingData::Dict{String, Any})
@@ -131,58 +122,6 @@ import LightGraphs; LG = LightGraphs
         end
         close(outputFile)
         println("Box $(i_box): Coordinates written in ", outputFile.name)
-    end
-
-    function readDipolesCoordinates(periodicBox::PeriodicBox, components::Array{Component, 1},
-        coordinates::IOStream)        
-        periodicBox.edgesSize = map(parse, split(readline(coordinates))[3:5])
-        numsParticles = split(readline(coordinates))
-        for i_component = 1:size(components, 1)
-            components[i_component].num = parse(numsParticles[2+i_component])
-        end
-
-        readline(coordinates) # header
-        for component in components
-            if component.isDipolar
-                component.positions = zeros(3, component.num)
-                component.orientations = zeros(3, component.num)
-                for i_particle = 1:component.num
-                    coordinates_i = split(readline(coordinates))
-                    component.positions[:, i_particle] = map(parse, coordinates_i[2:4])
-                    component.orientations[:, i_particle] = map(parse, coordinates_i[5:7])
-                end
-            else
-                for i_particle = 1:component.num
-                    readline(coordinates) # apolar coordinates
-                end
-            end
-        end        
-    end
-
-    function newDiGraph(periodicBox::PeriodicBox, component::Component,
-        maximumEdgeDistance::Float64)
-        if component.isDipolar
-            graph = LG.DiGraph(component.num)
-            for j_particle = 1:LG.nv(graph)
-                for i_particle = 1:j_particle-1
-                    vector_ij = vector(periodicBox,
-                        component.positions[:, i_particle],
-                        component.positions[:, j_particle])
-                    if norm(vector_ij) < maximumEdgeDistance && dipolarEnergyIsNegative(vector_ij,
-                            component.orientations[:, i_particle],
-                            component.orientations[:, j_particle])
-                        if dot(vector_ij, component.orientations[:, i_particle]) > 0
-                            LG.add_edge!(graph, i_particle => j_particle)
-                        else
-                            LG.add_edge!(graph, j_particle => i_particle)
-                        end
-                    end
-                end
-            end
-        else
-            graph = LG.DiGraph()
-        end
-        graph
     end
 
 end

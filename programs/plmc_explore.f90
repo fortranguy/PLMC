@@ -41,18 +41,18 @@ implicit none
     call plmc_catch_exploring_help()
 
     call json_data_create(generating_parameters, i_generating)
-    call json_data_create(io%parameters, i_exploring)
-    call plmc_create(physical_model, generating_parameters, io%parameters, unique_box=.true.)
+    call json_data_create(io%data, i_exploring)
+    call plmc_create(physical_model, generating_parameters, io%data, unique_box=.true.)
     call plmc_set(generating_parameters)
     call plmc_set(num_snaps, generating_parameters)
-    visit_energies = logical_from_json(io%parameters, "Check.visit energies")
+    visit_energies = logical_from_json(io%data, "Check.visit energies")
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, visit_energies, io%&
-        parameters)
+        data)
     call plmc_create(observables, physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_explorer, visit_energies,&
         generating_parameters)
     call json_data_destroy(generating_parameters)
-    call json_data_destroy(io%parameters)
+    call json_data_destroy(io%data)
     call json%initialize()
     call json%create_object(io%report%root, "")
     call json_reports_create(json, io%report)

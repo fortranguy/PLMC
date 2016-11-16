@@ -125,11 +125,56 @@
                 \namespace{DipolarInteractions} :: DipolarNeighbourhood};
         \end{scope}
 
+        \begin{scope}[shift={($(PairPotential.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
+                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
+                \operation{\procedure{construct}{$\mathAggregation$ periodicBox:
+                    \type{PeriodicBox}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
+                    positions1: \type{ComponentCoordinates},
+                    positions2: \type{ComponentCoordinates},
+                    pairPotential: \type{PairPotential}}}
+                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
+                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(Import) - (0 cm, 4 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
+                \UMLattribute{betaPressuresExcess: \type{BetaPressureExcess[\numBoxes]}}
+                \UMLattribute{hardContact: \type{HardContact}}
+                \UMLattribute{wallsVisitors: \type{WallsVisitor[\numBoxes]}}
+                \UMLattribute{wallPairs: \type{PairPotential[\numComponents]}}
+                \UMLattribute{componentsVisitors: \type{ShortPairsVisitor[\numBoxes]}}
+                \UMLattribute{componentsPairs:
+                    \type{PairPotential[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{dipolarNeighbourhoods:
+                    \type{DipolarNeighbourhood[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{cells: \type{Cells}[\numBoxes]}
+                \UMLattribute{visitableCellsMemento: \type{VisitableCellsMemento}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(ShortInteractions.south) - (0 cm, 1 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{Cells}{0, 0}
+                \UMLattribute{neighbourCells:
+                    \type{NeighbourCells[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{visitableCells: \type{VisitableCells[\numComponents, \numComponents]}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(Cells.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{NeighbourCells}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ accessibleDomain:
-                    \type{ParallelepipedDomain}, hardContact: \type{HardContact},
-                    pairPotential: \type{PairPotential}}}
+                    \type{ParallelepipedDomain}, pairPotential: \type{PairPotential},
+                    hardContact: \type{HardContact}, dipolarNeighbourhood:
+                    \type{DipolarNeighbourhood}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{resizeOnly}{}: \type{bool}}
                 \operation{\procedure{reset}{}}
@@ -146,51 +191,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PairPotential.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
-                \operation{\procedure{get}{distance: \type{real}}: \type{real}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(Import) - (0 cm, 4.5 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{ShortInteractions}{0, 0}
-                \UMLattribute{betaPressuresExcess: \type{BetaPressureExcess[\numBoxes]}}
-                \UMLattribute{hardContact: \type{HardContact}}
-                \UMLattribute{wallsVisitors: \type{WallsVisitor[\numBoxes]}}
-                \UMLattribute{wallPairs: \type{PairPotential[\numComponents]}}
-                \UMLattribute{componentsVisitors: \type{ShortPairsVisitor[\numBoxes]}}
-                \UMLattribute{componentsPairs:
-                    \type{PairPotential[\numComponents, \numComponents]\textsubscript{\sym}}}
-                \UMLattribute{dipolarNeighbourhoods:
-                    \type{DipolarNeighbourhood[\numComponents, \numComponents]\textsubscript{\sym}}}
-                \UMLattribute{cells: \type{Cells}[\numBoxes]}
-                \UMLattribute{visitableCellsMemento: \type{VisitableCellsMemento}}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(ShortInteractions.south) - (0 cm, 1.5 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{Cells}{0, 0}
-                \UMLattribute{neighbourCells:
-                    \type{NeighbourCells[\numComponents, \numComponents]\textsubscript{\sym}}}
-                \UMLattribute{visitableCells: \type{VisitableCells[\numComponents, \numComponents]}}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(Cells.south) - (0 cm, 1.5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
-                \operation{\procedure{construct}{$\mathAggregation$ periodicBox:
-                    \type{PeriodicBox}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
-                    positions1: \type{ComponentCoordinates},
-                    positions2: \type{ComponentCoordinates},
-                    pairPotential: \type{PairPotential}}}
-                \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
-                    positions: \type{ComponentCoordinates}, pairPotential: \type{PairPotential}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ShortPairsVisitor.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(NeighbourCells.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableCellsMemento}{0, 0}
                 \operation[0]{\procedure{save}{visitableCellsTarget: \type{VisitableCells},
                     visitableCellsSource: \type{VisitableCells}}}

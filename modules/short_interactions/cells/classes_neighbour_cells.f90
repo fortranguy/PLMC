@@ -4,9 +4,11 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
 use data_cells, only: nums_local_cells
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_positive
 use classes_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use classes_hard_contact, only: Abstract_Hard_Contact
 use classes_pair_potential, only: Abstract_Pair_Potential
+use classes_hard_contact, only: Abstract_Hard_Contact
+use classes_dipoles_neighbourhood, only: Abstract_Dipolar_Neighbourhood
 
 implicit none
 
@@ -93,19 +95,24 @@ contains
 
 !implementation Abstract_Neighbour_Cells
 
-    subroutine Abstract_construct(this, accessible_domain, hard_contact, pair_potential)
+    subroutine Abstract_construct(this, accessible_domain, pair_potential, hard_contact, &
+        dipolar_neighbourhood)
         class(Abstract_Neighbour_Cells), intent(out) :: this
         class(Abstract_Parallelepiped_Domain), target, intent(in) :: accessible_domain
-        class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        class(Abstract_Hard_Contact), intent(in) :: hard_contact
+        class(Abstract_Dipolar_Neighbourhood), intent(in) :: dipolar_neighbourhood
 
         this%accessible_domain => accessible_domain
-        if (pair_potential%get_max_distance() - pair_potential%get_min_distance() >= hard_contact%&
-            get_width()) then
-            this%max_distance = pair_potential%get_max_distance()
-        else
-            this%max_distance = pair_potential%get_max_distance() + hard_contact%get_width()
+        this%max_distance = pair_potential%get_max_distance()
+        if (this%max_distance - pair_potential%get_min_distance() < hard_contact%get_width()) then
+            this%max_distance = this%max_distance + hard_contact%get_width()
         end if
+        if (this%max_distance < dipolar_neighbourhood%get_max_distance()) then
+            this%max_distance = dipolar_neighbourhood%get_max_distance()
+        end if
+        call check_positive("Abstract_Neighbour_Cells: construct", "this%max_distance", this%&
+            max_distance)
         call this%set_skip_layers()
     end subroutine Abstract_construct
 
@@ -309,11 +316,13 @@ contains
 
 !implementation Null_Neighbour_Cells
 
-    subroutine Null_construct(this, accessible_domain, hard_contact, pair_potential)
+    subroutine Null_construct(this, accessible_domain, pair_potential, hard_contact, &
+        dipolar_neighbourhood)
         class(Null_Neighbour_Cells), intent(out) :: this
         class(Abstract_Parallelepiped_Domain), target, intent(in) :: accessible_domain
-        class(Abstract_Hard_Contact), intent(in) :: hard_contact
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        class(Abstract_Hard_Contact), intent(in) :: hard_contact
+        class(Abstract_Dipolar_Neighbourhood), intent(in) :: dipolar_neighbourhood
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

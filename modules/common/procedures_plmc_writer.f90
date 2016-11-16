@@ -80,6 +80,8 @@ contains
                 inv_pow_activities(:, i_box))
             call writers%insertion_successes(i_box)%write(i_snap, observables%&
                 insertion_successes(:, i_box))
+            call writers%dipoles_graph_writer%write(i_snap, i_box, observables%&
+                adjacency_matrices(:, :, i_box))
         end do
     end subroutine write_exploring_observables
 

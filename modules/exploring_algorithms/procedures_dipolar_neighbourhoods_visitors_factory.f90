@@ -11,15 +11,15 @@ public :: create, destroy
 
 contains
 
-    subroutine create(dipolar_neighbourhoods_visitors, physical_model, make_dipolar_graph)
+    subroutine create(dipolar_neighbourhoods_visitors, physical_model, make_dipoles_graph)
         class(Abstract_Dipolar_Neighbourhoods_Visitor), allocatable, intent(out) :: &
             dipolar_neighbourhoods_visitors(:)
         type(Physical_Model_Wrapper), intent(in) :: physical_model
-        logical, intent(in) :: make_dipolar_graph
+        logical, intent(in) :: make_dipoles_graph
 
         integer :: i_box
 
-        if (make_dipolar_graph) then
+        if (make_dipoles_graph) then
             allocate(Concrete_Dipolar_Neighbourhoods_Visitor :: &
                 dipolar_neighbourhoods_visitors(size(physical_model%environment%periodic_boxes)))
         else

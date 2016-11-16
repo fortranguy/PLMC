@@ -1,6 +1,6 @@
 module procedures_short_interactions_factory
 
-use data_input_prefixes, only: short_interactions_prefix, volume_change_prefix, dipolar_graph_prefix
+use data_input_prefixes, only: short_interactions_prefix, volume_change_prefix, dipoles_graph_prefix
 use json_module, only: json_file
 use procedures_walls_factory, only: walls_create => create, walls_destroy => destroy
 use procedures_beta_pressures_excess_factory, only: beta_pressures_excess_create => create, &
@@ -22,7 +22,7 @@ use procedures_visitable_list_factory, only: visitable_list_allocate => allocate
 use procedures_cells_factory, only: cells_create => create, cells_destroy => destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_exploration_inquirers, only: property_measure_pressure => measure_pressure, &
-    property_make_dipolar_graph => make_dipolar_graph
+    property_make_dipoles_graph => make_dipoles_graph
 
 implicit none
 
@@ -38,17 +38,17 @@ contains
         type(json_file), intent(inout) :: generating_data
         type(json_file), optional, intent(inout) :: exploring_data
 
-        logical :: boxes_size_can_change, measure_pressure, make_dipolar_graph
+        logical :: boxes_size_can_change, measure_pressure, make_dipoles_graph
         logical :: interact_with_walls, interact
         class(Abstract_Dirac_Distribution_Plus), allocatable :: dirac_plus
         class(Abstract_Visitable_List), allocatable :: list_mold
 
         if (present(exploring_data)) then
             measure_pressure = property_measure_pressure(exploring_data, volume_change_prefix)
-            make_dipolar_graph = property_make_dipolar_graph(exploring_data, dipolar_graph_prefix)
+            make_dipoles_graph = property_make_dipoles_graph(exploring_data, dipoles_graph_prefix)
         else
             measure_pressure = .false.
-            make_dipolar_graph = .false.
+            make_dipoles_graph = .false.
         end if
 
         call beta_pressures_excess_create(short_interactions%beta_pressures_excess, environment%&
@@ -67,12 +67,12 @@ contains
         call pairs_create(short_interactions%components_visitors, environment%periodic_boxes, &
             interact)
         call dipolar_neighbourhoods_create(short_interactions%dipolar_neighbourhoods, mixture%&
-            components, make_dipolar_graph, exploring_data, dipolar_graph_prefix)
+            components, make_dipoles_graph, exploring_data, dipoles_graph_prefix)
         call visitable_list_allocate(list_mold, interact, generating_data, &
             short_interactions_prefix)
         call cells_create(short_interactions%cells, environment%periodic_boxes, environment%&
-            accessible_domains, mixture%components, short_interactions%hard_contact, &
-            short_interactions%components_pairs, short_interactions%dipolar_neighbourhoods, &
+            accessible_domains, mixture%components, short_interactions%components_pairs, &
+            short_interactions%hard_contact, short_interactions%dipolar_neighbourhoods, &
             list_mold, interact)
         boxes_size_can_change = total_volume_can_change(environment%beta_pressure) .or. &
             size(environment%periodic_boxes) > 1

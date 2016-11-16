@@ -40,10 +40,9 @@
     "Radial": {
         "name": "inter",
         "components couple": [1, 3],
-        "delta": 0.1,
-        "file name": "radial.out"
+        "delta": 0.1
     },
-    "Dipolar Graph": {
+    "Dipoles Graph": {
         "make graph": true,
         "maximum distance": 1.5
     }
