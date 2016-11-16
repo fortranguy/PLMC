@@ -68,7 +68,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DiracDistributionPlus.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(DiracDistributionPlus.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ periodicBox: \type{PeriodicBox},
                     $\mathAggregation$ positions: \type{ComponentCoordinates},
@@ -125,10 +125,18 @@
                 \namespace{DipolarInteractions} :: DipolarNeighbourhood};
         \end{scope}
 
-        \begin{scope}[shift={($(PairPotential.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(PairPotential.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
                 \operation{\procedure{get}{distance: \type{real}}: \type{real}}
             \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PotentialExpression.south) - (0 cm, 1 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{Cells}{0, 0}
+                \UMLattribute{neighbourCells:
+                    \type{NeighbourCells[\numComponents, \numComponents]\textsubscript{\sym}}}
+                \UMLattribute{visitableCells: \type{VisitableCells[\numComponents, \numComponents]}}
+            \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
@@ -162,14 +170,6 @@
         \end{scope}
 
         \begin{scope}[shift={($(ShortInteractions.south) - (0 cm, 1 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{Cells}{0, 0}
-                \UMLattribute{neighbourCells:
-                    \type{NeighbourCells[\numComponents, \numComponents]\textsubscript{\sym}}}
-                \UMLattribute{visitableCells: \type{VisitableCells[\numComponents, \numComponents]}}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(Cells.south) - (0 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{NeighbourCells}{0, 0}
                 \operation{\procedure{construct}{$\mathAggregation$ accessibleDomain:
                     \type{ParallelepipedDomain}, pairPotential: \type{PairPotential},

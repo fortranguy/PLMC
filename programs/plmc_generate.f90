@@ -51,7 +51,7 @@ implicit none
     call random_seed_add_to_report(json, io%report%random_seed, "initial seed")
     call json%print(io%report%root, generating_report_filename)
 
-    call plmc_reset(physical_model)
+    call plmc_reset(physical_model, skip_dipolar_interactions=.false.)
     call markov_chain_generator%plmc_propagator%reset()
     call plmc_set(observables, physical_model) !in exploring too?
     call plmc_visit(observables%energies, physical_model, use_cells=.false.)
@@ -76,7 +76,7 @@ implicit none
         call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
     end do
     write(output_unit, *) "Iterations end."
-    call plmc_reset(physical_model)
+    call plmc_reset(physical_model, skip_dipolar_interactions=.false.)
     call plmc_visit(observables%energies, physical_model, use_cells=.false.)
     call plmc_write(io%writers, observables, num_tuning_steps, num_steps, num_steps)
     call random_seed_add_to_report(json, io%report%random_seed, "final seed")

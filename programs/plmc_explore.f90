@@ -15,11 +15,12 @@ use procedures_json_reports_factory, only: json_reports_create => create, json_r
 use procedures_property_inquirers, only: logical_from_json
 use procedures_random_seed_factory, only: random_seed_add_to_report => add_to_report
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
+use procedures_exploration_inquirers, only: measure_pressure, measure_chemical_potentials
 use types_markov_chain_explorer_wrapper, only: Markov_Chain_Explorer_Wrapper
-use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
-use types_exploring_io, only: Exploring_IO_Wrapper
 use procedures_markov_chain_explorer_factory, markov_chain_explorer_create => create, &
     markov_chain_explorer_destroy => destroy
+use types_exploring_observables_wrapper, only: Exploring_Observables_Wrapper
+use types_exploring_io, only: Exploring_IO_Wrapper
 use procedures_plmc_factory, only: plmc_create, plmc_destroy, plmc_set
 use procedures_plmc_resetter, only: plmc_reset
 use procedures_plmc_visitor, only: plmc_visit
@@ -36,7 +37,7 @@ implicit none
     type(Exploring_IO_Wrapper) :: io
 
     integer :: i_box, num_snaps, i_snap
-    logical :: visit_energies
+    logical :: visit_energies, skip_dipolar_interactions_reset
 
     call plmc_catch_exploring_help()
 
@@ -48,6 +49,9 @@ implicit none
     visit_energies = logical_from_json(io%data, "Check.visit energies")
     call markov_chain_explorer_create(markov_chain_explorer, physical_model, visit_energies, io%&
         data)
+    skip_dipolar_interactions_reset = .not.(visit_energies .or. &
+        measure_pressure(markov_chain_explorer%volume_change_method) .or. &
+        measure_chemical_potentials(markov_chain_explorer%particle_insertion_method))
     call plmc_create(observables, physical_model%mixture%components)
     call plmc_create(io%readers, io%writers, physical_model, markov_chain_explorer, visit_energies,&
         generating_parameters)
@@ -62,7 +66,7 @@ implicit none
     write(output_unit, *) "Iterations start."
     do i_snap = 1, num_snaps
         call plmc_set(io%readers, i_snap)
-        call plmc_reset(physical_model)
+        call plmc_reset(physical_model, skip_dipolar_interactions_reset)
         if (visit_energies) then
             call plmc_visit(observables%energies, physical_model, use_cells=.true.)
         end if

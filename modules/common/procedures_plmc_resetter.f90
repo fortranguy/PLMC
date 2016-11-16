@@ -12,8 +12,9 @@ public :: plmc_reset
 contains
 
     !> @note average_num_particles%set() will be useless at the end of the run.
-    subroutine plmc_reset(physical_model)
+    subroutine plmc_reset(physical_model, skip_dipolar_interactions)
         type(Physical_Model_Wrapper), intent(inout) :: physical_model
+        logical, intent(in) :: skip_dipolar_interactions
 
         integer :: i_box, i_component
 
@@ -29,6 +30,7 @@ contains
             call short_interactions_reset(physical_model%short_interactions%cells(i_box)%&
                 visitable_cells)
 
+            if (skip_dipolar_interactions) cycle
             call dipolar_interactions_reset(physical_model%dipolar_interactions_static(i_box), &
                 reset_real_pair=.true.)
         end do
