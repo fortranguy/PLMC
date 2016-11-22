@@ -7,7 +7,7 @@ use procedures_hetero_couples_factory, only: hetero_couples_create_half => creat
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower_sampler_destroy =>&
     destroy
-use procedures_mixture_factory, only: set_have_positions
+use procedures_mixture_properties, only: set_have_positions
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_exchanged_boxes_size, only: Exchanged_Boxes_Size_Line
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
@@ -42,10 +42,9 @@ contains
             any(have_positions))
         select type (volume_exchange)
             type is (Boxes_Volume_Exchange)
-                call volume_exchange%construct(physical_model%environment, physical_model%mixture%&
-                    components, physical_model%short_interactions, physical_model%&
-                    dipolar_interactions_facades, exchanged_boxes_size, have_positions, couples, &
-                    selector)
+                call volume_exchange%construct(physical_model%environment, physical_model%mixture,&
+                    physical_model%short_interactions, physical_model%dipolar_interactions_facades,&
+                    exchanged_boxes_size, have_positions, couples, selector)
             type is (Null_Generating_Algorithm)
             class default
                 call error_exit("procedures_boxes_volume_exchange_factory: create: "//&

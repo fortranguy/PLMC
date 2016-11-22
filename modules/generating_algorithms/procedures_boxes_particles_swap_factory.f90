@@ -9,7 +9,7 @@ use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower
     destroy
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_changes_factory, only: set_can_translate
+use procedures_changes_properties, only: set_can_translate
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
 use classes_boxes_particles_swap, only: Boxes_Particles_Swap
 

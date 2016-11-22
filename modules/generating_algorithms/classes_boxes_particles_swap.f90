@@ -104,7 +104,7 @@ contains
         class(Boxes_Particles_Swap), intent(inout) :: this
 
         call selectors_reset(this%components_selectors, this%box_couples, this%component_couples, &
-            this%mixture%components, this%can_translate)
+            this%mixture%average_nums_particles, this%can_translate)
     end subroutine Concrete_reset_selectors
 
     pure integer function Concrete_get_num_choices(this) result(num_choices)

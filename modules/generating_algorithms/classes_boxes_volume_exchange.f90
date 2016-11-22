@@ -9,7 +9,7 @@ use procedures_hetero_couples_factory, only: hetero_couples_destroy => destroy
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
+use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_factory, only: mixture_rescale_positions => rescale_positions
 use types_cells_wrapper, only: Cells_Wrapper
 use procedures_cells_factory, only: cells_destroy => destroy
@@ -38,7 +38,7 @@ private
     type, extends(Abstract_Generating_Algorithm), public :: Boxes_Volume_Exchange
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Component_Wrapper), pointer :: components(:, :) => null()
+        type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facades(:) => &
             null()
@@ -58,11 +58,11 @@ private
 
 contains
 
-    subroutine Concrete_construct(this, environment, components, short_interactions, &
+    subroutine Concrete_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_facades, exchanged_boxes_size, have_positions, couples, selector)
         class(Boxes_Volume_Exchange), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Component_Wrapper), target, intent(in) :: components(:, :)
+        type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facades(:)
@@ -72,7 +72,7 @@ contains
         class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
-        this%components => components
+        this%mixture => mixture
         this%short_interactions => short_interactions
         this%dipolar_interactions_facades => dipolar_interactions_facades
         this%exchanged_boxes_size => exchanged_boxes_size
@@ -90,15 +90,15 @@ contains
         this%exchanged_boxes_size => null()
         this%dipolar_interactions_facades => null()
         this%short_interactions => null()
-        this%components => null()
+        this%mixture => null()
         this%environment => null()
     end subroutine Concrete_destroy
 
     subroutine Concrete_reset_selectors(this)
         class(Boxes_Volume_Exchange), intent(inout) :: this
 
-        call selectors_reset(this%selector, this%couples, this%exchanged_boxes_size, this%&
-            components, this%have_positions)
+        call selectors_reset(this%selector, this%couples, this%exchanged_boxes_size, this%mixture%&
+            average_nums_particles, this%have_positions)
     end subroutine Concrete_reset_selectors
 
     pure integer function Concrete_get_num_choices(this) result(num_choices)
@@ -147,9 +147,10 @@ contains
         do i_partner = 1, size(new_boxes_size, 2)
             call this%environment%periodic_boxes(ij_boxes(i_partner))%&
                 set(new_boxes_size(:, i_partner))
-            call mixture_rescale_positions(this%components(:, ij_boxes(i_partner)), &
+            call mixture_rescale_positions(this%mixture%components(:, ij_boxes(i_partner)), &
                 boxes_size_ratio(:, i_partner))
-            call logical_create(only_resized_triangle(i_partner)%triangle, size(this%components, 1))
+            call logical_create(only_resized_triangle(i_partner)%triangle, &
+                size(this%mixture%components, 1))
             call cells_memento_save(cells(i_partner), only_resized_triangle(i_partner)%triangle, &
                 this%short_interactions%visitable_cells_memento, this%short_interactions%&
                 cells(ij_boxes(i_partner)))
@@ -158,7 +159,8 @@ contains
                 short_interactions%cells(ij_boxes(i_partner))%visitable_cells)
             call this%dipolar_interactions_facades(ij_boxes(i_partner))%&
                 reset(reset_real_pair(i_partner))
-            call observables_energies_create(new_energies(i_partner), size(this%components, 1))
+            call observables_energies_create(new_energies(i_partner), &
+                size(this%mixture%components, 1))
         end do
 
         call this%metropolis_algorithm(success, new_energies, ij_boxes, &
@@ -179,7 +181,7 @@ contains
             do i_partner = 1, size(ij_boxes)
                 call this%environment%periodic_boxes(ij_boxes(i_partner))%&
                     set(boxes_size(:, i_partner))
-                call mixture_rescale_positions(this%components(:, ij_boxes(i_partner)), &
+                call mixture_rescale_positions(this%mixture%components(:, ij_boxes(i_partner)), &
                     1._DP / boxes_size_ratio(:, i_partner))
                 call cells_memento_restore(this%short_interactions%cells(ij_boxes(i_partner)), &
                     only_resized_triangle(i_partner)%triangle, this%short_interactions%&
@@ -210,12 +212,12 @@ contains
 
         success = .false.
         do i_partner = 1, size(deltas)
-            call observables_energies_create(deltas(i_partner), size(this%components, 1))
+            call observables_energies_create(deltas(i_partner), size(this%mixture%components, 1))
         end do
 
         do i_partner = 1, size(deltas)
             call short_interactions_visit(overlap, new_energies(i_partner)%walls_energies, this%&
-                components(:, ij_boxes(i_partner)), this%short_interactions%&
+                mixture%components(:, ij_boxes(i_partner)), this%short_interactions%&
                 walls_visitors(ij_boxes(i_partner)), this%short_interactions%wall_pairs)
             if (overlap) return
             deltas(i_partner)%walls_energies = new_energies(i_partner)%walls_energies - &
@@ -224,7 +226,7 @@ contains
 
         do i_partner = 1, size(deltas)
             call short_interactions_visit(overlap, new_energies(i_partner)%short_energies, this%&
-                components(:, ij_boxes(i_partner)), this%short_interactions%&
+                mixture%components(:, ij_boxes(i_partner)), this%short_interactions%&
                 cells(ij_boxes(i_partner))%visitable_cells)
             if (overlap) return
             call triangle_observables_diff(deltas(i_partner)%short_energies, &
@@ -235,7 +237,7 @@ contains
         do i_partner = 1, size(deltas)
             call dipolar_interactions_visit(new_energies(i_partner)%field_energies, this%&
                 environment%external_fields(ij_boxes(i_partner)), this%&
-                components(:, ij_boxes(i_partner)))
+                mixture%components(:, ij_boxes(i_partner)))
             deltas(i_partner)%field_energies = new_energies(i_partner)%field_energies - &
                 energies(ij_boxes(i_partner))%field_energies
             call this%dipolar_interactions_facades(ij_boxes(i_partner))%&
@@ -283,9 +285,9 @@ contains
 
         do i_partner = 1, size(nums_particles)
             nums_particles(i_partner) = 0
-            do i_component = 1, size(this%components, 1)
+            do i_component = 1, size(this%mixture%components, 1)
                 nums_particles(i_partner) = nums_particles(i_partner) + this%&
-                    components(i_component, ij_boxes(i_partner))%num_particles%get()
+                    mixture%components(i_component, ij_boxes(i_partner))%num_particles%get()
             end do
         end do
 

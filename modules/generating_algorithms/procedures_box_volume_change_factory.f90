@@ -5,7 +5,7 @@ use procedures_errors, only: error_exit
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower_sampler_destroy =>&
     destroy
-use procedures_mixture_factory, only: set_have_positions
+use procedures_mixture_properties, only: set_have_positions
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use classes_changed_box_size, only: Abstract_Changed_Box_Size
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
@@ -44,9 +44,9 @@ contains
             boxes_size_can_change)
         select type (volume_change)
             type is (Box_Volume_Change)
-                call volume_change%construct(physical_model%environment, physical_model%mixture%&
-                    components, physical_model%short_interactions, physical_model%&
-                    dipolar_interactions_facades, changed_boxes_size, have_positions, selectors)
+                call volume_change%construct(physical_model%environment, physical_model%mixture, &
+                    physical_model%short_interactions, physical_model%dipolar_interactions_facades,&
+                    changed_boxes_size, have_positions, selectors)
             type is (Null_Generating_Algorithm)
             class default
                 call error_exit("procedures_box_volume_change_factory: create: volume_change: "//&

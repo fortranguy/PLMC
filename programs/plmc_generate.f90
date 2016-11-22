@@ -53,22 +53,20 @@ implicit none
 
     call plmc_reset(physical_model, skip_dipolar_interactions=.false.)
     call markov_chain_generator%plmc_propagator%reset()
-    call plmc_set(observables, physical_model) !in exploring too?
-    call plmc_visit(observables%energies, physical_model, use_cells=.false.)
-    call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
-    if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes and propagator..."
-    do i_step = -num_tuning_steps + 1, 0
-        call markov_chain_generator%plmc_propagator%try(observables)
-        call plmc_set(physical_model%mixture%components, i_step)
-        call plmc_set(changes_tuned, i_step, markov_chain_generator%changes, observables)
-        call plmc_set(observables)
-        call markov_chain_generator%plmc_propagator%tune(i_step)
-        call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
-        if (changes_tuned) exit
-    end do
     call generating_algorithms_add_to_report(json, io%report%algorithms_weight, &
         markov_chain_generator%generating_algorithms)
     call json%print(io%report%root, generating_report_filename)
+    call plmc_set(observables, physical_model) !in exploring too?
+    call plmc_visit(observables%energies, physical_model, use_cells=.false.)
+    call plmc_write(io%writers, observables, num_tuning_steps, num_steps, -num_tuning_steps)
+    if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
+    do i_step = -num_tuning_steps + 1, 0
+        call markov_chain_generator%plmc_propagator%try(observables)
+        call plmc_set(changes_tuned, i_step, markov_chain_generator%changes, observables)
+        call plmc_set(observables)
+        call plmc_write(io%writers, observables, num_tuning_steps, num_steps, i_step)
+        if (changes_tuned) exit
+    end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call markov_chain_generator%plmc_propagator%try(observables)

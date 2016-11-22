@@ -10,9 +10,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_inquirers, only: property_total_volume_can_change => &
     total_volume_can_change
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_inquirers, only: component_can_translate, component_can_rotate, &
-    component_can_exchange
-use procedures_mixture_factory, only: set_have_positions, set_have_orientations
+use procedures_mixture_properties, only: set_have_positions, set_have_orientations, set_can_exchange
 use module_move_tuning, only: Concrete_Move_Tuning_Parameters
 use procedures_changed_boxes_size_factory, only: changed_boxes_size_create => create, &
     changed_boxes_size_destroy => destroy
@@ -34,7 +32,7 @@ use types_changes_wrapper, only: Changes_Wrapper
 implicit none
 
 private
-public :: create, destroy, set_can_translate, set_can_rotate, set_can_exchange
+public :: create, destroy
 
 interface create
     module procedure :: create_all
@@ -48,7 +46,6 @@ end interface destroy
 
 contains
 
-    !> @todo Review the compatibility with GEMC
     subroutine create_all(changes, environment, components, num_tuning_steps, generating_data)
         type(Changes_Wrapper), intent(out) :: changes
         type(Environment_Wrapper), intent(in) :: environment
@@ -181,48 +178,6 @@ contains
             parameters%tolerance = 0._DP
         end if
     end subroutine set_tuner_parameters
-
-    subroutine set_can_translate(can_translate, components)
-        logical, intent(inout) :: can_translate(:, :)
-        type(Changes_Component_Wrapper), intent(in) :: components(:, :)
-
-        integer :: i_box, i_component
-
-        do i_box = 1, size(can_translate, 2)
-            do i_component = 1, size(can_translate, 1)
-                can_translate(i_component, i_box) = &
-                    component_can_translate(components(i_component, i_box)%translated_positions)
-            end do
-        end do
-    end subroutine set_can_translate
-
-    subroutine set_can_rotate(can_rotate, components)
-        logical, intent(inout) :: can_rotate(:, :)
-        type(Changes_Component_Wrapper), intent(in) :: components(:, :)
-
-        integer :: i_box, i_component
-
-        do i_box = 1, size(can_rotate, 2)
-            do i_component = 1, size(can_rotate, 1)
-                can_rotate(i_component, i_box) = &
-                    component_can_rotate(components(i_component, i_box)%rotated_orientations)
-            end do
-        end do
-    end subroutine set_can_rotate
-
-    subroutine set_can_exchange(can_exchange, components)
-        logical, intent(inout) :: can_exchange(:, :)
-        type(Component_Wrapper), intent(in) :: components(:, :)
-
-        integer :: i_box, i_component
-
-        do i_box = 1, size(can_exchange, 2)
-            do i_component = 1, size(can_exchange, 1)
-                can_exchange(i_component, i_box) = &
-                    component_can_exchange(components(i_component, i_box)%chemical_potential)
-            end do
-        end do
-    end subroutine set_can_exchange
 
     subroutine destroy_all(changes)
         type(Changes_Wrapper), intent(inout) :: changes

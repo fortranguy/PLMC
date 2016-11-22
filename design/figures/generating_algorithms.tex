@@ -41,7 +41,7 @@
                 \namespace{Common} :: HeteroCouples \\
                 \namespace{Random} :: TowerSampler \\
                 \namespace{Environment} :: Environment \\
-                \namespace{Mixture} :: Mixture, Component \\
+                \namespace{Mixture} :: Mixture \\
                 \namespace{ShortInteractions} :: ShortInteractions \\
                 \namespace{DipolarInteractions} :: DipolarInteractionsDynamic,
                     DipolarInteractionsStatic, DipolarInteractionsFacade \\
@@ -87,7 +87,7 @@
             \begin{class}[text width=\largeTextWidth]{BoxVolumeChange}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
-                    $\mathAggregation$ components: \type{Component[\numComponents, \numBoxes]},
+                    $\mathAggregation$ mixture: \type{Mixture},
                     $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                     $\mathAggregation$ dipolarInteractionsFacade:
                         \type{DipolarInteractionsFacade[\numBoxes]},
@@ -120,7 +120,7 @@
             \begin{class}[text width=\largeTextWidth]{BoxesVolumeExchange}{0, 0}
                 \inherit{GeneratingAlgorithm}
                 \operation{\procedure{construct}{$\mathAggregation$ environment: \type{Environment},
-                $\mathAggregation$ components: \type{Component[\numComponents, \numBoxes]},
+                $\mathAggregation$ mixture: \type{Mixture},
                 $\mathAggregation$ shortInteractions: \type{ShortInteractions},
                 $\mathAggregation$ dipolarInteractionsFacade:
                     \type{DipolarInteractionsFacade[\numBoxes]},

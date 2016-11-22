@@ -38,9 +38,8 @@
         "delta": 0.1
     },
     "Radial": {
-        "name": "inter",
-        "components couple": [1, 3],
-        "delta": 0.1
+        "components couple": [1, 1],
+        "delta": 0.01
     },
     "Dipoles Graph": {
         "make graph": true,

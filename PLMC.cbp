@@ -77,7 +77,10 @@
 			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/changes/procedures_changes_factory.f90">
-			<Option weight="12" />
+			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/changes/procedures_changes_properties.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/changes/procedures_coordinates_copier_factory.f90">
 			<Option weight="3" />
@@ -164,7 +167,7 @@
 			<Option weight="17" />
 		</Unit>
 		<Unit filename="modules/common/procedures_observables_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/common/procedures_physical_model_factory.f90">
 			<Option weight="17" />
@@ -179,16 +182,16 @@
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_propagator_factory.f90">
-			<Option weight="12" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_resetter.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_visitor.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_writer.f90">
-			<Option weight="12" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/common/procedures_property_inquirers.f90">
 			<Option weight="3" />
@@ -203,10 +206,10 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/common/types_exploring_io.f90">
-			<Option weight="12" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/common/types_generating_io.f90">
-			<Option weight="12" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/common/types_logical_wrapper.f90">
 			<Option weight="0" />
@@ -218,7 +221,7 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/common/types_physical_model_wrapper.f90">
-			<Option weight="14" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/common/types_potential_domain.f90">
 			<Option weight="0" />
@@ -239,10 +242,10 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_des_surf_mixture.f90">
-			<Option weight="10" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_dipolar_interactions_facade.f90">
-			<Option weight="13" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/classes_dipolar_neighbourhood.f90">
 			<Option weight="3" />
@@ -263,49 +266,49 @@
 			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_factory.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_real/procedures_des_real_pair_factory.f90">
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_structure.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_visitor.f90">
-			<Option weight="10" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/classes_des_reci_weight.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/procedures_des_reci_factory.f90">
-			<Option weight="12" />
-		</Unit>
-		<Unit filename="modules/dipolar_interactions/des_reci/procedures_des_reci_structure_factory.f90">
 			<Option weight="10" />
 		</Unit>
+		<Unit filename="modules/dipolar_interactions/des_reci/procedures_des_reci_structure_factory.f90">
+			<Option weight="8" />
+		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/procedures_des_reci_visitor_factory.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/des_reci/procedures_des_reci_weight_factory.f90">
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/classes_dlc_structures.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/classes_dlc_visitor.f90">
-			<Option weight="10" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/classes_dlc_weight.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/procedures_dlc_factory.f90">
-			<Option weight="12" />
-		</Unit>
-		<Unit filename="modules/dipolar_interactions/dlc/procedures_dlc_structures_factory.f90">
 			<Option weight="10" />
 		</Unit>
+		<Unit filename="modules/dipolar_interactions/dlc/procedures_dlc_structures_factory.f90">
+			<Option weight="9" />
+		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/procedures_dlc_visitor_factory.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/dlc/procedures_dlc_weight_factory.f90">
 			<Option weight="9" />
@@ -314,37 +317,37 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_des_self_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_des_surf_mixture_factory.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_facades_factory.f90">
 			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_factory.f90">
-			<Option weight="13" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_micro.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_resetter.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_visitor.f90">
-			<Option weight="12" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_neighbourhoods_factory.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipoles_field_interaction.f90">
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/types_dipolar_interactions_dynamic_wrapper.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/types_dipolar_interactions_static_wrapper.f90">
-			<Option weight="10" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/environment/boxes/classes_box_size_checker.f90">
 			<Option weight="7" />
@@ -497,34 +500,34 @@
 			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/procedures_dipolar_neighbourhoods_visitors_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/procedures_maximum_boxes_compression_explorer_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/procedures_particle_insertion_method_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/exploring_algorithms/procedures_volume_change_method_factory.f90">
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_box_particle_exchange.f90">
-			<Option weight="13" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_box_particle_move.f90">
 			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_box_particles_swap.f90">
-			<Option weight="13" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_box_volume_change.f90">
 			<Option weight="14" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_boxes_particle_teleportation.f90">
-			<Option weight="13" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_boxes_particles_swap.f90">
-			<Option weight="13" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/classes_boxes_volume_exchange.f90">
 			<Option weight="14" />
@@ -533,31 +536,31 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_box_particle_exchange_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_box_particle_move_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_box_particles_swap_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_box_volume_change_factory.f90">
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_boxes_particle_teleportation_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_boxes_particles_swap_factory.f90">
-			<Option weight="15" />
+			<Option weight="13" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_boxes_volume_exchange_factory.f90">
 			<Option weight="15" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_exchange_updaters.f90">
-			<Option weight="11" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_exchange_visitors.f90">
-			<Option weight="12" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_generating_algorithms_factory.f90">
 			<Option weight="16" />
@@ -566,16 +569,16 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_selectors_resetters.f90">
-			<Option weight="9" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_transmutation_updaters.f90">
-			<Option weight="11" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/generating_algorithms/procedures_transmutation_visitors.f90">
-			<Option weight="12" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/mixture/classes_mixture_total_moment.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/mixture/composition/classes_average_num_particles.f90">
 			<Option weight="7" />
@@ -586,7 +589,7 @@
 		<Unit filename="modules/mixture/composition/classes_num_particles.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/mixture/composition/procedures_average_num_particles_factory.f90">
+		<Unit filename="modules/mixture/composition/procedures_average_nums_particles_factory.f90">
 			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/mixture/composition/procedures_component_chemical_potential_factory.f90">
@@ -640,14 +643,17 @@
 		<Unit filename="modules/mixture/procedures_mixture_inquirers.f90">
 			<Option weight="6" />
 		</Unit>
-		<Unit filename="modules/mixture/procedures_mixture_total_moments_factory.f90">
-			<Option weight="10" />
+		<Unit filename="modules/mixture/procedures_mixture_properties.f90">
+			<Option weight="7" />
 		</Unit>
-		<Unit filename="modules/mixture/types_component_wrapper.f90">
+		<Unit filename="modules/mixture/procedures_mixture_total_moments_factory.f90">
 			<Option weight="8" />
 		</Unit>
+		<Unit filename="modules/mixture/types_component_wrapper.f90">
+			<Option weight="6" />
+		</Unit>
 		<Unit filename="modules/mixture/types_mixture_wrapper.f90">
-			<Option weight="10" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/mixture/types_particle_wrapper.f90">
 			<Option weight="1" />
@@ -707,7 +713,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/readers/classes_complete_coordinates_reader.f90">
-			<Option weight="10" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/readers/classes_component_coordinates_reader.f90">
 			<Option weight="5" />
@@ -716,10 +722,10 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/readers/procedures_complete_coordinates_reader_factory.f90">
-			<Option weight="11" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/readers/procedures_component_coordinates_reader_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/readers/procedures_coordinates_reader.f90">
 			<Option weight="3" />
@@ -728,13 +734,13 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/readers/procedures_readers_factory.f90">
-			<Option weight="12" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/readers/types_component_coordinates_reader_selector.f90">
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/readers/types_readers_wrapper.f90">
-			<Option weight="11" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/short_interactions/cells/classes_neighbour_cells.f90">
 			<Option weight="7" />
@@ -842,34 +848,34 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="modules/writers/coordinates/classes_complete_coordinates_writer.f90">
-			<Option weight="10" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/writers/coordinates/classes_component_coordinates_writer.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/writers/coordinates/procedures_complete_coordinates_writer_factory.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/writers/coordinates/procedures_component_coordinates_writer_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/writers/coordinates/types_component_coordinates_writer_selector.f90">
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_changes_success_writer_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_directed_graph_writer_factory.f90">
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_energies_writers_factory.f90">
-			<Option weight="13" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_exploring_writers_factory.f90">
 			<Option weight="16" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_generating_writers_factory.f90">
-			<Option weight="14" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_json_reports_factory.f90">
 			<Option weight="1" />
@@ -881,10 +887,10 @@
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_rectangle_writer_factory.f90">
-			<Option weight="9" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_triangle_writer_factory.f90">
-			<Option weight="12" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_writers_inquirers.f90">
 			<Option weight="4" />
@@ -899,7 +905,7 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/writers/types_generating_writers_wrapper.f90">
-			<Option weight="11" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/writers/types_json_report.f90">
 			<Option weight="0" />

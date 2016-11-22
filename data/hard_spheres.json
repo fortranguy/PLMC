@@ -1,0 +1,77 @@
+{
+    "Environment": {
+        "Boxes": {
+            "number": 1,
+            "periodicity": "XYZ",
+            "initial size": [[12.0, 12.0, 12.0]],
+            "total volume can change": false
+        },
+        "Thermostat": {
+            "temperature": 1.0
+        },
+        "External Field": {
+            "apply": false
+        },
+        "Permittivity": {
+            "use": false
+        },
+        "Reciprocal Lattice": {
+            "use": false
+        },
+        "Walls": {
+            "use": false
+        }
+    },
+    "Mixture": {
+        "number of components": 1,
+        "can exchange with reservoir": false,
+        "Component 1": {
+            "initial number": [1000],
+            "minimum distance": 1.0,
+            "is dipolar": false
+        }
+    },
+    "Short Interactions": {
+        "Component 1": {
+            "name": "null",
+            "tabulated": false
+        },
+        "Cells": {
+            "data structure": "list"
+        }
+    },
+    "Random Number Generator": {
+        "state": "default"
+    },
+    "Changes": {
+        "number of tuning steps": 1000,
+        "Components": {
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 100,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01,
+            "Component 1": {
+                "Small Move": {
+                    "initial delta": [0.3, 0.3, 0.3]
+                }
+            }
+        }
+    },
+    "Monte Carlo": {
+        "number of steps": 10000
+    },
+    "Input": {
+        "initial coordinates": ["initial_coordinates.xyz"]
+    },
+    "Output": {
+        "Coordinates": {
+            "write": true,
+            "period": 10
+        },
+        "Shell": {
+            "make directory command": "mkdir -p",
+            "path separator": "/"
+        }
+    }
+}

@@ -4,7 +4,7 @@ use types_logical_wrapper, only: Logical_Line
 use types_string_wrapper, only: String_Wrapper
 use procedures_environment_inquirers, only: box_size_can_change
 use types_component_wrapper, only: Component_Wrapper
-use procedures_mixture_factory, only: set_have_positions
+use procedures_mixture_properties, only: set_have_positions
 use classes_pair_potential, only: Pair_Potential_Line
 use procedures_short_interactions_inquirers, only: components_interact
 use classes_exchanged_boxes_size, only: Exchanged_Boxes_Size_Line

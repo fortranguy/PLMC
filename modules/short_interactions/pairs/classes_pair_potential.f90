@@ -1,8 +1,7 @@
 module classes_pair_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use procedures_errors, only: error_exit, warning_continue
-use procedures_checks, only: check_positive, check_potential_domain
+use procedures_checks, only: check_potential_domain
 use classes_potential_expression, only: Abstract_Potential_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
 use types_potential_domain_selector, only: Concrete_Potential_Domain_Selector

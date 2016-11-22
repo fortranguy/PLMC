@@ -203,7 +203,7 @@ contains
     subroutine Abstract_reset_selectors(this)
         class(Abstract_Box_Particle_Exchange), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%mixture%components, this%can_exchange)
+        call selectors_reset(this%selectors, this%mixture%average_nums_particles, this%can_exchange)
     end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)

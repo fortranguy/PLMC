@@ -4,7 +4,7 @@ use data_input_prefixes, only: particle_insertion_prefix, volume_change_prefix, 
 use json_module, only: json_file
 use procedures_errors, only: warning_continue
 use procedures_boxes_factory, only: boxes_create => create, boxes_destroy => destroy
-use procedures_mixture_factory, only: set_have_positions, set_have_orientations
+use procedures_mixture_properties, only: set_have_positions, set_have_orientations
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use procedures_random_coordinates_factory, only: random_coordinates_create => create, &
     random_coordinates_destroy => destroy

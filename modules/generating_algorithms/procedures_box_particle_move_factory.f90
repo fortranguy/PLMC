@@ -6,7 +6,7 @@ use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower
     destroy
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use procedures_changes_factory, only: set_can_translate, set_can_rotate
+use procedures_changes_properties, only: set_can_translate, set_can_rotate
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
 use classes_box_particle_move, only: Box_Particle_Translation, Box_Particle_Rotation
 

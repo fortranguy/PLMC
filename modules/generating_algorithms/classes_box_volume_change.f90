@@ -8,7 +8,7 @@ use procedures_random_number, only: random_integer
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
+use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_factory, only: mixture_rescale_positions => rescale_positions
 use types_cells_wrapper, only: Cells_Wrapper
 use procedures_cells_factory, only: cells_destroy => destroy
@@ -37,7 +37,7 @@ private
     type, extends(Abstract_Generating_Algorithm), public :: Box_Volume_Change
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Component_Wrapper), pointer :: components(:, :) => null()
+        type(Mixture_Wrapper), pointer :: mixture => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         class(Abstract_Dipolar_Interactions_Facade), pointer :: dipolar_interactions_facades(:) => &
             null()
@@ -56,11 +56,11 @@ private
 
 contains
 
-    subroutine Concrete_construct(this, environment, components, short_interactions, &
+    subroutine Concrete_construct(this, environment, mixture, short_interactions, &
         dipolar_interactions_facades, changed_boxes_size, have_positions, selectors)
         class(Box_Volume_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Component_Wrapper), target, intent(in) :: components(:, :)
+        type(Mixture_Wrapper), target, intent(in) :: mixture
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         class(Abstract_Dipolar_Interactions_Facade), target, intent(in) :: &
             dipolar_interactions_facades(:)
@@ -69,7 +69,7 @@ contains
         class(Abstract_Tower_Sampler), intent(in) :: selectors(:)
 
         this%environment => environment
-        this%components => components
+        this%mixture => mixture
         this%short_interactions => short_interactions
         this%dipolar_interactions_facades => dipolar_interactions_facades
         this%changed_boxes_size => changed_boxes_size
@@ -85,15 +85,15 @@ contains
         this%changed_boxes_size => null()
         this%dipolar_interactions_facades => null()
         this%short_interactions => null()
-        this%components => null()
+        this%mixture => null()
         this%environment => null()
     end subroutine Concrete_destroy
 
     subroutine Concrete_reset_selectors(this)
         class(Box_Volume_Change), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%changed_boxes_size, this%components, this%&
-            have_positions)
+        call selectors_reset(this%selectors, this%changed_boxes_size, this%mixture%&
+            average_nums_particles, this%have_positions)
     end subroutine Concrete_reset_selectors
 
     pure integer function Concrete_get_num_choices(this) result(num_choices)
@@ -133,14 +133,14 @@ contains
             reset_real_pair, new_box_size)
 
         call this%environment%periodic_boxes(i_box)%set(new_box_size)
-        call mixture_rescale_positions(this%components(:, i_box), box_size_ratio)
-        call logical_create(only_resized_triangle, size(this%components, 1))
+        call mixture_rescale_positions(this%mixture%components(:, i_box), box_size_ratio)
+        call logical_create(only_resized_triangle, size(this%mixture%components, 1))
         call cells_memento_save(cells, only_resized_triangle, this%short_interactions%&
             visitable_cells_memento, this%short_interactions%cells(i_box))
         call short_interactions_reset(this%short_interactions%cells(i_box)%neighbour_cells, &
             only_resized_triangle, this%short_interactions%cells(i_box)%visitable_cells)
         call this%dipolar_interactions_facades(i_box)%reset(reset_real_pair)
-        call observables_energies_create(new_energies, size(this%components, 1))
+        call observables_energies_create(new_energies, size(this%mixture%components, 1))
 
         call this%metropolis_algorithm(success, new_energies, i_box, product(box_size_ratio), &
             observables%energies(i_box))
@@ -155,7 +155,7 @@ contains
             call cells_destroy(cells%neighbour_cells)
         else
             call this%environment%periodic_boxes(i_box)%set(box_size)
-            call mixture_rescale_positions(this%components(:, i_box), 1._DP / box_size_ratio)
+            call mixture_rescale_positions(this%mixture%components(:, i_box), 1._DP/box_size_ratio)
             call cells_memento_restore(this%short_interactions%cells(i_box), only_resized_triangle,&
                 this%short_interactions%visitable_cells_memento, cells)
             call this%dipolar_interactions_facades(i_box)%restore(dipolar_interactions_static, &
@@ -179,19 +179,19 @@ contains
         logical :: overlap
 
         success = .false.
-        call observables_energies_create(deltas, size(this%components, 1))
+        call observables_energies_create(deltas, size(this%mixture%components, 1))
         call short_interactions_visit(overlap, new_energies%walls_energies, this%&
-            components(:, i_box), this%short_interactions%walls_visitors(i_box), this%&
+            mixture%components(:, i_box), this%short_interactions%walls_visitors(i_box), this%&
             short_interactions%wall_pairs)
         if (overlap) return
         deltas%walls_energies = new_energies%walls_energies - energies%walls_energies
         call short_interactions_visit(overlap, new_energies%short_energies, this%&
-            components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
+            mixture%components(:, i_box), this%short_interactions%cells(i_box)%visitable_cells)
         if (overlap) return
         call triangle_observables_diff(deltas%short_energies, new_energies%short_energies, &
             energies%short_energies)
         call dipolar_interactions_visit(new_energies%field_energies, this%environment%&
-            external_fields(i_box), this%components(:, i_box))
+            external_fields(i_box), this%mixture%components(:, i_box))
         deltas%field_energies = new_energies%field_energies - energies%field_energies
         call this%dipolar_interactions_facades(i_box)%visit(new_energies%dipolar_energies, &
             new_energies%dipolar_shared_energy, box_volume_ratio, energies%dipolar_energies,&
@@ -223,8 +223,9 @@ contains
         integer :: i_component, num_particles
 
         num_particles = 0._DP
-        do i_component = 1, size(this%components, 1)
-            num_particles = num_particles + this%components(i_component, i_box)%num_particles%get()
+        do i_component = 1, size(this%mixture%components, 1)
+            num_particles = num_particles + this%mixture%components(i_component, i_box)%&
+                num_particles%get()
         end do
 
         probability = exp(-this%environment%beta_pressure%get() * &

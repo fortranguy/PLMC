@@ -217,7 +217,8 @@ contains
     subroutine Abstract_reset_selectors(this)
         class(Abstract_Box_Particles_Swap), intent(inout) :: this
 
-        call selectors_reset(this%selectors, this%couples, this%mixture%components, this%can_swap)
+        call selectors_reset(this%selectors, this%couples, this%mixture%average_nums_particles, &
+            this%can_swap)
     end subroutine Abstract_reset_selectors
 
     pure integer function Abstract_get_num_choices(this) result(num_choices)
@@ -246,7 +247,7 @@ contains
         allocate(deltas%dipolar_energies(size(observables%energies(i_box)%dipolar_energies), 2))
 
         call this%metropolis_algorithm(success, deltas, i_box, ij_components)
-        
+
         if (success) then
             do i_partner = 1, size(ij_components)
                 observables%nums_particles(ij_components(i_partner), i_box) = this%mixture%&

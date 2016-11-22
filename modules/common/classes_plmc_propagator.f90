@@ -1,6 +1,5 @@
 module classes_plmc_propagator
 
-use procedures_checks, only: check_positive
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only: tower_sampler_destroy => destroy
 use classes_generating_algorithm, only: Generating_Algorithm_Wrapper
@@ -14,12 +13,10 @@ private
     private
         type(Generating_Algorithm_Wrapper), pointer :: generating_algorithms(:) => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
-        integer :: tuning_period = 0
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_reset
-        procedure :: tune => Abstract_tune
         procedure :: try => Abstract_try
     end type Abstract_PLMC_Propagator
 
@@ -32,7 +29,6 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_reset
-        procedure :: tune => Null_tune
         procedure :: try => Null_try
     end type Null_PLMC_Propagator
 
@@ -40,16 +36,13 @@ contains
 
 !implementation Abstract_PLMC_Propagator
 
-    subroutine Abstract_construct(this, generating_algorithms, selector, tuning_period)
+    subroutine Abstract_construct(this, generating_algorithms, selector)
         class(Abstract_PLMC_Propagator), intent(out) :: this
         type(Generating_Algorithm_Wrapper), target, intent(in) :: generating_algorithms(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
-        integer, intent(in) :: tuning_period
 
         this%generating_algorithms => generating_algorithms
         allocate(this%selector, source=selector)
-        call check_positive("Abstract_PLMC_Propagator: construct", "tuning_period", tuning_period)
-        this%tuning_period = tuning_period
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
@@ -72,15 +65,6 @@ contains
         call this%selector%reset(nums_algorithms)
     end subroutine Abstract_reset
 
-    subroutine Abstract_tune(this, i_step)
-        class(Abstract_PLMC_Propagator), intent(inout) :: this
-        integer, intent(in) :: i_step
-
-        if (i_step /= 0 .and. mod(i_step, this%tuning_period) == 0) then
-            call this%reset()
-        end if
-    end subroutine Abstract_tune
-
     !> @bug Direct feed in array doesn't work: gfortran bug?
     subroutine Abstract_try(this, observables)
         class(Abstract_PLMC_Propagator), intent(in) :: this
@@ -98,11 +82,10 @@ contains
 
 !implementation Null_PLMC_Propagator
 
-    subroutine Null_construct(this, generating_algorithms, selector, tuning_period)
+    subroutine Null_construct(this, generating_algorithms, selector)
         class(Null_PLMC_Propagator), intent(out) :: this
         type(Generating_Algorithm_Wrapper), target, intent(in) :: generating_algorithms(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
-        integer, intent(in) :: tuning_period
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
@@ -112,11 +95,6 @@ contains
     subroutine Null_reset(this)
         class(Null_PLMC_Propagator), intent(inout) :: this
     end subroutine Null_reset
-
-    subroutine Null_tune(this, i_step)
-        class(Null_PLMC_Propagator), intent(inout) :: this
-        integer, intent(in) :: i_step
-    end subroutine Null_tune
 
     subroutine Null_try(this, observables)
         class(Null_PLMC_Propagator), intent(in) :: this

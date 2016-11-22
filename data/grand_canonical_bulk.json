@@ -116,7 +116,7 @@
         }
     },
     "Random Number Generator": {
-        "name": "urandom"
+        "state": "urandom"
     },
     "Changes": {
         "number of tuning steps": 1000,
@@ -147,9 +147,6 @@
                     "initial delta": 1.0
                 }
             }
-        },
-        "Propagator": {
-            "tuning period": 1000
         }
     },
     "Monte Carlo": {

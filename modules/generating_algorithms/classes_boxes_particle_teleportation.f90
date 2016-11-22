@@ -107,7 +107,8 @@ contains
     subroutine Concrete_reset_selectors(this)
         class(Boxes_Particle_Teleportation), intent(inout) :: this
 
-        call selectors_reset(this%component_selectors, this%mixture%components, this%can_translate)
+        call selectors_reset(this%component_selectors, this%mixture%average_nums_particles, this%&
+            can_translate)
     end subroutine Concrete_reset_selectors
 
     !> @todo Is num_choices enough?
@@ -142,7 +143,7 @@ contains
         end do
 
         call this%metropolis_algorithm(success, deltas, ij_boxes, i_component)
-        
+
         if (success) then
             do i_partner = 1, size(deltas)
                 observables%nums_particles(i_component, ij_boxes(i_partner)) = this%mixture%&

@@ -54,10 +54,8 @@ module PLMC
         boxSize = map(Float64, generatingData["Environment"]["Boxes"]["initial size"][i_box])
         if periodicity == "XYZ"
             PLMC.XYZperiodicBox(boxSize)
-        elseif periodicity == "XY"
-            PLMC.XYperiodicBox(boxSize)
         else
-            error("Box periodicity unknown")
+            error("Sorry, I only know XYZ box periodicity. But you can fool me.")
         end
     end
 

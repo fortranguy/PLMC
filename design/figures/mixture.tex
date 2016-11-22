@@ -15,7 +15,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Coordinates.north) + (8 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(Coordinates.north) + (8 cm, 1 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{ComponentDipoleMoments}{0, 0}
                 \inherit{Coordinates}
                 \operation{\procedure{construct}{norm: \type{real},
@@ -56,12 +56,11 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(Particle.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(Particle.north) + (0 cm, 4.25 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AverageNumParticles}{0, 0}
                 \operation[0]{\procedure{construct}{\ldots}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{set}{}}
-                \operation{\procedure{accumulate}{iStep: \type{int}}}
                 \operation{\procedure{get}{}: \type{int}}
             \end{abstractclass}
         \end{scope}
@@ -69,6 +68,8 @@
         \begin{scope}[shift={($(AverageNumParticles.north -| ComponentDipoleMoments)$)}]
             \begin{class}[text width=\largeTextWidth]{Mixture}{0, 0}
                 \UMLattribute{components: \type{Component[\numComponents, \numBoxes]}}
+                \UMLattribute{averageNumsParticles:
+                    \type{AverageNumParticles[\numComponents, \numBoxes]}}
                 \UMLattribute{componentsMinDistances:
                     \type{MinDistance[\numComponents, \numComponents]\textsubscript{\sym}}}
                 \UMLattribute{wallMinDistances: \type{MinDistance[\numComponents]}}
@@ -83,7 +84,6 @@
                 \UMLattribute{orientations: \type{ComponentCoordinates}}
                 \UMLattribute{dipoleMoments: \type{ComponentDipoleMoments}}
                 \UMLattribute{chemicalPotential: \type{ComponentChemicalPotential}}
-                \UMLattribute{averageNumParticles: \type{AverageNumParticles}}
             \end{class}
         \end{scope}
 

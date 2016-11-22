@@ -7,9 +7,10 @@ use procedures_hetero_couples_factory, only: hetero_couples_create_full => creat
 use classes_tower_sampler, only: Abstract_Tower_Sampler
 use procedures_tower_sampler_factory, only:tower_sampler_create => create, tower_sampler_destroy =>&
     destroy
+use procedures_mixture_properties, only: set_can_exchange
 use types_physical_model_wrapper, only: Physical_Model_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_changes_factory, only: set_can_translate, set_can_exchange
+use procedures_changes_properties, only: set_can_translate
 use classes_generating_algorithm, only: Abstract_Generating_Algorithm, Null_Generating_Algorithm
 use classes_box_particles_swap, only: Box_Particles_Transmutation, Box_Particles_Switch
 

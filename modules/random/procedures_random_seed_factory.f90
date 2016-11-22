@@ -15,14 +15,14 @@ contains
     subroutine set(input_data)
         type(json_file), intent(inout) :: input_data
 
-        character(len=:), allocatable :: seed_name, data_field
+        character(len=:), allocatable :: seed_state, data_field
         integer, allocatable :: custom_seed(:)
         logical :: data_found
 
-        data_field = random_number_generator_prefix//"name"
-        call input_data%get(data_field, seed_name, data_found)
+        data_field = random_number_generator_prefix//"state"
+        call input_data%get(data_field, seed_state, data_found)
         call check_data_found(data_field, data_found)
-        select case (seed_name)
+        select case (seed_state)
             case ("default")
                 call random_seed()
             case ("urandom")
@@ -33,7 +33,7 @@ contains
                 call check_data_found(data_field, data_found)
                 call set_from_seed(custom_seed)
             case default
-                call error_exit("procedures_random_seed_factory: set: seed_name type unknown. "//&
+                call error_exit("procedures_random_seed_factory: set: "//data_field//" unknown. "//&
                     "Choose between: 'default', 'urandom', 'custom'.")
         end select
     end subroutine set
