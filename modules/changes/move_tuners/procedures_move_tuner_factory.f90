@@ -62,7 +62,8 @@ contains
             allocate(boxes_size_exchange_tuner(j_box)%line(j_box))
             do i_box = 1, size(boxes_size_exchange_tuner(j_box)%line)
                 if (i_box /= j_box .and. num_tuning_steps > 0) then
-                    allocate(Concrete_Move_Tuner :: boxes_size_exchange_tuner(j_box)%line(i_box)%tuner)
+                    allocate(Concrete_Move_Tuner :: boxes_size_exchange_tuner(j_box)%line(i_box)%&
+                        tuner)
                 else
                     allocate(Null_Move_Tuner :: boxes_size_exchange_tuner(j_box)%line(i_box)%tuner)
                 end if

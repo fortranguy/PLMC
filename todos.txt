@@ -6,6 +6,7 @@
 - DipolarVisitor: Self is scalable (instead of O(N)): is it worth it?
 - In DESreciStructure & DESreciVisitor, document the role of boxVolumeMemento
 - doc: permittivity: \epsilon -> \varepsilon
+- Changes: optional -> no warning?
 - VolumeChange: + or - in observable?
 - Generalise ParticleInsertionMethod (Widom) for other ensembles, cf. FS02
 - Convert all explorations for multiples boxes & components
@@ -20,6 +21,7 @@
 + GeneratingAlgorithms:
     - acceptationProbability(): uniformise comment notation
     - BoxesVolumeExchange: optimise overlap
+- Remove ``hub'' procedures (i.e. interface with module procedure from use)?
 - rewrite modules/index.md
 - docUML: Improve the type of adjacencyMatrices?
 - docUML to update

@@ -13,8 +13,10 @@ You need:
 * [json-fortran 5.0+](https://github.com/jacobwilliams/json-fortran) to input simulation parameters.
 
 You may need:
-* [FORD 5.0+](https://github.com/cmacmackin/ford) to generate the documentation
-* [LuaLaTex 0.95+](https://www.tug.org/texlive/) to draw the class diagrams
+* [FORD 5.0+](https://github.com/cmacmackin/ford) to generate the
+[documentation](https://fortranguy.github.io/PLMC/)
+* [LuaLaTex 0.95+](https://www.tug.org/texlive/) to draw the
+[class diagrams](https://github.com/fortranguy/PLMC/blob/gh-pages/plmc_design.pdf)
 * [Julia 0.5+](http://julialang.org/) to create an initial configuration or check
 energy consistency
 * [Python 3+](https://www.continuum.io/downloads) to analyse dipoles clusters.
@@ -27,7 +29,7 @@ mkdir build
 cd build
 FC=gfortran cmake /path/to/PLMC
 ```
-The default build is debug. You can change it using `ccmake` instead of `cmake`.
+The default build is debug. You can change it using `make edit_cache`.
 From now on `PLMC` will be a shorthand for `/path/to/PLMC`.
 Now you can build the project:
 ```bash
@@ -73,7 +75,7 @@ radial hard_spheres.json exploring.json generating_box_1/coordinates/coordinates
 And you can plot it:
 ```
 gnuplot
-plot "./radial_1-1.out" w l
+plot "radial_1-1.out" w l
 ```
 
 ## Legacy

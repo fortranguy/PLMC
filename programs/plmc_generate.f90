@@ -1,5 +1,3 @@
-!> @note After thermalisation, plmc_propagator%reset() was removed because it may delay
-!> the search of the equilibrium (e.g. GEMC: DHS+HS at low temperature).
 program plmc_generate
 
 use, intrinsic :: iso_fortran_env, only: output_unit

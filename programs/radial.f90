@@ -1,4 +1,4 @@
-program radial_intra
+program radial
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
@@ -60,4 +60,4 @@ implicit none
     call radial_explorer_destroy(radial_explorer)
     call boxes_destroy(periodic_boxes)
 
-end program radial_intra
+end program radial

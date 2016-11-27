@@ -142,13 +142,8 @@
         "state": "urandom"
     },
     "Changes": {
-        "number of tuning steps": 1000,
+        "number of tuning steps": 0,
         "Boxes": {
-            "increase factor": 1.05,
-            "maximum increase factor": 1.5,
-            "accumulation period": 100,
-            "wanted success ratio": 0.75,
-            "tolerance": 0.01,
             "frequency ratio": 0.01,
             "Boxes 12": {
                 "initial delta": 0.01

@@ -1,5 +1,10 @@
-bin/
-build_test/
-build_release/
-*.txt~
-.gitignore~
+doc/
+*.bbl
+*.bcf
+*.blg
+*.log
+*.pdf
+*.run.xml
+*.toc
+*.aux
+*.tmp
