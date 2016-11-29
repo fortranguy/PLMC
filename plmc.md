@@ -1,5 +1,6 @@
 project: Physics of Liquids Monte-Carlo
 summary: A simple Monte-Carlo program for colloids written in Modern Fortran
+project_github: https://github.com/fortranguy/PLMC
 favicon: ./plmc_logo.png
 src_dir: ./programs
     ./modules
