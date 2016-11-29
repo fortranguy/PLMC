@@ -1,9 +1,0 @@
-{
-    "Dipoles": {
-        "number": 3,
-        "moment norm": 0.5,
-        "orientation 1": [0.0, 0.0, -1.0],
-        "orientation 2": [0.0, 1.0, 0.0],
-        "orientation 3": [-1.0, 0.0, 0.0]
-    }
-}

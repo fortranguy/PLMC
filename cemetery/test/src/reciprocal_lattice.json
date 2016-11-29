@@ -1,8 +1,0 @@
-{
-    "Periodic Box": {
-        "size": [10.0, 10.0, 10.0]
-    },
-    "Reciprocal Lattice": {
-        "numbers": [8, 8, 8]
-    }
-}

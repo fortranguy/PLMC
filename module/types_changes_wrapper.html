@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="A simple Monte-Carlo program for colloids written in Modern Fortran">
+    
+    <meta name="author" content="Salomon CHUNG" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>types_changes_wrapper &ndash; Physics of Liquids Monte-Carlo</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Physics of Liquids Monte-Carlo <small>Green Mile</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>Bridging Physics and Computer Science</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+				
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>types_changes_wrapper 
+    <small>Module</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 0.1% of total for modules and submodules.">19 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/types_changes_wrapper.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/types_changes_wrapper.f90.html'>types_changes_wrapper.f90</a></li>
+  
+     <li class="active">types_changes_wrapper</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
+  <div id="types-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/types_changes_wrapper.html#type-changes_wrapper">Changes_Wrapper</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-0">All Modules</a></h3></div>
+  <div id="allmods-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/classes_average_num_particles.html">classes_average_num_particles</a>
+      
+      <a class="list-group-item" href="../module/classes_beta_pressure.html">classes_beta_pressure</a>
+      
+      <a class="list-group-item" href="../module/classes_beta_pressure_excess.html">classes_beta_pressure_excess</a>
+      
+      <a class="list-group-item" href="../module/classes_box_particle_exchange.html">classes_box_particle_exchange</a>
+      
+      <a class="list-group-item" href="../module/classes_box_particle_move.html">classes_box_particle_move</a>
+      
+      <a class="list-group-item" href="../module/classes_box_particles_swap.html">classes_box_particles_swap</a>
+      
+      <a class="list-group-item" href="../module/classes_box_size_checker.html">classes_box_size_checker</a>
+      
+      <a class="list-group-item" href="../module/classes_box_size_memento.html">classes_box_size_memento</a>
+      
+      <a class="list-group-item" href="../module/classes_box_volume_change.html">classes_box_volume_change</a>
+      
+      <a class="list-group-item" href="../module/classes_boxes_particle_teleportation.html">classes_boxes_particle_teleportation</a>
+      
+      <a class="list-group-item" href="../module/classes_boxes_particles_swap.html">classes_boxes_particles_swap</a>
+      
+      <a class="list-group-item" href="../module/classes_boxes_volume_exchange.html">classes_boxes_volume_exchange</a>
+      
+      <a class="list-group-item" href="../module/classes_changed_box_size.html">classes_changed_box_size</a>
+      
+      <a class="list-group-item" href="../module/classes_changed_box_size_ratio.html">classes_changed_box_size_ratio</a>
+      
+      <a class="list-group-item" href="../module/classes_changes_success_writer.html">classes_changes_success_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_complete_coordinates_reader.html">classes_complete_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/classes_complete_coordinates_writer.html">classes_complete_coordinates_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_component_chemical_potential.html">classes_component_chemical_potential</a>
+      
+      <a class="list-group-item" href="../module/classes_component_coordinates.html">classes_component_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_component_coordinates_reader.html">classes_component_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/classes_component_coordinates_writer.html">classes_component_coordinates_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_component_dipole_moments.html">classes_component_dipole_moments</a>
+      
+      <a class="list-group-item" href="../module/classes_coordinates.html">classes_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_coordinates_copier.html">classes_coordinates_copier</a>
+      
+      <a class="list-group-item" href="../module/classes_density_explorer.html">classes_density_explorer</a>
+      
+      <a class="list-group-item" href="../module/classes_des_convergence_parameter.html">classes_des_convergence_parameter</a>
+      
+      <a class="list-group-item" href="../module/classes_des_real_component.html">classes_des_real_component</a>
+      
+      <a class="list-group-item" href="../module/classes_des_real_pair.html">classes_des_real_pair</a>
+      
+      <a class="list-group-item" href="../module/classes_des_reci_structure.html">classes_des_reci_structure</a>
+      
+      <a class="list-group-item" href="../module/classes_des_reci_visitor.html">classes_des_reci_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_des_reci_weight.html">classes_des_reci_weight</a>
+      
+      <a class="list-group-item" href="../module/classes_des_self_component.html">classes_des_self_component</a>
+      
+      <a class="list-group-item" href="../module/classes_des_surf_mixture.html">classes_des_surf_mixture</a>
+      
+      <a class="list-group-item" href="../module/classes_dipolar_interactions_facade.html">classes_dipolar_interactions_facade</a>
+      
+      <a class="list-group-item" href="../module/classes_dipolar_neighbourhoods_visitor.html">classes_dipolar_neighbourhoods_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_dipoles_neighbourhood.html">classes_dipoles_neighbourhood</a>
+      
+      <a class="list-group-item" href="../module/classes_dirac_distribution_plus.html">classes_dirac_distribution_plus</a>
+      
+      <a class="list-group-item" href="../module/classes_directed_graph_writer.html">classes_directed_graph_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_dlc_structures.html">classes_dlc_structures</a>
+      
+      <a class="list-group-item" href="../module/classes_dlc_visitor.html">classes_dlc_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_dlc_weight.html">classes_dlc_weight</a>
+      
+      <a class="list-group-item" href="../module/classes_exchanged_boxes_size.html">classes_exchanged_boxes_size</a>
+      
+      <a class="list-group-item" href="../module/classes_external_field.html">classes_external_field</a>
+      
+      <a class="list-group-item" href="../module/classes_field_expression.html">classes_field_expression</a>
+      
+      <a class="list-group-item" href="../module/classes_floor_penetration.html">classes_floor_penetration</a>
+      
+      <a class="list-group-item" href="../module/classes_generating_algorithm.html">classes_generating_algorithm</a>
+      
+      <a class="list-group-item" href="../module/classes_hard_contact.html">classes_hard_contact</a>
+      
+      <a class="list-group-item" href="../module/classes_hetero_couples.html">classes_hetero_couples</a>
+      
+      <a class="list-group-item" href="../module/classes_line_writer.html">classes_line_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_maximum_box_compression.html">classes_maximum_box_compression</a>
+      
+      <a class="list-group-item" href="../module/classes_maximum_box_compression_explorer.html">classes_maximum_box_compression_explorer</a>
+      
+      <a class="list-group-item" href="../module/classes_min_distance.html">classes_min_distance</a>
+      
+      <a class="list-group-item" href="../module/classes_mixture_total_moment.html">classes_mixture_total_moment</a>
+      
+      <a class="list-group-item" href="../module/classes_move_tuner.html">classes_move_tuner</a>
+      
+      <a class="list-group-item" href="../module/classes_moved_coordinates.html">classes_moved_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_neighbour_cells.html">classes_neighbour_cells</a>
+      
+      <a class="list-group-item" href="../module/classes_num_particles.html">classes_num_particles</a>
+      
+      <a class="list-group-item" href="../module/classes_number_to_string.html">classes_number_to_string</a>
+      
+      <a class="list-group-item" href="../module/classes_pair_potential.html">classes_pair_potential</a>
+      
+      <a class="list-group-item" href="../module/classes_parallelepiped_domain.html">classes_parallelepiped_domain</a>
+      
+      <a class="list-group-item" href="../module/classes_particle_insertion_method.html">classes_particle_insertion_method</a>
+      
+      <a class="list-group-item" href="../module/classes_periodic_box.html">classes_periodic_box</a>
+      
+      <a class="list-group-item" href="../module/classes_permittivity.html">classes_permittivity</a>
+      
+      <a class="list-group-item" href="../module/classes_plmc_propagator.html">classes_plmc_propagator</a>
+      
+      <a class="list-group-item" href="../module/classes_potential_expression.html">classes_potential_expression</a>
+      
+      <a class="list-group-item" href="../module/classes_radial_explorer.html">classes_radial_explorer</a>
+      
+      <a class="list-group-item" href="../module/classes_random_coordinates.html">classes_random_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_random_orientation.html">classes_random_orientation</a>
+      
+      <a class="list-group-item" href="../module/classes_random_position.html">classes_random_position</a>
+      
+      <a class="list-group-item" href="../module/classes_real_writer.html">classes_real_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_reciprocal_lattice.html">classes_reciprocal_lattice</a>
+      
+      <a class="list-group-item" href="../module/classes_rectangle_writer.html">classes_rectangle_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_rotated_orientations.html">classes_rotated_orientations</a>
+      
+      <a class="list-group-item" href="../module/classes_short_pairs_visitor.html">classes_short_pairs_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_structure_factor.html">classes_structure_factor</a>
+      
+      <a class="list-group-item" href="../module/classes_structure_visitor.html">classes_structure_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_temperature.html">classes_temperature</a>
+      
+      <a class="list-group-item" href="../module/classes_tower_sampler.html">classes_tower_sampler</a>
+      
+      <a class="list-group-item" href="../module/classes_translated_positions.html">classes_translated_positions</a>
+      
+      <a class="list-group-item" href="../module/classes_triangle_writer.html">classes_triangle_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_tunable_move.html">classes_tunable_move</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_cells.html">classes_visitable_cells</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_cells_memento.html">classes_visitable_cells_memento</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_list.html">classes_visitable_list</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_walls.html">classes_visitable_walls</a>
+      
+      <a class="list-group-item" href="../module/classes_volume_change_method.html">classes_volume_change_method</a>
+      
+      <a class="list-group-item" href="../module/classes_walls_visitor.html">classes_walls_visitor</a>
+      
+      <a class="list-group-item" href="../module/data_cells.html">data_cells</a>
+      
+      <a class="list-group-item" href="../module/data_constants.html">data_constants</a>
+      
+      <a class="list-group-item" href="../module/data_input_prefixes.html">data_input_prefixes</a>
+      
+      <a class="list-group-item" href="../module/data_output_objects.html">data_output_objects</a>
+      
+      <a class="list-group-item" href="../module/data_strings.html">data_strings</a>
+      
+      <a class="list-group-item" href="../module/module_changes_success.html">module_changes_success</a>
+      
+      <a class="list-group-item" href="../module/module_list_node.html">module_list_node</a>
+      
+      <a class="list-group-item" href="../module/module_move_tuning.html">module_move_tuning</a>
+      
+      <a class="list-group-item" href="../module/procedures_average_nums_particles_factory.html">procedures_average_nums_particles_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_beta_pressure_factory.html">procedures_beta_pressure_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_beta_pressures_excess_factory.html">procedures_beta_pressures_excess_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_particle_exchange_factory.html">procedures_box_particle_exchange_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_particle_move_factory.html">procedures_box_particle_move_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_particles_swap_factory.html">procedures_box_particles_swap_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_size.html">procedures_box_size</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_size_memento_factory.html">procedures_box_size_memento_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_volume_change_factory.html">procedures_box_volume_change_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_particle_teleportation_factory.html">procedures_boxes_particle_teleportation_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_particles_swap_factory.html">procedures_boxes_particles_swap_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_size_checker_factory.html">procedures_boxes_size_checker_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_volume_exchange_factory.html">procedures_boxes_volume_exchange_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_cells_memento.html">procedures_cells_memento</a>
+      
+      <a class="list-group-item" href="../module/procedures_centered_block_micro.html">procedures_centered_block_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_changed_boxes_size_factory.html">procedures_changed_boxes_size_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changed_boxes_size_ratio_factory.html">procedures_changed_boxes_size_ratio_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_component_factory.html">procedures_changes_component_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_factory.html">procedures_changes_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_properties.html">procedures_changes_properties</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_success_writer_factory.html">procedures_changes_success_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_checks.html">procedures_checks</a>
+      
+      <a class="list-group-item" href="../module/procedures_command_arguments.html">procedures_command_arguments</a>
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_reader.html">procedures_complete_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_reader_factory.html">procedures_complete_coordinates_reader_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_writer_factory.html">procedures_complete_coordinates_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_chemical_potential_factory.html">procedures_component_chemical_potential_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_coordinates_factory.html">procedures_component_coordinates_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_coordinates_reader_factory.html">procedures_component_coordinates_reader_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_coordinates_writer_factory.html">procedures_component_coordinates_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_dipole_moments_factory.html">procedures_component_dipole_moments_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_factory.html">procedures_component_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_coordinates_copier_factory.html">procedures_coordinates_copier_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_coordinates_micro.html">procedures_coordinates_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_coordinates_reader.html">procedures_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/procedures_density_explorer_factory.html">procedures_density_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_convergence_parameter_factory.html">procedures_des_convergence_parameter_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_real_component_factory.html">procedures_des_real_component_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_real_pair_factory.html">procedures_des_real_pair_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_reci_structure_factory.html">procedures_des_reci_structure_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_reci_visitor_factory.html">procedures_des_reci_visitor_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_reci_weight_factory.html">procedures_des_reci_weight_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_surf_mixture_factory.html">procedures_des_surf_mixture_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_facades_factory.html">procedures_dipolar_interactions_facades_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_factory.html">procedures_dipolar_interactions_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_micro.html">procedures_dipolar_interactions_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_resetter.html">procedures_dipolar_interactions_resetter</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_visitor.html">procedures_dipolar_interactions_visitor</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_neighbourhoods_factory.html">procedures_dipolar_neighbourhoods_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_neighbourhoods_visitors_factory.html">procedures_dipolar_neighbourhoods_visitors_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipoles_field_interaction.html">procedures_dipoles_field_interaction</a>
+      
+      <a class="list-group-item" href="../module/procedures_dirac_distribution_plus_factory.html">procedures_dirac_distribution_plus_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_directed_graph_writer_factory.html">procedures_directed_graph_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dlc_structures_factory.html">procedures_dlc_structures_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dlc_visitor_factory.html">procedures_dlc_visitor_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dlc_weight_factory.html">procedures_dlc_weight_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_elementary_geometry.html">procedures_elementary_geometry</a>
+      
+      <a class="list-group-item" href="../module/procedures_elementary_statistics.html">procedures_elementary_statistics</a>
+      
+      <a class="list-group-item" href="../module/procedures_energies_writers_factory.html">procedures_energies_writers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_environment_factory.html">procedures_environment_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_environment_inquirers.html">procedures_environment_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_errors.html">procedures_errors</a>
+      
+      <a class="list-group-item" href="../module/procedures_exchange_updaters.html">procedures_exchange_updaters</a>
+      
+      <a class="list-group-item" href="../module/procedures_exchange_visitors.html">procedures_exchange_visitors</a>
+      
+      <a class="list-group-item" href="../module/procedures_exchanged_boxes_size_factory.html">procedures_exchanged_boxes_size_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_exploration_inquirers.html">procedures_exploration_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_exploring_observables_factory.html">procedures_exploring_observables_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_exploring_writers_factory.html">procedures_exploring_writers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_external_fields_factory.html">procedures_external_fields_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_field_expression_factory.html">procedures_field_expression_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_field_expression_micro.html">procedures_field_expression_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_floor_penetration_factory.html">procedures_floor_penetration_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_generating_algorithms_factory.html">procedures_generating_algorithms_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_generating_observables_factory.html">procedures_generating_observables_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_generating_writers_factory.html">procedures_generating_writers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_hard_contact_factory.html">procedures_hard_contact_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_hetero_couples_factory.html">procedures_hetero_couples_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_json_data_factory.html">procedures_json_data_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_json_reports_factory.html">procedures_json_reports_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_line_writer_factory.html">procedures_line_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_logical_factory.html">procedures_logical_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_markov_chain_explorer_factory.html">procedures_markov_chain_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_markov_chain_generator_factory.html">procedures_markov_chain_generator_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_maximum_box_compression_factory.html">procedures_maximum_box_compression_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_maximum_boxes_compression_explorer_factory.html">procedures_maximum_boxes_compression_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_metropolis_algorithm.html">procedures_metropolis_algorithm</a>
+      
+      <a class="list-group-item" href="../module/procedures_min_distance_factory.html">procedures_min_distance_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_mixture_inquirers.html">procedures_mixture_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_mixture_properties.html">procedures_mixture_properties</a>
+      
+      <a class="list-group-item" href="../module/procedures_mixture_total_moments_factory.html">procedures_mixture_total_moments_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_move_tuner_factory.html">procedures_move_tuner_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_moved_coordinates_factory.html">procedures_moved_coordinates_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_neighbour_cells_factory.html">procedures_neighbour_cells_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_num_particles_factory.html">procedures_num_particles_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_observables_changes_factory.html">procedures_observables_changes_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_observables_energies_factory.html">procedures_observables_energies_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_observables_factory.html">procedures_observables_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_pair_potential_factory.html">procedures_pair_potential_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_parallelepiped_domain_macro.html">procedures_parallelepiped_domain_macro</a>
+      
+      <a class="list-group-item" href="../module/procedures_parallelepiped_domain_micro.html">procedures_parallelepiped_domain_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_parallelepiped_domains_factory.html">procedures_parallelepiped_domains_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_particle_insertion_method_factory.html">procedures_particle_insertion_method_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_periodic_boxes_factory.html">procedures_periodic_boxes_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_permittivity_factory.html">procedures_permittivity_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_physical_model_factory.html">procedures_physical_model_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_help.html">procedures_plmc_help</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_iterations.html">procedures_plmc_iterations</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_propagator_factory.html">procedures_plmc_propagator_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_resetter.html">procedures_plmc_resetter</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_visitor.html">procedures_plmc_visitor</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_writer.html">procedures_plmc_writer</a>
+      
+      <a class="list-group-item" href="../module/procedures_potential_expression_factory.html">procedures_potential_expression_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_property_inquirers.html">procedures_property_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_radial_explorer_factory.html">procedures_radial_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_random_coordinates_factory.html">procedures_random_coordinates_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_random_number.html">procedures_random_number</a>
+      
+      <a class="list-group-item" href="../module/procedures_random_seed_factory.html">procedures_random_seed_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_readers_factory.html">procedures_readers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_real_writer_factory.html">procedures_real_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_reals_factory.html">procedures_reals_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_reciprocal_lattices_factory.html">procedures_reciprocal_lattices_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_rectangle_writer_factory.html">procedures_rectangle_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_selectors_resetters.html">procedures_selectors_resetters</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_factory.html">procedures_short_interactions_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_inquirers.html">procedures_short_interactions_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_resetter.html">procedures_short_interactions_resetter</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_visitor.html">procedures_short_interactions_visitor</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_pairs_visitors_factory.html">procedures_short_pairs_visitors_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_string_factory.html">procedures_string_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_temperature_factory.html">procedures_temperature_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_tower_sampler_factory.html">procedures_tower_sampler_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_transmutation_updaters.html">procedures_transmutation_updaters</a>
+      
+      <a class="list-group-item" href="../module/procedures_transmutation_visitors.html">procedures_transmutation_visitors</a>
+      
+      <a class="list-group-item" href="../module/procedures_triangle_observables.html">procedures_triangle_observables</a>
+      
+      <a class="list-group-item" href="../module/procedures_triangle_writer_factory.html">procedures_triangle_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visit_condition.html">procedures_visit_condition</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_cells_factory.html">procedures_visitable_cells_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_cells_memento_factory.html">procedures_visitable_cells_memento_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_list_factory.html">procedures_visitable_list_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_walls_factory.html">procedures_visitable_walls_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_volume_change_method_factory.html">procedures_volume_change_method_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_walls_visitors_factory.html">procedures_walls_visitors_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_writers_inquirers.html">procedures_writers_inquirers</a>
+      
+      <a class="list-group-item" href="../module/types_cells_wrapper.html">types_cells_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_changes_component_wrapper.html">types_changes_component_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_changes_success_writer_selector.html">types_changes_success_writer_selector</a>
+      
+      <a class="list-group-item" href="../module/types_changes_wrapper.html">types_changes_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_component_coordinates_reader_selector.html">types_component_coordinates_reader_selector</a>
+      
+      <a class="list-group-item" href="../module/types_component_coordinates_writer_selector.html">types_component_coordinates_writer_selector</a>
+      
+      <a class="list-group-item" href="../module/types_component_wrapper.html">types_component_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_dipolar_interactions_dynamic_wrapper.html">types_dipolar_interactions_dynamic_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_dipolar_interactions_static_wrapper.html">types_dipolar_interactions_static_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_energies_writers.html">types_energies_writers</a>
+      
+      <a class="list-group-item" href="../module/types_environment_wrapper.html">types_environment_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_exploring_io.html">types_exploring_io</a>
+      
+      <a class="list-group-item" href="../module/types_exploring_writers_wrapper.html">types_exploring_writers_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_generating_io.html">types_generating_io</a>
+      
+      <a class="list-group-item" href="../module/types_generating_observables_wrapper.html">types_generating_observables_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_generating_writers_wrapper.html">types_generating_writers_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_json_report.html">types_json_report</a>
+      
+      <a class="list-group-item" href="../module/types_logical_wrapper.html">types_logical_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_markov_chain_explorer_wrapper.html">types_markov_chain_explorer_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_markov_chain_generator_wrapper.html">types_markov_chain_generator_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_mixture_wrapper.html">types_mixture_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_move_tuner_parameters.html">types_move_tuner_parameters</a>
+      
+      <a class="list-group-item" href="../module/types_observables_changes.html">types_observables_changes</a>
+      
+      <a class="list-group-item" href="../module/types_observables_energies.html">types_observables_energies</a>
+      
+      <a class="list-group-item" href="../module/types_particle_wrapper.html">types_particle_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_physical_model_wrapper.html">types_physical_model_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_potential_domain.html">types_potential_domain</a>
+      
+      <a class="list-group-item" href="../module/types_potential_domain_selector.html">types_potential_domain_selector</a>
+      
+      <a class="list-group-item" href="../module/types_raw_coordinates.html">types_raw_coordinates</a>
+      
+      <a class="list-group-item" href="../module/types_readers_wrapper.html">types_readers_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_real_wrapper.html">types_real_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_short_interactions_wrapper.html">types_short_interactions_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_string_wrapper.html">types_string_wrapper</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      
+    
+  
+    <ul class="list-inline">
+      <li><h4>Uses:</h4></li>
+      
+      <li><a href='../module/classes_changed_box_size.html'>classes_changed_box_size</a></li>
+      
+      <li><a href='../module/classes_exchanged_boxes_size.html'>classes_exchanged_boxes_size</a></li>
+      
+      <li><a href='../module/classes_move_tuner.html'>classes_move_tuner</a></li>
+      
+      <li><a href='../module/classes_random_coordinates.html'>classes_random_coordinates</a></li>
+      
+      <li><a href='../module/classes_coordinates_copier.html'>classes_coordinates_copier</a></li>
+      
+      <li><a href='../module/types_changes_component_wrapper.html'>types_changes_component_wrapper</a></li>
+      
+    </ul>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: module~~types_changes_wrapper~~UsesGraph Pages: 1 -->
+<svg id="moduletypes_changes_wrapperUsesGraph" width="641pt" height="287pt"
+ viewBox="0.00 0.00 641.00 286.62" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~types_changes_wrapper~~UsesGraph" class="graph" transform="scale(0.597814 0.597814) rotate(0) translate(4 475.442)">
+<title>module~~types_changes_wrapper~~UsesGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-475.442 1068.24,-475.442 1068.24,4 -4,4"/>
+<!-- module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node1" class="node"><title>module~types_changes_wrapper</title>
+<polygon fill="none" stroke="black" points="1064.43,-223.245 937.686,-223.245 937.686,-199.039 1064.43,-199.039 1064.43,-223.245"/>
+<text text-anchor="middle" x="1001.06" y="-207.992" font-family="Helvetica,sans-Serif" font-size="10.50">types_changes_wrapper</text>
+</g>
+<!-- module~classes_exchanged_boxes_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node2" class="node"><title>module~classes_exchanged_boxes_size</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node2"><a xlink:href="../module/classes_exchanged_boxes_size.html" xlink:title="classes_exchanged_boxes_size">
+<polygon fill="#337ab7" stroke="#337ab7" points="679.466,-233.245 517.362,-233.245 517.362,-209.039 679.466,-209.039 679.466,-233.245"/>
+<text text-anchor="middle" x="598.414" y="-217.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_exchanged_boxes_size</text>
+</a>
+</g>
+</g>
+<!-- module~classes_exchanged_boxes_size&#45;&gt;module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge43" class="edge"><title>module~classes_exchanged_boxes_size&#45;&gt;module~types_changes_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M655.947,-233.275C698.14,-240.696 757.169,-247.628 808.8,-241.142"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M810.8,-241.142C849.404,-236.293 892.236,-229.613 927.376,-223.787"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="928.258,-227.188 937.545,-222.089 927.106,-220.284 928.258,-227.188"/>
+</g>
+<!-- module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node3" class="node"><title>module~classes_changed_box_size</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node3"><a xlink:href="../module/classes_changed_box_size.html" xlink:title="classes_changed_box_size">
+<polygon fill="#337ab7" stroke="#337ab7" points="880.178,-193.245 739.423,-193.245 739.423,-169.039 880.178,-169.039 880.178,-193.245"/>
+<text text-anchor="middle" x="809.8" y="-177.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_changed_box_size</text>
+</a>
+</g>
+</g>
+<!-- module~classes_changed_box_size&#45;&gt;module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge44" class="edge"><title>module~classes_changed_box_size&#45;&gt;module~types_changes_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M880.197,-192.143C895.688,-194.598 912.151,-197.208 927.756,-199.681"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="927.443,-203.175 937.867,-201.284 928.539,-196.262 927.443,-203.175"/>
+</g>
+<!-- module~classes_move_tuner -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node4" class="node"><title>module~classes_move_tuner</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node4"><a xlink:href="../module/classes_move_tuner.html" xlink:title="classes_move_tuner">
+<polygon fill="#337ab7" stroke="#337ab7" points="652.686,-313.245 544.142,-313.245 544.142,-289.039 652.686,-289.039 652.686,-313.245"/>
+<text text-anchor="middle" x="598.414" y="-297.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_move_tuner</text>
+</a>
+</g>
+</g>
+<!-- module~classes_move_tuner&#45;&gt;module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge45" class="edge"><title>module~classes_move_tuner&#45;&gt;module~types_changes_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M639.355,-288.978C695.258,-272.065 791.916,-243.263 808.8,-241.142"/>
+</g>
+<!-- module~types_changes_component_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node7" class="node"><title>module~types_changes_component_wrapper</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node7"><a xlink:href="../module/types_changes_component_wrapper.html" xlink:title="types_changes_component_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="901.942,-313.245 717.659,-313.245 717.659,-289.039 901.942,-289.039 901.942,-313.245"/>
+<text text-anchor="middle" x="809.8" y="-297.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_changes_component_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~classes_move_tuner&#45;&gt;module~types_changes_component_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge41" class="edge"><title>module~classes_move_tuner&#45;&gt;module~types_changes_component_wrapper</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M652.793,-301.142C669.534,-301.142 688.6,-301.142 707.518,-301.142"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="707.69,-304.642 717.69,-301.142 707.69,-297.642 707.69,-304.642"/>
+</g>
+<!-- module~classes_coordinates_copier -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node5" class="node"><title>module~classes_coordinates_copier</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node5"><a xlink:href="../module/classes_coordinates_copier.html" xlink:title="classes_coordinates_copier">
+<polygon fill="#337ab7" stroke="#337ab7" points="668.944,-72.2454 527.884,-72.2454 527.884,-48.039 668.944,-48.039 668.944,-72.2454"/>
+<text text-anchor="middle" x="598.414" y="-56.9922" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_coordinates_copier</text>
+</a>
+</g>
+</g>
+<!-- module~classes_coordinates_copier&#45;&gt;module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge46" class="edge"><title>module~classes_coordinates_copier&#45;&gt;module~types_changes_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M637.686,-48.0302C689.183,-32.5558 777.892,-9.02772 808.8,-20.1422"/>
+</g>
+<!-- module~classes_random_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node6" class="node"><title>module~classes_random_coordinates</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node6"><a xlink:href="../module/classes_random_coordinates.html" xlink:title="classes_random_coordinates">
+<polygon fill="#337ab7" stroke="#337ab7" points="474.488,-72.2454 326.423,-72.2454 326.423,-48.039 474.488,-48.039 474.488,-72.2454"/>
+<text text-anchor="middle" x="400.456" y="-56.9922" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_random_coordinates</text>
+</a>
+</g>
+</g>
+<!-- module~classes_random_coordinates&#45;&gt;module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge47" class="edge"><title>module~classes_random_coordinates&#45;&gt;module~types_changes_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M433.255,-47.9595C503.401,-23.0043 675.734,27.7083 808.8,-20.1422"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M810.8,-20.1422C896.841,-52.1131 962.36,-147.652 988.123,-190.247"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="985.171,-192.131 993.277,-198.952 991.194,-188.564 985.171,-192.131"/>
+</g>
+<!-- module~classes_random_coordinates&#45;&gt;module~classes_coordinates_copier -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge34" class="edge"><title>module~classes_random_coordinates&#45;&gt;module~classes_coordinates_copier</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M474.702,-60.1422C488.698,-60.1422 503.415,-60.1422 517.605,-60.1422"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="517.827,-63.6423 527.826,-60.1422 517.826,-56.6423 517.827,-63.6423"/>
+</g>
+<!-- module~types_changes_component_wrapper&#45;&gt;module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge48" class="edge"><title>module~types_changes_component_wrapper&#45;&gt;module~types_changes_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M836.324,-289.004C869.482,-273.236 927.529,-245.632 964.854,-227.882"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="966.804,-230.831 974.332,-223.375 963.798,-224.509 966.804,-230.831"/>
+</g>
+<!-- module~classes_tunable_move -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node8" class="node"><title>module~classes_tunable_move</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node8"><a xlink:href="../module/classes_tunable_move.html" xlink:title="classes_tunable_move">
+<polygon fill="#337ab7" stroke="#337ab7" points="459.736,-313.245 341.176,-313.245 341.176,-289.039 459.736,-289.039 459.736,-313.245"/>
+<text text-anchor="middle" x="400.456" y="-297.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_tunable_move</text>
+</a>
+</g>
+</g>
+<!-- module~classes_tunable_move&#45;&gt;module~classes_exchanged_boxes_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge14" class="edge"><title>module~classes_tunable_move&#45;&gt;module~classes_exchanged_boxes_size</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M446.471,-288.93C457.451,-285.183 468.95,-280.582 479.098,-275.142 496.963,-265.565 497.152,-256.565 515.098,-247.142 522.633,-243.186 530.874,-239.706 539.139,-236.685"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="540.498,-239.919 548.81,-233.349 538.216,-233.301 540.498,-239.919"/>
+</g>
+<!-- module~classes_tunable_move&#45;&gt;module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge23" class="edge"><title>module~classes_tunable_move&#45;&gt;module~classes_changed_box_size</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M460.014,-290.528C529.618,-277.613 641.416,-255.839 681.73,-242.142 700.208,-235.864 744.988,-213.73 776.122,-197.934"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="777.979,-200.917 785.302,-193.261 774.803,-194.679 777.979,-200.917"/>
+</g>
+<!-- module~classes_tunable_move&#45;&gt;module~classes_move_tuner -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge29" class="edge"><title>module~classes_tunable_move&#45;&gt;module~classes_move_tuner</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M459.984,-301.142C483.372,-301.142 510.359,-301.142 534.194,-301.142"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="534.196,-304.642 544.196,-301.142 534.196,-297.642 534.196,-304.642"/>
+</g>
+<!-- module~classes_moved_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node20" class="node"><title>module~classes_moved_coordinates</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node20"><a xlink:href="../module/classes_moved_coordinates.html" xlink:title="classes_moved_coordinates">
+<polygon fill="#337ab7" stroke="#337ab7" points="670.864,-471.245 525.964,-471.245 525.964,-447.039 670.864,-447.039 670.864,-471.245"/>
+<text text-anchor="middle" x="598.414" y="-455.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_moved_coordinates</text>
+</a>
+</g>
+</g>
+<!-- module~classes_tunable_move&#45;&gt;module~classes_moved_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge38" class="edge"><title>module~classes_tunable_move&#45;&gt;module~classes_moved_coordinates</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M450.466,-313.266C460.388,-316.878 470.427,-321.442 479.098,-327.142 524.811,-357.194 564.087,-409.157 583.825,-438.112"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="581.063,-440.278 589.53,-446.647 586.883,-436.388 581.063,-440.278"/>
+</g>
+<!-- iso_fortran_env -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node9" class="node"><title>iso_fortran_env</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node9"><a xlink:href="https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html" xlink:title="iso_fortran_env">
+<polygon fill="#337ab7" stroke="#337ab7" points="84.5293,-248.245 -0.176914,-248.245 -0.176914,-224.039 84.5293,-224.039 84.5293,-248.245"/>
+<text text-anchor="middle" x="42.1762" y="-232.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">iso_fortran_env</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_exchanged_boxes_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge15" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_exchanged_boxes_size</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M58.3946,-248.332C67.1144,-256.045 77.6276,-266.697 84.3524,-278.142 112.991,-326.885 79.2246,-361.354 120.352,-400.142 147.483,-425.73 166.759,-407.184 202.083,-419.142"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M204.083,-419.142C239.407,-431.1 258.625,-425.668 285.813,-400.142 326.407,-362.03 280.945,-317.96 321.813,-280.142 329.293,-273.22 443.791,-250.314 522.827,-235.164"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="523.598,-238.58 532.762,-233.264 522.283,-231.705 523.598,-238.58"/>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge26" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_changed_box_size</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M401.456,-100.142C488.535,-101.686 511.115,-88.41 597.414,-100.142"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M599.414,-100.142C636.618,-105.2 646.337,-106.607 681.73,-119.142 715.994,-131.278 753.136,-150.119 778.361,-163.847"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="776.967,-167.075 787.415,-168.834 780.344,-160.944 776.967,-167.075"/>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_move_tuner -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge30" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_move_tuner</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M204.083,-419.142C287.99,-447.7 311.18,-467.098 399.456,-459.142"/>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M401.456,-459.142C436.838,-455.953 448.864,-458.796 479.098,-440.142 527.982,-409.983 566.954,-352.852 585.546,-322.06"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="588.583,-323.8 590.65,-313.409 582.554,-320.243 588.583,-323.8"/>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_coordinates_copier -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge35" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_coordinates_copier</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M204.083,-93.1422C284.241,-59.6141 312.581,-98.6021 399.456,-100.142"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M401.456,-100.142C453.943,-101.073 512.781,-86.9529 552.162,-75.2349"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="553.193,-78.5798 561.74,-72.3182 551.154,-71.8835 553.193,-78.5798"/>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_random_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge36" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_random_coordinates</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M47.2473,-223.668C56.1694,-198.388 79.9391,-141.07 120.352,-112.142 150.677,-90.4357 167.678,-107.533 202.083,-93.1422"/>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M204.083,-93.1422C239.177,-78.4633 280.408,-70.3084 315.925,-65.7801"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="316.752,-69.2063 326.265,-64.5424 315.92,-62.2559 316.752,-69.2063"/>
+</g>
+<!-- module~data_constants -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node10" class="node"><title>module~data_constants</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node10"><a xlink:href="../module/data_constants.html" xlink:title="data_constants">
+<polygon fill="#337ab7" stroke="#337ab7" points="244.782,-145.245 161.383,-145.245 161.383,-121.039 244.782,-121.039 244.782,-145.245"/>
+<text text-anchor="middle" x="203.083" y="-129.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">data_constants</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~data_constants -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge1" class="edge"><title>iso_fortran_env&#45;&gt;module~data_constants</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M51.3853,-223.984C64.0645,-206.158 90.1306,-173.105 120.352,-155.142 129.83,-149.509 140.773,-145.288 151.508,-142.135"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="152.502,-145.493 161.26,-139.531 150.696,-138.73 152.502,-145.493"/>
+</g>
+<!-- module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node11" class="node"><title>module~procedures_checks</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node11"><a xlink:href="../module/procedures_checks.html" xlink:title="procedures_checks">
+<polygon fill="#337ab7" stroke="#337ab7" points="451.979,-190.245 348.932,-190.245 348.932,-166.039 451.979,-166.039 451.979,-190.245"/>
+<text text-anchor="middle" x="400.456" y="-174.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_checks</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge9" class="edge"><title>iso_fortran_env&#45;&gt;module~procedures_checks</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M84.4035,-229.596C132.689,-221.911 215.08,-208.74 285.813,-197.142 303.057,-194.315 321.765,-191.205 338.93,-188.334"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="339.551,-191.779 348.836,-186.675 338.395,-184.875 339.551,-191.779"/>
+</g>
+<!-- module~module_move_tuning -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node12" class="node"><title>module~module_move_tuning</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node12"><a xlink:href="../module/module_move_tuning.html" xlink:title="module_move_tuning">
+<polygon fill="#337ab7" stroke="#337ab7" points="456.818,-233.245 344.093,-233.245 344.093,-209.039 456.818,-209.039 456.818,-233.245"/>
+<text text-anchor="middle" x="400.456" y="-217.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_move_tuning</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~module_move_tuning -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge12" class="edge"><title>iso_fortran_env&#45;&gt;module~module_move_tuning</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M55.6501,-248.429C63.9327,-256.692 74.9671,-267.906 84.3524,-278.142 100.967,-296.264 98.0161,-309.869 120.352,-320.142 187.163,-350.871 223.364,-358.975 285.813,-320.142 316.533,-301.039 294.566,-270.938 321.813,-247.142 325.962,-243.519 330.634,-240.397 335.575,-237.707"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="337.21,-240.805 344.706,-233.318 334.177,-234.496 337.21,-240.805"/>
+</g>
+<!-- module~procedures_errors -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node13" class="node"><title>module~procedures_errors</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node13"><a xlink:href="../module/procedures_errors.html" xlink:title="procedures_errors">
+<polygon fill="#337ab7" stroke="#337ab7" points="251.843,-391.245 154.323,-391.245 154.323,-367.039 251.843,-367.039 251.843,-391.245"/>
+<text text-anchor="middle" x="203.083" y="-375.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_errors</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~procedures_errors -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge2" class="edge"><title>iso_fortran_env&#45;&gt;module~procedures_errors</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M57.3528,-248.39C65.9084,-256.284 76.614,-267.106 84.3524,-278.142 105.579,-308.416 92.4486,-328.883 120.352,-353.142 127.367,-359.24 135.82,-363.91 144.593,-367.486"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="143.591,-370.846 154.185,-370.953 145.97,-364.262 143.591,-370.846"/>
+</g>
+<!-- module~classes_number_to_string -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node14" class="node"><title>module~classes_number_to_string</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node14"><a xlink:href="../module/classes_number_to_string.html" xlink:title="classes_number_to_string">
+<polygon fill="#337ab7" stroke="#337ab7" points="270.109,-311.245 136.056,-311.245 136.056,-287.039 270.109,-287.039 270.109,-311.245"/>
+<text text-anchor="middle" x="203.083" y="-295.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_number_to_string</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_number_to_string -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge3" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_number_to_string</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M63.2148,-248.403C78.4533,-257.322 100.169,-269.183 120.352,-277.142 126.69,-279.641 133.412,-281.957 140.172,-284.073"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="139.479,-287.519 150.063,-287.03 141.484,-280.812 139.479,-287.519"/>
+</g>
+<!-- module~types_potential_domain -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node15" class="node"><title>module~types_potential_domain</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node15"><a xlink:href="../module/types_potential_domain.html" xlink:title="types_potential_domain">
+<polygon fill="#337ab7" stroke="#337ab7" points="264.452,-188.245 141.713,-188.245 141.713,-164.039 264.452,-164.039 264.452,-188.245"/>
+<text text-anchor="middle" x="203.083" y="-172.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_potential_domain</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~types_potential_domain -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge5" class="edge"><title>iso_fortran_env&#45;&gt;module~types_potential_domain</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M68.9673,-223.952C83.83,-217.137 102.96,-208.718 120.352,-202.142 130.274,-198.391 141.002,-194.714 151.32,-191.361"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="152.586,-194.631 161.046,-188.253 150.456,-187.963 152.586,-194.631"/>
+</g>
+<!-- module~classes_changed_box_size_ratio -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node18" class="node"><title>module~classes_changed_box_size_ratio</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node18"><a xlink:href="../module/classes_changed_box_size_ratio.html" xlink:title="classes_changed_box_size_ratio">
+<polygon fill="#337ab7" stroke="#337ab7" points="681.546,-152.245 515.282,-152.245 515.282,-128.039 681.546,-128.039 681.546,-152.245"/>
+<text text-anchor="middle" x="598.414" y="-136.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_changed_box_size_ratio</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_changed_box_size_ratio -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge19" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_changed_box_size_ratio</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401.456,-100.142C452.714,-101.051 510.029,-114.217 549.364,-125.199"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="548.635,-128.631 559.212,-128.008 550.556,-121.899 548.635,-128.631"/>
+</g>
+<!-- module~types_move_tuner_parameters -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node19" class="node"><title>module~types_move_tuner_parameters</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node19"><a xlink:href="../module/types_move_tuner_parameters.html" xlink:title="types_move_tuner_parameters">
+<polygon fill="#337ab7" stroke="#337ab7" points="479.241,-431.245 321.67,-431.245 321.67,-407.039 479.241,-407.039 479.241,-431.245"/>
+<text text-anchor="middle" x="400.456" y="-415.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_move_tuner_parameters</text>
+</a>
+</g>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~types_move_tuner_parameters -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge28" class="edge"><title>iso_fortran_env&#45;&gt;module~types_move_tuner_parameters</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M204.083,-419.142C238.003,-430.625 277.175,-432.637 311.497,-431.036"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="311.727,-434.529 321.51,-430.462 311.326,-427.54 311.727,-434.529"/>
+</g>
+<!-- iso_fortran_env&#45;&gt;module~classes_moved_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge39" class="edge"><title>iso_fortran_env&#45;&gt;module~classes_moved_coordinates</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401.456,-459.142C438.925,-455.765 480.589,-455.306 515.831,-455.874"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="516.004,-459.377 526.07,-456.07 516.139,-452.379 516.004,-459.377"/>
+</g>
+<!-- module~data_constants&#45;&gt;module~classes_exchanged_boxes_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge16" class="edge"><title>module~data_constants&#45;&gt;module~classes_exchanged_boxes_size</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401.456,-138.142C436.933,-139.994 448.378,-139.299 479.098,-157.142 499.216,-168.827 495.377,-182.801 515.098,-195.142 521.387,-199.078 528.321,-202.463 535.416,-205.364"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="534.554,-208.78 545.146,-209.027 537.02,-202.228 534.554,-208.78"/>
+</g>
+<!-- module~data_constants&#45;&gt;module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge27" class="edge"><title>module~data_constants&#45;&gt;module~classes_changed_box_size</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M244.894,-133.556C284.437,-134.106 346.089,-135.356 399.456,-138.142"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M401.456,-138.142C490.05,-142.767 509.508,-88.1914 597.414,-100.142"/>
+</g>
+<!-- module~data_constants&#45;&gt;module~classes_random_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge37" class="edge"><title>module~data_constants&#45;&gt;module~classes_random_coordinates</title>
+<path fill="none" stroke="#0000ff" stroke-dasharray="5,2" d="M245.062,-122.04C258.298,-117.946 272.886,-112.885 285.813,-107.142 302.741,-99.6223 304.942,-93.7898 321.813,-86.1422 330.18,-82.3493 339.271,-78.8144 348.186,-75.6491"/>
+<polygon fill="#0000ff" stroke="#0000ff" points="349.429,-78.9232 357.75,-72.3647 347.155,-72.3027 349.429,-78.9232"/>
+</g>
+<!-- module~data_constants&#45;&gt;module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge10" class="edge"><title>module~data_constants&#45;&gt;module~procedures_checks</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M245.039,-142.576C272.182,-148.827 308.268,-157.139 338.729,-164.155"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="338.292,-167.646 348.823,-166.48 339.863,-160.825 338.292,-167.646"/>
+</g>
+<!-- module~data_constants&#45;&gt;module~classes_changed_box_size_ratio -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge20" class="edge"><title>module~data_constants&#45;&gt;module~classes_changed_box_size_ratio</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M401.456,-138.142C435.172,-139.902 472.193,-140.598 504.892,-140.791"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="504.877,-144.291 514.893,-140.835 504.908,-137.291 504.877,-144.291"/>
+</g>
+<!-- module~data_constants&#45;&gt;module~classes_moved_coordinates -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge40" class="edge"><title>module~data_constants&#45;&gt;module~classes_moved_coordinates</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M244.748,-135.403C259.523,-138.249 275.183,-143.96 285.813,-155.142 338.126,-210.172 274.872,-262.464 321.813,-322.142 369.812,-383.165 409.637,-363.462 479.098,-398.142 508.304,-412.724 541.3,-429.785 565.013,-442.15"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="563.451,-445.283 573.935,-446.81 566.691,-439.078 563.451,-445.283"/>
+</g>
+<!-- module~procedures_checks&#45;&gt;module~classes_exchanged_boxes_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge17" class="edge"><title>module~procedures_checks&#45;&gt;module~classes_exchanged_boxes_size</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M452.175,-189.272C476.61,-194.634 506.201,-201.127 532.282,-206.85"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="531.57,-210.277 542.087,-209.002 533.07,-203.439 531.57,-210.277"/>
+</g>
+<!-- module~procedures_checks&#45;&gt;module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge22" class="edge"><title>module~procedures_checks&#45;&gt;module~classes_changed_box_size</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M452.235,-180.641C491.811,-182.172 548.132,-183.44 597.414,-181.142"/>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M599.414,-181.142C642.248,-179.145 690.064,-178.988 729.177,-179.4"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="729.403,-182.903 739.444,-179.523 729.486,-175.903 729.403,-182.903"/>
+</g>
+<!-- module~procedures_checks&#45;&gt;module~classes_move_tuner -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge32" class="edge"><title>module~procedures_checks&#45;&gt;module~classes_move_tuner</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M452.182,-187.87C461.561,-190.933 470.955,-194.932 479.098,-200.142 499.808,-213.391 496.976,-225.528 515.098,-242.142 531.829,-257.481 552.618,-272.353 569.118,-283.329"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="567.506,-286.457 577.791,-289.004 571.339,-280.599 567.506,-286.457"/>
+</g>
+<!-- module~procedures_checks&#45;&gt;module~classes_changed_box_size_ratio -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge21" class="edge"><title>module~procedures_checks&#45;&gt;module~classes_changed_box_size_ratio</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M452.175,-168.307C474.301,-164.016 500.656,-158.905 524.804,-154.223"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="525.491,-157.655 534.642,-152.315 524.159,-150.783 525.491,-157.655"/>
+</g>
+<!-- module~module_move_tuning&#45;&gt;module~classes_exchanged_boxes_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge18" class="edge"><title>module~module_move_tuning&#45;&gt;module~classes_exchanged_boxes_size</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M456.824,-221.142C472.529,-221.142 490.048,-221.142 507.245,-221.142"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="507.316,-224.642 517.316,-221.142 507.316,-217.642 507.316,-224.642"/>
+</g>
+<!-- module~module_move_tuning&#45;&gt;module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge25" class="edge"><title>module~module_move_tuning&#45;&gt;module~classes_changed_box_size</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M442.276,-208.962C481.594,-198.15 542.96,-183.681 597.414,-181.142"/>
+</g>
+<!-- module~procedures_errors&#45;&gt;module~classes_move_tuner -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge33" class="edge"><title>module~procedures_errors&#45;&gt;module~classes_move_tuner</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M251.92,-369.656C322.653,-355.629 455.241,-329.336 534,-313.718"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="535.144,-317.059 544.273,-311.68 533.783,-310.193 535.144,-317.059"/>
+</g>
+<!-- module~procedures_errors&#45;&gt;module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge6" class="edge"><title>module~procedures_errors&#45;&gt;module~procedures_checks</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M228.935,-366.934C247.168,-356.776 271.202,-340.674 285.813,-320.142 318.098,-274.775 282.139,-239.212 321.813,-200.142 326.776,-195.255 332.74,-191.436 339.129,-188.455"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="340.714,-191.592 348.726,-184.66 338.14,-185.082 340.714,-191.592"/>
+</g>
+<!-- module~procedures_errors&#45;&gt;module~module_move_tuning -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge13" class="edge"><title>module~procedures_errors&#45;&gt;module~module_move_tuning</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M252.245,-371.835C264.447,-367.985 276.671,-362.109 285.813,-353.142 321.334,-318.304 286.557,-282.248 321.813,-247.142 325.716,-243.255 330.217,-239.95 335.045,-237.138"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="336.687,-240.23 344.029,-232.592 333.526,-233.984 336.687,-240.23"/>
+</g>
+<!-- module~classes_number_to_string&#45;&gt;module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge7" class="edge"><title>module~classes_number_to_string&#45;&gt;module~procedures_checks</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M270.43,-286.849C275.965,-284.212 281.198,-281.015 285.813,-277.142 314.751,-252.857 293.036,-224.617 321.813,-200.142 326.976,-195.751 332.96,-192.234 339.27,-189.418"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="340.629,-192.645 348.692,-185.772 338.103,-186.116 340.629,-192.645"/>
+</g>
+<!-- module~types_potential_domain&#45;&gt;module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge8" class="edge"><title>module~types_potential_domain&#45;&gt;module~procedures_checks</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M264.562,-176.761C288.089,-177.002 315.001,-177.278 338.567,-177.519"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="338.752,-181.021 348.787,-177.623 338.824,-174.021 338.752,-181.021"/>
+</g>
+<!-- module~types_potential_domain_selector -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node16" class="node"><title>module~types_potential_domain_selector</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node16"><a xlink:href="../module/types_potential_domain_selector.html" xlink:title="types_potential_domain_selector">
+<polygon fill="#337ab7" stroke="#337ab7" points="286.044,-268.245 120.121,-268.245 120.121,-244.039 286.044,-244.039 286.044,-268.245"/>
+<text text-anchor="middle" x="203.083" y="-252.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_potential_domain_selector</text>
+</a>
+</g>
+</g>
+<!-- module~types_potential_domain_selector&#45;&gt;module~procedures_checks -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge11" class="edge"><title>module~types_potential_domain_selector&#45;&gt;module~procedures_checks</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M252.903,-244.009C264.062,-240.318 275.628,-235.724 285.813,-230.142 304.077,-220.132 303.392,-209.86 321.813,-200.142 327.132,-197.336 332.85,-194.853 338.683,-192.663"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="340.252,-195.824 348.56,-189.248 337.965,-189.208 340.252,-195.824"/>
+</g>
+<!-- module~data_strings -->
+<g id="module~~types_changes_wrapper~~UsesGraph_node17" class="node"><title>module~data_strings</title>
+<g id="a_module~~types_changes_wrapper~~UsesGraph_node17"><a xlink:href="../module/data_strings.html" xlink:title="data_strings">
+<polygon fill="#337ab7" stroke="#337ab7" points="76.8594,-311.245 7.49293,-311.245 7.49293,-287.039 76.8594,-287.039 76.8594,-311.245"/>
+<text text-anchor="middle" x="42.1762" y="-295.992" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">data_strings</text>
+</a>
+</g>
+</g>
+<!-- module~data_strings&#45;&gt;module~classes_number_to_string -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge4" class="edge"><title>module~data_strings&#45;&gt;module~classes_number_to_string</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M76.8762,-299.142C91.27,-299.142 108.703,-299.142 125.928,-299.142"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="126.022,-302.642 136.022,-299.142 126.022,-295.642 126.022,-302.642"/>
+</g>
+<!-- module~classes_changed_box_size_ratio&#45;&gt;module~classes_changed_box_size -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge24" class="edge"><title>module~classes_changed_box_size_ratio&#45;&gt;module~classes_changed_box_size</title>
+<path fill="none" stroke="#ffff00" stroke-dasharray="5,2" d="M661.387,-152.277C685.128,-156.926 712.408,-162.267 736.994,-167.082"/>
+<polygon fill="#ffff00" stroke="#ffff00" points="736.5,-170.551 746.986,-169.038 737.845,-163.682 736.5,-170.551"/>
+</g>
+<!-- module~types_move_tuner_parameters&#45;&gt;module~classes_move_tuner -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge31" class="edge"><title>module~types_move_tuner_parameters&#45;&gt;module~classes_move_tuner</title>
+<path fill="none" stroke="#00ff00" stroke-dasharray="5,2" d="M446.471,-406.93C457.45,-403.182 468.95,-398.582 479.098,-393.142 516.681,-372.998 554.63,-340.945 577.076,-320.484"/>
+<polygon fill="#00ff00" stroke="#00ff00" points="579.649,-322.872 584.615,-313.513 574.897,-317.732 579.649,-322.872"/>
+</g>
+<!-- module~classes_moved_coordinates&#45;&gt;module~types_changes_component_wrapper -->
+<g id="module~~types_changes_wrapper~~UsesGraph_edge42" class="edge"><title>module~classes_moved_coordinates&#45;&gt;module~types_changes_component_wrapper</title>
+<path fill="none" stroke="#ff00ff" stroke-dasharray="5,2" d="M615.497,-447.007C652.036,-419.434 741.472,-351.948 784.669,-319.351"/>
+<polygon fill="#ff00ff" stroke="#ff00ff" points="786.789,-322.136 792.663,-313.319 782.572,-316.549 786.789,-322.136"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panmoduletypes_changes_wrapperUsesGraph = svgPanZoom('#moduletypes_changes_wrapperUsesGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="484pt" height="33pt"
+ viewBox="0.00 0.00 484.00 32.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28.6)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28.6 480.003,-28.6 480.003,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24.4032 0,-24.4032 0,-0.1968 54,-0.1968 54,-24.4032"/>
+<text text-anchor="middle" x="27" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="137.6,-24.4032 72.4004,-24.4032 72.4004,-0.1968 137.6,-0.1968 137.6,-24.4032"/>
+<text text-anchor="middle" x="105" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="218.268,-24.4032 155.732,-24.4032 155.732,-0.1968 218.268,-0.1968 218.268,-24.4032"/>
+<text text-anchor="middle" x="187" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="290,-24.4032 236,-24.4032 236,-0.1968 290,-0.1968 290,-24.4032"/>
+<text text-anchor="middle" x="263" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="362,-24.4032 308,-24.4032 308,-0.1968 362,-0.1968 362,-24.4032"/>
+<text text-anchor="middle" x="335" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="476.005,-24.4032 379.995,-24.4032 379.995,-0.1968 476.005,-0.1968 476.005,-24.4032"/>
+<text text-anchor="middle" x="428" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+
+    
+    
+    
+    
+    <h3>Used By</h3>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: module~~types_changes_wrapper~~UsedByGraph Pages: 1 -->
+<svg id="moduletypes_changes_wrapperUsedByGraph" width="641pt" height="189pt"
+ viewBox="0.00 0.00 641.00 188.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~types_changes_wrapper~~UsedByGraph" class="graph" transform="scale(0.548641 0.548641) rotate(0) translate(4 339.6)">
+<title>module~~types_changes_wrapper~~UsedByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-339.6 1164.34,-339.6 1164.34,4 -4,4"/>
+<!-- module~types_changes_wrapper -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node1" class="node"><title>module~types_changes_wrapper</title>
+<polygon fill="none" stroke="black" points="126.554,-164.403 -0.185116,-164.403 -0.185116,-140.197 126.554,-140.197 126.554,-164.403"/>
+<text text-anchor="middle" x="63.1846" y="-149.15" font-family="Helvetica,sans-Serif" font-size="10.50">types_changes_wrapper</text>
+</g>
+<!-- module~procedures_box_particle_exchange_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node2" class="node"><title>module~procedures_box_particle_exchange_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node2"><a xlink:href="../module/procedures_box_particle_exchange_factory.html" xlink:title="procedures_box_particle_exchange_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="652.816,-238.403 437.525,-238.403 437.525,-214.197 652.816,-214.197 652.816,-238.403"/>
+<text text-anchor="middle" x="545.17" y="-223.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_box_particle_exchange_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_box_particle_exchange_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge12" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_box_particle_exchange_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M282.858,-212.3C329.931,-217.96 382.049,-221.331 427.277,-223.34"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="427.275,-226.843 437.415,-223.773 427.574,-219.85 427.275,-226.843"/>
+</g>
+<!-- module~procedures_boxes_particles_swap_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node3" class="node"><title>module~procedures_boxes_particles_swap_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node3"><a xlink:href="../module/procedures_boxes_particles_swap_factory.html" xlink:title="procedures_boxes_particles_swap_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="650.635,-195.403 439.706,-195.403 439.706,-171.197 650.635,-171.197 650.635,-195.403"/>
+<text text-anchor="middle" x="545.17" y="-180.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_boxes_particles_swap_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_boxes_particles_swap_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge13" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_boxes_particles_swap_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M88.6219,-164.415C108.142,-173.62 136.43,-185.917 162.369,-193.3 213.667,-207.9 227.905,-205.933 280.858,-212.3"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M282.858,-212.3C315.982,-216.282 396.48,-206.261 459.45,-196.93"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="460.024,-200.383 469.395,-195.441 458.987,-193.461 460.024,-200.383"/>
+</g>
+<!-- module~procedures_changes_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node4" class="node"><title>module~procedures_changes_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node4"><a xlink:href="../module/procedures_changes_factory.html" xlink:title="procedures_changes_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="619.047,-335.403 471.293,-335.403 471.293,-311.197 619.047,-311.197 619.047,-335.403"/>
+<text text-anchor="middle" x="545.17" y="-320.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_changes_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_changes_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge14" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_changes_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M282.858,-292.3C340.756,-310.566 408.959,-318.222 461.167,-321.361"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="461.209,-324.868 471.388,-321.93 461.598,-317.879 461.209,-324.868"/>
+</g>
+<!-- module~types_markov_chain_generator_wrapper -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node5" class="node"><title>module~types_markov_chain_generator_wrapper</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node5"><a xlink:href="../module/types_markov_chain_generator_wrapper.html" xlink:title="types_markov_chain_generator_wrapper">
+<polygon fill="#337ab7" stroke="#337ab7" points="896.061,-152.403 693.472,-152.403 693.472,-128.197 896.061,-128.197 896.061,-152.403"/>
+<text text-anchor="middle" x="794.767" y="-137.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_markov_chain_generator_wrapper</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~types_markov_chain_generator_wrapper -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge15" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~types_markov_chain_generator_wrapper</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M74.0349,-139.945C90.1224,-120.877 124.103,-85.047 162.369,-71.3 172.319,-67.7254 651.892,-73.0466 652.993,-73.3 694.94,-82.9484 739.094,-106.463 766.527,-122.894"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="764.802,-125.942 775.162,-128.165 768.449,-119.967 764.802,-125.942"/>
+</g>
+<!-- module~procedures_generating_writers_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node6" class="node"><title>module~procedures_generating_writers_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node6"><a xlink:href="../module/procedures_generating_writers_factory.html" xlink:title="procedures_generating_writers_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="378.895,-24.4032 184.822,-24.4032 184.822,-0.1968 378.895,-0.1968 378.895,-24.4032"/>
+<text text-anchor="middle" x="281.858" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_generating_writers_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_generating_writers_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge16" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_generating_writers_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M71.0145,-140.047C84.9048,-116.343 118.851,-64.2618 162.369,-38.3 169.313,-34.1576 176.838,-30.673 184.615,-27.7419"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="185.892,-31.0039 194.204,-24.4342 183.609,-24.3866 185.892,-31.0039"/>
+</g>
+<!-- module~procedures_box_particles_swap_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node7" class="node"><title>module~procedures_box_particles_swap_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node7"><a xlink:href="../module/procedures_box_particles_swap_factory.html" xlink:title="procedures_box_particles_swap_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="645.048,-152.403 445.293,-152.403 445.293,-128.197 645.048,-128.197 645.048,-152.403"/>
+<text text-anchor="middle" x="545.17" y="-137.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_box_particles_swap_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_box_particles_swap_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge17" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_box_particles_swap_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M126.442,-150.744C204.392,-148.795 339.253,-145.423 434.629,-143.039"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="434.983,-146.531 444.893,-142.782 434.808,-139.533 434.983,-146.531"/>
+</g>
+<!-- module~classes_box_particle_exchange -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node8" class="node"><title>module~classes_box_particle_exchange</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node8"><a xlink:href="../module/classes_box_particle_exchange.html" xlink:title="classes_box_particle_exchange">
+<polygon fill="#337ab7" stroke="#337ab7" points="362.153,-264.403 201.564,-264.403 201.564,-240.197 362.153,-240.197 362.153,-264.403"/>
+<text text-anchor="middle" x="281.858" y="-249.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_box_particle_exchange</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~classes_box_particle_exchange -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge18" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~classes_box_particle_exchange</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M76.6573,-164.583C94.2466,-181.185 128.042,-210.518 162.369,-226.3 172.038,-230.745 182.507,-234.449 193.083,-237.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="192.236,-240.927 202.805,-240.188 194.082,-234.175 192.236,-240.927"/>
+</g>
+<!-- module~procedures_boxes_particle_teleportation_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node9" class="node"><title>module~procedures_boxes_particle_teleportation_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node9"><a xlink:href="../module/procedures_boxes_particle_teleportation_factory.html" xlink:title="procedures_boxes_particle_teleportation_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="401.337,-104.403 162.38,-104.403 162.38,-80.1968 401.337,-80.1968 401.337,-104.403"/>
+<text text-anchor="middle" x="281.858" y="-89.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_boxes_particle_teleportation_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_boxes_particle_teleportation_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge19" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_boxes_particle_teleportation_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M96.1646,-140.159C115.215,-133.196 139.971,-124.612 162.369,-118.3 177.335,-114.083 193.523,-110.135 208.984,-106.653"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="210.011,-110.011 219.019,-104.434 208.5,-103.176 210.011,-110.011"/>
+</g>
+<!-- module~procedures_generating_algorithms_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node10" class="node"><title>module~procedures_generating_algorithms_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node10"><a xlink:href="../module/procedures_generating_algorithms_factory.html" xlink:title="procedures_generating_algorithms_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="900.314,-195.403 689.219,-195.403 689.219,-171.197 900.314,-171.197 900.314,-195.403"/>
+<text text-anchor="middle" x="794.767" y="-180.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_generating_algorithms_factory</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~procedures_generating_algorithms_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge20" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~procedures_generating_algorithms_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M70.2714,-164.752C83.296,-189.935 116.462,-246.767 162.369,-273.3 208.546,-299.989 229.995,-276.253 280.858,-292.3"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M282.858,-292.3C361.877,-317.23 575.287,-276.061 652.993,-247.3 671.027,-240.625 671.904,-232.118 688.993,-223.3 707.18,-213.916 728.095,-205.495 746.432,-198.827"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="747.791,-202.059 756.038,-195.407 745.443,-195.464 747.791,-202.059"/>
+</g>
+<!-- module~classes_box_particles_swap -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node11" class="node"><title>module~classes_box_particles_swap</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node11"><a xlink:href="../module/classes_box_particles_swap.html" xlink:title="classes_box_particles_swap">
+<polygon fill="#337ab7" stroke="#337ab7" points="354.385,-184.403 209.332,-184.403 209.332,-160.197 354.385,-160.197 354.385,-184.403"/>
+<text text-anchor="middle" x="281.858" y="-169.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_box_particles_swap</text>
+</a>
+</g>
+</g>
+<!-- module~types_changes_wrapper&#45;&gt;module~classes_box_particles_swap -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge21" class="edge"><title>module~types_changes_wrapper&#45;&gt;module~classes_box_particles_swap</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M126.565,-158.058C149.1,-160.138 174.891,-162.519 198.852,-164.73"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="198.715,-168.233 208.995,-165.667 199.359,-161.262 198.715,-168.233"/>
+</g>
+<!-- module~procedures_box_particle_exchange_factory&#45;&gt;module~procedures_generating_algorithms_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge1" class="edge"><title>module~procedures_box_particle_exchange_factory&#45;&gt;module~procedures_generating_algorithms_factory</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M616.129,-214.15C646.581,-208.862 682.432,-202.635 713.923,-197.167"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="714.728,-200.579 723.981,-195.42 713.53,-193.682 714.728,-200.579"/>
+</g>
+<!-- module~procedures_boxes_particles_swap_factory&#45;&gt;module~procedures_generating_algorithms_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge2" class="edge"><title>module~procedures_boxes_particles_swap_factory&#45;&gt;module~procedures_generating_algorithms_factory</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M650.815,-183.3C660.119,-183.3 669.572,-183.3 678.955,-183.3"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="679.1,-186.8 689.1,-183.3 679.1,-179.8 679.1,-186.8"/>
+</g>
+<!-- module~procedures_markov_chain_generator_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node12" class="node"><title>module~procedures_markov_chain_generator_factory</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node12"><a xlink:href="../module/procedures_markov_chain_generator_factory.html" xlink:title="procedures_markov_chain_generator_factory">
+<polygon fill="#337ab7" stroke="#337ab7" points="1160.24,-195.403 936.639,-195.403 936.639,-171.197 1160.24,-171.197 1160.24,-195.403"/>
+<text text-anchor="middle" x="1048.44" y="-180.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_markov_chain_generator_factory</text>
+</a>
+</g>
+</g>
+<!-- module~procedures_changes_factory&#45;&gt;module~procedures_markov_chain_generator_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge3" class="edge"><title>module~procedures_changes_factory&#45;&gt;module~procedures_markov_chain_generator_factory</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M597.9,-311.179C615.431,-306.946 635.101,-302.061 652.993,-297.3 777.759,-264.103 923.422,-220.817 997.963,-198.334"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="999.003,-201.676 1007.56,-195.435 996.979,-194.975 999.003,-201.676"/>
+</g>
+<!-- module~types_markov_chain_generator_wrapper&#45;&gt;module~procedures_markov_chain_generator_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge4" class="edge"><title>module~types_markov_chain_generator_wrapper&#45;&gt;module~procedures_markov_chain_generator_factory</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M866.877,-152.45C897.832,-157.738 934.273,-163.965 966.282,-169.433"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="966.06,-172.946 976.506,-171.18 967.239,-166.046 966.06,-172.946"/>
+</g>
+<!-- program~plmc_generate -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_node13" class="node"><title>program~plmc_generate</title>
+<g id="a_module~~types_changes_wrapper~~UsedByGraph_node13"><a xlink:href="../program/plmc_generate.html" xlink:title="plmc_generate">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1089.38,-152.403 1007.51,-152.403 1007.51,-128.197 1089.38,-128.197 1089.38,-152.403"/>
+<text text-anchor="middle" x="1048.44" y="-137.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plmc_generate</text>
+</a>
+</g>
+</g>
+<!-- module~types_markov_chain_generator_wrapper&#45;&gt;program~plmc_generate -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge5" class="edge"><title>module~types_markov_chain_generator_wrapper&#45;&gt;program~plmc_generate</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M896.32,-140.3C931.073,-140.3 968.51,-140.3 997.428,-140.3"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="997.676,-143.8 1007.68,-140.3 997.676,-136.8 997.676,-143.8"/>
+</g>
+<!-- module~procedures_box_particles_swap_factory&#45;&gt;module~procedures_generating_algorithms_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge6" class="edge"><title>module~procedures_box_particles_swap_factory&#45;&gt;module~procedures_generating_algorithms_factory</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M616.129,-152.45C646.581,-157.738 682.432,-163.965 713.923,-169.433"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="713.53,-172.918 723.981,-171.18 714.728,-166.021 713.53,-172.918"/>
+</g>
+<!-- module~classes_box_particle_exchange&#45;&gt;module~procedures_box_particle_exchange_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge7" class="edge"><title>module~classes_box_particle_exchange&#45;&gt;module~procedures_box_particle_exchange_factory</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M362.325,-244.393C382.768,-242.359 405.198,-240.127 427.111,-237.947"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="427.53,-241.423 437.134,-236.95 426.837,-234.457 427.53,-241.423"/>
+</g>
+<!-- module~procedures_boxes_particle_teleportation_factory&#45;&gt;module~procedures_generating_algorithms_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge8" class="edge"><title>module~procedures_boxes_particle_teleportation_factory&#45;&gt;module~procedures_generating_algorithms_factory</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M373.2,-80.1961C451.473,-73.9226 565.567,-75.166 652.993,-119.3 674.94,-130.379 667.838,-148.774 688.993,-161.3 692.83,-163.572 696.868,-165.611 701.036,-167.441"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="699.754,-170.698 710.34,-171.124 702.33,-164.189 699.754,-170.698"/>
+</g>
+<!-- module~procedures_generating_algorithms_factory&#45;&gt;module~procedures_markov_chain_generator_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge9" class="edge"><title>module~procedures_generating_algorithms_factory&#45;&gt;module~procedures_markov_chain_generator_factory</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M900.677,-183.3C909.208,-183.3 917.871,-183.3 926.503,-183.3"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="926.612,-186.8 936.612,-183.3 926.612,-179.8 926.612,-186.8"/>
+</g>
+<!-- module~procedures_generating_algorithms_factory&#45;&gt;program~plmc_generate -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge10" class="edge"><title>module~procedures_generating_algorithms_factory&#45;&gt;program~plmc_generate</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M866.877,-171.15C908.464,-164.045 959.955,-155.247 997.296,-148.868"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="998.165,-152.27 1007.43,-147.136 996.986,-145.37 998.165,-152.27"/>
+</g>
+<!-- module~classes_box_particles_swap&#45;&gt;module~procedures_box_particles_swap_factory -->
+<g id="module~~types_changes_wrapper~~UsedByGraph_edge11" class="edge"><title>module~classes_box_particles_swap&#45;&gt;module~procedures_box_particles_swap_factory</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M354.609,-163.514C379.503,-160.465 408.006,-156.974 435.217,-153.642"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="435.675,-157.113 445.175,-152.423 434.824,-150.164 435.675,-157.113"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panmoduletypes_changes_wrapperUsedByGraph = svgPanZoom('#moduletypes_changes_wrapperUsedByGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="484pt" height="33pt"
+ viewBox="0.00 0.00 484.00 32.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28.6)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28.6 480.003,-28.6 480.003,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24.4032 0,-24.4032 0,-0.1968 54,-0.1968 54,-24.4032"/>
+<text text-anchor="middle" x="27" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="137.6,-24.4032 72.4004,-24.4032 72.4004,-0.1968 137.6,-0.1968 137.6,-24.4032"/>
+<text text-anchor="middle" x="105" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Subroutine -->
+<g id="node3" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="218.268,-24.4032 155.732,-24.4032 155.732,-0.1968 218.268,-0.1968 218.268,-24.4032"/>
+<text text-anchor="middle" x="187" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node4" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="290,-24.4032 236,-24.4032 236,-0.1968 290,-0.1968 290,-24.4032"/>
+<text text-anchor="middle" x="263" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="362,-24.4032 308,-24.4032 308,-0.1968 362,-0.1968 362,-24.4032"/>
+<text text-anchor="middle" x="335" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="476.005,-24.4032 379.995,-24.4032 379.995,-0.1968 476.005,-0.1968 476.005,-24.4032"/>
+<text text-anchor="middle" x="428" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a parent (sub)module to the submodule which is
+    descended from it. Dashed arrows point from a module being used to the
+    module or program unit using it. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    <br>
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
+  <div id="types-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/types_changes_wrapper.html#type-changes_wrapper">Changes_Wrapper</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    <section>
+     <h2>Derived Types</h2>
+	 
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-changes_wrapper"></span><h3>type, public :: <a href='../type/changes_wrapper.html'>Changes_Wrapper</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-changed_boxes_size%7E2"></span>class(Abstract_Changed_Box_Size),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>changed_boxes_size</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-boxes_size_change_tuner"></span>class(Abstract_Move_Tuner),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>boxes_size_change_tuner</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-exchanged_boxes_size%7E2"></span>type(Exchanged_Boxes_Size_Line),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>exchanged_boxes_size</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-boxes_size_exchange_tuner"></span>type(Move_Tuner_Line),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>boxes_size_exchange_tuner</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-random_positions%7E2"></span>class(Abstract_Random_Coordinates),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>random_positions</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-random_orientation"></span>class(Abstract_Random_Coordinates),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>random_orientation</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-position_copiers"></span>class(Abstract_Coordinates_Copier),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>position_copiers</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-orientation_copier"></span>class(Abstract_Coordinates_Copier),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>orientation_copier</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-components%7E4"></span>type(Changes_Component_Wrapper),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>components</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+    </section>
+	<br>
+    
+    
+    
+
+    
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-1">All Modules</a></h3></div>
+  <div id="allmods-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/classes_average_num_particles.html">classes_average_num_particles</a>
+      
+      <a class="list-group-item" href="../module/classes_beta_pressure.html">classes_beta_pressure</a>
+      
+      <a class="list-group-item" href="../module/classes_beta_pressure_excess.html">classes_beta_pressure_excess</a>
+      
+      <a class="list-group-item" href="../module/classes_box_particle_exchange.html">classes_box_particle_exchange</a>
+      
+      <a class="list-group-item" href="../module/classes_box_particle_move.html">classes_box_particle_move</a>
+      
+      <a class="list-group-item" href="../module/classes_box_particles_swap.html">classes_box_particles_swap</a>
+      
+      <a class="list-group-item" href="../module/classes_box_size_checker.html">classes_box_size_checker</a>
+      
+      <a class="list-group-item" href="../module/classes_box_size_memento.html">classes_box_size_memento</a>
+      
+      <a class="list-group-item" href="../module/classes_box_volume_change.html">classes_box_volume_change</a>
+      
+      <a class="list-group-item" href="../module/classes_boxes_particle_teleportation.html">classes_boxes_particle_teleportation</a>
+      
+      <a class="list-group-item" href="../module/classes_boxes_particles_swap.html">classes_boxes_particles_swap</a>
+      
+      <a class="list-group-item" href="../module/classes_boxes_volume_exchange.html">classes_boxes_volume_exchange</a>
+      
+      <a class="list-group-item" href="../module/classes_changed_box_size.html">classes_changed_box_size</a>
+      
+      <a class="list-group-item" href="../module/classes_changed_box_size_ratio.html">classes_changed_box_size_ratio</a>
+      
+      <a class="list-group-item" href="../module/classes_changes_success_writer.html">classes_changes_success_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_complete_coordinates_reader.html">classes_complete_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/classes_complete_coordinates_writer.html">classes_complete_coordinates_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_component_chemical_potential.html">classes_component_chemical_potential</a>
+      
+      <a class="list-group-item" href="../module/classes_component_coordinates.html">classes_component_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_component_coordinates_reader.html">classes_component_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/classes_component_coordinates_writer.html">classes_component_coordinates_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_component_dipole_moments.html">classes_component_dipole_moments</a>
+      
+      <a class="list-group-item" href="../module/classes_coordinates.html">classes_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_coordinates_copier.html">classes_coordinates_copier</a>
+      
+      <a class="list-group-item" href="../module/classes_density_explorer.html">classes_density_explorer</a>
+      
+      <a class="list-group-item" href="../module/classes_des_convergence_parameter.html">classes_des_convergence_parameter</a>
+      
+      <a class="list-group-item" href="../module/classes_des_real_component.html">classes_des_real_component</a>
+      
+      <a class="list-group-item" href="../module/classes_des_real_pair.html">classes_des_real_pair</a>
+      
+      <a class="list-group-item" href="../module/classes_des_reci_structure.html">classes_des_reci_structure</a>
+      
+      <a class="list-group-item" href="../module/classes_des_reci_visitor.html">classes_des_reci_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_des_reci_weight.html">classes_des_reci_weight</a>
+      
+      <a class="list-group-item" href="../module/classes_des_self_component.html">classes_des_self_component</a>
+      
+      <a class="list-group-item" href="../module/classes_des_surf_mixture.html">classes_des_surf_mixture</a>
+      
+      <a class="list-group-item" href="../module/classes_dipolar_interactions_facade.html">classes_dipolar_interactions_facade</a>
+      
+      <a class="list-group-item" href="../module/classes_dipolar_neighbourhoods_visitor.html">classes_dipolar_neighbourhoods_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_dipoles_neighbourhood.html">classes_dipoles_neighbourhood</a>
+      
+      <a class="list-group-item" href="../module/classes_dirac_distribution_plus.html">classes_dirac_distribution_plus</a>
+      
+      <a class="list-group-item" href="../module/classes_directed_graph_writer.html">classes_directed_graph_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_dlc_structures.html">classes_dlc_structures</a>
+      
+      <a class="list-group-item" href="../module/classes_dlc_visitor.html">classes_dlc_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_dlc_weight.html">classes_dlc_weight</a>
+      
+      <a class="list-group-item" href="../module/classes_exchanged_boxes_size.html">classes_exchanged_boxes_size</a>
+      
+      <a class="list-group-item" href="../module/classes_external_field.html">classes_external_field</a>
+      
+      <a class="list-group-item" href="../module/classes_field_expression.html">classes_field_expression</a>
+      
+      <a class="list-group-item" href="../module/classes_floor_penetration.html">classes_floor_penetration</a>
+      
+      <a class="list-group-item" href="../module/classes_generating_algorithm.html">classes_generating_algorithm</a>
+      
+      <a class="list-group-item" href="../module/classes_hard_contact.html">classes_hard_contact</a>
+      
+      <a class="list-group-item" href="../module/classes_hetero_couples.html">classes_hetero_couples</a>
+      
+      <a class="list-group-item" href="../module/classes_line_writer.html">classes_line_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_maximum_box_compression.html">classes_maximum_box_compression</a>
+      
+      <a class="list-group-item" href="../module/classes_maximum_box_compression_explorer.html">classes_maximum_box_compression_explorer</a>
+      
+      <a class="list-group-item" href="../module/classes_min_distance.html">classes_min_distance</a>
+      
+      <a class="list-group-item" href="../module/classes_mixture_total_moment.html">classes_mixture_total_moment</a>
+      
+      <a class="list-group-item" href="../module/classes_move_tuner.html">classes_move_tuner</a>
+      
+      <a class="list-group-item" href="../module/classes_moved_coordinates.html">classes_moved_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_neighbour_cells.html">classes_neighbour_cells</a>
+      
+      <a class="list-group-item" href="../module/classes_num_particles.html">classes_num_particles</a>
+      
+      <a class="list-group-item" href="../module/classes_number_to_string.html">classes_number_to_string</a>
+      
+      <a class="list-group-item" href="../module/classes_pair_potential.html">classes_pair_potential</a>
+      
+      <a class="list-group-item" href="../module/classes_parallelepiped_domain.html">classes_parallelepiped_domain</a>
+      
+      <a class="list-group-item" href="../module/classes_particle_insertion_method.html">classes_particle_insertion_method</a>
+      
+      <a class="list-group-item" href="../module/classes_periodic_box.html">classes_periodic_box</a>
+      
+      <a class="list-group-item" href="../module/classes_permittivity.html">classes_permittivity</a>
+      
+      <a class="list-group-item" href="../module/classes_plmc_propagator.html">classes_plmc_propagator</a>
+      
+      <a class="list-group-item" href="../module/classes_potential_expression.html">classes_potential_expression</a>
+      
+      <a class="list-group-item" href="../module/classes_radial_explorer.html">classes_radial_explorer</a>
+      
+      <a class="list-group-item" href="../module/classes_random_coordinates.html">classes_random_coordinates</a>
+      
+      <a class="list-group-item" href="../module/classes_random_orientation.html">classes_random_orientation</a>
+      
+      <a class="list-group-item" href="../module/classes_random_position.html">classes_random_position</a>
+      
+      <a class="list-group-item" href="../module/classes_real_writer.html">classes_real_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_reciprocal_lattice.html">classes_reciprocal_lattice</a>
+      
+      <a class="list-group-item" href="../module/classes_rectangle_writer.html">classes_rectangle_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_rotated_orientations.html">classes_rotated_orientations</a>
+      
+      <a class="list-group-item" href="../module/classes_short_pairs_visitor.html">classes_short_pairs_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_structure_factor.html">classes_structure_factor</a>
+      
+      <a class="list-group-item" href="../module/classes_structure_visitor.html">classes_structure_visitor</a>
+      
+      <a class="list-group-item" href="../module/classes_temperature.html">classes_temperature</a>
+      
+      <a class="list-group-item" href="../module/classes_tower_sampler.html">classes_tower_sampler</a>
+      
+      <a class="list-group-item" href="../module/classes_translated_positions.html">classes_translated_positions</a>
+      
+      <a class="list-group-item" href="../module/classes_triangle_writer.html">classes_triangle_writer</a>
+      
+      <a class="list-group-item" href="../module/classes_tunable_move.html">classes_tunable_move</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_cells.html">classes_visitable_cells</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_cells_memento.html">classes_visitable_cells_memento</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_list.html">classes_visitable_list</a>
+      
+      <a class="list-group-item" href="../module/classes_visitable_walls.html">classes_visitable_walls</a>
+      
+      <a class="list-group-item" href="../module/classes_volume_change_method.html">classes_volume_change_method</a>
+      
+      <a class="list-group-item" href="../module/classes_walls_visitor.html">classes_walls_visitor</a>
+      
+      <a class="list-group-item" href="../module/data_cells.html">data_cells</a>
+      
+      <a class="list-group-item" href="../module/data_constants.html">data_constants</a>
+      
+      <a class="list-group-item" href="../module/data_input_prefixes.html">data_input_prefixes</a>
+      
+      <a class="list-group-item" href="../module/data_output_objects.html">data_output_objects</a>
+      
+      <a class="list-group-item" href="../module/data_strings.html">data_strings</a>
+      
+      <a class="list-group-item" href="../module/module_changes_success.html">module_changes_success</a>
+      
+      <a class="list-group-item" href="../module/module_list_node.html">module_list_node</a>
+      
+      <a class="list-group-item" href="../module/module_move_tuning.html">module_move_tuning</a>
+      
+      <a class="list-group-item" href="../module/procedures_average_nums_particles_factory.html">procedures_average_nums_particles_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_beta_pressure_factory.html">procedures_beta_pressure_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_beta_pressures_excess_factory.html">procedures_beta_pressures_excess_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_particle_exchange_factory.html">procedures_box_particle_exchange_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_particle_move_factory.html">procedures_box_particle_move_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_particles_swap_factory.html">procedures_box_particles_swap_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_size.html">procedures_box_size</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_size_memento_factory.html">procedures_box_size_memento_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_box_volume_change_factory.html">procedures_box_volume_change_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_particle_teleportation_factory.html">procedures_boxes_particle_teleportation_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_particles_swap_factory.html">procedures_boxes_particles_swap_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_size_checker_factory.html">procedures_boxes_size_checker_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_boxes_volume_exchange_factory.html">procedures_boxes_volume_exchange_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_cells_memento.html">procedures_cells_memento</a>
+      
+      <a class="list-group-item" href="../module/procedures_centered_block_micro.html">procedures_centered_block_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_changed_boxes_size_factory.html">procedures_changed_boxes_size_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changed_boxes_size_ratio_factory.html">procedures_changed_boxes_size_ratio_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_component_factory.html">procedures_changes_component_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_factory.html">procedures_changes_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_properties.html">procedures_changes_properties</a>
+      
+      <a class="list-group-item" href="../module/procedures_changes_success_writer_factory.html">procedures_changes_success_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_checks.html">procedures_checks</a>
+      
+      <a class="list-group-item" href="../module/procedures_command_arguments.html">procedures_command_arguments</a>
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_reader.html">procedures_complete_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_reader_factory.html">procedures_complete_coordinates_reader_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_writer_factory.html">procedures_complete_coordinates_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_chemical_potential_factory.html">procedures_component_chemical_potential_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_coordinates_factory.html">procedures_component_coordinates_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_coordinates_reader_factory.html">procedures_component_coordinates_reader_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_coordinates_writer_factory.html">procedures_component_coordinates_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_dipole_moments_factory.html">procedures_component_dipole_moments_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_component_factory.html">procedures_component_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_coordinates_copier_factory.html">procedures_coordinates_copier_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_coordinates_micro.html">procedures_coordinates_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_coordinates_reader.html">procedures_coordinates_reader</a>
+      
+      <a class="list-group-item" href="../module/procedures_density_explorer_factory.html">procedures_density_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_convergence_parameter_factory.html">procedures_des_convergence_parameter_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_real_component_factory.html">procedures_des_real_component_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_real_pair_factory.html">procedures_des_real_pair_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_reci_structure_factory.html">procedures_des_reci_structure_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_reci_visitor_factory.html">procedures_des_reci_visitor_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_reci_weight_factory.html">procedures_des_reci_weight_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_des_surf_mixture_factory.html">procedures_des_surf_mixture_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_facades_factory.html">procedures_dipolar_interactions_facades_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_factory.html">procedures_dipolar_interactions_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_micro.html">procedures_dipolar_interactions_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_resetter.html">procedures_dipolar_interactions_resetter</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_interactions_visitor.html">procedures_dipolar_interactions_visitor</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_neighbourhoods_factory.html">procedures_dipolar_neighbourhoods_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipolar_neighbourhoods_visitors_factory.html">procedures_dipolar_neighbourhoods_visitors_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dipoles_field_interaction.html">procedures_dipoles_field_interaction</a>
+      
+      <a class="list-group-item" href="../module/procedures_dirac_distribution_plus_factory.html">procedures_dirac_distribution_plus_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_directed_graph_writer_factory.html">procedures_directed_graph_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dlc_structures_factory.html">procedures_dlc_structures_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dlc_visitor_factory.html">procedures_dlc_visitor_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_dlc_weight_factory.html">procedures_dlc_weight_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_elementary_geometry.html">procedures_elementary_geometry</a>
+      
+      <a class="list-group-item" href="../module/procedures_elementary_statistics.html">procedures_elementary_statistics</a>
+      
+      <a class="list-group-item" href="../module/procedures_energies_writers_factory.html">procedures_energies_writers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_environment_factory.html">procedures_environment_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_environment_inquirers.html">procedures_environment_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_errors.html">procedures_errors</a>
+      
+      <a class="list-group-item" href="../module/procedures_exchange_updaters.html">procedures_exchange_updaters</a>
+      
+      <a class="list-group-item" href="../module/procedures_exchange_visitors.html">procedures_exchange_visitors</a>
+      
+      <a class="list-group-item" href="../module/procedures_exchanged_boxes_size_factory.html">procedures_exchanged_boxes_size_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_exploration_inquirers.html">procedures_exploration_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_exploring_observables_factory.html">procedures_exploring_observables_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_exploring_writers_factory.html">procedures_exploring_writers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_external_fields_factory.html">procedures_external_fields_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_field_expression_factory.html">procedures_field_expression_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_field_expression_micro.html">procedures_field_expression_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_floor_penetration_factory.html">procedures_floor_penetration_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_generating_algorithms_factory.html">procedures_generating_algorithms_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_generating_observables_factory.html">procedures_generating_observables_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_generating_writers_factory.html">procedures_generating_writers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_hard_contact_factory.html">procedures_hard_contact_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_hetero_couples_factory.html">procedures_hetero_couples_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_json_data_factory.html">procedures_json_data_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_json_reports_factory.html">procedures_json_reports_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_line_writer_factory.html">procedures_line_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_logical_factory.html">procedures_logical_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_markov_chain_explorer_factory.html">procedures_markov_chain_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_markov_chain_generator_factory.html">procedures_markov_chain_generator_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_maximum_box_compression_factory.html">procedures_maximum_box_compression_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_maximum_boxes_compression_explorer_factory.html">procedures_maximum_boxes_compression_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_metropolis_algorithm.html">procedures_metropolis_algorithm</a>
+      
+      <a class="list-group-item" href="../module/procedures_min_distance_factory.html">procedures_min_distance_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_mixture_inquirers.html">procedures_mixture_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_mixture_properties.html">procedures_mixture_properties</a>
+      
+      <a class="list-group-item" href="../module/procedures_mixture_total_moments_factory.html">procedures_mixture_total_moments_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_move_tuner_factory.html">procedures_move_tuner_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_moved_coordinates_factory.html">procedures_moved_coordinates_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_neighbour_cells_factory.html">procedures_neighbour_cells_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_num_particles_factory.html">procedures_num_particles_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_observables_changes_factory.html">procedures_observables_changes_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_observables_energies_factory.html">procedures_observables_energies_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_observables_factory.html">procedures_observables_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_pair_potential_factory.html">procedures_pair_potential_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_parallelepiped_domain_macro.html">procedures_parallelepiped_domain_macro</a>
+      
+      <a class="list-group-item" href="../module/procedures_parallelepiped_domain_micro.html">procedures_parallelepiped_domain_micro</a>
+      
+      <a class="list-group-item" href="../module/procedures_parallelepiped_domains_factory.html">procedures_parallelepiped_domains_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_particle_insertion_method_factory.html">procedures_particle_insertion_method_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_periodic_boxes_factory.html">procedures_periodic_boxes_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_permittivity_factory.html">procedures_permittivity_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_physical_model_factory.html">procedures_physical_model_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_help.html">procedures_plmc_help</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_iterations.html">procedures_plmc_iterations</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_propagator_factory.html">procedures_plmc_propagator_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_resetter.html">procedures_plmc_resetter</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_visitor.html">procedures_plmc_visitor</a>
+      
+      <a class="list-group-item" href="../module/procedures_plmc_writer.html">procedures_plmc_writer</a>
+      
+      <a class="list-group-item" href="../module/procedures_potential_expression_factory.html">procedures_potential_expression_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_property_inquirers.html">procedures_property_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_radial_explorer_factory.html">procedures_radial_explorer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_random_coordinates_factory.html">procedures_random_coordinates_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_random_number.html">procedures_random_number</a>
+      
+      <a class="list-group-item" href="../module/procedures_random_seed_factory.html">procedures_random_seed_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_readers_factory.html">procedures_readers_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_real_writer_factory.html">procedures_real_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_reals_factory.html">procedures_reals_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_reciprocal_lattices_factory.html">procedures_reciprocal_lattices_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_rectangle_writer_factory.html">procedures_rectangle_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_selectors_resetters.html">procedures_selectors_resetters</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_factory.html">procedures_short_interactions_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_inquirers.html">procedures_short_interactions_inquirers</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_resetter.html">procedures_short_interactions_resetter</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_interactions_visitor.html">procedures_short_interactions_visitor</a>
+      
+      <a class="list-group-item" href="../module/procedures_short_pairs_visitors_factory.html">procedures_short_pairs_visitors_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_string_factory.html">procedures_string_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_temperature_factory.html">procedures_temperature_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_tower_sampler_factory.html">procedures_tower_sampler_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_transmutation_updaters.html">procedures_transmutation_updaters</a>
+      
+      <a class="list-group-item" href="../module/procedures_transmutation_visitors.html">procedures_transmutation_visitors</a>
+      
+      <a class="list-group-item" href="../module/procedures_triangle_observables.html">procedures_triangle_observables</a>
+      
+      <a class="list-group-item" href="../module/procedures_triangle_writer_factory.html">procedures_triangle_writer_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visit_condition.html">procedures_visit_condition</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_cells_factory.html">procedures_visitable_cells_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_cells_memento_factory.html">procedures_visitable_cells_memento_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_list_factory.html">procedures_visitable_list_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_visitable_walls_factory.html">procedures_visitable_walls_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_volume_change_method_factory.html">procedures_volume_change_method_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_walls_visitors_factory.html">procedures_walls_visitors_factory</a>
+      
+      <a class="list-group-item" href="../module/procedures_writers_inquirers.html">procedures_writers_inquirers</a>
+      
+      <a class="list-group-item" href="../module/types_cells_wrapper.html">types_cells_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_changes_component_wrapper.html">types_changes_component_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_changes_success_writer_selector.html">types_changes_success_writer_selector</a>
+      
+      <a class="list-group-item" href="../module/types_changes_wrapper.html">types_changes_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_component_coordinates_reader_selector.html">types_component_coordinates_reader_selector</a>
+      
+      <a class="list-group-item" href="../module/types_component_coordinates_writer_selector.html">types_component_coordinates_writer_selector</a>
+      
+      <a class="list-group-item" href="../module/types_component_wrapper.html">types_component_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_dipolar_interactions_dynamic_wrapper.html">types_dipolar_interactions_dynamic_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_dipolar_interactions_static_wrapper.html">types_dipolar_interactions_static_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_energies_writers.html">types_energies_writers</a>
+      
+      <a class="list-group-item" href="../module/types_environment_wrapper.html">types_environment_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_exploring_io.html">types_exploring_io</a>
+      
+      <a class="list-group-item" href="../module/types_exploring_writers_wrapper.html">types_exploring_writers_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_generating_io.html">types_generating_io</a>
+      
+      <a class="list-group-item" href="../module/types_generating_observables_wrapper.html">types_generating_observables_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_generating_writers_wrapper.html">types_generating_writers_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_json_report.html">types_json_report</a>
+      
+      <a class="list-group-item" href="../module/types_logical_wrapper.html">types_logical_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_markov_chain_explorer_wrapper.html">types_markov_chain_explorer_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_markov_chain_generator_wrapper.html">types_markov_chain_generator_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_mixture_wrapper.html">types_mixture_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_move_tuner_parameters.html">types_move_tuner_parameters</a>
+      
+      <a class="list-group-item" href="../module/types_observables_changes.html">types_observables_changes</a>
+      
+      <a class="list-group-item" href="../module/types_observables_energies.html">types_observables_energies</a>
+      
+      <a class="list-group-item" href="../module/types_particle_wrapper.html">types_particle_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_physical_model_wrapper.html">types_physical_model_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_potential_domain.html">types_potential_domain</a>
+      
+      <a class="list-group-item" href="../module/types_potential_domain_selector.html">types_potential_domain_selector</a>
+      
+      <a class="list-group-item" href="../module/types_raw_coordinates.html">types_raw_coordinates</a>
+      
+      <a class="list-group-item" href="../module/types_readers_wrapper.html">types_readers_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_real_wrapper.html">types_real_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_short_interactions_wrapper.html">types_short_interactions_wrapper</a>
+      
+      <a class="list-group-item" href="../module/types_string_wrapper.html">types_string_wrapper</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Physics of Liquids Monte-Carlo was developed by Salomon CHUNG</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

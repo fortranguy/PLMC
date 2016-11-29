@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="A simple Monte-Carlo program for colloids written in Modern Fortran">
+    
+    <meta name="author" content="Salomon CHUNG" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>procedures_complete_coordinates_writer_factory.f90 &ndash; Physics of Liquids Monte-Carlo</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Physics of Liquids Monte-Carlo <small>Green Mile</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>Bridging Physics and Computer Science</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+				
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>procedures_complete_coordinates_writer_factory.f90
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 0.3% of total for source files.">67 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/procedures_complete_coordinates_writer_factory.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li class="active">procedures_complete_coordinates_writer_factory.f90</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div>
+  <div id="mods-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_writer_factory.html">procedures_complete_coordinates_writer_factory</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_writer_factory.f90.html#src">procedures_complete_coordinates_writer_factory.f90</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allfiles-0">All Source Files</a></h3></div>
+  <div id="allfiles-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../sourcefile/classes_average_num_particles.f90.html">classes_average_num_particles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_beta_pressure.f90.html">classes_beta_pressure.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_beta_pressure_excess.f90.html">classes_beta_pressure_excess.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_particle_exchange.f90.html">classes_box_particle_exchange.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_particle_move.f90.html">classes_box_particle_move.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_particles_swap.f90.html">classes_box_particles_swap.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_size_checker.f90.html">classes_box_size_checker.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_size_memento.f90.html">classes_box_size_memento.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_volume_change.f90.html">classes_box_volume_change.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_boxes_particle_teleportation.f90.html">classes_boxes_particle_teleportation.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_boxes_particles_swap.f90.html">classes_boxes_particles_swap.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_boxes_volume_exchange.f90.html">classes_boxes_volume_exchange.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_changed_box_size.f90.html">classes_changed_box_size.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_changed_box_size_ratio.f90.html">classes_changed_box_size_ratio.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_changes_success_writer.f90.html">classes_changes_success_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_complete_coordinates_reader.f90.html">classes_complete_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_complete_coordinates_writer.f90.html">classes_complete_coordinates_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_chemical_potential.f90.html">classes_component_chemical_potential.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_coordinates.f90.html">classes_component_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_coordinates_reader.f90.html">classes_component_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_coordinates_writer.f90.html">classes_component_coordinates_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_dipole_moments.f90.html">classes_component_dipole_moments.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_coordinates.f90.html">classes_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_coordinates_copier.f90.html">classes_coordinates_copier.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_density_explorer.f90.html">classes_density_explorer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_convergence_parameter.f90.html">classes_des_convergence_parameter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_real_component.f90.html">classes_des_real_component.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_real_pair.f90.html">classes_des_real_pair.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_reci_structure.f90.html">classes_des_reci_structure.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_reci_visitor.f90.html">classes_des_reci_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_reci_weight.f90.html">classes_des_reci_weight.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_self_component.f90.html">classes_des_self_component.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_surf_mixture.f90.html">classes_des_surf_mixture.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dipolar_interactions_facade.f90.html">classes_dipolar_interactions_facade.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dipolar_neighbourhood.f90.html">classes_dipolar_neighbourhood.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dipolar_neighbourhoods_visitor.f90.html">classes_dipolar_neighbourhoods_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dirac_distribution_plus.f90.html">classes_dirac_distribution_plus.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_directed_graph_writer.f90.html">classes_directed_graph_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dlc_structures.f90.html">classes_dlc_structures.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dlc_visitor.f90.html">classes_dlc_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dlc_weight.f90.html">classes_dlc_weight.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_exchanged_boxes_size.f90.html">classes_exchanged_boxes_size.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_external_field.f90.html">classes_external_field.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_field_expression.f90.html">classes_field_expression.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_floor_penetration.f90.html">classes_floor_penetration.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_generating_algorithm.f90.html">classes_generating_algorithm.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_hard_contact.f90.html">classes_hard_contact.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_hetero_couples.f90.html">classes_hetero_couples.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_line_writer.f90.html">classes_line_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_maximum_box_compression.f90.html">classes_maximum_box_compression.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_maximum_box_compression_explorer.f90.html">classes_maximum_box_compression_explorer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_min_distance.f90.html">classes_min_distance.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_mixture_total_moment.f90.html">classes_mixture_total_moment.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_move_tuner.f90.html">classes_move_tuner.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_moved_coordinates.f90.html">classes_moved_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_neighbour_cells.f90.html">classes_neighbour_cells.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_num_particles.f90.html">classes_num_particles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_number_to_string.f90.html">classes_number_to_string.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_pair_potential.f90.html">classes_pair_potential.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_parallelepiped_domain.f90.html">classes_parallelepiped_domain.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_particle_insertion_method.f90.html">classes_particle_insertion_method.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_periodic_box.f90.html">classes_periodic_box.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_permittivity.f90.html">classes_permittivity.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_plmc_propagator.f90.html">classes_plmc_propagator.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_potential_expression.f90.html">classes_potential_expression.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_radial_explorer.f90.html">classes_radial_explorer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_random_coordinates.f90.html">classes_random_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_random_orientation.f90.html">classes_random_orientation.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_random_position.f90.html">classes_random_position.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_real_writer.f90.html">classes_real_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_reciprocal_lattice.f90.html">classes_reciprocal_lattice.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_rectangle_writer.f90.html">classes_rectangle_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_rotated_orientations.f90.html">classes_rotated_orientations.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_short_pairs_visitor.f90.html">classes_short_pairs_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_structure_factor.f90.html">classes_structure_factor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_structure_visitor.f90.html">classes_structure_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_temperature.f90.html">classes_temperature.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_tower_sampler.f90.html">classes_tower_sampler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_translated_positions.f90.html">classes_translated_positions.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_triangle_writer.f90.html">classes_triangle_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_tunable_move.f90.html">classes_tunable_move.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_cells.f90.html">classes_visitable_cells.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_cells_memento.f90.html">classes_visitable_cells_memento.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_list.f90.html">classes_visitable_list.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_walls.f90.html">classes_visitable_walls.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_volume_change_method.f90.html">classes_volume_change_method.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_walls_visitor.f90.html">classes_walls_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_cells.f90.html">data_cells.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_constants.f90.html">data_constants.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_input_prefixes.f90.html">data_input_prefixes.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_output_objects.f90.html">data_output_objects.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_strings.f90.html">data_strings.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/density.f90.html">density.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/module_changes_success.f90.html">module_changes_success.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/module_list_node.f90.html">module_list_node.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/module_move_tuning.f90.html">module_move_tuning.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/plmc_explore.f90.html">plmc_explore.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/plmc_generate.f90.html">plmc_generate.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_average_nums_particles_factory.f90.html">procedures_average_nums_particles_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_beta_pressure_factory.f90.html">procedures_beta_pressure_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_beta_pressures_excess_factory.f90.html">procedures_beta_pressures_excess_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_particle_exchange_factory.f90.html">procedures_box_particle_exchange_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_particle_move_factory.f90.html">procedures_box_particle_move_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_particles_swap_factory.f90.html">procedures_box_particles_swap_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_size.f90.html">procedures_box_size.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_size_memento_factory.f90.html">procedures_box_size_memento_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_volume_change_factory.f90.html">procedures_box_volume_change_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_particle_teleportation_factory.f90.html">procedures_boxes_particle_teleportation_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_particles_swap_factory.f90.html">procedures_boxes_particles_swap_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_size_checker_factory.f90.html">procedures_boxes_size_checker_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_volume_exchange_factory.f90.html">procedures_boxes_volume_exchange_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_cells_memento.f90.html">procedures_cells_memento.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_centered_block_micro.f90.html">procedures_centered_block_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changed_boxes_size_factory.f90.html">procedures_changed_boxes_size_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changed_boxes_size_ratio_factory.f90.html">procedures_changed_boxes_size_ratio_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_component_factory.f90.html">procedures_changes_component_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_factory.f90.html">procedures_changes_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_properties.f90.html">procedures_changes_properties.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_success_writer_factory.f90.html">procedures_changes_success_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_checks.f90.html">procedures_checks.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_command_arguments.f90.html">procedures_command_arguments.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_reader.f90.html">procedures_complete_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_reader_factory.f90.html">procedures_complete_coordinates_reader_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_writer_factory.f90.html">procedures_complete_coordinates_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_chemical_potential_factory.f90.html">procedures_component_chemical_potential_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_coordinates_factory.f90.html">procedures_component_coordinates_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_coordinates_reader_factory.f90.html">procedures_component_coordinates_reader_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_coordinates_writer_factory.f90.html">procedures_component_coordinates_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_dipole_moments_factory.f90.html">procedures_component_dipole_moments_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_factory.f90.html">procedures_component_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_coordinates_copier_factory.f90.html">procedures_coordinates_copier_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_coordinates_micro.f90.html">procedures_coordinates_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_coordinates_reader.f90.html">procedures_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_density_explorer_factory.f90.html">procedures_density_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_convergence_parameter_factory.f90.html">procedures_des_convergence_parameter_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_real_component_factory.f90.html">procedures_des_real_component_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_real_pair_factory.f90.html">procedures_des_real_pair_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_reci_structure_factory.f90.html">procedures_des_reci_structure_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_reci_visitor_factory.f90.html">procedures_des_reci_visitor_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_reci_weight_factory.f90.html">procedures_des_reci_weight_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_surf_mixture_factory.f90.html">procedures_des_surf_mixture_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_facades_factory.f90.html">procedures_dipolar_interactions_facades_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_factory.f90.html">procedures_dipolar_interactions_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_micro.f90.html">procedures_dipolar_interactions_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_resetter.f90.html">procedures_dipolar_interactions_resetter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_visitor.f90.html">procedures_dipolar_interactions_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_neighbourhoods_factory.f90.html">procedures_dipolar_neighbourhoods_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_neighbourhoods_visitors_factory.f90.html">procedures_dipolar_neighbourhoods_visitors_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipoles_field_interaction.f90.html">procedures_dipoles_field_interaction.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dirac_distribution_plus.f90.html">procedures_dirac_distribution_plus.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_directed_graph_writer_factory.f90.html">procedures_directed_graph_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dlc_structures_factory.f90.html">procedures_dlc_structures_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dlc_visitor_factory.f90.html">procedures_dlc_visitor_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dlc_weight_factory.f90.html">procedures_dlc_weight_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_elementary_geometry.f90.html">procedures_elementary_geometry.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_elementary_statistics.f90.html">procedures_elementary_statistics.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_energies_writers_factory.f90.html">procedures_energies_writers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_environment_factory.f90.html">procedures_environment_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_environment_inquirers.f90.html">procedures_environment_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_errors.f90.html">procedures_errors.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exchange_updaters.f90.html">procedures_exchange_updaters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exchange_visitors.f90.html">procedures_exchange_visitors.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exchanged_boxes_size_factory.f90.html">procedures_exchanged_boxes_size_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exploration_inquirers.f90.html">procedures_exploration_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exploring_observables_factory.f90.html">procedures_exploring_observables_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exploring_writers_factory.f90.html">procedures_exploring_writers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_external_fields_factory.f90.html">procedures_external_fields_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_field_expression_factory.f90.html">procedures_field_expression_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_field_expression_micro.f90.html">procedures_field_expression_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_floor_penetration_factory.f90.html">procedures_floor_penetration_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_generating_algorithms_factory.f90.html">procedures_generating_algorithms_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_generating_observables_factory.f90.html">procedures_generating_observables_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_generating_writers_factory.f90.html">procedures_generating_writers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_hard_contact_factory.f90.html">procedures_hard_contact_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_hetero_couples_factory.f90.html">procedures_hetero_couples_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_json_data_factory.f90.html">procedures_json_data_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_json_reports_factory.f90.html">procedures_json_reports_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_line_writer_factory.f90.html">procedures_line_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_logical_factory.f90.html">procedures_logical_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_markov_chain_explorer_factory.f90.html">procedures_markov_chain_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_markov_chain_generator_factory.f90.html">procedures_markov_chain_generator_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_maximum_box_compression_factory.f90.html">procedures_maximum_box_compression_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_maximum_boxes_compression_explorer_factory.f90.html">procedures_maximum_boxes_compression_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_metropolis_algorithm.f90.html">procedures_metropolis_algorithm.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_min_distance_factory.f90.html">procedures_min_distance_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_mixture_inquirers.f90.html">procedures_mixture_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_mixture_properties.f90.html">procedures_mixture_properties.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_mixture_total_moments_factory.f90.html">procedures_mixture_total_moments_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_move_tuner_factory.f90.html">procedures_move_tuner_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_moved_coordinates_factory.f90.html">procedures_moved_coordinates_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_neighbour_cells_factory.f90.html">procedures_neighbour_cells_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_num_particles_factory.f90.html">procedures_num_particles_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_observables_changes_factory.f90.html">procedures_observables_changes_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_observables_energies_factory.f90.html">procedures_observables_energies_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_observables_factory.f90.html">procedures_observables_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_pair_potential_factory.f90.html">procedures_pair_potential_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_parallelepiped_domain_macro.f90.html">procedures_parallelepiped_domain_macro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_parallelepiped_domain_micro.f90.html">procedures_parallelepiped_domain_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_parallelepiped_domains_factory.f90.html">procedures_parallelepiped_domains_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_particle_insertion_method_factory.f90.html">procedures_particle_insertion_method_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_periodic_boxes_factory.f90.html">procedures_periodic_boxes_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_permittivity_factory.f90.html">procedures_permittivity_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_physical_model_factory.f90.html">procedures_physical_model_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_help.f90.html">procedures_plmc_help.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_iterations.f90.html">procedures_plmc_iterations.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_propagator_factory.f90.html">procedures_plmc_propagator_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_resetter.f90.html">procedures_plmc_resetter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_visitor.f90.html">procedures_plmc_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_writer.f90.html">procedures_plmc_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_potential_expression_factory.f90.html">procedures_potential_expression_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_property_inquirers.f90.html">procedures_property_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_radial_explorer_factory.f90.html">procedures_radial_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_random_coordinates_factory.f90.html">procedures_random_coordinates_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_random_number.f90.html">procedures_random_number.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_random_seed_factory.f90.html">procedures_random_seed_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_readers_factory.f90.html">procedures_readers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_real_writer_factory.f90.html">procedures_real_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_reals_factory.f90.html">procedures_reals_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_reciprocal_lattices_factory.f90.html">procedures_reciprocal_lattices_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_rectangle_writer_factory.f90.html">procedures_rectangle_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_selectors_resetters.f90.html">procedures_selectors_resetters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_factory.f90.html">procedures_short_interactions_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_inquirers.f90.html">procedures_short_interactions_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_resetter.f90.html">procedures_short_interactions_resetter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_visitor.f90.html">procedures_short_interactions_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_pairs_visitors_factory.f90.html">procedures_short_pairs_visitors_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_string_factory.f90.html">procedures_string_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_temperature_factory.f90.html">procedures_temperature_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_tower_sampler_factory.f90.html">procedures_tower_sampler_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_transmutation_updaters.f90.html">procedures_transmutation_updaters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_transmutation_visitors.f90.html">procedures_transmutation_visitors.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_triangle_observables.f90.html">procedures_triangle_observables.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_triangle_writer_factory.f90.html">procedures_triangle_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visit_condition.f90.html">procedures_visit_condition.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_cells_factory.f90.html">procedures_visitable_cells_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_cells_memento_factory.f90.html">procedures_visitable_cells_memento_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_list_factory.f90.html">procedures_visitable_list_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_walls_factory.f90.html">procedures_visitable_walls_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_volume_change_method_factory.f90.html">procedures_volume_change_method_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_walls_visitors_factory.f90.html">procedures_walls_visitors_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_writers_inquirers.f90.html">procedures_writers_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/radial.f90.html">radial.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_cells_wrapper.f90.html">types_cells_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_changes_component_wrapper.f90.html">types_changes_component_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_changes_success_writer_selector.f90.html">types_changes_success_writer_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_changes_wrapper.f90.html">types_changes_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_component_coordinates_reader_selector.f90.html">types_component_coordinates_reader_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_component_coordinates_writer_selector.f90.html">types_component_coordinates_writer_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_component_wrapper.f90.html">types_component_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_dipolar_interactions_dynamic_wrapper.f90.html">types_dipolar_interactions_dynamic_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_dipolar_interactions_static_wrapper.f90.html">types_dipolar_interactions_static_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_energies_writers.f90.html">types_energies_writers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_environment_wrapper.f90.html">types_environment_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_exploring_io.f90.html">types_exploring_io.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_exploring_writers_wrapper.f90.html">types_exploring_writers_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_generating_io.f90.html">types_generating_io.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_generating_observables_wrapper.f90.html">types_generating_observables_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_generating_writers_wrapper.f90.html">types_generating_writers_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_json_report.f90.html">types_json_report.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_logical_wrapper.f90.html">types_logical_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_markov_chain_explorer_wrapper.f90.html">types_markov_chain_explorer_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_markov_chain_generator_wrapper.f90.html">types_markov_chain_generator_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_mixture_wrapper.f90.html">types_mixture_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_move_tuner_parameters.f90.html">types_move_tuner_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_observables_changes.f90.html">types_observables_changes.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_observables_energies.f90.html">types_observables_energies.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_particle_wrapper.f90.html">types_particle_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_physical_model_wrapper.f90.html">types_physical_model_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_potential_domain.f90.html">types_potential_domain.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_potential_domain_selector.f90.html">types_potential_domain_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_raw_coordinates.f90.html">types_raw_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_readers_wrapper.f90.html">types_readers_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_real_wrapper.f90.html">types_real_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_short_interactions_wrapper.f90.html">types_short_interactions_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_string_wrapper.f90.html">types_string_wrapper.f90</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    <div class="col-md-9" id='text'>
+    
+    
+    <h3>This File Depends On</h3>
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph Pages: 1 -->
+<svg id="sourcefileprocedures_complete_coordinates_writer_factoryf90EfferentGraph" width="641pt" height="267pt"
+ viewBox="0.00 0.00 641.00 266.61" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph" class="graph" transform="scale(0.282217 0.282217) rotate(0) translate(4 940.683)">
+<title>sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-940.683 2267.3,-940.683 2267.3,4 -4,4"/>
+<!-- sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node1" class="node"><title>sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<polygon fill="none" stroke="black" points="2263.49,-201.267 2003.72,-201.267 2003.72,-177.061 2263.49,-177.061 2263.49,-201.267"/>
+<text text-anchor="middle" x="2133.6" y="-186.014" font-family="Helvetica,sans-Serif" font-size="10.50">procedures_complete_coordinates_writer_factory.f90</text>
+</g>
+<!-- sourcefile~types_component_coordinates_writer_selector.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node2" class="node"><title>sourcefile~types_component_coordinates_writer_selector.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node2"><a xlink:href="../sourcefile/types_component_coordinates_writer_selector.f90.html" xlink:title="types_component_coordinates_writer_selector.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1172.54,-163.267 926.423,-163.267 926.423,-139.061 1172.54,-139.061 1172.54,-163.267"/>
+<text text-anchor="middle" x="1049.48" y="-148.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_component_coordinates_writer_selector.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge82" class="edge"><title>sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1316.7,-149.164C1439.52,-163.394 1468.45,-184.714 1592.01,-189.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1594.01,-189.164C1729.82,-194.055 1885.02,-193.393 1993.82,-191.906"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1993.92,-195.405 2003.87,-191.764 1993.82,-188.406 1993.92,-195.405"/>
+</g>
+<!-- sourcefile~classes_component_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node4" class="node"><title>sourcefile~classes_component_coordinates_writer.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node4"><a xlink:href="../sourcefile/classes_component_coordinates_writer.f90.html" xlink:title="classes_component_coordinates_writer.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1422.58,-201.267 1208.82,-201.267 1208.82,-177.061 1422.58,-177.061 1422.58,-201.267"/>
+<text text-anchor="middle" x="1315.7" y="-186.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_component_coordinates_writer.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge51" class="edge"><title>sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1134.81,-163.292C1161.98,-167.2 1192.27,-171.555 1220.13,-175.562"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1219.87,-179.062 1230.27,-177.021 1220.87,-172.133 1219.87,-179.062"/>
+</g>
+<!-- sourcefile~procedures_component_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node5" class="node"><title>sourcefile~procedures_component_coordinates_writer_factory.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node5"><a xlink:href="../sourcefile/procedures_component_coordinates_writer_factory.f90.html" xlink:title="procedures_component_coordinates_writer_factory.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1727.24,-361.267 1458.78,-361.267 1458.78,-337.061 1727.24,-337.061 1727.24,-361.267"/>
+<text text-anchor="middle" x="1593.01" y="-346.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_component_coordinates_writer_factory.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge55" class="edge"><title>sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1316.7,-149.164C1364.22,-154.669 1380.62,-145.313 1422.64,-168.164 1432.21,-173.364 1532.47,-283.429 1574.07,-329.333"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1571.59,-331.809 1580.9,-336.871 1576.78,-327.11 1571.59,-331.809"/>
+</g>
+<!-- sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node8" class="node"><title>sourcefile~classes_complete_coordinates_writer.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node8"><a xlink:href="../sourcefile/classes_complete_coordinates_writer.f90.html" xlink:title="classes_complete_coordinates_writer.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1967.68,-161.267 1763.61,-161.267 1763.61,-137.061 1967.68,-137.061 1967.68,-161.267"/>
+<text text-anchor="middle" x="1865.64" y="-146.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_complete_coordinates_writer.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge65" class="edge"><title>sourcefile~types_component_coordinates_writer_selector.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1172.83,-143.995C1217.59,-143.014 1268.57,-143.819 1314.7,-149.164"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1316.7,-149.164C1439.4,-163.38 1468.49,-111.167 1592.01,-111.164"/>
+</g>
+<!-- sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node3" class="node"><title>sourcefile~procedures_mixture_inquirers.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node3"><a xlink:href="../sourcefile/procedures_mixture_inquirers.f90.html" xlink:title="procedures_mixture_inquirers.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1400.06,-482.267 1231.35,-482.267 1231.35,-458.061 1400.06,-458.061 1400.06,-482.267"/>
+<text text-anchor="middle" x="1315.7" y="-467.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_mixture_inquirers.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_mixture_inquirers.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge83" class="edge"><title>sourcefile~procedures_mixture_inquirers.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1400.17,-468.488C1454.77,-467.804 1527.65,-467.673 1592.01,-470.164"/>
+</g>
+<!-- sourcefile~procedures_mixture_inquirers.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge56" class="edge"><title>sourcefile~procedures_mixture_inquirers.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1390.54,-458.053C1401.47,-455.338 1412.47,-452.072 1422.64,-448.164 1477.28,-427.171 1534.88,-389.753 1566.85,-367.42"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1569.01,-370.176 1575.16,-361.547 1564.97,-364.458 1569.01,-370.176"/>
+</g>
+<!-- sourcefile~classes_component_coordinates_writer.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge84" class="edge"><title>sourcefile~classes_component_coordinates_writer.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1422.63,-187.384C1473.82,-186.978 1536.12,-187.151 1592.01,-189.164"/>
+</g>
+<!-- sourcefile~classes_component_coordinates_writer.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge52" class="edge"><title>sourcefile~classes_component_coordinates_writer.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1337.85,-201.453C1386.51,-229.735 1506.53,-299.485 1562.45,-331.984"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1560.76,-335.053 1571.17,-337.052 1564.28,-329.001 1560.76,-335.053"/>
+</g>
+<!-- sourcefile~classes_component_coordinates_writer.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge67" class="edge"><title>sourcefile~classes_component_coordinates_writer.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1368.59,-177.059C1385.84,-172.866 1405.12,-168.001 1422.64,-163.164 1498.55,-142.216 1513.27,-111.166 1592.01,-111.164"/>
+</g>
+<!-- sourcefile~procedures_component_coordinates_writer_factory.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge85" class="edge"><title>sourcefile~procedures_component_coordinates_writer_factory.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1605.62,-361.395C1642.63,-398.846 1761.47,-507.218 1864.64,-470.164"/>
+</g>
+<!-- sourcefile~procedures_component_coordinates_writer_factory.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge68" class="edge"><title>sourcefile~procedures_component_coordinates_writer_factory.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1610.53,-336.954C1656.39,-303.062 1785.47,-207.675 1839.92,-167.435"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1842.03,-170.226 1847.99,-161.468 1837.87,-164.597 1842.03,-170.226"/>
+</g>
+<!-- sourcefile~procedures_checks.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node6" class="node"><title>sourcefile~procedures_checks.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node6"><a xlink:href="../sourcefile/procedures_checks.f90.html" xlink:title="procedures_checks.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="461.964,-449.267 341.896,-449.267 341.896,-425.061 461.964,-425.061 461.964,-449.267"/>
+<text text-anchor="middle" x="401.93" y="-434.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_checks.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge86" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M800.009,-309.164C902.271,-296.344 1632.91,-286.949 1727.37,-328.164 1807.83,-363.267 1781,-496.785 1864.64,-470.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1866.64,-470.164C1999.65,-427.445 2092.08,-268.686 2122.08,-210.616"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2125.25,-212.093 2126.65,-201.591 2119.01,-208.927 2125.25,-212.093"/>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge40" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M800.009,-309.164C870.732,-300.217 865.457,-370.861 926.203,-408.164 977.299,-439.541 989.521,-454.267 1048.48,-465.164"/>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1050.48,-465.164C1106.53,-475.521 1170.39,-477.004 1221.29,-475.787"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1221.39,-479.286 1231.29,-475.509 1221.2,-472.288 1221.39,-479.286"/>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge50" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M448.774,-424.973C485.201,-415.665 537.567,-403.124 584.006,-395.164"/>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M586.006,-395.164C686.226,-377.987 697.132,-321.926 798.009,-309.164"/>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M800.009,-309.164C869.392,-300.387 862.261,-243.49 926.203,-215.164 976.841,-192.732 994.891,-205.136 1048.48,-191.164"/>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge69" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M800.009,-309.164C861.812,-301.346 866.056,-264.379 926.203,-248.164 1139.86,-190.564 1202.62,-233.746 1422.64,-210.164 1546.13,-196.929 1688.3,-176.347 1777.32,-162.811"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1778.01,-166.246 1787.37,-161.278 1776.96,-159.326 1778.01,-166.246"/>
+</g>
+<!-- sourcefile~classes_periodic_box.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node11" class="node"><title>sourcefile~classes_periodic_box.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node11"><a xlink:href="../sourcefile/classes_periodic_box.f90.html" xlink:title="classes_periodic_box.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="649.871,-650.267 520.141,-650.267 520.141,-626.061 649.871,-626.061 649.871,-650.267"/>
+<text text-anchor="middle" x="585.006" y="-635.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_periodic_box.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_periodic_box.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge79" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_periodic_box.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M410.332,-449.494C421.843,-468.809 444.542,-507.48 462.196,-541.164 479.361,-573.913 469.613,-592.71 498.196,-616.164 502.009,-619.292 506.212,-621.981 510.648,-624.293"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="509.477,-627.605 520.032,-628.527 512.357,-621.224 509.477,-627.605"/>
+</g>
+<!-- sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node12" class="node"><title>sourcefile~classes_translated_positions.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node12"><a xlink:href="../sourcefile/classes_translated_positions.f90.html" xlink:title="classes_translated_positions.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1131.19,-673.267 967.774,-673.267 967.774,-649.061 1131.19,-649.061 1131.19,-673.267"/>
+<text text-anchor="middle" x="1049.48" y="-658.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_translated_positions.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge2" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M586.006,-395.164C638.102,-384.754 812.09,-395.858 890.203,-465.164 925.225,-496.237 898.83,-526.181 926.203,-564.164 950.686,-598.135 990.167,-626.439 1017.62,-643.538"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1016.07,-646.691 1026.43,-648.9 1019.71,-640.711 1016.07,-646.691"/>
+</g>
+<!-- sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node13" class="node"><title>sourcefile~classes_rotated_orientations.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node13"><a xlink:href="../sourcefile/classes_rotated_orientations.f90.html" xlink:title="classes_rotated_orientations.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1131.11,-768.267 967.853,-768.267 967.853,-744.061 1131.11,-744.061 1131.11,-768.267"/>
+<text text-anchor="middle" x="1049.48" y="-753.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_rotated_orientations.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge11" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M586.006,-475.164C623.772,-485.141 635.552,-479.647 671.816,-494.164 777.106,-536.314 808.906,-547.086 890.203,-626.164 911.413,-646.795 905,-661.528 926.203,-682.164 951.227,-706.517 985.687,-726.457 1011.65,-739.476"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1010.28,-742.701 1020.8,-743.955 1013.35,-736.414 1010.28,-742.701"/>
+</g>
+<!-- sourcefile~classes_component_chemical_potential.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node14" class="node"><title>sourcefile~classes_component_chemical_potential.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node14"><a xlink:href="../sourcefile/classes_component_chemical_potential.f90.html" xlink:title="classes_component_chemical_potential.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1157.04,-399.267 941.927,-399.267 941.927,-375.061 1157.04,-375.061 1157.04,-399.267"/>
+<text text-anchor="middle" x="1049.48" y="-384.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_component_chemical_potential.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_chemical_potential.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge17" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_chemical_potential.f90</title>
+<path fill="none" stroke="#7fff00" stroke-dasharray="5,2" d="M800.009,-309.164C882.89,-298.679 975.57,-343.962 1020.73,-369.974"/>
+<polygon fill="#7fff00" stroke="#7fff00" points="1018.97,-373.001 1029.37,-375.051 1022.52,-366.966 1018.97,-373.001"/>
+</g>
+<!-- sourcefile~classes_component_dipole_moments.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node15" class="node"><title>sourcefile~classes_component_dipole_moments.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node15"><a xlink:href="../sourcefile/classes_component_dipole_moments.f90.html" xlink:title="classes_component_dipole_moments.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1152.12,-555.267 946.846,-555.267 946.846,-531.061 1152.12,-531.061 1152.12,-555.267"/>
+<text text-anchor="middle" x="1049.48" y="-540.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_component_dipole_moments.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge21" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M800.009,-309.164C854.656,-302.251 861.418,-347.202 890.203,-394.164 919.97,-442.727 884.44,-478.43 926.203,-517.164 929.841,-520.538 933.804,-523.516 938.005,-526.143"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="936.487,-529.303 946.935,-531.056 939.861,-523.169 936.487,-529.303"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node16" class="node"><title>sourcefile~classes_component_coordinates.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node16"><a xlink:href="../sourcefile/classes_component_coordinates.f90.html" xlink:title="classes_component_coordinates.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="890.398,-498.267 707.621,-498.267 707.621,-474.061 890.398,-474.061 890.398,-498.267"/>
+<text text-anchor="middle" x="799.009" y="-483.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_component_coordinates.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge30" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M462.388,-448.956C506.008,-457.736 561.413,-469.195 584.006,-475.164"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M586.006,-475.164C621.6,-484.567 661.695,-488.307 697.358,-489.371"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="697.704,-492.88 707.782,-489.611 697.865,-485.882 697.704,-492.88"/>
+</g>
+<!-- sourcefile~procedures_property_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node17" class="node"><title>sourcefile~procedures_property_inquirers.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node17"><a xlink:href="../sourcefile/procedures_property_inquirers.f90.html" xlink:title="procedures_property_inquirers.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1135.94,-281.267 963.031,-281.267 963.031,-257.061 1135.94,-257.061 1135.94,-281.267"/>
+<text text-anchor="middle" x="1049.48" y="-266.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_property_inquirers.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_property_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge34" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_property_inquirers.f90</title>
+<path fill="none" stroke="#003fff" stroke-dasharray="5,2" d="M800.009,-309.164C857.494,-301.892 922.1,-291.42 971.022,-283.015"/>
+<polygon fill="#003fff" stroke="#003fff" points="971.644,-286.46 980.903,-281.309 970.453,-279.562 971.644,-286.46"/>
+</g>
+<!-- sourcefile~procedures_random_number.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node23" class="node"><title>sourcefile~procedures_random_number.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node23"><a xlink:href="../sourcefile/procedures_random_number.f90.html" xlink:title="procedures_random_number.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="667.38,-768.267 502.632,-768.267 502.632,-744.061 667.38,-744.061 667.38,-768.267"/>
+<text text-anchor="middle" x="585.006" y="-753.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_random_number.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_random_number.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge9" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_random_number.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M411.17,-449.504C423.585,-468.52 447.223,-506.432 462.196,-541.164 483.904,-591.515 471.42,-611.316 498.196,-659.164 515.181,-689.515 542.97,-718.603 562.305,-736.873"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="560.051,-739.555 569.765,-743.783 564.808,-734.42 560.051,-739.555"/>
+</g>
+<!-- sourcefile~procedures_coordinates_micro.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node25" class="node"><title>sourcefile~procedures_coordinates_micro.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node25"><a xlink:href="../sourcefile/procedures_coordinates_micro.f90.html" xlink:title="procedures_coordinates_micro.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="671.626,-527.267 498.387,-527.267 498.387,-503.061 671.626,-503.061 671.626,-527.267"/>
+<text text-anchor="middle" x="585.006" y="-512.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_coordinates_micro.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge24" class="edge"><title>sourcefile~procedures_checks.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M422.412,-449.348C441.264,-460.761 470.913,-477.728 498.196,-489.164 507.564,-493.091 517.731,-496.705 527.681,-499.91"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="526.933,-503.343 537.521,-502.976 529.015,-496.66 526.933,-503.343"/>
+</g>
+<!-- sourcefile~types_string_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node7" class="node"><title>sourcefile~types_string_wrapper.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node7"><a xlink:href="../sourcefile/types_string_wrapper.f90.html" xlink:title="types_string_wrapper.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1380.56,-83.2672 1250.84,-83.2672 1250.84,-59.0608 1380.56,-59.0608 1380.56,-83.2672"/>
+<text text-anchor="middle" x="1315.7" y="-68.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_string_wrapper.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_string_wrapper.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge87" class="edge"><title>sourcefile~types_string_wrapper.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1340.54,-59.008C1368.13,-45.678 1415.34,-25.1233 1458.64,-17.164 1576.11,4.42613 1610.34,6.64649 1727.37,-17.164 1876.21,-47.4428 2038.16,-134.36 2103.18,-171.736"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2101.65,-174.893 2112.06,-176.878 2105.16,-168.836 2101.65,-174.893"/>
+</g>
+<!-- sourcefile~types_string_wrapper.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge70" class="edge"><title>sourcefile~types_string_wrapper.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1372.06,-59.0088C1439.9,-44.8353 1550.88,-24.1787 1592.01,-31.164"/>
+</g>
+<!-- sourcefile~procedures_string_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node31" class="node"><title>sourcefile~procedures_string_factory.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node31"><a xlink:href="../sourcefile/procedures_string_factory.f90.html" xlink:title="procedures_string_factory.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1668.38,-83.2672 1517.64,-83.2672 1517.64,-59.0608 1668.38,-59.0608 1668.38,-83.2672"/>
+<text text-anchor="middle" x="1593.01" y="-68.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_string_factory.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_string_wrapper.f90&#45;&gt;sourcefile~procedures_string_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge64" class="edge"><title>sourcefile~types_string_wrapper.f90&#45;&gt;sourcefile~procedures_string_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1380.9,-71.164C1418.55,-71.164 1466.56,-71.164 1507.28,-71.164"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1507.46,-74.6641 1517.46,-71.164 1507.46,-67.6641 1507.46,-74.6641"/>
+</g>
+<!-- sourcefile~classes_complete_coordinates_writer.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge88" class="edge"><title>sourcefile~classes_complete_coordinates_writer.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1947.16,-161.274C1976.97,-165.757 2010.96,-170.87 2041.64,-175.483"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2041.49,-179 2051.9,-177.026 2042.53,-172.078 2041.49,-179"/>
+</g>
+<!-- sourcefile~types_component_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node9" class="node"><title>sourcefile~types_component_wrapper.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node9"><a xlink:href="../sourcefile/types_component_wrapper.f90.html" xlink:title="types_component_wrapper.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1393.83,-439.267 1237.57,-439.267 1237.57,-415.061 1393.83,-415.061 1393.83,-439.267"/>
+<text text-anchor="middle" x="1315.7" y="-424.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_component_wrapper.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_component_wrapper.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge89" class="edge"><title>sourcefile~types_component_wrapper.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1382.77,-439.294C1450.84,-451.466 1552.43,-468.632 1592.01,-470.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1594.01,-470.164C1714.2,-474.816 1751.44,-510.82 1864.64,-470.164"/>
+</g>
+<!-- sourcefile~types_component_wrapper.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge53" class="edge"><title>sourcefile~types_component_wrapper.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M1359.72,-414.977C1408.17,-401.25 1486.93,-378.936 1539.1,-364.154"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1540.17,-367.488 1548.84,-361.394 1538.27,-360.753 1540.17,-367.488"/>
+</g>
+<!-- sourcefile~procedures_writers_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node10" class="node"><title>sourcefile~procedures_writers_inquirers.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node10"><a xlink:href="../sourcefile/procedures_writers_inquirers.f90.html" xlink:title="procedures_writers_inquirers.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="1947.99,-261.267 1783.29,-261.267 1783.29,-237.061 1947.99,-237.061 1947.99,-261.267"/>
+<text text-anchor="middle" x="1865.64" y="-246.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_writers_inquirers.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_writers_inquirers.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge90" class="edge"><title>sourcefile~procedures_writers_inquirers.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1920.46,-237.022C1963.36,-227.344 2023.54,-213.768 2068.85,-203.546"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="2069.88,-206.903 2078.86,-201.288 2068.34,-200.074 2069.88,-206.903"/>
+</g>
+<!-- sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge91" class="edge"><title>sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M650.019,-638.86C692.081,-639.295 748.32,-639.833 798.009,-640.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M800.009,-640.164C1039.59,-641.762 1639.16,-551.144 1864.64,-470.164"/>
+</g>
+<!-- sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge73" class="edge"><title>sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M650.355,-631.355C781.148,-617.302 1073.99,-584.684 1172.76,-564.164 1286.04,-540.629 1313.23,-528.777 1422.64,-491.164 1560.45,-443.791 1631.23,-479.666 1727.37,-370.164 1770.33,-321.239 1727.79,-282.685 1763.37,-228.164 1780.7,-201.624 1810,-180.203 1832.64,-166.397"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1834.43,-169.405 1841.26,-161.307 1830.87,-163.377 1834.43,-169.405"/>
+</g>
+<!-- sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge8" class="edge"><title>sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M800.009,-640.164C852.239,-640.512 910.426,-645.197 957.355,-650.052"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="957.184,-653.554 967.496,-651.122 957.919,-646.592 957.184,-653.554"/>
+</g>
+<!-- sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge33" class="edge"><title>sourcefile~classes_periodic_box.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M650.169,-628.045C657.935,-625.045 665.382,-621.169 671.816,-616.164 698.187,-595.646 685.62,-575.14 707.816,-550.164 724.476,-531.416 747.617,-515.138 766.287,-503.69"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="768.249,-506.595 775.046,-498.468 764.664,-500.583 768.249,-506.595"/>
+</g>
+<!-- sourcefile~classes_translated_positions.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge38" class="edge"><title>sourcefile~classes_translated_positions.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1067.41,-648.926C1112.62,-616.246 1236.34,-526.808 1289.69,-488.249"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1291.86,-490.996 1297.91,-482.301 1287.76,-485.323 1291.86,-490.996"/>
+</g>
+<!-- sourcefile~classes_rotated_orientations.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge39" class="edge"><title>sourcefile~classes_rotated_orientations.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1077.81,-743.96C1104.23,-731.224 1144.32,-709.331 1172.76,-682.164 1234.6,-623.091 1283.9,-532.53 1304.4,-491.583"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1307.59,-493.028 1308.88,-482.512 1301.31,-489.932 1307.59,-493.028"/>
+</g>
+<!-- sourcefile~classes_component_chemical_potential.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge41" class="edge"><title>sourcefile~classes_component_chemical_potential.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1078.03,-399.362C1109.24,-412.808 1161.87,-434.358 1208.76,-448.164 1218.16,-450.929 1228.12,-453.48 1238.02,-455.79"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1237.36,-459.229 1247.89,-458.018 1238.91,-452.401 1237.36,-459.229"/>
+</g>
+<!-- sourcefile~classes_component_chemical_potential.f90&#45;&gt;sourcefile~types_component_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge77" class="edge"><title>sourcefile~classes_component_chemical_potential.f90&#45;&gt;sourcefile~types_component_wrapper.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1130.47,-399.274C1161.04,-403.901 1196.03,-409.199 1227.26,-413.926"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1226.84,-417.402 1237.25,-415.439 1227.89,-410.481 1226.84,-417.402"/>
+</g>
+<!-- sourcefile~classes_component_dipole_moments.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge42" class="edge"><title>sourcefile~classes_component_dipole_moments.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1113.95,-531.056C1132.97,-527.056 1153.8,-522.301 1172.76,-517.164 1206.49,-508.023 1244,-495.499 1271.99,-485.677"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1273.2,-488.958 1281.46,-482.325 1270.87,-482.359 1273.2,-488.958"/>
+</g>
+<!-- sourcefile~classes_component_dipole_moments.f90&#45;&gt;sourcefile~types_component_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge75" class="edge"><title>sourcefile~classes_component_dipole_moments.f90&#45;&gt;sourcefile~types_component_wrapper.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1147.49,-531.043C1156.53,-527.462 1165.14,-522.918 1172.76,-517.164 1200.05,-496.559 1181.42,-469.704 1208.76,-449.164 1214.6,-444.781 1221.1,-441.222 1227.93,-438.337"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1229.27,-441.573 1237.43,-434.807 1226.83,-435.012 1229.27,-441.573"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge43" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1050.48,-503.164C1109.4,-499.206 1175.3,-490.982 1226.55,-483.735"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1227.2,-487.178 1236.6,-482.3 1226.21,-480.249 1227.2,-487.178"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge49" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M807.042,-474.026C822.558,-447.127 860.685,-380.356 890.203,-323.164 907.161,-290.308 899.911,-274.16 926.203,-248.164 968.842,-206.006 990.462,-206.291 1048.48,-191.164"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge54" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~procedures_component_coordinates_writer_factory.f90</title>
+<path fill="none" stroke="#33ff00" stroke-dasharray="5,2" d="M807.991,-474.005C825.656,-448.333 870.903,-389.082 926.203,-366.164 1017.1,-328.494 1281.39,-333.396 1448.37,-340.916"/>
+<polygon fill="#33ff00" stroke="#33ff00" points="1448.57,-344.429 1458.72,-341.391 1448.89,-337.436 1448.57,-344.429"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~types_component_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge74" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~types_component_wrapper.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M890.295,-498.227C937.435,-503.035 996.066,-506.685 1048.48,-503.164"/>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M1050.48,-503.164C1124.64,-498.182 1137.06,-468.758 1208.76,-449.164 1218.79,-446.425 1229.43,-443.842 1239.95,-441.476"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1240.95,-444.838 1249.97,-439.276 1239.45,-438.001 1240.95,-444.838"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge4" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M817.482,-498.47C860.52,-528.781 971.819,-607.169 1022.57,-642.914"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1020.84,-645.975 1031.03,-648.872 1024.87,-640.252 1020.84,-645.975"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge13" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M813.628,-498.476C832.913,-516.528 868.271,-551.979 890.203,-588.164 913.392,-626.422 897.515,-647.837 926.203,-682.164 947.887,-708.109 981.132,-727.4 1007.49,-739.77"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1006.3,-743.073 1016.85,-744.013 1009.19,-736.697 1006.3,-743.073"/>
+</g>
+<!-- sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge20" class="edge"><title>sourcefile~classes_component_coordinates.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M847.864,-498.295C871.416,-504.169 900.255,-511.22 926.203,-517.164 943.446,-521.114 962.104,-525.184 979.528,-528.898"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="979.116,-532.388 989.625,-531.039 980.569,-525.541 979.116,-532.388"/>
+</g>
+<!-- sourcefile~procedures_property_inquirers.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge44" class="edge"><title>sourcefile~procedures_property_inquirers.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M1071.68,-281.435C1098.36,-297.795 1144.13,-329.042 1172.76,-366.164 1197.07,-397.682 1177.84,-423.108 1208.76,-448.164 1212.85,-451.479 1217.32,-454.331 1222.03,-456.783"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1220.8,-460.068 1231.35,-461.021 1223.69,-453.696 1220.8,-460.068"/>
+</g>
+<!-- sourcefile~procedures_property_inquirers.f90&#45;&gt;sourcefile~procedures_writers_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge78" class="edge"><title>sourcefile~procedures_property_inquirers.f90&#45;&gt;sourcefile~procedures_writers_inquirers.f90</title>
+<path fill="none" stroke="#cc00ff" stroke-dasharray="5,2" d="M1136.07,-267.061C1290.48,-263.268 1614.3,-255.314 1773.01,-251.415"/>
+<polygon fill="#cc00ff" stroke="#cc00ff" points="1773.31,-254.909 1783.22,-251.164 1773.14,-247.911 1773.31,-254.909"/>
+</g>
+<!-- sourcefile~classes_moved_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node18" class="node"><title>sourcefile~classes_moved_coordinates.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node18"><a xlink:href="../sourcefile/classes_moved_coordinates.f90.html" xlink:title="classes_moved_coordinates.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="879.968,-886.267 718.051,-886.267 718.051,-862.061 879.968,-862.061 879.968,-886.267"/>
+<text text-anchor="middle" x="799.009" y="-871.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_moved_coordinates.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~classes_moved_coordinates.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge45" class="edge"><title>sourcefile~classes_moved_coordinates.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M880.252,-872.632C962.45,-867.023 1089.64,-846.632 1172.76,-777.164 1265.27,-699.853 1300.69,-549.085 1311.09,-492.412"/>
+<polygon fill="#ff9900" stroke="#ff9900" points="1314.57,-492.835 1312.85,-482.381 1307.68,-491.628 1314.57,-492.835"/>
+</g>
+<!-- sourcefile~classes_moved_coordinates.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge7" class="edge"><title>sourcefile~classes_moved_coordinates.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M823.649,-861.882C843.491,-850.612 871.513,-832.328 890.203,-810.164 914.04,-781.899 901.353,-762.542 926.203,-735.164 949.226,-709.8 982.976,-690.273 1009.19,-677.663"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1010.89,-680.732 1018.47,-673.332 1007.93,-674.388 1010.89,-680.732"/>
+</g>
+<!-- sourcefile~classes_moved_coordinates.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge16" class="edge"><title>sourcefile~classes_moved_coordinates.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M854.158,-862.011C866.336,-858.339 878.971,-853.758 890.203,-848.164 908.106,-839.248 909.323,-831.89 926.203,-821.164 954.633,-803.1 988.569,-785.34 1013.47,-772.961"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1015.12,-776.051 1022.54,-768.491 1012.02,-769.772 1015.12,-776.051"/>
+</g>
+<!-- sourcefile~classes_num_particles.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node19" class="node"><title>sourcefile~classes_num_particles.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node19"><a xlink:href="../sourcefile/classes_num_particles.f90.html" xlink:title="classes_num_particles.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="652.697,-447.267 517.315,-447.267 517.315,-423.061 652.697,-423.061 652.697,-447.267"/>
+<text text-anchor="middle" x="585.006" y="-432.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_num_particles.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~classes_num_particles.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge46" class="edge"><title>sourcefile~classes_num_particles.f90&#45;&gt;sourcefile~procedures_mixture_inquirers.f90</title>
+<path fill="none" stroke="#ff9900" stroke-dasharray="5,2" d="M652.82,-434.802C743.247,-435.377 909.295,-440.205 1048.48,-465.164"/>
+</g>
+<!-- sourcefile~classes_num_particles.f90&#45;&gt;sourcefile~types_component_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge76" class="edge"><title>sourcefile~classes_num_particles.f90&#45;&gt;sourcefile~types_component_wrapper.f90</title>
+<path fill="none" stroke="#3200ff" stroke-dasharray="5,2" d="M652.699,-433.324C670.598,-432.884 689.943,-432.458 707.816,-432.164 892.846,-429.123 1109.64,-427.902 1227.53,-427.434"/>
+<polygon fill="#3200ff" stroke="#3200ff" points="1227.59,-430.934 1237.58,-427.395 1227.56,-423.934 1227.59,-430.934"/>
+</g>
+<!-- sourcefile~classes_num_particles.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge28" class="edge"><title>sourcefile~classes_num_particles.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M636.517,-447.315C666.797,-454.599 705.491,-463.908 737.412,-471.587"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="736.977,-475.082 747.519,-474.018 738.615,-468.276 736.977,-475.082"/>
+</g>
+<!-- sourcefile~module_move_tuning.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node20" class="node"><title>sourcefile~module_move_tuning.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node20"><a xlink:href="../sourcefile/module_move_tuning.f90.html" xlink:title="module_move_tuning.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="863.882,-768.267 734.137,-768.267 734.137,-744.061 863.882,-744.061 863.882,-768.267"/>
+<text text-anchor="middle" x="799.009" y="-753.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">module_move_tuning.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~module_move_tuning.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge3" class="edge"><title>sourcefile~module_move_tuning.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M846.728,-743.95C860.822,-739.93 876.252,-735.192 890.203,-730.164 933.779,-714.461 982.414,-692.577 1014.13,-677.694"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1015.85,-680.749 1023.4,-673.314 1012.86,-674.42 1015.85,-680.749"/>
+</g>
+<!-- sourcefile~module_move_tuning.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge12" class="edge"><title>sourcefile~module_move_tuning.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M863.998,-756.164C892.419,-756.164 926.39,-756.164 957.391,-756.164"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="957.779,-759.664 967.779,-756.164 957.779,-752.664 957.779,-759.664"/>
+</g>
+<!-- sourcefile~data_constants.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node21" class="node"><title>sourcefile~data_constants.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node21"><a xlink:href="../sourcefile/data_constants.f90.html" xlink:title="data_constants.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="264.388,-610.267 163.968,-610.267 163.968,-586.061 264.388,-586.061 264.388,-610.267"/>
+<text text-anchor="middle" x="214.178" y="-595.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">data_constants.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~procedures_checks.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge61" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~procedures_checks.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M264.403,-592.944C278.623,-589.718 293.556,-584.522 305.663,-576.164 328.22,-560.592 368.797,-493.344 388.928,-458.413"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="392.106,-459.906 394.032,-449.487 386.029,-456.431 392.106,-459.906"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_periodic_box.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge81" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_periodic_box.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M402.93,-796.164C423.158,-801.481 522.793,-701.532 565.028,-657.959"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="567.786,-660.143 572.215,-650.518 562.75,-655.28 567.786,-660.143"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge5" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M586.006,-796.164C720.56,-780.503 768.959,-837.578 890.203,-777.164 912.208,-766.199 907.45,-751.062 926.203,-735.164 953.344,-712.156 988.444,-691.706 1014.07,-678.167"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1015.79,-681.217 1023.05,-673.5 1012.57,-675.005 1015.79,-681.217"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge15" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M586.006,-914.164C717.596,-946.32 764.991,-946.854 890.203,-895.164 952.619,-869.398 1007.34,-808.491 1032.99,-776.538"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="1036.01,-778.369 1039.44,-768.346 1030.51,-774.039 1036.01,-778.369"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge22" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M402.93,-796.164C480.764,-816.624 503.871,-803.589 584.006,-796.164"/>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M586.006,-796.164C624.901,-792.56 638.313,-797.248 671.816,-777.164 692.902,-764.523 688.097,-749.847 707.816,-735.164 778.955,-682.191 813.002,-697.832 890.203,-654.164 940.456,-625.739 994.64,-585.396 1024.78,-561.986"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="1027.26,-564.493 1032.98,-555.576 1022.95,-558.979 1027.26,-564.493"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge31" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M402.93,-593.164C443.475,-586.341 543.774,-563.641 584.006,-555.164"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_moved_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge35" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_moved_coordinates.f90</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M402.93,-796.164C461.987,-811.688 444.941,-865.287 498.196,-895.164 532.263,-914.276 546.061,-904.892 584.006,-914.164"/>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M586.006,-914.164C615.659,-921.41 693.495,-903.214 746.137,-889.036"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="747.254,-892.359 755.982,-886.352 745.413,-885.605 747.254,-892.359"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~procedures_random_number.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge10" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~procedures_random_number.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402.93,-796.164C415.164,-799.38 480.631,-783.57 529.353,-770.883"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="530.376,-774.233 539.162,-768.313 528.601,-767.462 530.376,-774.233"/>
+</g>
+<!-- sourcefile~classes_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node24" class="node"><title>sourcefile~classes_coordinates.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node24"><a xlink:href="../sourcefile/classes_coordinates.f90.html" xlink:title="classes_coordinates.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="647.122,-607.267 522.89,-607.267 522.89,-583.061 647.122,-583.061 647.122,-607.267"/>
+<text text-anchor="middle" x="585.006" y="-592.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_coordinates.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge18" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~classes_coordinates.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M220.66,-610.333C239.119,-649.389 303.377,-770.52 400.93,-796.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402.93,-796.164C490.09,-819.076 427.353,-672.869 498.196,-617.164 502.843,-613.51 508.029,-610.457 513.488,-607.908"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="514.947,-611.093 522.884,-604.075 512.303,-604.611 514.947,-611.093"/>
+</g>
+<!-- sourcefile~data_constants.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge26" class="edge"><title>sourcefile~data_constants.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M264.425,-600.557C302.072,-601.491 355.119,-600.873 400.93,-593.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402.93,-593.164C430.954,-588.448 437.575,-583.356 462.196,-569.164 479.758,-559.041 480.195,-550.481 498.196,-541.164 506.031,-537.109 514.602,-533.575 523.2,-530.53"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="524.503,-533.785 532.88,-527.299 522.286,-527.145 524.503,-533.785"/>
+</g>
+<!-- sourcefile~procedures_errors.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node22" class="node"><title>sourcefile~procedures_errors.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node22"><a xlink:href="../sourcefile/procedures_errors.f90.html" xlink:title="procedures_errors.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="271.948,-567.267 156.408,-567.267 156.408,-543.061 271.948,-543.061 271.948,-567.267"/>
+<text text-anchor="middle" x="214.178" y="-552.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_errors.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~procedures_checks.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge60" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~procedures_checks.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M229.655,-543.023C252.452,-524.285 298.568,-487.903 341.663,-463.164 347.621,-459.744 354.114,-456.474 360.546,-453.479"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="362.167,-456.587 369.857,-449.3 359.3,-450.201 362.167,-456.587"/>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_periodic_box.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge80" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_periodic_box.f90</title>
+<path fill="none" stroke="#ff0098" stroke-dasharray="5,2" d="M402.93,-555.164C431.172,-558.325 438.613,-563.308 462.196,-579.164 481.237,-591.966 478.343,-604.664 498.196,-616.164 502.12,-618.437 506.278,-620.478 510.565,-622.311"/>
+<polygon fill="#ff0098" stroke="#ff0098" points="509.523,-625.66 520.113,-625.999 512.046,-619.131 509.523,-625.66"/>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_translated_positions.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge6" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_translated_positions.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402.93,-555.164C431.172,-558.325 441.723,-559.455 462.196,-579.164 490.286,-606.204 465.493,-637.934 498.196,-659.164 571.535,-706.773 821.331,-687.322 957.749,-672.369"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="958.221,-675.838 967.774,-671.256 957.448,-668.881 958.221,-675.838"/>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge32" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M402.93,-555.164C482.909,-564.115 505.257,-571.756 584.006,-555.164"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M586.006,-555.164C624.228,-547.111 634.471,-547.617 671.816,-536.164 702.645,-526.709 736.571,-513.077 761.475,-502.434"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="763.094,-505.547 770.888,-498.37 760.32,-499.121 763.094,-505.547"/>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_num_particles.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge37" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~classes_num_particles.f90</title>
+<path fill="none" stroke="#ff00bf" stroke-dasharray="5,2" d="M250.821,-542.989C304.383,-524.77 408.879,-489.523 498.196,-461.164 509.442,-457.594 521.551,-453.858 533.026,-450.368"/>
+<polygon fill="#ff00bf" stroke="#ff00bf" points="534.353,-453.623 542.909,-447.375 532.324,-446.924 534.353,-453.623"/>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~module_move_tuning.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge1" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~module_move_tuning.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M272.105,-564.807C283.562,-567.896 295.268,-571.927 305.663,-577.164 324.264,-586.534 324.428,-595.471 341.663,-607.164 407.175,-651.609 423.937,-664.729 498.196,-692.164 538.869,-707.19 649.219,-729.015 724.075,-742.897"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="723.464,-746.343 733.934,-744.717 724.736,-739.459 723.464,-746.343"/>
+</g>
+<!-- sourcefile~procedures_errors.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge25" class="edge"><title>sourcefile~procedures_errors.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M271.857,-551.904C308.74,-550.585 357.825,-550.34 400.93,-555.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M402.93,-555.164C427.842,-557.952 489.448,-542.548 533.889,-530.052"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="534.992,-533.377 543.654,-527.275 533.078,-526.643 534.992,-533.377"/>
+</g>
+<!-- sourcefile~procedures_random_number.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge14" class="edge"><title>sourcefile~procedures_random_number.f90&#45;&gt;sourcefile~classes_rotated_orientations.f90</title>
+<path fill="none" stroke="#ffbf00" stroke-dasharray="5,2" d="M644.294,-768.295C664.333,-771.909 686.969,-775.38 707.816,-777.164 788.582,-784.075 809.318,-782.506 890.203,-777.164 913.8,-775.605 939.248,-772.753 962.692,-769.643"/>
+<polygon fill="#ffbf00" stroke="#ffbf00" points="963.167,-773.111 972.606,-768.298 962.226,-766.175 963.167,-773.111"/>
+</g>
+<!-- sourcefile~classes_coordinates.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge19" class="edge"><title>sourcefile~classes_coordinates.f90&#45;&gt;sourcefile~classes_component_dipole_moments.f90</title>
+<path fill="none" stroke="#00ff3f" stroke-dasharray="5,2" d="M631.998,-582.996C645.046,-579.07 659.145,-574.371 671.816,-569.164 688.549,-562.287 690.3,-554.694 707.816,-550.164 782.311,-530.897 869.052,-529.402 936.363,-532.593"/>
+<polygon fill="#00ff3f" stroke="#00ff3f" points="936.404,-536.1 946.571,-533.12 936.765,-529.109 936.404,-536.1"/>
+</g>
+<!-- sourcefile~classes_coordinates.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge27" class="edge"><title>sourcefile~classes_coordinates.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M646.372,-582.903C655.435,-579.404 664.261,-574.917 671.816,-569.164 695.653,-551.011 683.856,-530.155 707.816,-512.164 712.861,-508.375 718.444,-505.138 724.285,-502.372"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="725.801,-505.531 733.639,-498.401 723.066,-499.087 725.801,-505.531"/>
+</g>
+<!-- sourcefile~procedures_coordinates_micro.f90&#45;&gt;sourcefile~classes_component_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge29" class="edge"><title>sourcefile~procedures_coordinates_micro.f90&#45;&gt;sourcefile~classes_component_coordinates.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M671.93,-503.41C680.854,-502.19 689.974,-500.942 699.025,-499.704"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="699.768,-503.135 709.202,-498.312 698.82,-496.2 699.768,-503.135"/>
+</g>
+<!-- sourcefile~data_strings.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node26" class="node"><title>sourcefile~data_strings.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node26"><a xlink:href="../sourcefile/data_strings.f90.html" xlink:title="data_strings.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="86.5397,-293.267 0.153058,-293.267 0.153058,-269.061 86.5397,-269.061 86.5397,-293.267"/>
+<text text-anchor="middle" x="43.3464" y="-278.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">data_strings.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~data_strings.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge66" class="edge"><title>sourcefile~data_strings.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M52.9049,-268.766C88.843,-218.322 233.463,-31.164 400.93,-31.164 400.93,-31.164 400.93,-31.164 1050.48,-31.164 1291.16,-31.164 1354.73,9.13613 1592.01,-31.164"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1594.01,-31.164C1652.92,-41.8248 1672.26,-26.7783 1727.37,-50.164 1746.03,-58.0813 1747.07,-66.1199 1763.37,-78.164 1788.46,-96.6955 1817.68,-117.055 1838.27,-131.202"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1836.3,-134.095 1846.52,-136.861 1840.25,-128.321 1836.3,-134.095"/>
+</g>
+<!-- sourcefile~data_strings.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge23" class="edge"><title>sourcefile~data_strings.f90&#45;&gt;sourcefile~procedures_coordinates_micro.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M45.0311,-293.445C47.7298,-328.838 60.7999,-431.432 122.693,-477.164 178.664,-518.521 370.063,-521.311 488.016,-518.789"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="488.221,-522.285 498.138,-518.556 488.06,-515.287 488.221,-522.285"/>
+</g>
+<!-- sourcefile~classes_number_to_string.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node28" class="node"><title>sourcefile~classes_number_to_string.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node28"><a xlink:href="../sourcefile/classes_number_to_string.f90.html" xlink:title="classes_number_to_string.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="290.213,-293.267 138.143,-293.267 138.143,-269.061 290.213,-269.061 290.213,-293.267"/>
+<text text-anchor="middle" x="214.178" y="-278.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_number_to_string.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~data_strings.f90&#45;&gt;sourcefile~classes_number_to_string.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge47" class="edge"><title>sourcefile~data_strings.f90&#45;&gt;sourcefile~classes_number_to_string.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M86.9497,-281.164C99.4482,-281.164 113.583,-281.164 127.755,-281.164"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="128.058,-284.664 138.058,-281.164 128.058,-277.664 128.058,-284.664"/>
+</g>
+<!-- sourcefile~classes_tunable_move.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node27" class="node"><title>sourcefile~classes_tunable_move.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node27"><a xlink:href="../sourcefile/classes_tunable_move.f90.html" xlink:title="classes_tunable_move.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="653.296,-886.267 516.716,-886.267 516.716,-862.061 653.296,-862.061 653.296,-886.267"/>
+<text text-anchor="middle" x="585.006" y="-871.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">classes_tunable_move.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~classes_tunable_move.f90&#45;&gt;sourcefile~classes_moved_coordinates.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge36" class="edge"><title>sourcefile~classes_tunable_move.f90&#45;&gt;sourcefile~classes_moved_coordinates.f90</title>
+<path fill="none" stroke="#7f00ff" stroke-dasharray="5,2" d="M653.377,-874.164C670.665,-874.164 689.543,-874.164 707.782,-874.164"/>
+<polygon fill="#7f00ff" stroke="#7f00ff" points="707.836,-877.664 717.836,-874.164 707.836,-870.664 707.836,-877.664"/>
+</g>
+<!-- sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge48" class="edge"><title>sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~classes_component_coordinates_writer.f90</title>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M800.009,-191.164C910.096,-182.429 941.622,-219.024 1048.48,-191.164"/>
+<path fill="none" stroke="#cbff00" stroke-dasharray="5,2" d="M1050.48,-191.164C1097.94,-178.792 1151.84,-176.404 1198.52,-177.82"/>
+<polygon fill="#cbff00" stroke="#cbff00" points="1198.55,-181.323 1208.67,-178.19 1198.81,-174.328 1198.55,-181.323"/>
+</g>
+<!-- sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~procedures_checks.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge58" class="edge"><title>sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~procedures_checks.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M229.754,-293.405C262.036,-320.516 339.752,-385.785 378.368,-418.216"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="376.513,-421.229 386.422,-424.98 381.015,-415.868 376.513,-421.229"/>
+</g>
+<!-- sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~types_string_wrapper.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge62" class="edge"><title>sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~types_string_wrapper.f90</title>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M274.408,-269.042C379.36,-248.231 605.108,-206.47 798.009,-191.164"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M800.009,-191.164C861.698,-182.494 866.731,-148.705 926.203,-130.164 978.71,-113.795 994.496,-121.663 1048.48,-111.164"/>
+<path fill="none" stroke="#00ffff" stroke-dasharray="5,2" d="M1050.48,-111.164C1114.34,-98.7464 1187.51,-87.9319 1240.63,-80.6895"/>
+<polygon fill="#00ffff" stroke="#00ffff" points="1241.21,-84.1438 1250.65,-79.3342 1240.27,-77.2071 1241.21,-84.1438"/>
+</g>
+<!-- sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge72" class="edge"><title>sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1316.7,-111.164C1438.98,-106.76 1469.65,-111.167 1592.01,-111.164"/>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1594.01,-111.164C1665.25,-111.162 1746.03,-124.236 1800.64,-135.047"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1800.03,-138.494 1810.53,-137.035 1801.41,-131.632 1800.03,-138.494"/>
+</g>
+<!-- sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~procedures_string_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge63" class="edge"><title>sourcefile~classes_number_to_string.f90&#45;&gt;sourcefile~procedures_string_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1050.48,-111.164C1165.75,-88.7475 1197.35,-115.391 1314.7,-111.164"/>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M1316.7,-111.164C1387.93,-108.599 1468.52,-95.7002 1524.01,-85.2334"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="1524.9,-88.6256 1534.07,-83.3104 1523.59,-81.75 1524.9,-88.6256"/>
+</g>
+<!-- sourcefile~types_potential_domain.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node29" class="node"><title>sourcefile~types_potential_domain.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node29"><a xlink:href="../sourcefile/types_potential_domain.f90.html" xlink:title="types_potential_domain.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="284.558,-468.267 143.798,-468.267 143.798,-444.061 284.558,-444.061 284.558,-468.267"/>
+<text text-anchor="middle" x="214.178" y="-453.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_potential_domain.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_potential_domain.f90&#45;&gt;sourcefile~procedures_checks.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge57" class="edge"><title>sourcefile~types_potential_domain.f90&#45;&gt;sourcefile~procedures_checks.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M284.609,-449.062C299.994,-447.488 316.297,-445.821 331.674,-444.248"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="332.035,-447.729 341.627,-443.23 331.323,-440.766 332.035,-447.729"/>
+</g>
+<!-- sourcefile~types_potential_domain_selector.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node30" class="node"><title>sourcefile~types_potential_domain_selector.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_node30"><a xlink:href="../sourcefile/types_potential_domain_selector.f90.html" xlink:title="types_potential_domain_selector.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="305.648,-425.267 122.708,-425.267 122.708,-401.061 305.648,-401.061 305.648,-425.267"/>
+<text text-anchor="middle" x="214.178" y="-410.014" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">types_potential_domain_selector.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~types_potential_domain_selector.f90&#45;&gt;sourcefile~procedures_checks.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge59" class="edge"><title>sourcefile~types_potential_domain_selector.f90&#45;&gt;sourcefile~procedures_checks.f90</title>
+<path fill="none" stroke="#00ff66" stroke-dasharray="5,2" d="M305.877,-424.883C314.52,-425.999 323.187,-427.119 331.581,-428.204"/>
+<polygon fill="#00ff66" stroke="#00ff66" points="331.296,-431.696 341.662,-429.506 332.193,-424.754 331.296,-431.696"/>
+</g>
+<!-- sourcefile~procedures_string_factory.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~EfferentGraph_edge71" class="edge"><title>sourcefile~procedures_string_factory.f90&#45;&gt;sourcefile~classes_complete_coordinates_writer.f90</title>
+<path fill="none" stroke="#0066ff" stroke-dasharray="5,2" d="M1668.26,-83.3244C1687.65,-87.1302 1708.43,-91.7712 1727.37,-97.164 1761.86,-106.982 1799.91,-121.718 1827.19,-132.999"/>
+<polygon fill="#0066ff" stroke="#0066ff" points="1826.15,-136.357 1836.72,-136.984 1828.84,-129.899 1826.15,-136.357"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var pansourcefileprocedures_complete_coordinates_writer_factoryf90EfferentGraph = svgPanZoom('#sourcefileprocedures_complete_coordinates_writer_factoryf90EfferentGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="188pt" height="33pt"
+ viewBox="0.00 0.00 187.55 32.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28.6)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28.6 183.547,-28.6 183.547,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node"><title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="65.1321,-24.4032 -0.0440596,-24.4032 -0.0440596,-0.1968 65.1321,-0.1968 65.1321,-24.4032"/>
+<text text-anchor="middle" x="32.544" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="179.549,-24.4032 83.5387,-24.4032 83.5387,-0.1968 179.549,-0.1968 179.549,-24.4032"/>
+<text text-anchor="middle" x="131.544" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a file to a file which depends upon it. A file 
+    is dependent upon another if the latter must be compiled before the former
+    can be. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    
+      
+      <h3>Files Dependent On This One</h3>
+      
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph Pages: 1 -->
+<svg id="sourcefileprocedures_complete_coordinates_writer_factoryf90AfferentGraph" width="515pt" height="33pt"
+ viewBox="0.00 0.00 514.93 32.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28.6)">
+<title>sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28.6 510.934,-28.6 510.934,4 -4,4"/>
+<!-- sourcefile~procedures_complete_coordinates_writer_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph_node1" class="node"><title>sourcefile~procedures_complete_coordinates_writer_factory.f90</title>
+<polygon fill="none" stroke="black" points="259.581,-24.4032 -0.193965,-24.4032 -0.193965,-0.1968 259.581,-0.1968 259.581,-24.4032"/>
+<text text-anchor="middle" x="129.694" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50">procedures_complete_coordinates_writer_factory.f90</text>
+</g>
+<!-- sourcefile~procedures_generating_writers_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph_node2" class="node"><title>sourcefile~procedures_generating_writers_factory.f90</title>
+<g id="a_sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph_node2"><a xlink:href="../sourcefile/procedures_generating_writers_factory.f90.html" xlink:title="procedures_generating_writers_factory.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="506.707,-24.4032 295.614,-24.4032 295.614,-0.1968 506.707,-0.1968 506.707,-24.4032"/>
+<text text-anchor="middle" x="401.16" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">procedures_generating_writers_factory.f90</text>
+</a>
+</g>
+</g>
+<!-- sourcefile~procedures_complete_coordinates_writer_factory.f90&#45;&gt;sourcefile~procedures_generating_writers_factory.f90 -->
+<g id="sourcefile~~procedures_complete_coordinates_writer_factory.f90~~AfferentGraph_edge1" class="edge"><title>sourcefile~procedures_complete_coordinates_writer_factory.f90&#45;&gt;sourcefile~procedures_generating_writers_factory.f90</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M259.508,-12.3C268.164,-12.3 276.852,-12.3 285.43,-12.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="285.44,-15.8001 295.44,-12.3 285.44,-8.8001 285.44,-15.8001"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="188pt" height="33pt"
+ viewBox="0.00 0.00 187.55 32.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28.6)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28.6 183.547,-28.6 183.547,4 -4,4"/>
+<!-- Source File -->
+<g id="node1" class="node"><title>Source File</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="65.1321,-24.4032 -0.0440596,-24.4032 -0.0440596,-0.1968 65.1321,-0.1968 65.1321,-24.4032"/>
+<text text-anchor="middle" x="32.544" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Source File</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="179.549,-24.4032 83.5387,-24.4032 83.5387,-0.1968 179.549,-0.1968 179.549,-24.4032"/>
+<text text-anchor="middle" x="131.544" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a file to a file which depends upon it. A file 
+    is dependent upon another if the latter must be compiled before the former
+    can be. Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div>
+  <div id="mods-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/procedures_complete_coordinates_writer_factory.html">procedures_complete_coordinates_writer_factory</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_writer_factory.f90.html#src">procedures_complete_coordinates_writer_factory.f90</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">module </span><span class="n">procedures_complete_coordinates_writer_factory</span>
+<a name="ln-2"></a>
+<a name="ln-3"></a><span class="k">use </span><span class="n">json_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">json_file</span>
+<a name="ln-4"></a><span class="k">use </span><span class="n">procedures_checks</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">check_data_found</span>
+<a name="ln-5"></a><span class="k">use </span><span class="n">types_string_wrapper</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">String_Wrapper</span>
+<a name="ln-6"></a><span class="k">use </span><span class="n">classes_periodic_box</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">Abstract_Periodic_Box</span>
+<a name="ln-7"></a><span class="k">use </span><span class="n">types_component_wrapper</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">Component_Wrapper</span>
+<a name="ln-8"></a><span class="k">use </span><span class="n">procedures_mixture_inquirers</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span>  <span class="n">component_has_positions</span><span class="p">,</span> <span class="n">component_has_orientations</span>
+<a name="ln-9"></a><span class="k">use </span><span class="n">types_component_coordinates_writer_selector</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">Component_Coordinates_Writer_Selector</span>
+<a name="ln-10"></a><span class="k">use </span><span class="n">classes_component_coordinates_writer</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">Component_Coordinates_Writer_Wrapper</span>
+<a name="ln-11"></a><span class="k">use </span><span class="n">procedures_component_coordinates_writer_factory</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">component_coordinates_writer_create</span> <span class="o">=&gt;</span> <span class="p">&amp;</span>
+<a name="ln-12"></a>    <span class="n">create</span><span class="p">,</span> <span class="n">component_coordinates_writer_destroy</span> <span class="o">=&gt;</span> <span class="n">destroy</span>
+<a name="ln-13"></a><span class="k">use </span><span class="n">classes_complete_coordinates_writer</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">Abstract_Complete_Coordinates_Writer</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-14"></a>    <span class="n">Concrete_Complete_Coordinates_Writer</span><span class="p">,</span> <span class="n">Null_Complete_Coordinates_Writer</span>
+<a name="ln-15"></a><span class="k">use </span><span class="n">procedures_writers_inquirers</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">property_write_coordinates</span> <span class="o">=&gt;</span> <span class="n">write_coordinates</span>
+<a name="ln-16"></a>
+<a name="ln-17"></a><span class="k">implicit none</span>
+<a name="ln-18"></a>
+<a name="ln-19"></a><span class="k">private</span>
+<a name="ln-20"></a><span class="k">public</span> <span class="kd">::</span> <span class="n">create</span><span class="p">,</span> <span class="n">destroy</span>
+<a name="ln-21"></a>
+<a name="ln-22"></a><span class="k">contains</span>
+<a name="ln-23"></a>
+<a name="ln-24"></a><span class="k">    subroutine </span><span class="n">create</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">periodic_boxes</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">generating_data</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-25"></a>        <span class="n">prefix</span><span class="p">)</span>
+<a name="ln-26"></a>        <span class="k">class</span><span class="p">(</span><span class="n">Abstract_Complete_Coordinates_Writer</span><span class="p">),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">coordinates</span>
+<a name="ln-27"></a>        <span class="k">type</span><span class="p">(</span><span class="n">String_Wrapper</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">paths</span><span class="p">(:)</span>
+<a name="ln-28"></a>        <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">basename</span>
+<a name="ln-29"></a>        <span class="k">class</span><span class="p">(</span><span class="n">Abstract_Periodic_Box</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">periodic_boxes</span><span class="p">(:)</span>
+<a name="ln-30"></a>        <span class="k">type</span><span class="p">(</span><span class="n">Component_Wrapper</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">components</span><span class="p">(:,</span> <span class="p">:)</span>
+<a name="ln-31"></a>        <span class="k">type</span><span class="p">(</span><span class="n">json_file</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">generating_data</span>
+<a name="ln-32"></a>        <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">prefix</span>
+<a name="ln-33"></a>
+<a name="ln-34"></a>        <span class="kt">integer</span> <span class="kd">::</span> <span class="n">period</span>
+<a name="ln-35"></a>        <span class="kt">logical</span> <span class="kd">::</span> <span class="n">write_coordinates</span>
+<a name="ln-36"></a>        <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">data_field</span>
+<a name="ln-37"></a>        <span class="kt">logical</span> <span class="kd">::</span> <span class="n">data_found</span>
+<a name="ln-38"></a>
+<a name="ln-39"></a>        <span class="k">type</span><span class="p">(</span><span class="n">Component_Coordinates_Writer_Wrapper</span><span class="p">)</span> <span class="kd">::</span> <span class="n">components_coordinates</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">&amp;</span>
+<a name="ln-40"></a>            <span class="n">size</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<a name="ln-41"></a>        <span class="k">type</span><span class="p">(</span><span class="n">Component_Coordinates_Writer_Selector</span><span class="p">)</span> <span class="kd">::</span> <span class="n">coordinates_selector</span>
+<a name="ln-42"></a>
+<a name="ln-43"></a>        <span class="n">write_coordinates</span> <span class="o">=</span> <span class="n">property_write_coordinates</span><span class="p">(</span><span class="n">generating_data</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
+<a name="ln-44"></a>        <span class="k">if</span> <span class="p">(</span><span class="n">write_coordinates</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-45"></a><span class="k">            </span><span class="n">data_field</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">//</span><span class="s2">&quot;Coordinates.period&quot;</span>
+<a name="ln-46"></a>            <span class="k">call </span><span class="n">generating_data</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">data_field</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">data_found</span><span class="p">)</span>
+<a name="ln-47"></a>            <span class="k">call </span><span class="n">check_data_found</span><span class="p">(</span><span class="n">data_field</span><span class="p">,</span> <span class="n">data_found</span><span class="p">)</span>
+<a name="ln-48"></a>            <span class="k">allocate</span><span class="p">(</span><span class="n">Concrete_Complete_Coordinates_Writer</span> <span class="kd">::</span> <span class="n">coordinates</span><span class="p">)</span>
+<a name="ln-49"></a>        <span class="k">else</span>
+<a name="ln-50"></a><span class="k">            </span><span class="n">period</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-51"></a>            <span class="k">allocate</span><span class="p">(</span><span class="n">Null_Complete_Coordinates_Writer</span> <span class="kd">::</span> <span class="n">coordinates</span><span class="p">)</span>
+<a name="ln-52"></a>        <span class="k">end if</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a><span class="k">        call </span><span class="n">set_selector</span><span class="p">(</span><span class="n">coordinates_selector</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
+<a name="ln-55"></a>        <span class="k">call </span><span class="n">component_coordinates_writer_create</span><span class="p">(</span><span class="n">components_coordinates</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-56"></a>            <span class="n">write_coordinates</span><span class="p">)</span>
+<a name="ln-57"></a>        <span class="k">call </span><span class="n">coordinates</span><span class="p">%</span><span class="n">construct</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">periodic_boxes</span><span class="p">,</span> <span class="n">components_coordinates</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-58"></a>            <span class="n">coordinates_selector</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
+<a name="ln-59"></a>        <span class="k">call </span><span class="n">component_coordinates_writer_destroy</span><span class="p">(</span><span class="n">components_coordinates</span><span class="p">)</span>
+<a name="ln-60"></a>    <span class="k">end subroutine </span><span class="n">create</span>
+<a name="ln-61"></a>
+<a name="ln-62"></a>    <span class="k">subroutine </span><span class="n">set_selector</span><span class="p">(</span><span class="n">coordinates_selector</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
+<a name="ln-63"></a>        <span class="k">type</span><span class="p">(</span><span class="n">Component_Coordinates_Writer_Selector</span><span class="p">)</span> <span class="kd">::</span> <span class="n">coordinates_selector</span>
+<a name="ln-64"></a>        <span class="k">type</span><span class="p">(</span><span class="n">Component_Wrapper</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">components</span><span class="p">(:,</span> <span class="p">:)</span>
+<a name="ln-65"></a>
+<a name="ln-66"></a>        <span class="kt">logical</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="kd">::</span> <span class="n">have_positions</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-67"></a>            <span class="n">have_orientations</span>
+<a name="ln-68"></a>        <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i_box</span><span class="p">,</span> <span class="n">i_component</span>
+<a name="ln-69"></a>
+<a name="ln-70"></a>        <span class="k">do </span><span class="n">i_box</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<a name="ln-71"></a>            <span class="k">do </span><span class="n">i_component</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<a name="ln-72"></a>                <span class="n">have_positions</span><span class="p">(</span><span class="n">i_component</span><span class="p">,</span> <span class="n">i_box</span><span class="p">)</span> <span class="o">=</span> <span class="p">&amp;</span>
+<a name="ln-73"></a>                    <span class="n">component_has_positions</span><span class="p">(</span><span class="n">components</span><span class="p">(</span><span class="n">i_component</span><span class="p">,</span> <span class="n">i_box</span><span class="p">)%</span><span class="n">positions</span><span class="p">)</span>
+<a name="ln-74"></a>                <span class="n">have_orientations</span><span class="p">(</span><span class="n">i_component</span><span class="p">,</span> <span class="n">i_box</span><span class="p">)</span> <span class="o">=</span> <span class="p">&amp;</span>
+<a name="ln-75"></a>                    <span class="n">component_has_orientations</span><span class="p">(</span><span class="n">components</span><span class="p">(</span><span class="n">i_component</span><span class="p">,</span> <span class="n">i_box</span><span class="p">)%</span><span class="n">orientations</span><span class="p">)</span>
+<a name="ln-76"></a>            <span class="k">end do</span>
+<a name="ln-77"></a><span class="k">        end do</span>
+<a name="ln-78"></a><span class="k">        </span><span class="n">coordinates_selector</span><span class="p">%</span><span class="n">write_positions</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">have_positions</span><span class="p">)</span>
+<a name="ln-79"></a>        <span class="n">coordinates_selector</span><span class="p">%</span><span class="n">write_orientations</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">have_orientations</span><span class="p">)</span>
+<a name="ln-80"></a>    <span class="k">end subroutine </span><span class="n">set_selector</span>
+<a name="ln-81"></a>
+<a name="ln-82"></a>    <span class="k">subroutine </span><span class="n">destroy</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<a name="ln-83"></a>        <span class="k">class</span><span class="p">(</span><span class="n">Abstract_Complete_Coordinates_Writer</span><span class="p">),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">coordinates</span>
+<a name="ln-84"></a>
+<a name="ln-85"></a>        <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span> <span class="k">then</span>
+<a name="ln-86"></a><span class="k">            call </span><span class="n">coordinates</span><span class="p">%</span><span class="n">destroy</span><span class="p">()</span>
+<a name="ln-87"></a>            <span class="k">deallocate</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<a name="ln-88"></a>        <span class="k">end if</span>
+<a name="ln-89"></a><span class="k">    end subroutine </span><span class="n">destroy</span>
+<a name="ln-90"></a>
+<a name="ln-91"></a><span class="k">end module </span><span class="n">procedures_complete_coordinates_writer_factory</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allfiles-1">All Source Files</a></h3></div>
+  <div id="allfiles-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../sourcefile/classes_average_num_particles.f90.html">classes_average_num_particles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_beta_pressure.f90.html">classes_beta_pressure.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_beta_pressure_excess.f90.html">classes_beta_pressure_excess.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_particle_exchange.f90.html">classes_box_particle_exchange.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_particle_move.f90.html">classes_box_particle_move.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_particles_swap.f90.html">classes_box_particles_swap.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_size_checker.f90.html">classes_box_size_checker.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_size_memento.f90.html">classes_box_size_memento.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_box_volume_change.f90.html">classes_box_volume_change.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_boxes_particle_teleportation.f90.html">classes_boxes_particle_teleportation.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_boxes_particles_swap.f90.html">classes_boxes_particles_swap.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_boxes_volume_exchange.f90.html">classes_boxes_volume_exchange.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_changed_box_size.f90.html">classes_changed_box_size.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_changed_box_size_ratio.f90.html">classes_changed_box_size_ratio.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_changes_success_writer.f90.html">classes_changes_success_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_complete_coordinates_reader.f90.html">classes_complete_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_complete_coordinates_writer.f90.html">classes_complete_coordinates_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_chemical_potential.f90.html">classes_component_chemical_potential.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_coordinates.f90.html">classes_component_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_coordinates_reader.f90.html">classes_component_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_coordinates_writer.f90.html">classes_component_coordinates_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_component_dipole_moments.f90.html">classes_component_dipole_moments.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_coordinates.f90.html">classes_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_coordinates_copier.f90.html">classes_coordinates_copier.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_density_explorer.f90.html">classes_density_explorer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_convergence_parameter.f90.html">classes_des_convergence_parameter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_real_component.f90.html">classes_des_real_component.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_real_pair.f90.html">classes_des_real_pair.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_reci_structure.f90.html">classes_des_reci_structure.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_reci_visitor.f90.html">classes_des_reci_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_reci_weight.f90.html">classes_des_reci_weight.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_self_component.f90.html">classes_des_self_component.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_des_surf_mixture.f90.html">classes_des_surf_mixture.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dipolar_interactions_facade.f90.html">classes_dipolar_interactions_facade.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dipolar_neighbourhood.f90.html">classes_dipolar_neighbourhood.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dipolar_neighbourhoods_visitor.f90.html">classes_dipolar_neighbourhoods_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dirac_distribution_plus.f90.html">classes_dirac_distribution_plus.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_directed_graph_writer.f90.html">classes_directed_graph_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dlc_structures.f90.html">classes_dlc_structures.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dlc_visitor.f90.html">classes_dlc_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_dlc_weight.f90.html">classes_dlc_weight.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_exchanged_boxes_size.f90.html">classes_exchanged_boxes_size.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_external_field.f90.html">classes_external_field.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_field_expression.f90.html">classes_field_expression.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_floor_penetration.f90.html">classes_floor_penetration.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_generating_algorithm.f90.html">classes_generating_algorithm.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_hard_contact.f90.html">classes_hard_contact.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_hetero_couples.f90.html">classes_hetero_couples.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_line_writer.f90.html">classes_line_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_maximum_box_compression.f90.html">classes_maximum_box_compression.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_maximum_box_compression_explorer.f90.html">classes_maximum_box_compression_explorer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_min_distance.f90.html">classes_min_distance.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_mixture_total_moment.f90.html">classes_mixture_total_moment.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_move_tuner.f90.html">classes_move_tuner.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_moved_coordinates.f90.html">classes_moved_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_neighbour_cells.f90.html">classes_neighbour_cells.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_num_particles.f90.html">classes_num_particles.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_number_to_string.f90.html">classes_number_to_string.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_pair_potential.f90.html">classes_pair_potential.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_parallelepiped_domain.f90.html">classes_parallelepiped_domain.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_particle_insertion_method.f90.html">classes_particle_insertion_method.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_periodic_box.f90.html">classes_periodic_box.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_permittivity.f90.html">classes_permittivity.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_plmc_propagator.f90.html">classes_plmc_propagator.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_potential_expression.f90.html">classes_potential_expression.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_radial_explorer.f90.html">classes_radial_explorer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_random_coordinates.f90.html">classes_random_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_random_orientation.f90.html">classes_random_orientation.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_random_position.f90.html">classes_random_position.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_real_writer.f90.html">classes_real_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_reciprocal_lattice.f90.html">classes_reciprocal_lattice.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_rectangle_writer.f90.html">classes_rectangle_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_rotated_orientations.f90.html">classes_rotated_orientations.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_short_pairs_visitor.f90.html">classes_short_pairs_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_structure_factor.f90.html">classes_structure_factor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_structure_visitor.f90.html">classes_structure_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_temperature.f90.html">classes_temperature.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_tower_sampler.f90.html">classes_tower_sampler.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_translated_positions.f90.html">classes_translated_positions.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_triangle_writer.f90.html">classes_triangle_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_tunable_move.f90.html">classes_tunable_move.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_cells.f90.html">classes_visitable_cells.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_cells_memento.f90.html">classes_visitable_cells_memento.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_list.f90.html">classes_visitable_list.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_visitable_walls.f90.html">classes_visitable_walls.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_volume_change_method.f90.html">classes_volume_change_method.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/classes_walls_visitor.f90.html">classes_walls_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_cells.f90.html">data_cells.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_constants.f90.html">data_constants.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_input_prefixes.f90.html">data_input_prefixes.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_output_objects.f90.html">data_output_objects.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/data_strings.f90.html">data_strings.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/density.f90.html">density.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/module_changes_success.f90.html">module_changes_success.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/module_list_node.f90.html">module_list_node.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/module_move_tuning.f90.html">module_move_tuning.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/plmc_explore.f90.html">plmc_explore.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/plmc_generate.f90.html">plmc_generate.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_average_nums_particles_factory.f90.html">procedures_average_nums_particles_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_beta_pressure_factory.f90.html">procedures_beta_pressure_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_beta_pressures_excess_factory.f90.html">procedures_beta_pressures_excess_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_particle_exchange_factory.f90.html">procedures_box_particle_exchange_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_particle_move_factory.f90.html">procedures_box_particle_move_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_particles_swap_factory.f90.html">procedures_box_particles_swap_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_size.f90.html">procedures_box_size.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_size_memento_factory.f90.html">procedures_box_size_memento_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_box_volume_change_factory.f90.html">procedures_box_volume_change_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_particle_teleportation_factory.f90.html">procedures_boxes_particle_teleportation_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_particles_swap_factory.f90.html">procedures_boxes_particles_swap_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_size_checker_factory.f90.html">procedures_boxes_size_checker_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_boxes_volume_exchange_factory.f90.html">procedures_boxes_volume_exchange_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_cells_memento.f90.html">procedures_cells_memento.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_centered_block_micro.f90.html">procedures_centered_block_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changed_boxes_size_factory.f90.html">procedures_changed_boxes_size_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changed_boxes_size_ratio_factory.f90.html">procedures_changed_boxes_size_ratio_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_component_factory.f90.html">procedures_changes_component_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_factory.f90.html">procedures_changes_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_properties.f90.html">procedures_changes_properties.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_changes_success_writer_factory.f90.html">procedures_changes_success_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_checks.f90.html">procedures_checks.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_command_arguments.f90.html">procedures_command_arguments.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_reader.f90.html">procedures_complete_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_reader_factory.f90.html">procedures_complete_coordinates_reader_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_complete_coordinates_writer_factory.f90.html">procedures_complete_coordinates_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_chemical_potential_factory.f90.html">procedures_component_chemical_potential_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_coordinates_factory.f90.html">procedures_component_coordinates_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_coordinates_reader_factory.f90.html">procedures_component_coordinates_reader_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_coordinates_writer_factory.f90.html">procedures_component_coordinates_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_dipole_moments_factory.f90.html">procedures_component_dipole_moments_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_component_factory.f90.html">procedures_component_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_coordinates_copier_factory.f90.html">procedures_coordinates_copier_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_coordinates_micro.f90.html">procedures_coordinates_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_coordinates_reader.f90.html">procedures_coordinates_reader.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_density_explorer_factory.f90.html">procedures_density_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_convergence_parameter_factory.f90.html">procedures_des_convergence_parameter_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_real_component_factory.f90.html">procedures_des_real_component_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_real_pair_factory.f90.html">procedures_des_real_pair_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_reci_structure_factory.f90.html">procedures_des_reci_structure_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_reci_visitor_factory.f90.html">procedures_des_reci_visitor_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_reci_weight_factory.f90.html">procedures_des_reci_weight_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_des_surf_mixture_factory.f90.html">procedures_des_surf_mixture_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_facades_factory.f90.html">procedures_dipolar_interactions_facades_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_factory.f90.html">procedures_dipolar_interactions_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_micro.f90.html">procedures_dipolar_interactions_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_resetter.f90.html">procedures_dipolar_interactions_resetter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_interactions_visitor.f90.html">procedures_dipolar_interactions_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_neighbourhoods_factory.f90.html">procedures_dipolar_neighbourhoods_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipolar_neighbourhoods_visitors_factory.f90.html">procedures_dipolar_neighbourhoods_visitors_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dipoles_field_interaction.f90.html">procedures_dipoles_field_interaction.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dirac_distribution_plus.f90.html">procedures_dirac_distribution_plus.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_directed_graph_writer_factory.f90.html">procedures_directed_graph_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dlc_structures_factory.f90.html">procedures_dlc_structures_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dlc_visitor_factory.f90.html">procedures_dlc_visitor_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_dlc_weight_factory.f90.html">procedures_dlc_weight_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_elementary_geometry.f90.html">procedures_elementary_geometry.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_elementary_statistics.f90.html">procedures_elementary_statistics.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_energies_writers_factory.f90.html">procedures_energies_writers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_environment_factory.f90.html">procedures_environment_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_environment_inquirers.f90.html">procedures_environment_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_errors.f90.html">procedures_errors.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exchange_updaters.f90.html">procedures_exchange_updaters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exchange_visitors.f90.html">procedures_exchange_visitors.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exchanged_boxes_size_factory.f90.html">procedures_exchanged_boxes_size_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exploration_inquirers.f90.html">procedures_exploration_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exploring_observables_factory.f90.html">procedures_exploring_observables_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_exploring_writers_factory.f90.html">procedures_exploring_writers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_external_fields_factory.f90.html">procedures_external_fields_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_field_expression_factory.f90.html">procedures_field_expression_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_field_expression_micro.f90.html">procedures_field_expression_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_floor_penetration_factory.f90.html">procedures_floor_penetration_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_generating_algorithms_factory.f90.html">procedures_generating_algorithms_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_generating_observables_factory.f90.html">procedures_generating_observables_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_generating_writers_factory.f90.html">procedures_generating_writers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_hard_contact_factory.f90.html">procedures_hard_contact_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_hetero_couples_factory.f90.html">procedures_hetero_couples_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_json_data_factory.f90.html">procedures_json_data_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_json_reports_factory.f90.html">procedures_json_reports_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_line_writer_factory.f90.html">procedures_line_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_logical_factory.f90.html">procedures_logical_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_markov_chain_explorer_factory.f90.html">procedures_markov_chain_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_markov_chain_generator_factory.f90.html">procedures_markov_chain_generator_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_maximum_box_compression_factory.f90.html">procedures_maximum_box_compression_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_maximum_boxes_compression_explorer_factory.f90.html">procedures_maximum_boxes_compression_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_metropolis_algorithm.f90.html">procedures_metropolis_algorithm.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_min_distance_factory.f90.html">procedures_min_distance_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_mixture_inquirers.f90.html">procedures_mixture_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_mixture_properties.f90.html">procedures_mixture_properties.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_mixture_total_moments_factory.f90.html">procedures_mixture_total_moments_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_move_tuner_factory.f90.html">procedures_move_tuner_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_moved_coordinates_factory.f90.html">procedures_moved_coordinates_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_neighbour_cells_factory.f90.html">procedures_neighbour_cells_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_num_particles_factory.f90.html">procedures_num_particles_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_observables_changes_factory.f90.html">procedures_observables_changes_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_observables_energies_factory.f90.html">procedures_observables_energies_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_observables_factory.f90.html">procedures_observables_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_pair_potential_factory.f90.html">procedures_pair_potential_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_parallelepiped_domain_macro.f90.html">procedures_parallelepiped_domain_macro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_parallelepiped_domain_micro.f90.html">procedures_parallelepiped_domain_micro.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_parallelepiped_domains_factory.f90.html">procedures_parallelepiped_domains_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_particle_insertion_method_factory.f90.html">procedures_particle_insertion_method_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_periodic_boxes_factory.f90.html">procedures_periodic_boxes_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_permittivity_factory.f90.html">procedures_permittivity_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_physical_model_factory.f90.html">procedures_physical_model_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_help.f90.html">procedures_plmc_help.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_iterations.f90.html">procedures_plmc_iterations.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_propagator_factory.f90.html">procedures_plmc_propagator_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_resetter.f90.html">procedures_plmc_resetter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_visitor.f90.html">procedures_plmc_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_plmc_writer.f90.html">procedures_plmc_writer.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_potential_expression_factory.f90.html">procedures_potential_expression_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_property_inquirers.f90.html">procedures_property_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_radial_explorer_factory.f90.html">procedures_radial_explorer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_random_coordinates_factory.f90.html">procedures_random_coordinates_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_random_number.f90.html">procedures_random_number.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_random_seed_factory.f90.html">procedures_random_seed_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_readers_factory.f90.html">procedures_readers_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_real_writer_factory.f90.html">procedures_real_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_reals_factory.f90.html">procedures_reals_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_reciprocal_lattices_factory.f90.html">procedures_reciprocal_lattices_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_rectangle_writer_factory.f90.html">procedures_rectangle_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_selectors_resetters.f90.html">procedures_selectors_resetters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_factory.f90.html">procedures_short_interactions_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_inquirers.f90.html">procedures_short_interactions_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_resetter.f90.html">procedures_short_interactions_resetter.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_interactions_visitor.f90.html">procedures_short_interactions_visitor.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_short_pairs_visitors_factory.f90.html">procedures_short_pairs_visitors_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_string_factory.f90.html">procedures_string_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_temperature_factory.f90.html">procedures_temperature_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_tower_sampler_factory.f90.html">procedures_tower_sampler_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_transmutation_updaters.f90.html">procedures_transmutation_updaters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_transmutation_visitors.f90.html">procedures_transmutation_visitors.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_triangle_observables.f90.html">procedures_triangle_observables.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_triangle_writer_factory.f90.html">procedures_triangle_writer_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visit_condition.f90.html">procedures_visit_condition.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_cells_factory.f90.html">procedures_visitable_cells_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_cells_memento_factory.f90.html">procedures_visitable_cells_memento_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_list_factory.f90.html">procedures_visitable_list_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_visitable_walls_factory.f90.html">procedures_visitable_walls_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_volume_change_method_factory.f90.html">procedures_volume_change_method_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_walls_visitors_factory.f90.html">procedures_walls_visitors_factory.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/procedures_writers_inquirers.f90.html">procedures_writers_inquirers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/radial.f90.html">radial.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_cells_wrapper.f90.html">types_cells_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_changes_component_wrapper.f90.html">types_changes_component_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_changes_success_writer_selector.f90.html">types_changes_success_writer_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_changes_wrapper.f90.html">types_changes_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_component_coordinates_reader_selector.f90.html">types_component_coordinates_reader_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_component_coordinates_writer_selector.f90.html">types_component_coordinates_writer_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_component_wrapper.f90.html">types_component_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_dipolar_interactions_dynamic_wrapper.f90.html">types_dipolar_interactions_dynamic_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_dipolar_interactions_static_wrapper.f90.html">types_dipolar_interactions_static_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_energies_writers.f90.html">types_energies_writers.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_environment_wrapper.f90.html">types_environment_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_exploring_io.f90.html">types_exploring_io.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_exploring_writers_wrapper.f90.html">types_exploring_writers_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_generating_io.f90.html">types_generating_io.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_generating_observables_wrapper.f90.html">types_generating_observables_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_generating_writers_wrapper.f90.html">types_generating_writers_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_json_report.f90.html">types_json_report.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_logical_wrapper.f90.html">types_logical_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_markov_chain_explorer_wrapper.f90.html">types_markov_chain_explorer_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_markov_chain_generator_wrapper.f90.html">types_markov_chain_generator_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_mixture_wrapper.f90.html">types_mixture_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_move_tuner_parameters.f90.html">types_move_tuner_parameters.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_observables_changes.f90.html">types_observables_changes.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_observables_energies.f90.html">types_observables_energies.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_particle_wrapper.f90.html">types_particle_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_physical_model_wrapper.f90.html">types_physical_model_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_potential_domain.f90.html">types_potential_domain.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_potential_domain_selector.f90.html">types_potential_domain_selector.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_raw_coordinates.f90.html">types_raw_coordinates.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_readers_wrapper.f90.html">types_readers_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_real_wrapper.f90.html">types_real_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_short_interactions_wrapper.f90.html">types_short_interactions_wrapper.f90</a>
+      
+      <a class="list-group-item" href="../sourcefile/types_string_wrapper.f90.html">types_string_wrapper.f90</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Physics of Liquids Monte-Carlo was developed by Salomon CHUNG</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

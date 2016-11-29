@@ -1,8 +1,0 @@
-{
-    "Number of Particles": 10000,
-    "Particles": {
-        "moment norm": 1.0,
-        "with orientation": true
-    },
-    "Write moments": true
-}

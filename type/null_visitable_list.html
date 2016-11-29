@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="A simple Monte-Carlo program for colloids written in Modern Fortran">
+    
+    <meta name="author" content="Salomon CHUNG" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>Null_Visitable_List &ndash; Physics of Liquids Monte-Carlo </title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">Physics of Liquids Monte-Carlo <small>Green Mile</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>Bridging Physics and Computer Science</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+				
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/absint.html">Abstract Interfaces</a></li>
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>Null_Visitable_List
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title="<p> 0.5% of total for derived types.</p>Including implementation: 74 statements,  0.5% of total for derived types.">12 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/classes_visitable_list.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/classes_visitable_list.f90.html'>classes_visitable_list.f90</a></li>
+  
+     <li><a href='../module/classes_visitable_list.html'>classes_visitable_list</a></li>
+  
+     <li class="active">Null_Visitable_List</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-construct%7E28">construct</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-destroy%7E32">destroy</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-set%7E13">set</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-add%7E3">add</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-remove%7E3">remove</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_energy%7E3">visit_energy</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_contacts%7E3">visit_contacts</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_min_distance%7E3">visit_min_distance</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_dipolar_neighbours%7E3">visit_dipolar_neighbours</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes-0">All Derived Types</a></h3></div>
+  <div id="alltypes-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/abstract_average_num_particles.html">Abstract_Average_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/abstract_beta_pressure.html">Abstract_Beta_Pressure</a>
+      
+      <a class="list-group-item" href="../type/abstract_beta_pressure_excess.html">Abstract_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_particle_exchange.html">Abstract_Box_Particle_Exchange</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_particle_move.html">Abstract_Box_Particle_Move</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_particles_swap.html">Abstract_Box_Particles_Swap</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_size_checker.html">Abstract_Box_Size_Checker</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_size_memento.html">Abstract_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/abstract_changed_box_size.html">Abstract_Changed_Box_Size</a>
+      
+      <a class="list-group-item" href="../type/abstract_changed_box_size_ratio.html">Abstract_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/abstract_changes_success_writer.html">Abstract_Changes_Success_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_complete_coordinates_reader.html">Abstract_Complete_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/abstract_complete_coordinates_writer.html">Abstract_Complete_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_chemical_potential.html">Abstract_Component_Chemical_Potential</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_coordinates.html">Abstract_Component_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_coordinates_reader.html">Abstract_Component_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_coordinates_writer.html">Abstract_Component_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_dipole_moments.html">Abstract_Component_Dipole_Moments</a>
+      
+      <a class="list-group-item" href="../type/abstract_coordinates.html">Abstract_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_coordinates_copier.html">Abstract_Coordinates_Copier</a>
+      
+      <a class="list-group-item" href="../type/abstract_density_explorer.html">Abstract_Density_Explorer</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_convergence_parameter.html">Abstract_DES_Convergence_Parameter</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_real_component.html">Abstract_DES_Real_Component</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_real_pair.html">Abstract_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_reci_structure.html">Abstract_DES_Reci_Structure</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_reci_visitor.html">Abstract_DES_Reci_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_reci_weight.html">Abstract_DES_Reci_Weight</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_self_component.html">Abstract_DES_Self_Component</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_surf_mixture.html">Abstract_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/abstract_dipolar_interactions_facade.html">Abstract_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/abstract_dipolar_neighbourhood.html">Abstract_Dipolar_Neighbourhood</a>
+      
+      <a class="list-group-item" href="../type/abstract_dipolar_neighbourhoods_visitor.html">Abstract_Dipolar_Neighbourhoods_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_dirac_distribution_plus.html">Abstract_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/abstract_directed_graph_writer.html">Abstract_Directed_Graph_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_dlc_structures.html">Abstract_DLC_Structures</a>
+      
+      <a class="list-group-item" href="../type/abstract_dlc_visitor.html">Abstract_DLC_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_dlc_weight.html">Abstract_DLC_Weight</a>
+      
+      <a class="list-group-item" href="../type/abstract_exchanged_boxes_size.html">Abstract_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/abstract_external_field.html">Abstract_External_Field</a>
+      
+      <a class="list-group-item" href="../type/abstract_field_expression.html">Abstract_Field_Expression</a>
+      
+      <a class="list-group-item" href="../type/abstract_floor_penetration.html">Abstract_Floor_Penetration</a>
+      
+      <a class="list-group-item" href="../type/abstract_generating_algorithm.html">Abstract_Generating_Algorithm</a>
+      
+      <a class="list-group-item" href="../type/abstract_hard_contact.html">Abstract_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/abstract_hetero_couples.html">Abstract_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/abstract_line_writer.html">Abstract_Line_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_maximum_box_compression.html">Abstract_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/abstract_maximum_box_compression_explorer.html">Abstract_Maximum_Box_Compression_Explorer</a>
+      
+      <a class="list-group-item" href="../type/abstract_min_distance.html">Abstract_Min_Distance</a>
+      
+      <a class="list-group-item" href="../type/abstract_mixture_total_moment.html">Abstract_Mixture_Total_Moment</a>
+      
+      <a class="list-group-item" href="../type/abstract_move_tuner.html">Abstract_Move_Tuner</a>
+      
+      <a class="list-group-item" href="../type/abstract_moved_coordinates.html">Abstract_Moved_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_neighbour_cells.html">Abstract_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/abstract_num_particles.html">Abstract_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/abstract_number_to_string.html">Abstract_Number_to_String</a>
+      
+      <a class="list-group-item" href="../type/abstract_pair_potential.html">Abstract_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/abstract_parallelepiped_domain.html">Abstract_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/abstract_particle_insertion_method.html">Abstract_Particle_Insertion_Method</a>
+      
+      <a class="list-group-item" href="../type/abstract_periodic_box.html">Abstract_Periodic_Box</a>
+      
+      <a class="list-group-item" href="../type/abstract_permittivity.html">Abstract_Permittivity</a>
+      
+      <a class="list-group-item" href="../type/abstract_plmc_propagator.html">Abstract_PLMC_Propagator</a>
+      
+      <a class="list-group-item" href="../type/abstract_potential_expression.html">Abstract_Potential_Expression</a>
+      
+      <a class="list-group-item" href="../type/abstract_radial_explorer.html">Abstract_Radial_Explorer</a>
+      
+      <a class="list-group-item" href="../type/abstract_random_coordinates.html">Abstract_Random_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_real_writer.html">Abstract_Real_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_reciprocal_lattice.html">Abstract_Reciprocal_Lattice</a>
+      
+      <a class="list-group-item" href="../type/abstract_rectangle_writer.html">Abstract_Rectangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_short_pairs_visitor.html">Abstract_Short_Pairs_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_structure_factor.html">Abstract_Structure_Factor</a>
+      
+      <a class="list-group-item" href="../type/abstract_structure_visitor.html">Abstract_Structure_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_temperature.html">Abstract_Temperature</a>
+      
+      <a class="list-group-item" href="../type/abstract_tower_sampler.html">Abstract_Tower_Sampler</a>
+      
+      <a class="list-group-item" href="../type/abstract_triangle_writer.html">Abstract_Triangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_tunable_move.html">Abstract_Tunable_Move</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_cells.html">Abstract_Visitable_Cells</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_cells_memento.html">Abstract_Visitable_Cells_Memento</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_list.html">Abstract_Visitable_List</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_walls.html">Abstract_Visitable_Walls</a>
+      
+      <a class="list-group-item" href="../type/abstract_volume_change_method.html">Abstract_Volume_Change_Method</a>
+      
+      <a class="list-group-item" href="../type/abstract_walls_visitor.html">Abstract_Walls_Visitor</a>
+      
+      <a class="list-group-item" href="../type/box_particle_add.html">Box_Particle_Add</a>
+      
+      <a class="list-group-item" href="../type/box_particle_remove.html">Box_Particle_Remove</a>
+      
+      <a class="list-group-item" href="../type/box_particle_rotation.html">Box_Particle_Rotation</a>
+      
+      <a class="list-group-item" href="../type/box_particle_translation.html">Box_Particle_Translation</a>
+      
+      <a class="list-group-item" href="../type/box_particles_switch.html">Box_Particles_Switch</a>
+      
+      <a class="list-group-item" href="../type/box_particles_transmutation.html">Box_Particles_Transmutation</a>
+      
+      <a class="list-group-item" href="../type/box_volume_change.html">Box_Volume_Change</a>
+      
+      <a class="list-group-item" href="../type/boxed_parallelepiped_domain.html">Boxed_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/boxes_particle_teleportation.html">Boxes_Particle_Teleportation</a>
+      
+      <a class="list-group-item" href="../type/boxes_particles_swap.html">Boxes_Particles_Swap</a>
+      
+      <a class="list-group-item" href="../type/boxes_volume_exchange.html">Boxes_Volume_Exchange</a>
+      
+      <a class="list-group-item" href="../type/cells_wrapper.html">Cells_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/centered_block_penetration.html">Centered_Block_Penetration</a>
+      
+      <a class="list-group-item" href="../type/centered_plates_expression.html">Centered_Plates_Expression</a>
+      
+      <a class="list-group-item" href="../type/changes_component_wrapper.html">Changes_Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/changes_success_writer_selector.html">Changes_Success_Writer_Selector</a>
+      
+      <a class="list-group-item" href="../type/changes_success_writer_wrapper.html">Changes_Success_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/changes_wrapper.html">Changes_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_reader_selector.html">Component_Coordinates_Reader_Selector</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_reader_wrapper.html">Component_Coordinates_Reader_wrapper</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_writer_selector.html">Component_Coordinates_Writer_Selector</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_writer_wrapper.html">Component_Coordinates_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/component_wrapper.html">Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/concrete_beta_pressure.html">Concrete_Beta_Pressure</a>
+      
+      <a class="list-group-item" href="../type/concrete_change_counter.html">Concrete_Change_Counter</a>
+      
+      <a class="list-group-item" href="../type/concrete_change_counter_line.html">Concrete_Change_Counter_Line</a>
+      
+      <a class="list-group-item" href="../type/concrete_changed_box_size.html">Concrete_Changed_Box_Size</a>
+      
+      <a class="list-group-item" href="../type/concrete_changes_counter.html">Concrete_Changes_Counter</a>
+      
+      <a class="list-group-item" href="../type/concrete_changes_success.html">Concrete_Changes_Success</a>
+      
+      <a class="list-group-item" href="../type/concrete_changes_success_writer.html">Concrete_Changes_Success_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_complete_coordinates_reader.html">Concrete_Complete_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_complete_coordinates_writer.html">Concrete_Complete_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_chemical_potential.html">Concrete_Component_Chemical_Potential</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_coordinates_reader.html">Concrete_Component_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_coordinates_writer.html">Concrete_Component_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_dipole_moments.html">Concrete_Component_Dipole_Moments</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_orientations.html">Concrete_Component_Orientations</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_orientations_reader.html">Concrete_Component_Orientations_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_positions.html">Concrete_Component_Positions</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_positions_reader.html">Concrete_Component_Positions_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_convergence_parameter.html">Concrete_DES_Convergence_Parameter</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_real_component.html">Concrete_DES_Real_Component</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_reci_structure.html">Concrete_DES_Reci_Structure</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_reci_visitor.html">Concrete_DES_Reci_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_reci_weight.html">Concrete_DES_Reci_Weight</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_self_component.html">Concrete_DES_Self_Component</a>
+      
+      <a class="list-group-item" href="../type/concrete_dipolar_neighbourhood.html">Concrete_Dipolar_Neighbourhood</a>
+      
+      <a class="list-group-item" href="../type/concrete_dipolar_neighbourhoods_visitor.html">Concrete_Dipolar_Neighbourhoods_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_dlc_structures.html">Concrete_DLC_Structures</a>
+      
+      <a class="list-group-item" href="../type/concrete_dlc_visitor.html">Concrete_DLC_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_dlc_weight.html">Concrete_DLC_Weight</a>
+      
+      <a class="list-group-item" href="../type/concrete_double_energies.html">Concrete_Double_Energies</a>
+      
+      <a class="list-group-item" href="../type/concrete_double_particle.html">Concrete_Double_Particle</a>
+      
+      <a class="list-group-item" href="../type/concrete_energies_writers.html">Concrete_Energies_Writers</a>
+      
+      <a class="list-group-item" href="../type/concrete_external_field.html">Concrete_External_Field</a>
+      
+      <a class="list-group-item" href="../type/concrete_line_writer.html">Concrete_Line_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_linkable_node.html">Concrete_Linkable_Node</a>
+      
+      <a class="list-group-item" href="../type/concrete_maximum_box_compression_explorer.html">Concrete_Maximum_Box_Compression_Explorer</a>
+      
+      <a class="list-group-item" href="../type/concrete_min_distance.html">Concrete_Min_Distance</a>
+      
+      <a class="list-group-item" href="../type/concrete_mixture_total_moment.html">Concrete_Mixture_Total_Moment</a>
+      
+      <a class="list-group-item" href="../type/concrete_move_tuner.html">Concrete_Move_Tuner</a>
+      
+      <a class="list-group-item" href="../type/concrete_move_tuner_parameters.html">Concrete_Move_Tuner_Parameters</a>
+      
+      <a class="list-group-item" href="../type/concrete_move_tuning_parameters.html">Concrete_Move_Tuning_Parameters</a>
+      
+      <a class="list-group-item" href="../type/concrete_node.html">Concrete_Node</a>
+      
+      <a class="list-group-item" href="../type/concrete_num_particles.html">Concrete_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/concrete_number_to_string.html">Concrete_Number_to_String</a>
+      
+      <a class="list-group-item" href="../type/concrete_observables_changes.html">Concrete_Observables_Changes</a>
+      
+      <a class="list-group-item" href="../type/concrete_observables_energies.html">Concrete_Observables_Energies</a>
+      
+      <a class="list-group-item" href="../type/concrete_parallelepiped_domain.html">Concrete_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/concrete_particle.html">Concrete_Particle</a>
+      
+      <a class="list-group-item" href="../type/concrete_particle_insertion_method.html">Concrete_Particle_Insertion_Method</a>
+      
+      <a class="list-group-item" href="../type/concrete_permittivity.html">Concrete_Permittivity</a>
+      
+      <a class="list-group-item" href="../type/concrete_plmc_propagator.html">Concrete_PLMC_Propagator</a>
+      
+      <a class="list-group-item" href="../type/concrete_potential_domain.html">Concrete_Potential_Domain</a>
+      
+      <a class="list-group-item" href="../type/concrete_potential_domain_selector.html">Concrete_Potential_Domain_Selector</a>
+      
+      <a class="list-group-item" href="../type/concrete_random_orientation.html">Concrete_Random_Orientation</a>
+      
+      <a class="list-group-item" href="../type/concrete_random_position.html">Concrete_Random_Position</a>
+      
+      <a class="list-group-item" href="../type/concrete_raw_coordinates.html">Concrete_Raw_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/concrete_real_writer.html">Concrete_Real_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_reciprocal_lattice.html">Concrete_Reciprocal_Lattice</a>
+      
+      <a class="list-group-item" href="../type/concrete_rectangle_writer.html">Concrete_Rectangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_rotated_orientations.html">Concrete_Rotated_Orientations</a>
+      
+      <a class="list-group-item" href="../type/concrete_short_pairs_visitor.html">Concrete_Short_Pairs_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_single_energies.html">Concrete_Single_Energies</a>
+      
+      <a class="list-group-item" href="../type/concrete_temperature.html">Concrete_Temperature</a>
+      
+      <a class="list-group-item" href="../type/concrete_tower_sampler.html">Concrete_Tower_Sampler</a>
+      
+      <a class="list-group-item" href="../type/concrete_translated_positions.html">Concrete_Translated_Positions</a>
+      
+      <a class="list-group-item" href="../type/concrete_triangle_writer.html">Concrete_Triangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_array.html">Concrete_Visitable_Array</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_arrays_memento.html">Concrete_Visitable_Arrays_Memento</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_cells.html">Concrete_Visitable_Cells</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_list.html">Concrete_Visitable_List</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_lists_memento.html">Concrete_Visitable_Lists_Memento</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_walls.html">Concrete_Visitable_Walls</a>
+      
+      <a class="list-group-item" href="../type/concrete_volume_change_method.html">Concrete_Volume_Change_Method</a>
+      
+      <a class="list-group-item" href="../type/concrete_walls_visitor.html">Concrete_Walls_Visitor</a>
+      
+      <a class="list-group-item" href="../type/constant_chemical_potential_num_particles.html">Constant_Chemical_Potential_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/constant_field_expression.html">Constant_Field_Expression</a>
+      
+      <a class="list-group-item" href="../type/constant_num_particles.html">Constant_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/des_real_component_wrapper.html">DES_Real_Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/des_self_component_wrapper.html">DES_Self_Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dipolar_interactions_dynamic_wrapper.html">Dipolar_Interactions_Dynamic_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dipolar_interactions_static_wrapper.html">Dipolar_Interactions_Static_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dipolar_neighbourhood_line.html">Dipolar_Neighbourhood_Line</a>
+      
+      <a class="list-group-item" href="../type/dipolar_neighbourhood_wrapper.html">Dipolar_Neighbourhood_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dot_directed_graph_writer.html">Dot_Directed_Graph_Writer</a>
+      
+      <a class="list-group-item" href="../type/environment_wrapper.html">Environment_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/equipartition_num_particles.html">Equipartition_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/exchanged_boxes_size_line.html">Exchanged_Boxes_Size_Line</a>
+      
+      <a class="list-group-item" href="../type/exchanged_boxes_size_wrapper.html">Exchanged_Boxes_Size_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/exploring_box_size_checker.html">Exploring_Box_Size_Checker</a>
+      
+      <a class="list-group-item" href="../type/exploring_io_wrapper.html">Exploring_IO_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/exploring_json_report.html">Exploring_JSON_Report</a>
+      
+      <a class="list-group-item" href="../type/exploring_writers_wrapper.html">Exploring_Writers_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/flat_floor_penetration.html">Flat_Floor_Penetration</a>
+      
+      <a class="list-group-item" href="../type/forgetful_box_size_memento.html">Forgetful_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/full_hetero_couples.html">Full_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/gaussian_dirac_distribution_plus.html">Gaussian_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/generating_algorithm_wrapper.html">Generating_Algorithm_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/generating_box_size_checker.html">Generating_Box_Size_Checker</a>
+      
+      <a class="list-group-item" href="../type/generating_io_wrapper.html">Generating_IO_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/generating_json_report.html">Generating_JSON_Report</a>
+      
+      <a class="list-group-item" href="../type/generating_observables_wrapper.html">Generating_Observables_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/generating_writers_wrapper.html">Generating_Writers_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/half_hetero_couples.html">Half_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/inter_radial_explorer.html">Inter_Radial_Explorer</a>
+      
+      <a class="list-group-item" href="../type/intra_radial_explorer.html">Intra_Radial_Explorer</a>
+      
+      <a class="list-group-item" href="../type/lennard_jones_expression.html">Lennard_Jones_Expression</a>
+      
+      <a class="list-group-item" href="../type/line_writer_wrapper.html">Line_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/logical_line.html">Logical_Line</a>
+      
+      <a class="list-group-item" href="../type/logical_rectangle.html">Logical_Rectangle</a>
+      
+      <a class="list-group-item" href="../type/logical_triangle.html">Logical_Triangle</a>
+      
+      <a class="list-group-item" href="../type/markov_chain_explorer_wrapper.html">Markov_Chain_Explorer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/markov_chain_generator_wrapper.html">Markov_Chain_Generator_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/min_distance_line.html">Min_Distance_Line</a>
+      
+      <a class="list-group-item" href="../type/min_distance_wrapper.html">Min_Distance_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/mixture_wrapper.html">Mixture_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/move_tuner_line.html">Move_Tuner_Line</a>
+      
+      <a class="list-group-item" href="../type/move_tuner_wrapper.html">Move_Tuner_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/neighbour_cells_line.html">Neighbour_Cells_Line</a>
+      
+      <a class="list-group-item" href="../type/neighbour_cells_wrapper.html">Neighbour_Cells_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/null_average_num_particles.html">Null_Average_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/null_beta_pressure.html">Null_Beta_Pressure</a>
+      
+      <a class="list-group-item" href="../type/null_beta_pressure_excess.html">Null_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/null_box_size_memento.html">Null_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/null_changed_box_size.html">Null_Changed_Box_Size</a>
+      
+      <a class="list-group-item" href="../type/null_changed_box_size_ratio.html">Null_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/null_changes_success_writer.html">Null_Changes_Success_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_complete_coordinates_writer.html">Null_Complete_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_component_chemical_potential.html">Null_Component_Chemical_Potential</a>
+      
+      <a class="list-group-item" href="../type/null_component_coordinates.html">Null_Component_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/null_component_coordinates_reader.html">Null_Component_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/null_component_coordinates_writer.html">Null_Component_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_component_dipole_moments.html">Null_Component_Dipole_Moments</a>
+      
+      <a class="list-group-item" href="../type/null_coordinates_copier.html">Null_Coordinates_Copier</a>
+      
+      <a class="list-group-item" href="../type/null_des_convergence_parameter.html">Null_DES_Convergence_Parameter</a>
+      
+      <a class="list-group-item" href="../type/null_des_real_component.html">Null_DES_Real_Component</a>
+      
+      <a class="list-group-item" href="../type/null_des_real_pair.html">Null_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/null_des_reci_structure.html">Null_DES_Reci_Structure</a>
+      
+      <a class="list-group-item" href="../type/null_des_reci_visitor.html">Null_DES_Reci_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_des_reci_weight.html">Null_DES_Reci_Weight</a>
+      
+      <a class="list-group-item" href="../type/null_des_self_component.html">Null_DES_Self_Component</a>
+      
+      <a class="list-group-item" href="../type/null_des_surf_mixture.html">Null_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/null_dipolar_interactions_facade.html">Null_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/null_dipolar_neighbourhood.html">Null_Dipolar_Neighbourhood</a>
+      
+      <a class="list-group-item" href="../type/null_dipolar_neighbourhoods_visitor.html">Null_Dipolar_Neighbourhoods_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_dirac_distribution_plus.html">Null_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/null_directed_graph_writer.html">Null_Directed_Graph_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_dlc_structures.html">Null_DLC_Structures</a>
+      
+      <a class="list-group-item" href="../type/null_dlc_visitor.html">Null_DLC_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_dlc_weight.html">Null_DLC_Weight</a>
+      
+      <a class="list-group-item" href="../type/null_exchanged_boxes_size.html">Null_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/null_external_field.html">Null_External_Field</a>
+      
+      <a class="list-group-item" href="../type/null_field_expression.html">Null_Field_Expression</a>
+      
+      <a class="list-group-item" href="../type/null_floor_penetration.html">Null_Floor_Penetration</a>
+      
+      <a class="list-group-item" href="../type/null_generating_algorithm.html">Null_Generating_Algorithm</a>
+      
+      <a class="list-group-item" href="../type/null_hard_contact.html">Null_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/null_hetero_couples.html">Null_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/null_line_writer.html">Null_Line_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_maximum_box_compression.html">Null_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/null_maximum_box_compression_explorer.html">Null_Maximum_Box_Compression_Explorer</a>
+      
+      <a class="list-group-item" href="../type/null_min_distance.html">Null_Min_Distance</a>
+      
+      <a class="list-group-item" href="../type/null_mixture_total_moment.html">Null_Mixture_Total_Moment</a>
+      
+      <a class="list-group-item" href="../type/null_move_tuner.html">Null_Move_Tuner</a>
+      
+      <a class="list-group-item" href="../type/null_moved_coordinates.html">Null_Moved_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/null_neighbour_cells.html">Null_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/null_num_particles.html">Null_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/null_number_to_string.html">Null_Number_to_String</a>
+      
+      <a class="list-group-item" href="../type/null_pair_potential.html">Null_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/null_parallelepiped_domain.html">Null_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/null_particle_insertion_method.html">Null_Particle_Insertion_Method</a>
+      
+      <a class="list-group-item" href="../type/null_permittivity.html">Null_Permittivity</a>
+      
+      <a class="list-group-item" href="../type/null_plmc_propagator.html">Null_PLMC_Propagator</a>
+      
+      <a class="list-group-item" href="../type/null_potential_expression.html">Null_Potential_Expression</a>
+      
+      <a class="list-group-item" href="../type/null_random_coordinates.html">Null_Random_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/null_real_writer.html">Null_Real_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_reciprocal_lattice.html">Null_Reciprocal_Lattice</a>
+      
+      <a class="list-group-item" href="../type/null_rectangle_writer.html">Null_Rectangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_short_pairs_visitor.html">Null_Short_Pairs_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_tower_sampler.html">Null_Tower_Sampler</a>
+      
+      <a class="list-group-item" href="../type/null_triangle_writer.html">Null_Triangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_cells.html">Null_Visitable_Cells</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_cells_memento.html">Null_Visitable_Cells_Memento</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html">Null_Visitable_List</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_walls.html">Null_Visitable_Walls</a>
+      
+      <a class="list-group-item" href="../type/null_volume_change_method.html">Null_Volume_Change_Method</a>
+      
+      <a class="list-group-item" href="../type/null_walls_visitor.html">Null_Walls_Visitor</a>
+      
+      <a class="list-group-item" href="../type/number_to_string_line.html">Number_to_String_Line</a>
+      
+      <a class="list-group-item" href="../type/number_to_string_wrapper.html">Number_to_String_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/pair_potential_line.html">Pair_Potential_Line</a>
+      
+      <a class="list-group-item" href="../type/pair_potential_wrapper.html">Pair_Potential_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/physical_model_wrapper.html">Physical_Model_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/plain_density_explorer.html">Plain_Density_Explorer</a>
+      
+      <a class="list-group-item" href="../type/random_filling_coordinates_copier.html">Random_Filling_Coordinates_Copier</a>
+      
+      <a class="list-group-item" href="../type/raw_des_real_pair.html">Raw_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/raw_pair_potential.html">Raw_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/readers_wrapper.html">Readers_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/real_line.html">Real_Line</a>
+      
+      <a class="list-group-item" href="../type/rectangle_writer_wrapper.html">Rectangle_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/rectangular_des_surf_mixture.html">Rectangular_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/rectangular_dirac_distribution_plus.html">Rectangular_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/retentive_box_size_memento.html">Retentive_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/scalable_dipolar_interactions_facade.html">Scalable_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/short_interactions_wrapper.html">Short_Interactions_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/spherical_des_surf_mixture.html">Spherical_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/string_wrapper.html">String_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/tabulated_des_real_pair.html">Tabulated_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/tabulated_pair_potential.html">Tabulated_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/unscalable_dipolar_interactions_facade.html">Unscalable_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/walled_parallelepiped_domain.html">Walled_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/xy_beta_pressure_excess.html">XY_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/xy_changed_box_size_ratio.html">XY_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/xy_exchanged_boxes_size.html">XY_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/xy_hard_contact.html">XY_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/xy_maximum_box_compression.html">XY_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/xy_pbc_neighbour_cells.html">XY_PBC_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/xy_periodic_box.html">XY_Periodic_Box</a>
+      
+      <a class="list-group-item" href="../type/xyz_beta_pressure_excess.html">XYZ_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/xyz_changed_box_size_ratio.html">XYZ_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/xyz_exchanged_boxes_size.html">XYZ_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/xyz_hard_contact.html">XYZ_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/xyz_maximum_box_compression.html">XYZ_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/xyz_pbc_neighbour_cells.html">XYZ_PBC_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/xyz_periodic_box.html">XYZ_Periodic_Box</a>
+      
+      <a class="list-group-item" href="../type/xz_density_explorer.html">XZ_Density_Explorer</a>
+      
+      <a class="list-group-item" href="../type/yukawa_expression.html">Yukawa_Expression</a>
+      
+      <a class="list-group-item" href="../type/z_density_explorer.html">Z_Density_Explorer</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+      <h2>type, public, extends(<a href='../type/abstract_visitable_list.html'>Abstract_Visitable_List</a>) :: Null_Visitable_List</h2>
+    
+    
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: type~~null_visitable_list~~InheritsGraph Pages: 1 -->
+<svg id="typenull_visitable_listInheritsGraph" width="567pt" height="248pt"
+ viewBox="0.00 0.00 567.13 247.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~null_visitable_list~~InheritsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 243.6)">
+<title>type~~null_visitable_list~~InheritsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-243.6 563.132,-243.6 563.132,4 -4,4"/>
+<!-- type~null_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_node1" class="node"><title>type~null_visitable_list</title>
+<polygon fill="none" stroke="black" points="559.011,-131.403 461.497,-131.403 461.497,-107.197 559.011,-107.197 559.011,-131.403"/>
+<text text-anchor="middle" x="510.254" y="-116.15" font-family="Helvetica,sans-Serif" font-size="10.50">Null_Visitable_List</text>
+</g>
+<!-- type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_node2" class="node"><title>type~abstract_visitable_list</title>
+<g id="a_type~~null_visitable_list~~InheritsGraph_node2"><a xlink:href="../type/abstract_visitable_list.html" xlink:title="Abstract_Visitable_List">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="424.469,-131.403 306.094,-131.403 306.094,-107.197 424.469,-107.197 424.469,-131.403"/>
+<text text-anchor="middle" x="365.281" y="-116.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Visitable_List</text>
+</a>
+</g>
+</g>
+<!-- type~abstract_visitable_list&#45;&gt;type~null_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge7" class="edge"><title>type~abstract_visitable_list&#45;&gt;type~null_visitable_list</title>
+<path fill="none" stroke="#ff0000" d="M424.434,-119.3C433.213,-119.3 442.271,-119.3 451.051,-119.3"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="451.198,-122.8 461.198,-119.3 451.198,-115.8 451.198,-122.8"/>
+</g>
+<!-- Abstract_Pair_Potential -->
+<g id="type~~null_visitable_list~~InheritsGraph_node3" class="node"><title>Abstract_Pair_Potential</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="147.214,-239.403 25.828,-239.403 25.828,-215.197 147.214,-215.197 147.214,-239.403"/>
+<text text-anchor="middle" x="86.5208" y="-224.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Pair_Potential</text>
+</g>
+<!-- Abstract_Pair_Potential&#45;&gt;type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge1" class="edge"><title>Abstract_Pair_Potential&#45;&gt;type~abstract_visitable_list</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M147.578,-222.257C188.844,-216.956 243.95,-206.163 288.188,-184.3 310.792,-173.128 332.222,-153.734 346.545,-139.03"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="349.407,-141.097 353.733,-131.426 344.32,-136.288 349.407,-141.097"/>
+<text text-anchor="middle" x="239.615" y="-217.15" font-family="Helvetica,sans-Serif" font-size="9.50">pair_potential</text>
+</g>
+<!-- Concrete_Linkable_Node -->
+<g id="type~~null_visitable_list~~InheritsGraph_node4" class="node"><title>Concrete_Linkable_Node</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="151.972,-196.403 21.0695,-196.403 21.0695,-172.197 151.972,-172.197 151.972,-196.403"/>
+<text text-anchor="middle" x="86.5208" y="-181.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Concrete_Linkable_Node</text>
+</g>
+<!-- Concrete_Linkable_Node&#45;&gt;type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge2" class="edge"><title>Concrete_Linkable_Node&#45;&gt;type~abstract_visitable_list</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M151.919,-175.873C191.619,-169.91 243.341,-160.751 288.188,-148.3 300.979,-144.749 314.624,-139.901 326.776,-135.186"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="328.154,-138.404 336.156,-131.46 325.57,-131.899 328.154,-138.404"/>
+<text text-anchor="middle" x="239.615" y="-172.15" font-family="Helvetica,sans-Serif" font-size="9.50">beginning</text>
+</g>
+<!-- Abstract_Hard_Contact -->
+<g id="type~~null_visitable_list~~InheritsGraph_node5" class="node"><title>Abstract_Hard_Contact</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="147.128,-153.403 25.9132,-153.403 25.9132,-129.197 147.128,-129.197 147.128,-153.403"/>
+<text text-anchor="middle" x="86.5208" y="-138.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Hard_Contact</text>
+</g>
+<!-- Abstract_Hard_Contact&#45;&gt;type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge3" class="edge"><title>Abstract_Hard_Contact&#45;&gt;type~abstract_visitable_list</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M147.233,-136.553C190.962,-133.077 250.385,-128.354 296,-124.728"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="296.409,-128.206 306.1,-123.925 295.854,-121.228 296.409,-128.206"/>
+<text text-anchor="middle" x="239.615" y="-136.15" font-family="Helvetica,sans-Serif" font-size="9.50">hard_contact</text>
+</g>
+<!-- Abstract_Dipolar_Neighbourhood -->
+<g id="type~~null_visitable_list~~InheritsGraph_node6" class="node"><title>Abstract_Dipolar_Neighbourhood</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="170.224,-110.403 2.8181,-110.403 2.8181,-86.1968 170.224,-86.1968 170.224,-110.403"/>
+<text text-anchor="middle" x="86.5208" y="-95.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Dipolar_Neighbourhood</text>
+</g>
+<!-- Abstract_Dipolar_Neighbourhood&#45;&gt;type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge4" class="edge"><title>Abstract_Dipolar_Neighbourhood&#45;&gt;type~abstract_visitable_list</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M170.156,-100.377C206.431,-101.772 249.486,-104.085 288.188,-107.9 290.689,-108.147 293.233,-108.418 295.801,-108.711"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="295.429,-112.191 305.779,-109.927 296.276,-105.242 295.429,-112.191"/>
+<text text-anchor="middle" x="239.615" y="-111.15" font-family="Helvetica,sans-Serif" font-size="9.50">dipolar_neighbourhood</text>
+</g>
+<!-- Abstract_Component_Coordinates -->
+<g id="type~~null_visitable_list~~InheritsGraph_node7" class="node"><title>Abstract_Component_Coordinates</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="173.062,-67.4032 -0.02083,-67.4032 -0.02083,-43.1968 173.062,-43.1968 173.062,-67.4032"/>
+<text text-anchor="middle" x="86.5208" y="-52.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Component_Coordinates</text>
+</g>
+<!-- Abstract_Component_Coordinates&#45;&gt;type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge5" class="edge"><title>Abstract_Component_Coordinates&#45;&gt;type~abstract_visitable_list</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M173.479,-64.1067C209.373,-68.9977 251.237,-76.2999 288.188,-86.9 302.375,-90.97 317.439,-96.9957 330.386,-102.75"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="329.275,-106.09 339.826,-107.061 332.183,-99.723 329.275,-106.09"/>
+<text text-anchor="middle" x="239.615" y="-90.15" font-family="Helvetica,sans-Serif" font-size="9.50">positions, orientations</text>
+</g>
+<!-- Abstract_Periodic_Box -->
+<g id="type~~null_visitable_list~~InheritsGraph_node8" class="node"><title>Abstract_Periodic_Box</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="145.711,-24.4032 27.331,-24.4032 27.331,-0.1968 145.711,-0.1968 145.711,-24.4032"/>
+<text text-anchor="middle" x="86.5208" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Abstract_Periodic_Box</text>
+</g>
+<!-- Abstract_Periodic_Box&#45;&gt;type~abstract_visitable_list -->
+<g id="type~~null_visitable_list~~InheritsGraph_edge6" class="edge"><title>Abstract_Periodic_Box&#45;&gt;type~abstract_visitable_list</title>
+<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M145.858,-16.1366C187.337,-20.7239 243.408,-30.7944 288.188,-52.9 311.137,-64.2287 332.655,-84.2262 346.912,-99.3235"/>
+<polygon fill="#ff0000" stroke="#ff0000" points="344.715,-102.107 354.049,-107.121 349.879,-97.381 344.715,-102.107"/>
+<text text-anchor="middle" x="239.615" y="-56.15" font-family="Helvetica,sans-Serif" font-size="9.50">periodic_box</text>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="176pt" height="33pt"
+ viewBox="0.00 0.00 176.00 32.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28.6)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28.6 172.003,-28.6 172.003,4 -4,4"/>
+<!-- Type -->
+<g id="node1" class="node"><title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="54,-24.4032 0,-24.4032 0,-0.1968 54,-0.1968 54,-24.4032"/>
+<text text-anchor="middle" x="27" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node2" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="168.005,-24.4032 71.9947,-24.4032 71.9947,-0.1968 168.005,-0.1968 168.005,-24.4032"/>
+<text text-anchor="middle" x="120" y="-9.15" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from one derived type to another which extends
+    (inherits from) it. Dashed arrows point from a derived type to another
+    type containing it as a components, with a label listing the name(s) of
+    said component(s). Where possible, edges connecting nodes are given different colours to make them easier to distinguish in large graphs.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+    <br><br>
+    
+    
+    
+    
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-construct%7E28">construct</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-destroy%7E32">destroy</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-set%7E13">set</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-add%7E3">add</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-remove%7E3">remove</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_energy%7E3">visit_energy</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_contacts%7E3">visit_contacts</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_min_distance%7E3">visit_min_distance</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html#boundprocedure-visit_dipolar_neighbours%7E3">visit_dipolar_neighbours</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+    
+    
+    
+    
+    
+     
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-construct%7E28"></span><h3>procedure, public :: <strong>construct</strong>  => <a href='../proc/null_construct%7E9.html'>Null_construct</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_construct%7E9.html'>Null_construct</a>(this, periodic_box, positions, orientations, pair_potential, hard_contact, dipolar_neighbourhood)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(Abstract_Periodic_Box),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>periodic_box</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(Abstract_Component_Coordinates),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>positions</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(Abstract_Component_Coordinates),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>orientations</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(Abstract_Pair_Potential),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>pair_potential</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(Abstract_Hard_Contact),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>hard_contact</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(Abstract_Dipolar_Neighbourhood),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>dipolar_neighbourhood</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-destroy%7E32"></span><h3>procedure, public :: <strong>destroy</strong>  => <a href='../proc/null_destroy%7E10.html'>Null_destroy</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_destroy%7E10.html'>Null_destroy</a>(this)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-set%7E13"></span><h3>procedure, public :: <strong>set</strong>  => <a href='../proc/null_set%7E4.html'>Null_set</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_set%7E4.html'>Null_set</a>(this, i_target, i_source)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_target</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_source</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-add%7E3"></span><h3>procedure, public :: <strong>add</strong>  => <a href='../proc/null_add.html'>Null_add</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_add.html'>Null_add</a>(this, i_particle)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_particle</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-remove%7E3"></span><h3>procedure, public :: <strong>remove</strong>  => <a href='../proc/null_remove.html'>Null_remove</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_remove.html'>Null_remove</a>(this, i_particle)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_particle</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-visit_energy%7E3"></span><h3>procedure, public :: <strong>visit_energy</strong>  => <a href='../proc/null_visit_energy.html'>Null_visit_energy</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_visit_energy.html'>Null_visit_energy</a>(this, overlap, energy, particle, visit_condition, i_exclude)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>overlap</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=DP),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>energy</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(Concrete_Particle),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>particle</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>procedure(<a href='../interface/abstract_visit_condition.html'>abstract_visit_condition</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>visit_condition</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_exclude</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-visit_contacts%7E3"></span><h3>procedure, public :: <strong>visit_contacts</strong>  => <a href='../proc/null_visit_contacts.html'>Null_visit_contacts</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_visit_contacts.html'>Null_visit_contacts</a>(this, overlap, contacts, particle, visit_condition, i_exclude)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>overlap</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=DP),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>contacts</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(Concrete_Particle),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>particle</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>procedure(<a href='../interface/abstract_visit_condition.html'>abstract_visit_condition</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>visit_condition</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_exclude</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-visit_min_distance%7E3"></span><h3>procedure, public :: <strong>visit_min_distance</strong>  => <a href='../proc/null_visit_min_distance.html'>Null_visit_min_distance</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_visit_min_distance.html'>Null_visit_min_distance</a>(this, overlap, ratio, particle, visit_condition, i_exclude)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>overlap</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=DP),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ratio</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(Concrete_Particle),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>particle</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>procedure(<a href='../interface/abstract_visit_condition.html'>abstract_visit_condition</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>visit_condition</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_exclude</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="boundprocedure-visit_dipolar_neighbours%7E3"></span><h3>procedure, public :: <strong>visit_dipolar_neighbours</strong>  => <a href='../proc/null_visit_dipolar_neighbours.html'>Null_visit_dipolar_neighbours</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+    
+    <h3>
+private subroutine <a href='../proc/null_visit_dipolar_neighbours.html'>Null_visit_dipolar_neighbours</a>(this, overlap, adjacency_matrix, particle, visit_condition, i_exclude)
+    
+    
+	 
+</h3>
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/null_visitable_list.html'>Null_Visitable_List</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>overlap</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>adjacency_matrix</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(Concrete_Particle),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>particle</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>procedure(<a href='../interface/abstract_visit_condition.html'>abstract_visit_condition</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>visit_condition</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_exclude</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+    
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes-1">All Derived Types</a></h3></div>
+  <div id="alltypes-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/abstract_average_num_particles.html">Abstract_Average_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/abstract_beta_pressure.html">Abstract_Beta_Pressure</a>
+      
+      <a class="list-group-item" href="../type/abstract_beta_pressure_excess.html">Abstract_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_particle_exchange.html">Abstract_Box_Particle_Exchange</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_particle_move.html">Abstract_Box_Particle_Move</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_particles_swap.html">Abstract_Box_Particles_Swap</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_size_checker.html">Abstract_Box_Size_Checker</a>
+      
+      <a class="list-group-item" href="../type/abstract_box_size_memento.html">Abstract_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/abstract_changed_box_size.html">Abstract_Changed_Box_Size</a>
+      
+      <a class="list-group-item" href="../type/abstract_changed_box_size_ratio.html">Abstract_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/abstract_changes_success_writer.html">Abstract_Changes_Success_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_complete_coordinates_reader.html">Abstract_Complete_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/abstract_complete_coordinates_writer.html">Abstract_Complete_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_chemical_potential.html">Abstract_Component_Chemical_Potential</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_coordinates.html">Abstract_Component_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_coordinates_reader.html">Abstract_Component_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_coordinates_writer.html">Abstract_Component_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_component_dipole_moments.html">Abstract_Component_Dipole_Moments</a>
+      
+      <a class="list-group-item" href="../type/abstract_coordinates.html">Abstract_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_coordinates_copier.html">Abstract_Coordinates_Copier</a>
+      
+      <a class="list-group-item" href="../type/abstract_density_explorer.html">Abstract_Density_Explorer</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_convergence_parameter.html">Abstract_DES_Convergence_Parameter</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_real_component.html">Abstract_DES_Real_Component</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_real_pair.html">Abstract_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_reci_structure.html">Abstract_DES_Reci_Structure</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_reci_visitor.html">Abstract_DES_Reci_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_reci_weight.html">Abstract_DES_Reci_Weight</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_self_component.html">Abstract_DES_Self_Component</a>
+      
+      <a class="list-group-item" href="../type/abstract_des_surf_mixture.html">Abstract_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/abstract_dipolar_interactions_facade.html">Abstract_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/abstract_dipolar_neighbourhood.html">Abstract_Dipolar_Neighbourhood</a>
+      
+      <a class="list-group-item" href="../type/abstract_dipolar_neighbourhoods_visitor.html">Abstract_Dipolar_Neighbourhoods_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_dirac_distribution_plus.html">Abstract_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/abstract_directed_graph_writer.html">Abstract_Directed_Graph_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_dlc_structures.html">Abstract_DLC_Structures</a>
+      
+      <a class="list-group-item" href="../type/abstract_dlc_visitor.html">Abstract_DLC_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_dlc_weight.html">Abstract_DLC_Weight</a>
+      
+      <a class="list-group-item" href="../type/abstract_exchanged_boxes_size.html">Abstract_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/abstract_external_field.html">Abstract_External_Field</a>
+      
+      <a class="list-group-item" href="../type/abstract_field_expression.html">Abstract_Field_Expression</a>
+      
+      <a class="list-group-item" href="../type/abstract_floor_penetration.html">Abstract_Floor_Penetration</a>
+      
+      <a class="list-group-item" href="../type/abstract_generating_algorithm.html">Abstract_Generating_Algorithm</a>
+      
+      <a class="list-group-item" href="../type/abstract_hard_contact.html">Abstract_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/abstract_hetero_couples.html">Abstract_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/abstract_line_writer.html">Abstract_Line_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_maximum_box_compression.html">Abstract_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/abstract_maximum_box_compression_explorer.html">Abstract_Maximum_Box_Compression_Explorer</a>
+      
+      <a class="list-group-item" href="../type/abstract_min_distance.html">Abstract_Min_Distance</a>
+      
+      <a class="list-group-item" href="../type/abstract_mixture_total_moment.html">Abstract_Mixture_Total_Moment</a>
+      
+      <a class="list-group-item" href="../type/abstract_move_tuner.html">Abstract_Move_Tuner</a>
+      
+      <a class="list-group-item" href="../type/abstract_moved_coordinates.html">Abstract_Moved_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_neighbour_cells.html">Abstract_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/abstract_num_particles.html">Abstract_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/abstract_number_to_string.html">Abstract_Number_to_String</a>
+      
+      <a class="list-group-item" href="../type/abstract_pair_potential.html">Abstract_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/abstract_parallelepiped_domain.html">Abstract_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/abstract_particle_insertion_method.html">Abstract_Particle_Insertion_Method</a>
+      
+      <a class="list-group-item" href="../type/abstract_periodic_box.html">Abstract_Periodic_Box</a>
+      
+      <a class="list-group-item" href="../type/abstract_permittivity.html">Abstract_Permittivity</a>
+      
+      <a class="list-group-item" href="../type/abstract_plmc_propagator.html">Abstract_PLMC_Propagator</a>
+      
+      <a class="list-group-item" href="../type/abstract_potential_expression.html">Abstract_Potential_Expression</a>
+      
+      <a class="list-group-item" href="../type/abstract_radial_explorer.html">Abstract_Radial_Explorer</a>
+      
+      <a class="list-group-item" href="../type/abstract_random_coordinates.html">Abstract_Random_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/abstract_real_writer.html">Abstract_Real_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_reciprocal_lattice.html">Abstract_Reciprocal_Lattice</a>
+      
+      <a class="list-group-item" href="../type/abstract_rectangle_writer.html">Abstract_Rectangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_short_pairs_visitor.html">Abstract_Short_Pairs_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_structure_factor.html">Abstract_Structure_Factor</a>
+      
+      <a class="list-group-item" href="../type/abstract_structure_visitor.html">Abstract_Structure_Visitor</a>
+      
+      <a class="list-group-item" href="../type/abstract_temperature.html">Abstract_Temperature</a>
+      
+      <a class="list-group-item" href="../type/abstract_tower_sampler.html">Abstract_Tower_Sampler</a>
+      
+      <a class="list-group-item" href="../type/abstract_triangle_writer.html">Abstract_Triangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/abstract_tunable_move.html">Abstract_Tunable_Move</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_cells.html">Abstract_Visitable_Cells</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_cells_memento.html">Abstract_Visitable_Cells_Memento</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_list.html">Abstract_Visitable_List</a>
+      
+      <a class="list-group-item" href="../type/abstract_visitable_walls.html">Abstract_Visitable_Walls</a>
+      
+      <a class="list-group-item" href="../type/abstract_volume_change_method.html">Abstract_Volume_Change_Method</a>
+      
+      <a class="list-group-item" href="../type/abstract_walls_visitor.html">Abstract_Walls_Visitor</a>
+      
+      <a class="list-group-item" href="../type/box_particle_add.html">Box_Particle_Add</a>
+      
+      <a class="list-group-item" href="../type/box_particle_remove.html">Box_Particle_Remove</a>
+      
+      <a class="list-group-item" href="../type/box_particle_rotation.html">Box_Particle_Rotation</a>
+      
+      <a class="list-group-item" href="../type/box_particle_translation.html">Box_Particle_Translation</a>
+      
+      <a class="list-group-item" href="../type/box_particles_switch.html">Box_Particles_Switch</a>
+      
+      <a class="list-group-item" href="../type/box_particles_transmutation.html">Box_Particles_Transmutation</a>
+      
+      <a class="list-group-item" href="../type/box_volume_change.html">Box_Volume_Change</a>
+      
+      <a class="list-group-item" href="../type/boxed_parallelepiped_domain.html">Boxed_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/boxes_particle_teleportation.html">Boxes_Particle_Teleportation</a>
+      
+      <a class="list-group-item" href="../type/boxes_particles_swap.html">Boxes_Particles_Swap</a>
+      
+      <a class="list-group-item" href="../type/boxes_volume_exchange.html">Boxes_Volume_Exchange</a>
+      
+      <a class="list-group-item" href="../type/cells_wrapper.html">Cells_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/centered_block_penetration.html">Centered_Block_Penetration</a>
+      
+      <a class="list-group-item" href="../type/centered_plates_expression.html">Centered_Plates_Expression</a>
+      
+      <a class="list-group-item" href="../type/changes_component_wrapper.html">Changes_Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/changes_success_writer_selector.html">Changes_Success_Writer_Selector</a>
+      
+      <a class="list-group-item" href="../type/changes_success_writer_wrapper.html">Changes_Success_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/changes_wrapper.html">Changes_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_reader_selector.html">Component_Coordinates_Reader_Selector</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_reader_wrapper.html">Component_Coordinates_Reader_wrapper</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_writer_selector.html">Component_Coordinates_Writer_Selector</a>
+      
+      <a class="list-group-item" href="../type/component_coordinates_writer_wrapper.html">Component_Coordinates_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/component_wrapper.html">Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/concrete_beta_pressure.html">Concrete_Beta_Pressure</a>
+      
+      <a class="list-group-item" href="../type/concrete_change_counter.html">Concrete_Change_Counter</a>
+      
+      <a class="list-group-item" href="../type/concrete_change_counter_line.html">Concrete_Change_Counter_Line</a>
+      
+      <a class="list-group-item" href="../type/concrete_changed_box_size.html">Concrete_Changed_Box_Size</a>
+      
+      <a class="list-group-item" href="../type/concrete_changes_counter.html">Concrete_Changes_Counter</a>
+      
+      <a class="list-group-item" href="../type/concrete_changes_success.html">Concrete_Changes_Success</a>
+      
+      <a class="list-group-item" href="../type/concrete_changes_success_writer.html">Concrete_Changes_Success_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_complete_coordinates_reader.html">Concrete_Complete_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_complete_coordinates_writer.html">Concrete_Complete_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_chemical_potential.html">Concrete_Component_Chemical_Potential</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_coordinates_reader.html">Concrete_Component_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_coordinates_writer.html">Concrete_Component_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_dipole_moments.html">Concrete_Component_Dipole_Moments</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_orientations.html">Concrete_Component_Orientations</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_orientations_reader.html">Concrete_Component_Orientations_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_positions.html">Concrete_Component_Positions</a>
+      
+      <a class="list-group-item" href="../type/concrete_component_positions_reader.html">Concrete_Component_Positions_Reader</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_convergence_parameter.html">Concrete_DES_Convergence_Parameter</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_real_component.html">Concrete_DES_Real_Component</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_reci_structure.html">Concrete_DES_Reci_Structure</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_reci_visitor.html">Concrete_DES_Reci_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_reci_weight.html">Concrete_DES_Reci_Weight</a>
+      
+      <a class="list-group-item" href="../type/concrete_des_self_component.html">Concrete_DES_Self_Component</a>
+      
+      <a class="list-group-item" href="../type/concrete_dipolar_neighbourhood.html">Concrete_Dipolar_Neighbourhood</a>
+      
+      <a class="list-group-item" href="../type/concrete_dipolar_neighbourhoods_visitor.html">Concrete_Dipolar_Neighbourhoods_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_dlc_structures.html">Concrete_DLC_Structures</a>
+      
+      <a class="list-group-item" href="../type/concrete_dlc_visitor.html">Concrete_DLC_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_dlc_weight.html">Concrete_DLC_Weight</a>
+      
+      <a class="list-group-item" href="../type/concrete_double_energies.html">Concrete_Double_Energies</a>
+      
+      <a class="list-group-item" href="../type/concrete_double_particle.html">Concrete_Double_Particle</a>
+      
+      <a class="list-group-item" href="../type/concrete_energies_writers.html">Concrete_Energies_Writers</a>
+      
+      <a class="list-group-item" href="../type/concrete_external_field.html">Concrete_External_Field</a>
+      
+      <a class="list-group-item" href="../type/concrete_line_writer.html">Concrete_Line_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_linkable_node.html">Concrete_Linkable_Node</a>
+      
+      <a class="list-group-item" href="../type/concrete_maximum_box_compression_explorer.html">Concrete_Maximum_Box_Compression_Explorer</a>
+      
+      <a class="list-group-item" href="../type/concrete_min_distance.html">Concrete_Min_Distance</a>
+      
+      <a class="list-group-item" href="../type/concrete_mixture_total_moment.html">Concrete_Mixture_Total_Moment</a>
+      
+      <a class="list-group-item" href="../type/concrete_move_tuner.html">Concrete_Move_Tuner</a>
+      
+      <a class="list-group-item" href="../type/concrete_move_tuner_parameters.html">Concrete_Move_Tuner_Parameters</a>
+      
+      <a class="list-group-item" href="../type/concrete_move_tuning_parameters.html">Concrete_Move_Tuning_Parameters</a>
+      
+      <a class="list-group-item" href="../type/concrete_node.html">Concrete_Node</a>
+      
+      <a class="list-group-item" href="../type/concrete_num_particles.html">Concrete_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/concrete_number_to_string.html">Concrete_Number_to_String</a>
+      
+      <a class="list-group-item" href="../type/concrete_observables_changes.html">Concrete_Observables_Changes</a>
+      
+      <a class="list-group-item" href="../type/concrete_observables_energies.html">Concrete_Observables_Energies</a>
+      
+      <a class="list-group-item" href="../type/concrete_parallelepiped_domain.html">Concrete_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/concrete_particle.html">Concrete_Particle</a>
+      
+      <a class="list-group-item" href="../type/concrete_particle_insertion_method.html">Concrete_Particle_Insertion_Method</a>
+      
+      <a class="list-group-item" href="../type/concrete_permittivity.html">Concrete_Permittivity</a>
+      
+      <a class="list-group-item" href="../type/concrete_plmc_propagator.html">Concrete_PLMC_Propagator</a>
+      
+      <a class="list-group-item" href="../type/concrete_potential_domain.html">Concrete_Potential_Domain</a>
+      
+      <a class="list-group-item" href="../type/concrete_potential_domain_selector.html">Concrete_Potential_Domain_Selector</a>
+      
+      <a class="list-group-item" href="../type/concrete_random_orientation.html">Concrete_Random_Orientation</a>
+      
+      <a class="list-group-item" href="../type/concrete_random_position.html">Concrete_Random_Position</a>
+      
+      <a class="list-group-item" href="../type/concrete_raw_coordinates.html">Concrete_Raw_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/concrete_real_writer.html">Concrete_Real_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_reciprocal_lattice.html">Concrete_Reciprocal_Lattice</a>
+      
+      <a class="list-group-item" href="../type/concrete_rectangle_writer.html">Concrete_Rectangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_rotated_orientations.html">Concrete_Rotated_Orientations</a>
+      
+      <a class="list-group-item" href="../type/concrete_short_pairs_visitor.html">Concrete_Short_Pairs_Visitor</a>
+      
+      <a class="list-group-item" href="../type/concrete_single_energies.html">Concrete_Single_Energies</a>
+      
+      <a class="list-group-item" href="../type/concrete_temperature.html">Concrete_Temperature</a>
+      
+      <a class="list-group-item" href="../type/concrete_tower_sampler.html">Concrete_Tower_Sampler</a>
+      
+      <a class="list-group-item" href="../type/concrete_translated_positions.html">Concrete_Translated_Positions</a>
+      
+      <a class="list-group-item" href="../type/concrete_triangle_writer.html">Concrete_Triangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_array.html">Concrete_Visitable_Array</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_arrays_memento.html">Concrete_Visitable_Arrays_Memento</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_cells.html">Concrete_Visitable_Cells</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_list.html">Concrete_Visitable_List</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_lists_memento.html">Concrete_Visitable_Lists_Memento</a>
+      
+      <a class="list-group-item" href="../type/concrete_visitable_walls.html">Concrete_Visitable_Walls</a>
+      
+      <a class="list-group-item" href="../type/concrete_volume_change_method.html">Concrete_Volume_Change_Method</a>
+      
+      <a class="list-group-item" href="../type/concrete_walls_visitor.html">Concrete_Walls_Visitor</a>
+      
+      <a class="list-group-item" href="../type/constant_chemical_potential_num_particles.html">Constant_Chemical_Potential_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/constant_field_expression.html">Constant_Field_Expression</a>
+      
+      <a class="list-group-item" href="../type/constant_num_particles.html">Constant_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/des_real_component_wrapper.html">DES_Real_Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/des_self_component_wrapper.html">DES_Self_Component_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dipolar_interactions_dynamic_wrapper.html">Dipolar_Interactions_Dynamic_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dipolar_interactions_static_wrapper.html">Dipolar_Interactions_Static_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dipolar_neighbourhood_line.html">Dipolar_Neighbourhood_Line</a>
+      
+      <a class="list-group-item" href="../type/dipolar_neighbourhood_wrapper.html">Dipolar_Neighbourhood_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/dot_directed_graph_writer.html">Dot_Directed_Graph_Writer</a>
+      
+      <a class="list-group-item" href="../type/environment_wrapper.html">Environment_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/equipartition_num_particles.html">Equipartition_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/exchanged_boxes_size_line.html">Exchanged_Boxes_Size_Line</a>
+      
+      <a class="list-group-item" href="../type/exchanged_boxes_size_wrapper.html">Exchanged_Boxes_Size_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/exploring_box_size_checker.html">Exploring_Box_Size_Checker</a>
+      
+      <a class="list-group-item" href="../type/exploring_io_wrapper.html">Exploring_IO_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/exploring_json_report.html">Exploring_JSON_Report</a>
+      
+      <a class="list-group-item" href="../type/exploring_writers_wrapper.html">Exploring_Writers_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/flat_floor_penetration.html">Flat_Floor_Penetration</a>
+      
+      <a class="list-group-item" href="../type/forgetful_box_size_memento.html">Forgetful_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/full_hetero_couples.html">Full_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/gaussian_dirac_distribution_plus.html">Gaussian_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/generating_algorithm_wrapper.html">Generating_Algorithm_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/generating_box_size_checker.html">Generating_Box_Size_Checker</a>
+      
+      <a class="list-group-item" href="../type/generating_io_wrapper.html">Generating_IO_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/generating_json_report.html">Generating_JSON_Report</a>
+      
+      <a class="list-group-item" href="../type/generating_observables_wrapper.html">Generating_Observables_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/generating_writers_wrapper.html">Generating_Writers_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/half_hetero_couples.html">Half_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/inter_radial_explorer.html">Inter_Radial_Explorer</a>
+      
+      <a class="list-group-item" href="../type/intra_radial_explorer.html">Intra_Radial_Explorer</a>
+      
+      <a class="list-group-item" href="../type/lennard_jones_expression.html">Lennard_Jones_Expression</a>
+      
+      <a class="list-group-item" href="../type/line_writer_wrapper.html">Line_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/logical_line.html">Logical_Line</a>
+      
+      <a class="list-group-item" href="../type/logical_rectangle.html">Logical_Rectangle</a>
+      
+      <a class="list-group-item" href="../type/logical_triangle.html">Logical_Triangle</a>
+      
+      <a class="list-group-item" href="../type/markov_chain_explorer_wrapper.html">Markov_Chain_Explorer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/markov_chain_generator_wrapper.html">Markov_Chain_Generator_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/min_distance_line.html">Min_Distance_Line</a>
+      
+      <a class="list-group-item" href="../type/min_distance_wrapper.html">Min_Distance_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/mixture_wrapper.html">Mixture_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/move_tuner_line.html">Move_Tuner_Line</a>
+      
+      <a class="list-group-item" href="../type/move_tuner_wrapper.html">Move_Tuner_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/neighbour_cells_line.html">Neighbour_Cells_Line</a>
+      
+      <a class="list-group-item" href="../type/neighbour_cells_wrapper.html">Neighbour_Cells_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/null_average_num_particles.html">Null_Average_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/null_beta_pressure.html">Null_Beta_Pressure</a>
+      
+      <a class="list-group-item" href="../type/null_beta_pressure_excess.html">Null_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/null_box_size_memento.html">Null_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/null_changed_box_size.html">Null_Changed_Box_Size</a>
+      
+      <a class="list-group-item" href="../type/null_changed_box_size_ratio.html">Null_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/null_changes_success_writer.html">Null_Changes_Success_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_complete_coordinates_writer.html">Null_Complete_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_component_chemical_potential.html">Null_Component_Chemical_Potential</a>
+      
+      <a class="list-group-item" href="../type/null_component_coordinates.html">Null_Component_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/null_component_coordinates_reader.html">Null_Component_Coordinates_Reader</a>
+      
+      <a class="list-group-item" href="../type/null_component_coordinates_writer.html">Null_Component_Coordinates_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_component_dipole_moments.html">Null_Component_Dipole_Moments</a>
+      
+      <a class="list-group-item" href="../type/null_coordinates_copier.html">Null_Coordinates_Copier</a>
+      
+      <a class="list-group-item" href="../type/null_des_convergence_parameter.html">Null_DES_Convergence_Parameter</a>
+      
+      <a class="list-group-item" href="../type/null_des_real_component.html">Null_DES_Real_Component</a>
+      
+      <a class="list-group-item" href="../type/null_des_real_pair.html">Null_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/null_des_reci_structure.html">Null_DES_Reci_Structure</a>
+      
+      <a class="list-group-item" href="../type/null_des_reci_visitor.html">Null_DES_Reci_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_des_reci_weight.html">Null_DES_Reci_Weight</a>
+      
+      <a class="list-group-item" href="../type/null_des_self_component.html">Null_DES_Self_Component</a>
+      
+      <a class="list-group-item" href="../type/null_des_surf_mixture.html">Null_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/null_dipolar_interactions_facade.html">Null_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/null_dipolar_neighbourhood.html">Null_Dipolar_Neighbourhood</a>
+      
+      <a class="list-group-item" href="../type/null_dipolar_neighbourhoods_visitor.html">Null_Dipolar_Neighbourhoods_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_dirac_distribution_plus.html">Null_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/null_directed_graph_writer.html">Null_Directed_Graph_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_dlc_structures.html">Null_DLC_Structures</a>
+      
+      <a class="list-group-item" href="../type/null_dlc_visitor.html">Null_DLC_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_dlc_weight.html">Null_DLC_Weight</a>
+      
+      <a class="list-group-item" href="../type/null_exchanged_boxes_size.html">Null_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/null_external_field.html">Null_External_Field</a>
+      
+      <a class="list-group-item" href="../type/null_field_expression.html">Null_Field_Expression</a>
+      
+      <a class="list-group-item" href="../type/null_floor_penetration.html">Null_Floor_Penetration</a>
+      
+      <a class="list-group-item" href="../type/null_generating_algorithm.html">Null_Generating_Algorithm</a>
+      
+      <a class="list-group-item" href="../type/null_hard_contact.html">Null_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/null_hetero_couples.html">Null_Hetero_Couples</a>
+      
+      <a class="list-group-item" href="../type/null_line_writer.html">Null_Line_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_maximum_box_compression.html">Null_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/null_maximum_box_compression_explorer.html">Null_Maximum_Box_Compression_Explorer</a>
+      
+      <a class="list-group-item" href="../type/null_min_distance.html">Null_Min_Distance</a>
+      
+      <a class="list-group-item" href="../type/null_mixture_total_moment.html">Null_Mixture_Total_Moment</a>
+      
+      <a class="list-group-item" href="../type/null_move_tuner.html">Null_Move_Tuner</a>
+      
+      <a class="list-group-item" href="../type/null_moved_coordinates.html">Null_Moved_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/null_neighbour_cells.html">Null_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/null_num_particles.html">Null_Num_Particles</a>
+      
+      <a class="list-group-item" href="../type/null_number_to_string.html">Null_Number_to_String</a>
+      
+      <a class="list-group-item" href="../type/null_pair_potential.html">Null_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/null_parallelepiped_domain.html">Null_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/null_particle_insertion_method.html">Null_Particle_Insertion_Method</a>
+      
+      <a class="list-group-item" href="../type/null_permittivity.html">Null_Permittivity</a>
+      
+      <a class="list-group-item" href="../type/null_plmc_propagator.html">Null_PLMC_Propagator</a>
+      
+      <a class="list-group-item" href="../type/null_potential_expression.html">Null_Potential_Expression</a>
+      
+      <a class="list-group-item" href="../type/null_random_coordinates.html">Null_Random_Coordinates</a>
+      
+      <a class="list-group-item" href="../type/null_real_writer.html">Null_Real_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_reciprocal_lattice.html">Null_Reciprocal_Lattice</a>
+      
+      <a class="list-group-item" href="../type/null_rectangle_writer.html">Null_Rectangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_short_pairs_visitor.html">Null_Short_Pairs_Visitor</a>
+      
+      <a class="list-group-item" href="../type/null_tower_sampler.html">Null_Tower_Sampler</a>
+      
+      <a class="list-group-item" href="../type/null_triangle_writer.html">Null_Triangle_Writer</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_cells.html">Null_Visitable_Cells</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_cells_memento.html">Null_Visitable_Cells_Memento</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_list.html">Null_Visitable_List</a>
+      
+      <a class="list-group-item" href="../type/null_visitable_walls.html">Null_Visitable_Walls</a>
+      
+      <a class="list-group-item" href="../type/null_volume_change_method.html">Null_Volume_Change_Method</a>
+      
+      <a class="list-group-item" href="../type/null_walls_visitor.html">Null_Walls_Visitor</a>
+      
+      <a class="list-group-item" href="../type/number_to_string_line.html">Number_to_String_Line</a>
+      
+      <a class="list-group-item" href="../type/number_to_string_wrapper.html">Number_to_String_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/pair_potential_line.html">Pair_Potential_Line</a>
+      
+      <a class="list-group-item" href="../type/pair_potential_wrapper.html">Pair_Potential_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/physical_model_wrapper.html">Physical_Model_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/plain_density_explorer.html">Plain_Density_Explorer</a>
+      
+      <a class="list-group-item" href="../type/random_filling_coordinates_copier.html">Random_Filling_Coordinates_Copier</a>
+      
+      <a class="list-group-item" href="../type/raw_des_real_pair.html">Raw_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/raw_pair_potential.html">Raw_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/readers_wrapper.html">Readers_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/real_line.html">Real_Line</a>
+      
+      <a class="list-group-item" href="../type/rectangle_writer_wrapper.html">Rectangle_Writer_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/rectangular_des_surf_mixture.html">Rectangular_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/rectangular_dirac_distribution_plus.html">Rectangular_Dirac_Distribution_Plus</a>
+      
+      <a class="list-group-item" href="../type/retentive_box_size_memento.html">Retentive_Box_Size_Memento</a>
+      
+      <a class="list-group-item" href="../type/scalable_dipolar_interactions_facade.html">Scalable_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/short_interactions_wrapper.html">Short_Interactions_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/spherical_des_surf_mixture.html">Spherical_DES_Surf_Mixture</a>
+      
+      <a class="list-group-item" href="../type/string_wrapper.html">String_Wrapper</a>
+      
+      <a class="list-group-item" href="../type/tabulated_des_real_pair.html">Tabulated_DES_Real_Pair</a>
+      
+      <a class="list-group-item" href="../type/tabulated_pair_potential.html">Tabulated_Pair_Potential</a>
+      
+      <a class="list-group-item" href="../type/unscalable_dipolar_interactions_facade.html">Unscalable_Dipolar_Interactions_Facade</a>
+      
+      <a class="list-group-item" href="../type/walled_parallelepiped_domain.html">Walled_Parallelepiped_Domain</a>
+      
+      <a class="list-group-item" href="../type/xy_beta_pressure_excess.html">XY_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/xy_changed_box_size_ratio.html">XY_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/xy_exchanged_boxes_size.html">XY_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/xy_hard_contact.html">XY_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/xy_maximum_box_compression.html">XY_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/xy_pbc_neighbour_cells.html">XY_PBC_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/xy_periodic_box.html">XY_Periodic_Box</a>
+      
+      <a class="list-group-item" href="../type/xyz_beta_pressure_excess.html">XYZ_Beta_Pressure_Excess</a>
+      
+      <a class="list-group-item" href="../type/xyz_changed_box_size_ratio.html">XYZ_Changed_Box_Size_Ratio</a>
+      
+      <a class="list-group-item" href="../type/xyz_exchanged_boxes_size.html">XYZ_Exchanged_Boxes_Size</a>
+      
+      <a class="list-group-item" href="../type/xyz_hard_contact.html">XYZ_Hard_Contact</a>
+      
+      <a class="list-group-item" href="../type/xyz_maximum_box_compression.html">XYZ_Maximum_Box_Compression</a>
+      
+      <a class="list-group-item" href="../type/xyz_pbc_neighbour_cells.html">XYZ_PBC_Neighbour_Cells</a>
+      
+      <a class="list-group-item" href="../type/xyz_periodic_box.html">XYZ_Periodic_Box</a>
+      
+      <a class="list-group-item" href="../type/xz_density_explorer.html">XZ_Density_Explorer</a>
+      
+      <a class="list-group-item" href="../type/yukawa_expression.html">Yukawa_Expression</a>
+      
+      <a class="list-group-item" href="../type/z_density_explorer.html">Z_Density_Explorer</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> Physics of Liquids Monte-Carlo was developed by Salomon CHUNG</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>
